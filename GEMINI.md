@@ -45,23 +45,24 @@
 
 ## ✨ Key Features
 
-- Strictly Dark-Mode Only (no toggle)
-- Heavy Glassmorphism with backdrop blur and glowing effects via pure Tailwind CSS
-- Subtle animated mesh gradient background (CSS-only, no JS)
-- Smooth hover transitions using Tailwind native utilities (`transition-all duration-300`, `hover:scale-105`, `hover:shadow-[glow]`)
-- Fully responsive CSS Grid that collapses gracefully on mobile
-- 100% server-rendered — all content fetched from Firestore **on the server**, HTML delivered ready to the browser
-- Zero JavaScript delivered to public visitors (except minimal inline scripts for contact obfuscation)
-- Simple protected Admin Dashboard for easy CRUD operations
-- SEO and Open Graph tags injected server-side automatically — no extra tooling needed
-- Contact via Email, Telegram, and WhatsApp only — protected via Base64 obfuscation
-- Designed to stay comfortably within Firebase Spark Plan (free tier)
+- **Strictly Dark-Mode Only** (no toggle)
+- **Heavy Glassmorphism** with backdrop blur and glowing effects via pure Tailwind CSS
+- **Animated Mesh Gradient Background** (CSS-only, no JS)
+- **Multi-Language Name-Cycling:** Hero section typography gracefully cycles (Arabic → French → English → Tifinagh) using pure CSS animation.
+- **Smooth Hover Transitions** using Tailwind native utilities (`transition-all duration-300`, `hover:scale-105`, `hover:shadow-[glow]`)
+- **Responsive CSS Grid** that collapses gracefully on mobile
+- **100% Server-Rendered** — all content fetched from Firestore **on the server**, HTML delivered ready to the browser
+- **Zero JavaScript** delivered to public visitors (except minimal inline scripts for contact obfuscation)
+- **Admin Dashboard** (protected) for simple CRUD operations
+- **SEO and Open Graph** tags injected server-side automatically
+- **Contact Security:** Email, Telegram, and WhatsApp protected via Base64 obfuscation
+- **Strict Sequential Asset Overwrite:** Resumes undergo a strict delete-before-upload logic to protect storage limits.
 
 ---
 
 ## 🏗️ Architecture & Structure
 
-```
+```text
 Visitor Request
       │
       ▼
@@ -105,7 +106,7 @@ Admin (/admin):
 | `/admin` | Protected dashboard (React island, full CRUD) | Firebase SDK only |
 
 > [!NOTE]
-> The `/resume` page displays a preview of the currently stored PDF and a download button. The PDF itself is managed manually via the Admin Dashboard (upload new → auto-delete old).
+> The `/resume` page displays a preview of the currently stored PDF and a download button. The PDF itself is managed manually via the Admin Dashboard utilizing strict sequential asset overwrite logic.
 
 ---
 
@@ -113,7 +114,7 @@ Admin (/admin):
 
 ### Collection 1: `configuration` (single document: `static_data`)
 
-Stores all static profile information that changes infrequently.
+Stores all global site settings, static profile information, and persistent admin configurations.
 
 ```typescript
 interface StaticData {
@@ -128,30 +129,30 @@ interface StaticData {
     whatsapp: string;
   };
   imageSettings: {
-    quality: number;
-    maxWidth: number;
+    quality: number;          // Persistent client-side compression settings 
+    maxWidth: number;         // Persistent client-side compression settings 
   };
 }
 ```
 
 ### Collection 2: `entries` (dynamic, all portfolio items)
 
-A single unified collection for all portfolio content, differentiated by a `type` field.
+A single unified collection for all portfolio content, differentiated exclusively by a constrained `type` literal string.
 
 ```typescript
 interface PortfolioEntry {
-  id: string;                                         // Firestore document ID
+  id: string;                                                        
   type: 'project' | 'experience' | 'volunteering' | 'certificate';   // Drives filtering & display
   title: string;
   description: string;
   dateOrPeriod: string;
-  imageUrl?: string;          // Firebase Storage URL (optional)
-  tags?: string[];            // Technologies, tools, or categories
+  imageUrl?: string;          
+  tags?: string[];            
 }
 ```
 
 > [!IMPORTANT]
-> **No other collections should be created.** All content (projects, work history, GDG events) lives in `entries`. The `type` field is the only differentiator.
+> **No other collections should be created.** All content (projects, work history, GDG events) must live strictly in `entries`. The literal string constraint `'project' | 'experience' | 'volunteering' | 'certificate'` is the sole differentiating mechanism for layout and filtering.
 
 ---
 
@@ -190,6 +191,7 @@ This is a personal portfolio with a small, targeted audience (recruiters, collab
 ## 🗓️ Roadmap
 
 ### Phase 1: Foundation & Infrastructure
+
 - [ ] Astro project setup with SSR mode enabled for Vercel
 - [ ] Tailwind CSS configuration with Glassmorphism design tokens
 - [ ] Firebase Admin SDK integration (server-side only)
@@ -197,6 +199,7 @@ This is a personal portfolio with a small, targeted audience (recruiters, collab
 - [ ] TypeScript interfaces file (`src/types.ts`)
 
 ### Phase 2: Public Pages
+
 - [ ] Home page (`/`) — Hero + Stats + Navigation Hub
 - [ ] Projects page (`/projects`) — Responsive Grid + URL-based filtering
 - [ ] Experience page (`/experience`) — Scroll-animated timeline (CSS-only)
@@ -205,15 +208,17 @@ This is a personal portfolio with a small, targeted audience (recruiters, collab
 - [ ] Resume page (`/resume`) — PDF preview + download button
 
 ### Phase 3: Admin Dashboard
+
 - [ ] Admin layout (React island, isolated from public bundle)
 - [ ] Firebase Auth login gate for `/admin`
-- [ ] Dashboard: Edit `static_data` (profile, skills, contact info)
+- [ ] Dashboard: Edit `static_data` (profile, skills, contact info, imageSettings)
 - [ ] Dashboard: Full CRUD for `entries` collection
-- [ ] Dashboard: Resume PDF manager (preview current + replace with auto-delete)
+- [ ] Dashboard: Resume PDF manager (preview current + strict sequential replace)
 - [ ] Dashboard: Image compression settings panel (quality, maxWidth controls)
 - [ ] Firebase Security Rules configuration
 
 ### Phase 4: Polish & Launch
+
 - [ ] SEO validation (verify OG tags render correctly via server)
 - [ ] Contact link security (Base64 obfuscation applied to all contact hrefs)
 - [ ] Vercel Analytics integration
@@ -230,43 +235,33 @@ This is a personal portfolio with a small, targeted audience (recruiters, collab
 - **Background:** Deep dark (`#0a0a0f` or equivalent)
 - **Primary Accent:** Tech Cyan / Violet gradient
 - **Glassmorphism base class:**
-  ```
+
+  ```css
   bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]
   ```
-- **Hover glow example:**
-  ```
-  hover:shadow-[0_0_24px_rgba(99,102,241,0.4)] transition-all duration-300
-  ```
 
-### Typography
+### Typography & Animation Rules
 
-- Multi-language name cycling in the Hero (Arabic → French → English → Tifinagh) — implemented via CSS animation or minimal Vanilla JS, **no Framer Motion**
-- Section headings: fade-in + slight upward movement via Tailwind `@keyframes` or `animate-` utilities
-
-### Animation Rules
-
+- **Multi-language name-cycling:** Implemented via pure CSS animation (Arabic → French → English → Tifinagh) avoiding Framer Motion entirely.
+- **Section headings:** Fade-in + slight upward movement via Tailwind `@keyframes` or `animate-` utilities.
 - **Allowed:** Tailwind CSS native transitions (`transition`, `duration`, `ease`, `hover:`, `group-hover:`)
-- **Allowed:** CSS `@keyframes` defined in `global.css` for entrance animations
 - **Forbidden:** Framer Motion, GSAP, or any JS animation library on public pages
-- **Performance target:** 60fps on mid-range Android devices
 
 ### Grid Layout
 
-- Use **Responsive CSS Grid** with explicit `col-span` and `row-span` for Bento-style layouts
-- Enforce fixed aspect ratios on image containers (`aspect-video`, `aspect-square`) to prevent layout shifts from dynamic data
-- Use Flexbox (`flex flex-col justify-between`) inside cards to align content regardless of text length
-- **No Masonry layouts** — stability with dynamic data is the priority
+- Use **Responsive CSS Grid** with explicit `col-span` and `row-span` for Bento-style layouts.
+- Enforce fixed aspect ratios on image containers (`aspect-video`, `aspect-square`).
+- Use Flexbox (`flex flex-col justify-between`) inside cards.
+- **No Masonry layouts** — stability with dynamic data is the priority.
 
 ---
 
 ## 📱 Mobile Strategy
 
 - Homepage (`/`) is inherently short — stats + navigation links only, no scroll fatigue
-- Content-heavy pages (`/projects`, `/certificates`) use **URL-parameter filtering** for mobile:
-  - Example: `/projects?type=flutter` → Astro SSR filters `entries` on the server before rendering
-  - Filter buttons visible only on mobile (`block md:hidden`), full grid shown on desktop
+- Content-heavy pages (`/projects`, `/certificates`) use **URL-parameter filtering** for mobile (`/projects?type=flutter`)
+- Filter buttons visible only on mobile (`block md:hidden`), full grid shown on desktop
 - Certificate gallery uses `grid-cols-2` on mobile, `grid-cols-3 lg:grid-cols-4` on desktop
-- Card descriptions are truncated on mobile (`line-clamp-2`) and expandable on detail view
 
 ---
 
@@ -274,167 +269,77 @@ This is a personal portfolio with a small, targeted audience (recruiters, collab
 
 All image compression happens **client-side inside `/admin` only** using `compressorjs`.
 
-### Upload Flow
+### Admin Settings Panel & Persistence
 
-1. Admin selects an image file (any format, any size)
-2. `compressorjs` intercepts the file before upload:
-   - Converts to `image/webp`
-   - Resizes to `maxWidth` (configurable, default: 1200px)
-   - Compresses to target quality (configurable, default: 0.8)
-3. Compressed `Blob` is uploaded to Firebase Storage
-4. Storage URL is saved to the corresponding Firestore document
+The Admin Dashboard exposes a Compression Settings panel:
 
-### Admin Settings Panel
-
-The Admin Dashboard exposes a **Compression Settings** panel with live controls:
 - Quality slider (0.5 → 1.0, default 0.8)
 - Max Width input (px, default 1200)
-- Preview of original vs compressed size before upload
-- *Note: These settings are stored in the `static_data` document (`imageSettings: { quality, maxWidth }`) so they persist across sessions and devices.*
+
+*These settings do not reset on reload. They are saved directly into the `configuration` collection inside `static_data.imageSettings` so they persist seamlessly across devices and sessions.*
 
 ### Result
 
-- Images stored in Firebase Storage: typically 80–150 KB (WebP)
-- Served to visitors: further optimized and cached by Vercel CDN via Astro `<Image />`
+- Images stored in Firebase Storage: typically 80–150 KB (WebP).
+- Served to visitors: optimized and cached by Vercel CDN via Astro `<Image />`.
 
 ---
 
 ## 📄 Resume PDF Management (Admin Dashboard)
 
-The resume section uses a **manual overwrite strategy**:
-
-- Visitors see a PDF viewer and a "Download PDF" button linked to the current file URL stored in `static_data.resumeUrl`
-- The Admin Dashboard shows a **Resume Manager panel** with:
-  - An embedded preview of the current PDF
-  - A "Replace Resume" file uploader
+The resume section uses a **strict sequential asset overwrite logic**:
 
 ### Replace Logic (Strict Order)
 
-1. Admin selects a new PDF file
-2. On confirm, the code calls `deleteObject()` on Firebase Storage to permanently delete the old file
-3. Only after successful deletion, `uploadBytes()` uploads the new file
-4. The new Storage URL updates `static_data.resumeUrl` in Firestore
+1. Admin selects a new PDF file.
+2. On confirm, the codebase calls `deleteObject()` on Firebase Storage to permanently delete the old PDF file first.
+3. Only after a successful deletion response, `uploadBytes()` pushes the new file.
+4. The final, new Storage URL updates `static_data.resumeUrl` in Firestore.
 
 > [!NOTE]
-> The PDF is manually designed and updated by the admin. The website always serves whatever file is currently stored — there is no auto-generation. The admin accepts full responsibility for keeping the PDF in sync with site content.
+> The admin accepts full responsibility for keeping the PDF in sync with site content. There is no auto-generation — whatever is stored via overwrite strategy is what the Astro app displays.
 
 ---
 
 ## 🔒 Admin Security
 
-### Authentication
+### Authentication & Rules
 
-- Firebase Email/Password sign-in
-- Auth state checked before rendering any Admin UI
-- Unauthenticated access to `/admin` redirects to 404 or login
-
-### Firebase Security Rules
-
-**Firestore:**
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == "YOUR_EXACT_ADMIN_UID";
-    }
-  }
-}
-```
-
-**Cloud Storage:**
-```javascript
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == "YOUR_EXACT_ADMIN_UID";
-    }
-  }
-}
-```
-
-> [!IMPORTANT]
-> Replace `"YOUR_EXACT_ADMIN_UID"` with the actual UID from Firebase Authentication console before deploying to production.
+Authenticated strictly via Firebase Email/Password. Rules enforce total restriction of write abilities up to a single hardcoded UUID (`YOUR_EXACT_ADMIN_UID`).
 
 ---
 
 ## 🔐 Contact Link Security (Anti-Spam)
 
-All contact links in the public HTML are protected using **Base64 obfuscation** to prevent Spam Bots from scraping personal contact details.
-
-### Implementation
-
-Contact data is stored encoded in the HTML. A minimal inline script decodes and injects the `href` only on user interaction (click or hover):
-
-```html
-<button
-  data-contact="YWJkZXJyYWhtYW5lQGV4YW1wbGUuY29t"
-  data-prefix="mailto:"
-  onclick="this.closest('a').href = this.dataset.prefix + atob(this.dataset.contact)"
->
-  Email Me
-</button>
-```
-
-- Bots reading static HTML see only an encoded string — unusable
-- Human visitors experience zero friction — the link resolves instantly on click
+All contact links in the public HTML are protected using **Base64 obfuscation**. Static HTML exposes only `YWJkZXJyYWhtYW5lQGV4...`. A minimal inline script decodes `atob()` dynamically upon user click or hover. Bots scanning the DOM structure gain zero data, effectively mitigating spam vulnerabilities footprint.
 
 ---
 
-## 🎨 Visual Inspiration References
+## 🧭 Architectural Manifest (Engineering Audit)
 
-The following effects should be adapted in a CSS-only or minimal Vanilla JS manner. **No external animation libraries.**
+### Core Architectural Shift
 
-| Source | Effect to Adapt |
-| :----- | :-------------- |
-| n8nlab.io | Hero headline reveal animation (CSS keyframes), animated mesh gradient background |
-| sambenexpexps.lovable.app | "What I Offer" cards — glassmorphism style + hover lift + inner glow |
-| zoetang.work | Multi-language name cycling in hero (CSS animation or minimal JS interval) |
-| thelonelypixel.co.uk | Card hover: scale + glow + subtle movement (Tailwind `hover:` classes) |
-| theoceanagency.org | Fade-in + upward drift on section headings (CSS `@keyframes` + `animation-delay`) |
-| buzzworthystudio.com | Scroll-triggered image fade-in (Intersection Observer, ~10 lines Vanilla JS) |
-| kprverse.com | Footer links fade-in on scroll (same Intersection Observer approach) |
+- **Framework Pivot:** Switched from Vite + React SPA to **Astro SSR** (Vercel-hosted).
+- **0 KB Public JS Footprint:** Delivery of pure HTML/CSS on public routes.
+- **Admin Workspace Isolation:** Client libraries and interactive components are strictly sealed off within the `/admin` React island (`client:only="react"`).
 
-> [!IMPORTANT]
-> All effects must remain **performant on mobile (60fps)**. If an effect cannot be achieved with CSS or under 20 lines of Vanilla JS without a library, it should be **simplified or dropped**. Premium and purposeful always beats flashy.
+### Database & Security Infrastructure
 
----
+- **Schema Flattening:** 2-collection structure (`configuration` and `entries`).
+- **Server-Side Access Only:** Bypasses Firebase Client SDK entirely for public visitors; handles access statically via Firebase Admin SDK.
+
+### Optimization & Free-Tier Hardening
+
+- **Vercel Edge Cache Protection:** 5-minute TTL edge cache to shield Firestore Spark tier.
+- **Admin-Only Compression:** Images encoded and resized dynamically in-browser leveraging `configuration` persistent rules, minimizing upload sizing without server bloat.
 
 ## 💡 AI Assistant Instructions
 
-- **Framework:** Astro SSR — all public pages render server-side, zero client JS for visitors
-- **Styling:** Tailwind CSS only — no animation libraries, no clsx, no tailwind-merge
-- **Database:** Firebase Firestore — reads via Admin SDK on the server, never from the browser on public pages
-- **Admin:** React island (`client:only="react"`) isolated to `/admin` route only
-- **Images:** Always use Astro `<Image />` component to enable Vercel CDN caching
-- **Schema:** Two collections only — `configuration` (1 doc) and `entries` (typed items)
-- **TypeScript:** Define interfaces in `src/types.ts` only — no duplication across files
-- **Contact:** All contact hrefs must be Base64-obfuscated in the rendered HTML
-- **Compression:** Image compression via `compressorjs` inside Admin only — never loaded on public pages
-- **Resume:** PDF managed via overwrite logic in Admin — never auto-generated
+### Core Requirements
 
-### Pre-Flight Checklist (Critical)
-
-- [ ] `YOUR_EXACT_ADMIN_UID` replaced in both Security Rules files before deploy
-- [ ] Firebase Admin SDK credentials stored in Vercel environment variables (never in code)
-- [ ] `.env` file with all keys gitignored
-- [ ] Edge Cache configured on Vercel for Firestore-backed routes
-- [ ] Basic loading states and error handling on all data-fetching pages
-- [ ] 404 page implemented
-- [ ] Favicon, `manifest.json`, and Open Graph meta tags verified
-- [ ] Lighthouse performance score ≥ 90 confirmed before final deploy
-
----
-
-## 🤝 Contributors
-
-- Abderrahmane SAOUDI
-
----
-
-## 📜 License
-
-This project is licensed under the MIT License.
+- **Framework:** Astro SSR
+- **Styling:** Tailwind CSS only
+- **Database:** Firebase Admin SDK exclusively for visitors
+- **Admin:** React island (`client:only="react"`)
+- **Schema:** Strictly 2 collections — `configuration` (1 doc) and `entries` (`type` string constrained)
+- **Contact:** Base64-obfuscated in the rendered HTML
