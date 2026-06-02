@@ -1,16 +1,15 @@
 # 🚀 saoudi.online – Personal Portfolio
 
 > [!NOTE]
-> This document is the **single source of truth** and AI-assistant guide for building Abderrahmane SAOUDI's official personal portfolio website.
-> Last architectural revision: Full overhaul based on engineering audit — all decisions are final and must be strictly respected.
+> This document is **the single source of truth** and the AI-assistant guide for the visual system and architecture for Abderrahmane SAOUDI's official personal portfolio website. All visual decisions below are final and must be strictly respected for public pages.
 
 ---
 
 ## 📋 Project Overview
 
-- **Description:** Premium dark-mode, fully responsive personal portfolio with heavy Glassmorphism and a modern Google Developer Program aesthetic. The site is data-driven via a server-rendered architecture, and includes a simple protected admin dashboard for easy content management.
+- **Description:** A Material 3 (M3) Dark-Mode personal portfolio driven by strict Google Brand Color tokens, server-rendered via Astro, and animated exclusively with pure CSS and Tailwind utilities on public pages. No external animation libraries or client-side JS frameworks are permitted on public routes.
 - **Target Audience:** Tech recruiters, startup founders, GDG/community leaders, and potential collaborators.
-- **Goal:** Deliver a futuristic, high-impact first impression in under 8 seconds — clearly showcasing n8n automation focus, mobile development skills, design analysis expertise, and strong volunteering leadership.
+- **Goal:** Deliver a fast, highly animated M3-driven dark experience with strict color constraints and zero client JS footprint for public visitors while preserving an interactive, admin-only React island for content management.
 
 ---
 
@@ -18,95 +17,93 @@
 
 | Layer | Technology | Notes |
 | :---- | :--------- | :---- |
-| **Framework** | Astro (SSR mode) | Replaces Vite + React + React Router entirely |
-| **Styling** | Tailwind CSS | Native transitions only — no animation libraries |
-| **Interactivity** | Vanilla JS (inline, minimal) | Only where strictly necessary |
-| **Admin UI** | React component (island) | Loaded **only** inside `/admin` via `client:only="react"` |
-| **Database** | Firebase Firestore | Server-side reads via Admin SDK |
+| **Framework** | Astro (SSR mode) | Server-rendered HTML delivered from Vercel Edge |
+| **Styling** | Tailwind CSS + global.css | Material 3 token mapping implemented in Tailwind + CSS `@keyframes` for ambient motion |
+| **Interactivity** | Pure CSS + Tailwind utilities (public routes) | All public animations via CSS only; zero JS for visitors |
+| **Admin UI** | React component (island) | Loaded only inside `/admin` via `client:only="react"` for CRUD and image compression |
+| **Database** | Firebase Firestore (Admin SDK) | Server-side reads via Admin SDK only |
 | **Storage** | Firebase Storage | Images served via Astro `<Image />` + Vercel CDN cache |
-| **Authentication** | Firebase Auth (Email/Password) | Single admin user only |
+| **Authentication** | Firebase Auth (Email/Password) | Admin-only login for `/admin` |
 | **Analytics** | Vercel Analytics | Server-side, 0 KB impact on visitors |
 | **Deployment** | Vercel (SSR) | Custom domain `www.saoudi.online` |
-| **Icons** | Lucide (SVG inline or Astro component) | |
 
 ### ❌ Explicitly Removed (Do Not Re-add)
 
-- ~~Vite SPA~~
-- ~~React 19 (global)~~
-- ~~React Router v7~~
-- ~~Framer Motion~~
-- ~~Firebase Analytics~~
-- ~~Firebase Hosting~~
-- ~~clsx / tailwind-merge~~
-- ~~Masonry Grid libraries~~
-- ~~PDF generation libraries~~
+- Framer Motion, GSAP, or any animation libraries on public pages
+- Global React on public routes (React confined to `/admin` island)
+- Masonry layout libraries
+- Client-side Firebase SDK usage on public pages
 
 ---
 
-## ✨ Key Features
+## ✨ Key Features (M3 Visual Core)
 
-- **Strictly Dark-Mode Only** (no toggle)
-- **Heavy Glassmorphism** with backdrop blur and glowing effects via pure Tailwind CSS
-- **Animated Mesh Gradient Background** (CSS-only, no JS)
-- **Multi-Language Name-Cycling:** Hero section typography gracefully cycles (Arabic → French → English → Tifinagh) using pure CSS animation.
-- **Smooth Hover Transitions** using Tailwind native utilities (`transition-all duration-300`, `hover:scale-105`, `hover:shadow-[glow]`)
-- **Responsive CSS Grid** that collapses gracefully on mobile
-- **100% Server-Rendered** — all content fetched from Firestore **on the server**, HTML delivered ready to the browser
-- **Zero JavaScript** delivered to public visitors (except minimal inline scripts for contact obfuscation)
-- **Admin Dashboard** (protected) for simple CRUD operations
-- **SEO and Open Graph** tags injected server-side automatically
-- **Contact Security:** Email, Telegram, and WhatsApp protected via Base64 obfuscation
-- **Strict Sequential Asset Overwrite:** Resumes undergo a strict delete-before-upload logic to protect storage limits.
+- **Material 3 Dark Mode:** The entire visual language follows M3 geometry, elevation, and motion principles adapted for a dark theme.
+- **Strict Google Brand Colors Only:** The color system is explicitly limited to Google Blue, Google Red, Google Yellow, and Google Green (mapped to M3 token roles below).
+- **Heavy, Pervasive CSS Animations:** All motion is implemented with CSS `@keyframes` and Tailwind utility classes (`transition-all`, `duration-300`, custom `cubic-bezier` easings). Public pages deliver zero JS beyond minimal, audited inline decoding for Base64 contact obfuscation.
+- **Zero External Animation Libraries:** No Framer Motion, GSAP, or third-party animation libraries on public routes.
+- **Admin Island (React):** Full CRUD, authentication, and client-side image compression (`compressorjs`) remain isolated to `/admin`.
 
 ---
 
-## 🏗️ Architecture & Structure
+## **Design System & Visual Rules**
 
-```text
-Visitor Request
-      │
-      ▼
-Vercel Edge (Astro SSR)
-      │  ← Fetches data from Firestore (Admin SDK, server-side only)
-      │  ← Applies Edge Cache (5 min TTL) to protect Firestore read quota
-      ▼
-Pure HTML + CSS response → Browser renders instantly (0 KB JS for visitors)
+1. Material 3 & Strict Google Color Token Foundations
 
-Images:
-  └── Stored in Firebase Storage
-  └── Served via Astro <Image /> → Vercel CDN auto-compresses & caches → Browser
-      (Firebase Storage bandwidth is barely touched after first cache warm-up)
+       - The Palette Constraint: The entire application color spectrum is restricted to the official Google Brand Colors:
+             - Google Blue: `#4285F4`
+             - Google Red: `#DB4437`
+             - Google Yellow: `#F4B400`
+             - Google Green: `#0F9D58`
 
-Admin (/admin):
-  └── React island loaded client:only="react"
-  └── Firebase Auth gates access
-  └── Firebase Admin SDK writes back to Firestore/Storage
+       - M3 Dark Mapping (recommended tonal mapping using high-contrast desaturated shifts):
+             - Primary / Accent: Google Blue (use an M3 Dark Accent variant near tone 80–90 for contrast)
+             - Secondary / Surface Accents: Google Green (surface accents and interactive indicators)
+             - Tertiary / Highlights: Google Yellow (highlight strokes and subtle emphasis)
+             - Error / Alerts: Google Red (validation, destructive actions)
+
+       - Background & Surfaces: Use a deep, solid dark baseline such as `#141218` for the app background. Component surfaces use explicit M3 elevation containers: `Surface Container Low`, `Surface Container`, and `Surface Container High` implemented as solid tonal surfaces (no translucent glass effects).
+
+       - Geometry: Strict M3 curvature: expressive rounded geometry is required — use `rounded-3xl` for primary panels and `rounded-xl` for chips, buttons, and badges.
+
+2. Heavy Animation Infrastructure (CSS & Tailwind Only)
+
+       - Animated Background: A persistent, ambient background animation implemented in `src/styles/global.css` using CSS `@keyframes` (e.g., slow-floating geometric forms or ambient radial pulses). Shapes must be tinted only with soft Google brand tones at very low opacity.
+
+       - Hover & Interaction: Every card, button, link, and chip must use Tailwind-native transitions for expressive feedback: `transition-all duration-300 ease-in-out`, combined with M3-like elevation changes (`hover:-translate-y-1.5`, `hover:shadow-lg`) and ring indicators (`hover:ring-2 hover:ring-primary/40`). Use color overlay shifts such as `hover:bg-[rgba(66,133,244,0.06)]` to indicate primary-tinted feedback.
+
+       - Motion Easing & Entrance: Use M3-appropriate easing via Tailwind (`ease-in-out`) or explicit `cubic-bezier(0.2, 0.0, 0.2, 1)` when necessary. Staggered entrance animations for lists/grids must be implemented via accessible CSS animation-delay utilities (no JS staggering).
+
+3. Accessibility & Contrast
+
+       - Ensure WCAG AA contrast for text and UI elements on the chosen dark background. Use tonal shifts (Tones 80–90) for readable surface/label contrasts.
+
+4. Tokens & Tailwind Integration
+
+       - All color tokens must be declared in the Tailwind config as M3 roles (e.g., `--md-sys-color-primary`, `--md-sys-color-on-primary`, `--md-sys-color-surface`, etc.), and reference only the four Google brand hues with tonal adjustments. Global CSS `@keyframes` are the single source of motion definitions.
+
+---
+
+## 🏗️ Architecture & Data Flow (unchanged core guardrails)
+
+```mermaid
+graph TD
+            A[Visitor] -->|HTTPS Request| B[Vercel Edge - Astro SSR]
+            B -->|Content Fetch| C[Firebase Firestore via Admin SDK]
+            B -->|Image Processing| D[Astro Image / Vercel CDN Cache]
+            B -->|HTML Response| A
+            E[Admin User] -->|Login| F[Firebase Auth]
+            F --> G[Protected /Admin Route - React Island]
+            G -->|CRUD Ops| C
+            G -->|Uploads| H[Firebase Storage]
 ```
 
-### Data Flow Summary
+Key constraints to preserve:
 
-1. Visitor opens `saoudi.online` → Vercel receives request
-2. Astro server queries Firestore **once** (or serves from Edge Cache)
-3. Fully rendered HTML with SEO meta tags sent to browser
-4. Browser displays the page instantly — no client-side data fetching
-5. If visitor refreshes, they get updated data (no real-time listener needed)
-
----
-
-## 🗺️ Sitemap & Page Structure
-
-| Route | Purpose | JS for visitors |
-| :---- | :------ | :-------------- |
-| `/` | Hero + Stats + Navigation Hub (short, impactful) | 0 KB |
-| `/projects` | Filterable project grid with URL-based filtering | 0 KB |
-| `/experience` | Scroll timeline of professional experience | 0 KB |
-| `/volunteering` | GDG & leadership impact with stats | 0 KB |
-| `/certificates` | Two-column certificate gallery | 0 KB |
-| `/resume` | Static PDF viewer + download button | 0 KB |
-| `/admin` | Protected dashboard (React island, full CRUD) | Firebase SDK only |
-
-> [!NOTE]
-> The `/resume` page displays a preview of the currently stored PDF and a download button. The PDF itself is managed manually via the Admin Dashboard utilizing strict sequential asset overwrite logic.
+- Astro SSR Output Mode: public routes are server-rendered HTML with zero client-side Firebase SDK usage.
+- Isolated Admin Workspace: `/admin` remains the only route that loads the Firebase Client SDK and runs client-side JS (React island); all image compression using `compressorjs` is confined there.
+- Unified Two-Collection Schema: Keep the `configuration` singleton and the `entries` collection with the strict literal `type` constraint (`'project' | 'experience' | 'volunteering' | 'certificate'`).
+- Anti-Spam & Asset Logic: Base64 contact link obfuscation remains for public pages; resume file flow remains strict: call `deleteObject()` before `uploadBytes()` when replacing the resume PDF from the admin UI.
 
 ---
 
@@ -114,232 +111,110 @@ Admin (/admin):
 
 ### Collection 1: `configuration` (single document: `static_data`)
 
-Stores all global site settings, static profile information, and persistent admin configurations.
+Stores global site settings, profile info, and persistent admin configurations.
 
 ```typescript
 interface StaticData {
-  name: string;
-  title: string;
-  bio: string;
-  skills: string[];           // e.g. ["Flutter", "Firebase", "n8n", "Tailwind"]
-  resumeUrl: string;          // Firebase Storage URL of the current PDF
-  contact: {
-    email: string;            // Stored plain; obfuscated at render time
-    telegram: string;
-    whatsapp: string;
-  };
-  imageSettings: {
-    quality: number;          // Persistent client-side compression settings 
-    maxWidth: number;         // Persistent client-side compression settings 
-  };
+      name: string;
+      title: string;
+      bio: string;
+      skills: string[];
+      resumeUrl: string;
+      contact: {
+            email: string; // stored plain; obfuscated at render time
+            telegram: string;
+            whatsapp: string;
+      };
+      imageSettings: {
+            quality: number;
+            maxWidth: number;
+      };
 }
 ```
 
 ### Collection 2: `entries` (dynamic, all portfolio items)
 
-A single unified collection for all portfolio content, differentiated exclusively by a constrained `type` literal string.
+Unified collection for all portfolio content, differentiated only by a constrained `type` literal.
 
 ```typescript
 interface PortfolioEntry {
-  id: string;                                                        
-  type: 'project' | 'experience' | 'volunteering' | 'certificate';   // Drives filtering & display
-  title: string;
-  description: string;
-  dateOrPeriod: string;
-  imageUrl?: string;          
-  tags?: string[];            
+      id: string;
+      type: 'project' | 'experience' | 'volunteering' | 'certificate';
+      title: string;
+      description: string;
+      dateOrPeriod: string;
+      imageUrl?: string;
+      tags?: string[];
 }
 ```
 
-> [!IMPORTANT]
-> **No other collections should be created.** All content (projects, work history, GDG events) must live strictly in `entries`. The literal string constraint `'project' | 'experience' | 'volunteering' | 'certificate'` is the sole differentiating mechanism for layout and filtering.
+**No other collections should be created.** The `type` literal is the only layout differentiator.
 
 ---
 
-## 🔥 Firebase Free Tier Strategy (Spark Plan)
+## 🔥 Free-Tier & Optimization Rules (Spark Plan)
 
-### Why the Risk Is Manageable
-
-This is a personal portfolio with a small, targeted audience (recruiters, collaborators). Daily traffic in year one is expected to be low. The Astro SSR architecture with Edge Caching protects against both organic traffic spikes and random bot crawlers.
-
-### How the Architecture Protects Firestore Reads
-
-- Data is fetched **on the server**, not in the visitor's browser
-- Edge Cache (5-minute TTL on Vercel) means thousands of visitors trigger **only one** Firestore read every 5 minutes
-- No real-time listeners anywhere on public pages
-- Firestore writes happen only via the Admin Dashboard (your actions only)
-
-### How the Architecture Protects Storage Bandwidth
-
-- All images pass through Astro's `<Image />` component
-- Vercel CDN caches compressed WebP versions of all images automatically
-- Firebase Storage is only hit on the **first request** per image; all subsequent requests are served from Vercel's CDN
-- Images are compressed before upload in the Admin Dashboard (see Asset Pipeline section)
-
-### Firebase Spark Plan Limits Reference
-
-| Resource | Limit | Risk Level |
-| :------- | :---- | :--------- |
-| Firestore Reads | 50,000 / day | 🟢 Low (Edge Cache absorbs traffic) |
-| Firestore Writes | 20,000 / day | 🟢 Very Low (admin-only writes) |
-| Firestore Storage | 1 GB | 🟢 Low (text data only) |
-| Cloud Storage Space | 5 GB | 🟢 Low (compressed WebP images) |
-| Cloud Storage Bandwidth | 1 GB / day | 🟢 Low (Vercel CDN absorbs traffic) |
+- Server-side reads via Admin SDK with Vercel Edge Cache (5-minute TTL) to protect Firestore read quotas.
+- No persistent real-time listeners on public pipelines.
+- Images uploaded via the admin island are compressed client-side (`compressorjs`) and served via Astro `<Image />` with Vercel CDN caching.
 
 ---
 
-## 🗓️ Roadmap
+## 🗓️ Roadmap (Synchronized 4-Phase Timeline)
 
 ### Phase 1: Foundation & Infrastructure
 
-- [ ] Astro project setup with SSR mode enabled for Vercel
-- [ ] Tailwind CSS configuration with Glassmorphism design tokens
-- [ ] Firebase Admin SDK integration (server-side only)
-- [ ] Base layout, Navbar, and responsive navigation
-- [ ] TypeScript interfaces file (`src/types.ts`)
+- Astro project setup with SSR mode enabled for Vercel
+- Tailwind CSS configuration with Material 3 token mapping (Google brand colors only)
+- Firebase Admin SDK integration (server-side only)
+- Base layout, Navbar, and responsive navigation
+- TypeScript interfaces file (`src/types.ts`)
 
 ### Phase 2: Public Pages
 
-- [ ] Home page (`/`) — Hero + Stats + Navigation Hub
-- [ ] Projects page (`/projects`) — Responsive Grid + URL-based filtering
-- [ ] Experience page (`/experience`) — Scroll-animated timeline (CSS-only)
-- [ ] Volunteering page (`/volunteering`) — GDG stats and highlights
-- [ ] Certificates page (`/certificates`) — Two-column responsive gallery
-- [ ] Resume page (`/resume`) — PDF preview + download button
+- Home page (`/`) — Hero + Stats + Navigation Hub (M3 animated)
+- Projects page (`/projects`) — Responsive Grid + URL-based filtering
+- Experience page (`/experience`) — Scroll timeline with CSS-only entrance animations
+- Volunteering page (`/volunteering`) — GDG & leadership impact with animated metrics
+- Certificates page (`/certificates`) — Two-column responsive gallery
+- Resume page (`/resume`) — PDF preview + download button
 
 ### Phase 3: Admin Dashboard
 
-- [ ] Admin layout (React island, isolated from public bundle)
-- [ ] Firebase Auth login gate for `/admin`
-- [ ] Dashboard: Edit `static_data` (profile, skills, contact info, imageSettings)
-- [ ] Dashboard: Full CRUD for `entries` collection
-- [ ] Dashboard: Resume PDF manager (preview current + strict sequential replace)
-- [ ] Dashboard: Image compression settings panel (quality, maxWidth controls)
-- [ ] Firebase Security Rules configuration
+- Admin layout (React island, isolated from public bundle)
+- Firebase Auth login gate for `/admin`
+- Dashboard: Edit `static_data` (profile, skills, contact info, imageSettings)
+- Dashboard: Full CRUD for `entries` collection
+- Dashboard: Resume PDF manager (preview current + strict sequential replace)
+- Dashboard: Image compression settings panel (quality, maxWidth controls)
+- Firebase Security Rules configuration
 
 ### Phase 4: Polish & Launch
 
-- [ ] SEO validation (verify OG tags render correctly via server)
-- [ ] Contact link security (Base64 obfuscation applied to all contact hrefs)
-- [ ] Vercel Analytics integration
-- [ ] Performance testing (Lighthouse target: ≥ 90)
-- [ ] Cross-device testing and final CSS polish
-- [ ] Production deployment on custom domain
-
----
-
-## 📐 Design System & Visual Rules
-
-### Color & Aesthetic
-
-- **Background:** Deep dark (`#0a0a0f` or equivalent)
-- **Primary Accent:** Tech Cyan / Violet gradient
-- **Glassmorphism base class:**
-
-  ```css
-  bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]
-  ```
-
-### Typography & Animation Rules
-
-- **Multi-language name-cycling:** Implemented via pure CSS animation (Arabic → French → English → Tifinagh) avoiding Framer Motion entirely.
-- **Section headings:** Fade-in + slight upward movement via Tailwind `@keyframes` or `animate-` utilities.
-- **Allowed:** Tailwind CSS native transitions (`transition`, `duration`, `ease`, `hover:`, `group-hover:`)
-- **Forbidden:** Framer Motion, GSAP, or any JS animation library on public pages
-
-### Grid Layout
-
-- Use **Responsive CSS Grid** with explicit `col-span` and `row-span` for Bento-style layouts.
-- Enforce fixed aspect ratios on image containers (`aspect-video`, `aspect-square`).
-- Use Flexbox (`flex flex-col justify-between`) inside cards.
-- **No Masonry layouts** — stability with dynamic data is the priority.
-
----
-
-## 📱 Mobile Strategy
-
-- Homepage (`/`) is inherently short — stats + navigation links only, no scroll fatigue
-- Content-heavy pages (`/projects`, `/certificates`) use **URL-parameter filtering** for mobile (`/projects?type=flutter`)
-- Filter buttons visible only on mobile (`block md:hidden`), full grid shown on desktop
-- Certificate gallery uses `grid-cols-2` on mobile, `grid-cols-3 lg:grid-cols-4` on desktop
-
----
-
-## 🖼️ Image Asset Pipeline (Admin Dashboard)
-
-All image compression happens **client-side inside `/admin` only** using `compressorjs`.
-
-### Admin Settings Panel & Persistence
-
-The Admin Dashboard exposes a Compression Settings panel:
-
-- Quality slider (0.5 → 1.0, default 0.8)
-- Max Width input (px, default 1200)
-
-*These settings do not reset on reload. They are saved directly into the `configuration` collection inside `static_data.imageSettings` so they persist seamlessly across devices and sessions.*
-
-### Result
-
-- Images stored in Firebase Storage: typically 80–150 KB (WebP).
-- Served to visitors: optimized and cached by Vercel CDN via Astro `<Image />`.
-
----
-
-## 📄 Resume PDF Management (Admin Dashboard)
-
-The resume section uses a **strict sequential asset overwrite logic**:
-
-### Replace Logic (Strict Order)
-
-1. Admin selects a new PDF file.
-2. On confirm, the codebase calls `deleteObject()` on Firebase Storage to permanently delete the old PDF file first.
-3. Only after a successful deletion response, `uploadBytes()` pushes the new file.
-4. The final, new Storage URL updates `static_data.resumeUrl` in Firestore.
-
-> [!NOTE]
-> The admin accepts full responsibility for keeping the PDF in sync with site content. There is no auto-generation — whatever is stored via overwrite strategy is what the Astro app displays.
+- SEO validation (verify OG tags render correctly via server)
+- Contact link security (Base64 obfuscation applied to all contact hrefs)
+- Vercel Analytics integration
+- Performance testing (Lighthouse target: ≥ 90)
+- Cross-device testing and final CSS polish
+- Production deployment on custom domain
 
 ---
 
 ## 🔒 Admin Security
 
-### Authentication & Rules
-
-Authenticated strictly via Firebase Email/Password. Rules enforce total restriction of write abilities up to a single hardcoded UUID (`YOUR_EXACT_ADMIN_UID`).
+- Authentication: Firebase Email/Password for the admin user.
+- Firestore and Storage rules should restrict writes to the designated admin UID.
 
 ---
 
 ## 🔐 Contact Link Security (Anti-Spam)
 
-All contact links in the public HTML are protected using **Base64 obfuscation**. Static HTML exposes only `YWJkZXJyYWhtYW5lQGV4...`. A minimal inline script decodes `atob()` dynamically upon user click or hover. Bots scanning the DOM structure gain zero data, effectively mitigating spam vulnerabilities footprint.
+- All public contact hrefs must be Base64-encoded in the HTML and decoded only via a minimal inline `atob()` action on explicit user activation. This inline script is the only permitted inline JS on public pages.
 
 ---
 
-## 🧭 Architectural Manifest (Engineering Audit)
+## 💡 Notes for Implementers
 
-### Core Architectural Shift
-
-- **Framework Pivot:** Switched from Vite + React SPA to **Astro SSR** (Vercel-hosted).
-- **0 KB Public JS Footprint:** Delivery of pure HTML/CSS on public routes.
-- **Admin Workspace Isolation:** Client libraries and interactive components are strictly sealed off within the `/admin` React island (`client:only="react"`).
-
-### Database & Security Infrastructure
-
-- **Schema Flattening:** 2-collection structure (`configuration` and `entries`).
-- **Server-Side Access Only:** Bypasses Firebase Client SDK entirely for public visitors; handles access statically via Firebase Admin SDK.
-
-### Optimization & Free-Tier Hardening
-
-- **Vercel Edge Cache Protection:** 5-minute TTL edge cache to shield Firestore Spark tier.
-- **Admin-Only Compression:** Images encoded and resized dynamically in-browser leveraging `configuration` persistent rules, minimizing upload sizing without server bloat.
-
-## 💡 AI Assistant Instructions
-
-### Core Requirements
-
-- **Framework:** Astro SSR
-- **Styling:** Tailwind CSS only
-- **Database:** Firebase Admin SDK exclusively for visitors
-- **Admin:** React island (`client:only="react"`)
-- **Schema:** Strictly 2 collections — `configuration` (1 doc) and `entries` (`type` string constrained)
-- **Contact:** Base64-obfuscated in the rendered HTML
+- Global motion definitions live in `src/styles/global.css` as the canonical CSS `@keyframes` for ambient background shapes and entrance/stagger animations.
+- Tailwind utility classes should be the primary interface for motion and state transitions on public UI components.
+- Keep the admin island as the single allowed source of client-side JavaScript for content management tasks, compression, and authenticated uploads.
