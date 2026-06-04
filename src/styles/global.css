@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --color-google-blue: #4285F4;
+  --color-google-red: #DB4437;
+  --color-google-yellow: #F4B400;
+  --color-google-green: #0F9D58;
+
+  /* Material 3 Token Mapping */
+  --color-primary: var(--color-google-blue);
+  --color-secondary: var(--color-google-green);
+  --color-tertiary: var(--color-google-yellow);
+  --color-error: var(--color-google-red);
+
+  /* Dark Mode specific surface colors (as placeholders for M3 dark mode geometry/elevation) */
+  --color-surface: #121212;
+  --color-surface-container: #1E1E1E;
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-white antialiased;
+  }
+}
