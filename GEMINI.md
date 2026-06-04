@@ -164,39 +164,39 @@ interface PortfolioEntry {
 
 ### Phase 1: Foundation & Infrastructure
 
-- Astro project setup with SSR mode enabled for Vercel
-- Tailwind CSS configuration with Material 3 token mapping (Google brand colors only)
-- Firebase Admin SDK integration (server-side only)
-- Base layout, Navbar, and responsive navigation
-- TypeScript interfaces file (`src/types.ts`)
+[ ] Astro project setup with SSR mode enabled for Vercel
+[ ] Tailwind CSS configuration with Material 3 token mapping (Google brand colors only)
+[ ] Firebase Admin SDK integration (server-side only)
+[ ] Base layout, Navbar, and responsive navigation
+[ ] TypeScript interfaces file (`src/types.ts`)
 
 ### Phase 2: Public Pages
 
-- Home page (`/`) — Hero + Stats + Navigation Hub (M3 animated)
-- Projects page (`/projects`) — Responsive Grid + URL-based filtering
-- Experience page (`/experience`) — Scroll timeline with CSS-only entrance animations
-- Volunteering page (`/volunteering`) — GDG & leadership impact with animated metrics
-- Certificates page (`/certificates`) — Two-column responsive gallery
-- Resume page (`/resume`) — PDF preview + download button
+[ ] Home page (`/`) — Hero + Stats + Navigation Hub (M3 animated)
+[ ] Projects page (`/projects`) — Responsive Grid + URL-based filtering
+[ ] Experience page (`/experience`) — Scroll timeline with CSS-only entrance animations
+[ ] Volunteering page (`/volunteering`) — GDG & leadership impact with animated metrics
+[ ] Certificates page (`/certificates`) — Two-column responsive gallery
+[ ] Resume page (`/resume`) — PDF preview + download button
 
 ### Phase 3: Admin Dashboard
 
-- Admin layout (React island, isolated from public bundle)
-- Firebase Auth login gate for `/admin`
-- Dashboard: Edit `static_data` (profile, skills, contact info, imageSettings)
-- Dashboard: Full CRUD for `entries` collection
-- Dashboard: Resume PDF manager (preview current + strict sequential replace)
-- Dashboard: Image compression settings panel (quality, maxWidth controls)
-- Firebase Security Rules configuration
+[ ] Admin layout (React island, isolated from public bundle)
+[ ] Firebase Auth login gate for `/admin`
+[ ] Dashboard: Edit `static_data` (profile, skills, contact info, imageSettings)
+[ ] Dashboard: Full CRUD for `entries` collection
+[ ] Dashboard: Resume PDF manager (preview current + strict sequential replace)
+[ ] Dashboard: Image compression settings panel (quality, maxWidth controls)
+[ ] Firebase Security Rules configuration
 
 ### Phase 4: Polish & Launch
 
-- SEO validation (verify OG tags render correctly via server)
-- Contact link security (Base64 obfuscation applied to all contact hrefs)
-- Vercel Analytics integration
-- Performance testing (Lighthouse target: ≥ 90)
-- Cross-device testing and final CSS polish
-- Production deployment on custom domain
+[ ] SEO validation (verify OG tags render correctly via server)
+[ ] Contact link security (Base64 obfuscation applied to all contact hrefs)
+[ ] Vercel Analytics integration
+[ ] Performance testing (Lighthouse target: ≥ 90)
+[ ] Cross-device testing and final CSS polish
+[ ] Production deployment on custom domain
 
 ---
 
