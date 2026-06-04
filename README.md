@@ -75,9 +75,15 @@ graph TD
 
 ## 🔥 Firebase Free Tier Optimization Strategy (Spark Plan)
 
-- Server-side reads via Admin SDK and Vercel Edge Cache (5-minute TTL) to minimize Firestore reads.
-- Writes are admin-initiated via the protected dashboard.
-- Images compressed in `/admin` before upload; Astro `<Image />` + Vercel CDN handle distribution.
+
+## 🔐 Firebase Admin SDK Setup
+
+Use server-only environment variables for the Admin SDK:
+
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_CLIENT_EMAIL`
+- `FIREBASE_PRIVATE_KEY`
+- `FIREBASE_STORAGE_BUCKET` (optional, for Storage access)
 
 ---
 
@@ -93,7 +99,7 @@ See `GEMINI.md` for the canonical, synchronized data schema and exact interface 
 
 [x] Astro project setup with SSR mode enabled for Vercel
 [x] Tailwind CSS configuration with Material 3 token mapping (Google brand colors only)
-[ ] Firebase Admin SDK integration (server-side only)
+[x] Firebase Admin SDK integration (server-side only)
 [ ] Base layout, Navbar, and responsive navigation
 [ ] TypeScript interfaces file (`src/types.ts`)
 

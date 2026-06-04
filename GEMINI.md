@@ -158,6 +158,16 @@ interface PortfolioEntry {
 - No persistent real-time listeners on public pipelines.
 - Images uploaded via the admin island are compressed client-side (`compressorjs`) and served via Astro `<Image />` with Vercel CDN caching.
 
+### 🔐 Firebase Admin SDK Setup
+
+Use server-only environment variables for the Admin SDK:
+
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_CLIENT_EMAIL`
+- `FIREBASE_PRIVATE_KEY`
+- `FIREBASE_STORAGE_BUCKET` (optional, for Storage access)
+
+
 ---
 
 ## 🗓️ Roadmap (Synchronized 4-Phase Timeline)
