@@ -17,6 +17,7 @@
     "astro": "^6.4.3",
     "firebase-admin": "^13.10.0",
     "lucide-astro": "^0.556.0",
-    "tailwindcss": "^4.3.0"
+    "tailwindcss": "^4.3.0",
+    "zod": "^4.4.3"
   }
 }
