@@ -1,0 +1,71 @@
+@layer base {
+  html {
+    min-height: 100%;
+  }
+
+  body {
+    @apply bg-surface text-white antialiased relative;
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  body::before,
+  body::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  body::before {
+    background-image:
+      radial-gradient(circle, rgba(66, 133, 244, 0.75) 1px, transparent 1px),
+      radial-gradient(circle, rgba(15, 157, 88, 0.65) 1px, transparent 1px),
+      radial-gradient(circle, rgba(249, 171, 0, 0.55) 1px, transparent 1px),
+      radial-gradient(circle, rgba(219, 68, 55, 0.55) 1px, transparent 1px);
+    background-size: 70px 70px, 95px 95px, 70px 70px, 120px 120px;
+    background-position: 0 0, 30% 15%, 25% 68%, 82% 88%;
+    background-repeat: repeat, repeat, repeat, repeat;
+    animation: bgPoints 48s linear infinite;
+    opacity: 0.18;
+    mix-blend-mode: screen;
+  }
+
+  body::after {
+    background-image:
+      radial-gradient(circle, rgba(219, 68, 55, 0.22) 1px, transparent 1px),
+      radial-gradient(circle, rgba(66, 133, 244, 0.18) 1px, transparent 1px),
+      radial-gradient(circle, rgba(255, 255, 255, 0.25) 0.75px, transparent 0.75px),
+      radial-gradient(circle, rgba(255, 255, 255, 0.18) 0.65px, transparent 0.65px);
+    background-repeat: repeat, repeat, repeat, repeat;
+    background-size: 120px 120px, 100px 100px, 24px 24px, 24px 24px;
+    background-position: 8% 90%, 85% 60%, 0 0, 14px 14px;
+    animation: bgStars 18s linear infinite;
+    opacity: 0.9;
+  }
+
+  @keyframes bgPoints {
+    0% {
+      background-position: 0 0, 35% 15%, 20% 70%, 80% 85%;
+    }
+    50% {
+      background-position: -60px 50px, 45% 25%, 25% 80%, 70% 90%;
+    }
+    100% {
+      background-position: 0 0, 35% 15%, 20% 70%, 80% 85%;
+    }
+  }
+
+  @keyframes bgStars {
+    0% {
+      background-position: 0 0, 0 0, 0 0, 14px 14px;
+    }
+    50% {
+      background-position: -60px 60px, 60px -60px, 90px 90px, 14px 14px;
+    }
+    100% {
+      background-position: 0 0, 0 0, 0 0, 14px 14px;
+    }
+  }
+}

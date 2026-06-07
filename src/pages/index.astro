@@ -1,11 +1,122 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { ArrowRight, Code, Briefcase, Heart, Award, FileText } from 'lucide-astro';
+
+const navCards = [
+	{ href: '/projects', icon: Code, title: 'Projects', description: 'Explore my personal and professional projects' },
+	{ href: '/designs', icon: Code, title: 'Designs', description: 'View my visual and UI design explorations' },
+	{ href: '/experience', icon: Briefcase, title: 'Experience', description: 'View my work history and career journey' },
+	{ href: '/volunteering', icon: Heart, title: 'Volunteering', description: 'See my community contributions and GDG leadership' },
+	{ href: '/certificates', icon: Award, title: 'Certificates', description: 'Browse my professional certifications' },
+	{ href: '/resume', icon: FileText, title: 'Resume', description: 'Download my full resume in PDF format' },
+];
+
+const stats = [
+	{ value: '5+', label: 'Years Experience' },
+	{ value: '20+', label: 'Projects Completed' },
+	{ value: '10+', label: 'Certifications' },
+	{ value: '500+', label: 'Community Impact' },
+];
 ---
 
 <BaseLayout title="Home">
-	<div class="mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-7xl">
-		<h1 class="mb-4 font-bold text-primary text-4xl">Welcome to saoudi.online</h1>
-		<p class="text-white/70 text-lg">Base layout, navbar, and responsive navigation are now active.</p>
-		<div class="h-2000">Just a div</div>
+	<div class="mx-auto px-4 sm:px-6 lg:px-8 py-16 max-w-7xl">
+		<!-- Hero Section -->
+		<section class="mb-20 text-center animate-fade-in h-[80dvh] flex flex-col justify-center">
+			<h1 class="mb-6 font-bold text-white text-5xl md:text-6xl">
+				Hi, I'm <span class="text-primary">Abderrahmane SAOUDI</span>
+			</h1>
+			<p class="mx-auto mb-8 max-w-2xl text-white/70 text-lg md:text-xl">
+				A passionate developer building modern web experiences with Material 3 design principles and clean code.
+			</p>
+			<div class="flex sm:flex-row flex-col justify-center gap-4">
+				<a
+					href="/projects"
+					class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25 px-6 py-3 rounded-full font-medium text-white transition-all hover:-translate-y-0.5 duration-300"
+				>
+					View Projects
+					<ArrowRight class="w-4 h-4" />
+				</a>
+				<a
+					href="/resume"
+					class="inline-flex items-center gap-2 bg-surface-container hover:bg-surface-container-high px-6 py-3 border border-white/10 hover:border-white/20 rounded-full font-medium text-white transition-all hover:-translate-y-0.5 duration-300"
+				>
+					Download Resume
+				</a>
+			</div>
+		</section>
+
+		<!-- Stats Section -->
+		<section class="mb-20">
+			<div class="gap-4 grid grid-cols-2 md:grid-cols-4">
+				{stats.map((stat, index) => (
+					<div
+						class={`bg-surface-container border border-white/10 rounded-3xl p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10 animate-slide-up`}
+						style={`animation-delay: ${index * 100}ms`}
+					>
+						<div class="mb-2 font-bold text-primary text-3xl md:text-4xl">{stat.value}</div>
+						<div class="text-white/60 text-sm">{stat.label}</div>
+					</div>
+				))}
+			</div>
+		</section>
+
+		<!-- Navigation Hub -->
+		<section>
+			<h2 class="mb-8 font-bold text-white text-3xl text-center">Explore My Work</h2>
+			<div class="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+				{navCards.map((card, index) => (
+					<a
+						href={card.href}
+						class={`group relative overflow-hidden bg-surface-container border border-white/10 rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10 hover:border-primary/30 animate-slide-up`}
+						style={`animation-delay: ${(index + 4) * 100}ms`}
+					>
+						<div class="top-0 right-0 absolute bg-primary/5 group-hover:bg-primary/10 blur-3xl rounded-full w-32 h-32 transition-all duration-500"></div>
+						<div class="relative">
+							<div class="inline-flex justify-center items-center bg-primary/10 group-hover:bg-primary/20 mb-4 rounded-2xl w-12 h-12 transition-all duration-300">
+								<card.icon class="w-6 h-6 text-primary" />
+							</div>
+							<h3 class="mb-2 font-bold text-white group-hover:text-primary text-xl transition-colors duration-300">
+								{card.title}
+							</h3>
+							<p class="text-white/60 text-sm">{card.description}</p>
+						</div>
+					</a>
+				))}
+			</div>
+		</section>
 	</div>
 </BaseLayout>
+
+<style>
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@keyframes slide-up {
+		from {
+			opacity: 0;
+			transform: translateY(30px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.animate-fade-in {
+		animation: fade-in 0.8s ease-out forwards;
+	}
+
+	.animate-slide-up {
+		opacity: 0;
+		animation: slide-up 0.6s ease-out forwards;
+	}
+</style>

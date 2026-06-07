@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const designs = [
+  { title: 'Portfolio Redesign', desc: 'A modern, accessible redesign focused on motion and clarity.' },
+  { title: 'Mobile App Concept', desc: 'Exploration of responsive gestures and visual language.' },
+  { title: 'Component Library', desc: 'A small system of reusable UI components and tokens.' },
+];
+---
+
+<BaseLayout title="Designs">
+  <div class="mx-auto px-4 sm:px-6 lg:px-8 py-16 max-w-7xl">
+    <section class="mb-12 text-center">
+      <h1 class="mb-4 font-bold text-white text-4xl">Designs</h1>
+      <p class="mx-auto mb-8 max-w-2xl text-white/70">A curated selection of UI and visual design explorations.</p>
+    </section>
+
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {designs.map((d) => (
+        <div class="bg-surface-container border border-white/10 rounded-3xl p-6 transition-all hover:-translate-y-1 hover:shadow-lg">
+          <div class="h-40 mb-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl flex items-center justify-center text-white/60">Mockup</div>
+          <h3 class="font-bold text-white">{d.title}</h3>
+          <p class="text-white/60 text-sm mt-2">{d.desc}</p>
+        </div>
+      ))}
+    </section>
+  </div>
+</BaseLayout>
