@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * Firebase Data Schema
  * Canonical type definitions for the two-collection model
- * See GEMINI.md for the single-authoritative schema
+ * See README.md for the single-authoritative schema
  */
 
 /**
