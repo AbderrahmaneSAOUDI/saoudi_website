@@ -1,0 +1,106 @@
+---
+import '../styles/global.css';
+import { Home, Award, FolderOpen, Heart, FileText, Download, Github, Linkedin, Twitter, Mail } from 'lucide-astro';
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+
+const navLinks = [
+	{ href: '/', label: 'Home', icon: Home },
+	{ href: '/certificates', label: 'Certificates', icon: Award },
+	{ href: '/projects', label: 'Projects', icon: FolderOpen },
+	{ href: '/volunteering', label: 'Volunteering', icon: Heart },
+	{ href: '/resume', label: 'Resume', icon: FileText },
+];
+
+const socialLinks = [
+	{ icon: Github, href: 'https://github.com/AbderrahmaneSAOUDI', label: 'GitHub' },
+	{ icon: Linkedin, href: 'https://linkedin.com/in/abderrahmane-saoudi', label: 'LinkedIn' },
+	{ icon: Twitter, href: 'https://twitter.com/AbderrahmaneSAOUDI', label: 'Twitter' },
+	{ icon: Mail, href: 'mailto:contact@saoudi.online', label: 'Email' },
+];
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title} - saoudi.online</title>
+	</head>
+	<body class="flex flex-col min-h-screen">
+		<!-- Header -->
+		<header class="top-0 z-50 sticky">
+			<div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+				<div class="flex justify-between items-center h-16">
+					<!-- Part 1: Logo Capsule (Desktop Only) -->
+					<a href="/" class="hidden md:flex items-center hover:bg-surface-container-high backdrop-blur-lg px-6 py-2 border border-white/10 rounded-full transition-all hover:-translate-y-0.5 duration-300">
+						<span class="font-bold text-primary text-lg">saoudi.online</span>
+					</a>
+
+					<!-- Part 2: Navigation Pill -->
+					<nav class="flex items-center">
+						<div class="flex items-center backdrop-blur-lg px-4 py-2 border border-white/10 rounded-full">
+							{navLinks.map((link) => (
+								<a
+									href={link.href}
+									class="flex items-center gap-2 hover:bg-white/10 px-3 py-1.5 rounded-full font-medium text-white/70 hover:text-white text-sm transition-all hover:-translate-y-0.5 duration-300"
+								>
+									<span class="md:hidden">
+										<link.icon class="w-4 h-4" />
+									</span>
+									<span class="hidden md:inline">{link.label}</span>
+								</a>
+							))}
+						</div>
+					</nav>
+
+					<!-- Part 3: Download Button -->
+					<a
+						href="/resume"
+						class="flex items-center gap-2 bg-primary hover:bg-primary/90 backdrop-blur-lg px-5 py-2 border border-transparent hover:border-white/20 rounded-full font-medium text-white text-sm transition-all hover:-translate-y-0.5 duration-300"
+					>
+						<Download class="w-4 h-4" />
+						<span class="hidden md:inline">Download</span>
+					</a>
+				</div>
+			</div>
+		</header>
+
+		<!-- Main Content -->
+		<main class="flex-1">
+			<slot />
+		</main>
+
+		<!-- Footer -->
+		<footer class="bg-surface-container mx-4 my-4 py-8 border-white/10 border-t rounded-3xl">
+			<div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+				<div class="flex flex-col justify-center items-center gap-6">
+					<!-- Social Icons Row -->
+					<div class="flex items-center gap-4">
+						{socialLinks.map((social) => (
+							<a
+								href={social.href}
+								aria-label={social.label}
+								class="flex justify-center items-center bg-surface hover:bg-surface-high border border-white/10 hover:border-white/20 rounded-full w-10 h-10 text-white/70 hover:text-white transition-all hover:-translate-y-0.5 duration-300"
+							>
+								<social.icon class="w-5 h-5" />
+							</a>
+						))}
+					</div>
+
+					<!-- Copyright Text -->
+					<p class="text-white/50 text-sm text-center">
+						2026 - all rights reserved to Abderrahmane SAOUDI
+					</p>
+				</div>
+			</div>
+		</footer>
+	</body>
+</html>

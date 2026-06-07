@@ -1,18 +1,11 @@
 ---
-import '../styles/global.css';
-const test_name = "Hello world!";
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>{test_name}</h1>
-	</body>
-</html>
+<BaseLayout title="Home">
+	<div class="mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-7xl">
+		<h1 class="mb-4 font-bold text-primary text-4xl">Welcome to saoudi.online</h1>
+		<p class="text-white/70 text-lg">Base layout, navbar, and responsive navigation are now active.</p>
+		<div class="h-2000">Just a div</div>
+	</div>
+</BaseLayout>
