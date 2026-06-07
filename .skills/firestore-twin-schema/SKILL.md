@@ -126,6 +126,6 @@ const certs: PortfolioEntry[] = snapshot.docs.map(d => ({
 - **BANNED:** Enum types for the `type` field — must use the literal union only.
 - **BANNED:** Pluralized, aliased, or abbreviated collection paths.
 - **BANNED:** Storing more than one document in the `configuration` collection.
-- **BANNED:** Adding fields without updating `src/types.ts`, `README.md`, and `GEMINI.md` simultaneously.
+- **BANNED:** Adding fields without updating `src/types.ts` and `README.md` simultaneously.
 - **REQUIRED:** All Firestore reads on public routes must use the Firebase Admin SDK.
 - **REQUIRED:** Immediate TypeScript type assertion on all Firestore data retrieval.
