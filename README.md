@@ -100,7 +100,7 @@ See `GEMINI.md` for the canonical, synchronized data schema and exact interface 
 [x] Astro project setup with SSR mode enabled for Vercel
 [x] Tailwind CSS configuration with Material 3 token mapping (Google brand colors only)
 [x] Firebase Admin SDK integration (server-side only)
-[ ] Base layout, Navbar, and responsive navigation
+[x] Base layout, Navbar, and responsive navigation
 [ ] TypeScript interfaces file (`src/types.ts`)
 
 ### Phase 2: Public Pages

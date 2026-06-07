@@ -20,6 +20,9 @@ importers:
       firebase-admin:
         specifier: ^13.10.0
         version: 13.10.0
+      lucide-astro:
+        specifier: ^0.556.0
+        version: 0.556.0(astro@6.4.3(@types/node@25.9.1)(@vercel/functions@3.6.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0))
       tailwindcss:
         specifier: ^4.3.0
         version: 4.3.0
@@ -1628,6 +1631,12 @@ packages:
 
   lru-memoizer@2.3.0:
     resolution: {integrity: sha512-GXn7gyHAMhO13WSKrIiNfztwxodVsP8IoZ3XfrJV4yH2x0/OeTO/FIaAHTY5YekdGgW94njfuKmyyt1E0mR6Ug==}
+
+  lucide-astro@0.556.0:
+    resolution: {integrity: sha512-ugMjPb45AMfkLCaduNSbyy5NQEKvB1TxVVMmUS4S6L807PMESnX0Qp+DIKHjbyjJmPXOyLRbrzvR3YikTK7brg==}
+    deprecated: 'Deprecated: Use `@lucide/astro`'
+    peerDependencies:
+      astro: '>=2.7.1'
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -4103,6 +4112,10 @@ snapshots:
     dependencies:
       lodash.clonedeep: 4.5.0
       lru-cache: 6.0.0
+
+  lucide-astro@0.556.0(astro@6.4.3(@types/node@25.9.1)(@vercel/functions@3.6.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)):
+    dependencies:
+      astro: 6.4.3(@types/node@25.9.1)(@vercel/functions@3.6.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)
 
   magic-string@0.30.21:
     dependencies:
