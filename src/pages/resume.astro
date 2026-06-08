@@ -1,10 +1,34 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { resumeUrl } from '../lib/resume.ts';
 ---
 
 <BaseLayout title="Resume">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-		<h1 class="text-4xl font-bold text-primary mb-4">Resume</h1>
-		<p class="text-white/70 text-lg">My professional resume and work experience.</p>
+
+		<div class="mt-8 space-y-6">
+			<div class="border border-white/10 rounded-3xl overflow-hidden bg-surface-container min-h-[720px]">
+				<iframe
+					src={resumeUrl}
+					class="w-full min-h-[720px]"
+					title="Resume PDF"
+				/>
+			</div>
+
+			<div class="flex justify-center">
+				<a
+					href={resumeUrl}
+					download
+					class="inline-flex items-center justify-center gap-2 rounded-full bg-primary/80 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary/90"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+						<polyline points="7 10 12 15 17 10" />
+						<line x1="12" y1="15" x2="12" y2="3" />
+					</svg>
+					Download PDF
+				</a>
+			</div>
+		</div>
 	</div>
 </BaseLayout>
