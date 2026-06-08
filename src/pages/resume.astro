@@ -1,34 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { resumeUrl } from '../lib/resume.ts';
-const pdfViewerUrl = `${resumeUrl}#toolbar=0`;
+import { resumePreviewUrl, resumeUrl } from '../lib/resume.ts';
 ---
 
 <BaseLayout title="Resume">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
 		<div class="mt-8 space-y-6">
-			<div class="border border-white/10 rounded-3xl overflow-hidden bg-surface-container md:min-h-[720px] min-h-[420px]">
-				<object data={pdfViewerUrl} type="application/pdf" width="100%" height="100%" class="w-full h-full">
-					<embed src={pdfViewerUrl} type="application/pdf" width="100%" height="100%" />
-					<div class="p-6 text-center text-white/70">
-						<p class="mb-4">Resume preview is unavailable in this view. Use the buttons below to open or save the PDF.</p>
-						<div class="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-							<a href={resumeUrl} target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-full bg-primary/80 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary/90">Open PDF</a>
-							<a href={resumeUrl} download class="inline-flex items-center justify-center rounded-full border border-white/10 bg-surface/80 px-6 py-3 text-sm font-semibold text-white transition hover:border-white/20">Download PDF</a>
-						</div>
-					</div>
-				</object>
+			<div class="border border-white/10 rounded-3xl overflow-hidden bg-surface-container">
+				<img src={resumePreviewUrl} alt="Resume preview" class="w-full object-cover" />
 			</div>
 
-			<!-- Mobile: prominent open button when inline preview isn't supported -->
-			<div class="md:hidden flex justify-center">
-				<a href={resumeUrl} target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 rounded-full bg-primary/80 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary/90">
-					Open Resume
-				</a>
-			</div>
-
-			<div class="hidden md:flex justify-center">
+			<div class="flex justify-center">
 				<a
 					href={resumeUrl}
 					download
