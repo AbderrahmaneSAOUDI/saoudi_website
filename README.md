@@ -228,13 +228,13 @@ Use server-only environment variables for the Admin SDK:
 
 ### Phase 2: Public Pages
 
-[x] Home page (`/`) — Hero + Stats + Navigation Hub (M3 animated)
+[ ] Home page (`/`) — Hero + Stats + Navigation Hub (M3 animated)
+[ ] Resume page (`/resume`) — PDF preview + download button
 [ ] Projects page (`/projects`) — Responsive Grid + URL-based filtering
-[x] Experience page (`/experience`) — Scroll timeline with CSS-only entrance animations
+[ ] Experience page (`/experience`) — Scroll timeline with CSS-only entrance animations
 [ ] Volunteering page (`/volunteering`) — GDG & leadership impact with animated metrics
 [ ] Certificates page (`/certificates`) — Two-column responsive gallery
-[x] Designs page (`/designs`) — Visual gallery and mockups
-[ ] Resume page (`/resume`) — PDF preview + download button
+[ ] Designs page (`/designs`) — Visual gallery and mockups
 
 ### Phase 3: Admin Dashboard
 
