@@ -1,18 +1,20 @@
 @layer base {
   html {
     min-height: 100%;
+    width: 100%;
   }
 
   body {
     @apply bg-surface text-white antialiased relative;
     min-height: 100vh;
+    min-width: 100vw;
     width: 100%;
   }
 
   body::before,
   body::after {
     content: '';
-    position: absolute;
+    position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: -1;
