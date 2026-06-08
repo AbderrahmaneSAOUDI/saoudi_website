@@ -1,33 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-
-const timeline = [
-  { period: '2023 — Present', title: 'Senior Software Engineer', org: 'Acme Corp', desc: 'Working on scalable front-end platforms and design systems.' },
-  { period: '2020 — 2023', title: 'Frontend Engineer', org: 'Some Startup', desc: 'Built product features and performance optimizations for web apps.' },
-  { period: '2018 — 2020', title: 'Software Engineer', org: 'Agency XYZ', desc: 'Delivered client-facing UI and accessibility improvements.' },
-];
+import Construction from '../layouts/Construction.astro';
 ---
 
 <BaseLayout title="Experience">
-  <div class="mx-auto px-4 sm:px-6 lg:px-8 py-16 max-w-7xl">
-    <section class="mb-12 text-center">
-      <h1 class="mb-4 font-bold text-white text-4xl">Experience</h1>
-      <p class="mx-auto mb-8 max-w-2xl text-white/70">A concise, reverse-chronological view of roles and projects I've contributed to.</p>
-    </section>
-
-    <section class="space-y-6">
-      {timeline.map((item, i) => (
-        <article class="bg-surface-container border border-white/10 rounded-3xl p-6 transition-all hover:-translate-y-1 hover:shadow-lg" style={`animation-delay: ${i * 80}ms`}>
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <div class="text-primary font-semibold">{item.title}</div>
-              <div class="text-white/60 text-sm">{item.org}</div>
-            </div>
-            <div class="text-white/50 text-sm">{item.period}</div>
-          </div>
-          <p class="mt-3 text-white/70 text-sm">{item.desc}</p>
-        </article>
-      ))}
-    </section>
-  </div>
+  <Construction></Construction>
 </BaseLayout>
