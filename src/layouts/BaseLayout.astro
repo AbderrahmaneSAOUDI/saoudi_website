@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { resumeUrl } from '../lib/resume.ts';
+import { getRandomColor } from '../lib/colors.ts';
 import { Home, Award, FolderOpen, Heart, FileText, Download, Github, Linkedin, Twitter, Mail, Briefcase, Code } from 'lucide-astro';
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 
 const { title } = Astro.props;
 const { pathname } = Astro.url;
+const primaryColor = getRandomColor();
 
 const navLinks = [
 	{ href: '/', label: 'Home', icon: Home },
@@ -29,7 +31,7 @@ const socialLinks = [
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style={`--color-primary: ${primaryColor}`}>
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -37,16 +39,9 @@ const socialLinks = [
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title} - saoudi.online</title>
-		<script is:inline>
-			(() => {
-				const colors = ['#4285F4', '#EA4335', '#F9AB00', '#34A853'];
-				const randomColor = colors[Math.floor(Math.random() * colors.length)];
-				document.documentElement.style.setProperty('--color-primary', randomColor);
-			})();
-		</script>
 	</head>
-	<body class="flex flex-col min-h-screen relative">
-		<div class="w-full max-w-[1280px] mx-auto flex flex-col min-h-screen">
+	<body class="relative flex flex-col min-h-screen">
+		<div class="flex flex-col mx-auto w-full max-w-[1280px] min-h-screen">
 			<!-- Header -->
 			<header class="top-0 z-50 sticky">
 				<div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
