@@ -34,3 +34,18 @@
 }
 
 @import "./background_animation.css";
+
+/* Override header responsive behavior at 1000px */
+@layer utilities {
+  .header-logo { display: none !important; }
+  .download-text { display: none !important; }
+  .nav-icon { display: inline-flex !important; }
+  .nav-label { display: none !important; }
+
+  @media (min-width: 1000px) {
+    .header-logo { display: flex !important; }
+    .download-text { display: inline !important; }
+    .nav-icon { display: none !important; }
+    .nav-label { display: inline !important; }
+  }
+}

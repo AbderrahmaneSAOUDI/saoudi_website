@@ -1,0 +1,53 @@
+---
+import '../styles/global.css';
+import { resumeUrl } from '../lib/resume.ts';
+import { Home, Award, FolderOpen, Heart, FileText, Download, Briefcase, Code } from '@lucide/astro';
+import NavItem from '../components/NavItem.astro';
+import ActionButton from '../components/ActionButton.astro';
+
+const { pathname } = Astro.url;
+
+const navLinks = [
+	{ href: '/', label: 'Home', icon: Home },
+	{ href: '/experience', label: 'Experience', icon: Briefcase },
+	{ href: '/projects', label: 'Projects', icon: FolderOpen },
+	{ href: '/designs', label: 'Designs', icon: Code },
+	{ href: '/certificates', label: 'Certificates', icon: Award },
+	{ href: '/volunteering', label: 'Volunteering', icon: Heart },
+	{ href: '/resume', label: 'Resume', icon: FileText },
+];
+---
+
+<header class="top-0 z-50 sticky">
+	<div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+		<div class="flex justify-between items-center h-16">
+			<a href="/" class="header-logo items-center bg-surface/40 hover:bg-surface-container-high backdrop-blur-lg px-6 py-2 border border-white/10 rounded-full transition-all hover:-translate-y-0.5 duration-300">
+				<span class="font-bold text-primary text-lg">saoudi.online</span>
+			</a>
+
+			<nav class="flex items-center">
+				<div class="flex items-center bg-surface/40 backdrop-blur-lg px-4 py-2 border border-white/10 rounded-full">
+					{navLinks.map((link) => {
+						const isActive = pathname === link.href;
+						return (
+							<NavItem href={link.href} isActive={isActive}>
+								<span class="nav-icon">
+									<link.icon class="w-4 h-4" />
+								</span>
+								<span class="nav-label">{link.label}</span>
+							</NavItem>
+						);
+					})}
+				</div>
+			</nav>
+
+			<ActionButton href={resumeUrl} type="header" download>
+				href={resumeUrl} download
+				ariaLabel="Download resume"
+			>
+				<Download class="w-4 h-4" />
+				<span class="download-text">Download</span>
+			</ActionButton>
+		</div>
+	</div>
+</header>

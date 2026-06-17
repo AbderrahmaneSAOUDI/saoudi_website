@@ -1,0 +1,51 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import '../../styles/global.css';
+
+const title = "Admin — Login";
+---
+
+<AdminLayout title={title}>
+  <main class="min-h-screen flex items-center justify-center" style="background:var(--color-surface);">
+    <section class="w-full max-w-md mx-4" aria-labelledby="login-heading">
+      <div class="p-8 rounded-3xl shadow-lg" style="background:var(--color-surface-container); color:var(--color-google-white);">
+        <header class="mb-6 text-center">
+          <h1 id="login-heading" class="text-2xl font-bold" style="color:var(--color-google-white);">Admin Login</h1>
+          <p class="mt-2 text-sm text-gray-300">Sign in to access the admin workspace</p>
+        </header>
+
+        <form method="post" action="/admin/login" class="space-y-4" novalidate>
+          <div>
+            <label class="block text-sm mb-2" for="email" style="color:var(--color-google-light-blue);">Email</label>
+            <input id="email" name="email" type="email" required placeholder="you@example.com"
+              class="w-full px-4 py-3 rounded-xl border border-transparent focus:outline-none" 
+              style="background:var(--color-surface-container-high); color:var(--color-google-white); box-shadow: 0 6px 18px rgba(0,0,0,0.45);" />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-2" for="password" style="color:var(--color-google-light-blue);">Password</label>
+            <input id="password" name="password" type="password" required placeholder="••••••••"
+              class="w-full px-4 py-3 rounded-xl border border-transparent focus:outline-none"
+              style="background:var(--color-surface-container-high); color:var(--color-google-white); box-shadow: 0 6px 18px rgba(0,0,0,0.45);" />
+          </div>
+
+          <div class="flex items-center justify-between text-sm text-gray-300">
+            <label class="inline-flex items-center gap-2">
+              <input type="checkbox" name="remember" class="w-4 h-4 rounded" />
+              Remember me
+            </label>
+            <a href="#" class="text-sm" style="color:var(--color-google-light-blue);">Forgot?</a>
+          </div>
+
+          <div>
+            <button type="submit" class="w-full py-3 rounded-3xl font-semibold" style="background:var(--color-primary); color:#fff; box-shadow: 0 8px 24px rgba(66,133,244,0.18); transition:transform .18s ease;">Sign in</button>
+          </div>
+        </form>
+
+        <div class="mt-6 text-center text-xs text-gray-400">
+          <p>Protected admin area — authorized access only.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</AdminLayout>
