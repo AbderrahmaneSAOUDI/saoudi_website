@@ -1,51 +1,68 @@
 ---
-import AdminLayout from "../../layouts/AdminLayout.astro";
+import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
 import '../../styles/global.css';
+import { UserLock } from '@lucide/astro';
 
 const title = "Admin — Login";
+const gsiHtml = `
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+  function handleCredentialResponse(response) {
+    // Send the token to your backend for verification
+    fetch('/admin/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        credential: response.credential
+      })
+    })
+    .then(res => {
+      if (res.ok) {
+        window.location.href = '/admin';
+      }
+    })
+    .catch(err => console.error('Login failed:', err));
+  }
+
+  window.onload = function () {
+    google.accounts.id.initialize({
+      client_id: '863682225036-gsh98s9rql7kfvfj2p0kthrnhufbs780.apps.googleusercontent.com',
+      callback: handleCredentialResponse
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('g_id_signin'),
+      { 
+        theme: 'filled_black', 
+        size: 'medium',
+        width: '100%',
+        shape: 'pill',
+        text: 'continue_with',
+      }
+    );
+  };
+</script>
+`;
 ---
 
-<AdminLayout title={title}>
-  <main class="min-h-screen flex items-center justify-center" style="background:var(--color-surface);">
-    <section class="w-full max-w-md mx-4" aria-labelledby="login-heading">
-      <div class="p-8 rounded-3xl shadow-lg" style="background:var(--color-surface-container); color:var(--color-google-white);">
-        <header class="mb-6 text-center">
-          <h1 id="login-heading" class="text-2xl font-bold" style="color:var(--color-google-white);">Admin Login</h1>
-          <p class="mt-2 text-sm text-gray-300">Sign in to access the admin workspace</p>
+<BackgroundBaseLayout title={title}>
+  <main class="min-h-screen flex items-center justify-center">
+    <section class="max-w-md" aria-labelledby="login-heading">
+      <div class="p-6 rounded-3xl shadow-lg" style="background:var(--color-surface-container); color:var(--color-google-white);">
+        <header class="mb-6 text-center flex flex-col items-center">
+          <UserLock class="w-12 h-12" style="color:var(--color-primary);" />
         </header>
 
-        <form method="post" action="/admin/login" class="space-y-4" novalidate>
-          <div>
-            <label class="block text-sm mb-2" for="email" style="color:var(--color-google-light-blue);">Email</label>
-            <input id="email" name="email" type="email" required placeholder="you@example.com"
-              class="w-full px-4 py-3 rounded-xl border border-transparent focus:outline-none" 
-              style="background:var(--color-surface-container-high); color:var(--color-google-white); box-shadow: 0 6px 18px rgba(0,0,0,0.45);" />
-          </div>
-
-          <div>
-            <label class="block text-sm mb-2" for="password" style="color:var(--color-google-light-blue);">Password</label>
-            <input id="password" name="password" type="password" required placeholder="••••••••"
-              class="w-full px-4 py-3 rounded-xl border border-transparent focus:outline-none"
-              style="background:var(--color-surface-container-high); color:var(--color-google-white); box-shadow: 0 6px 18px rgba(0,0,0,0.45);" />
-          </div>
-
-          <div class="flex items-center justify-between text-sm text-gray-300">
-            <label class="inline-flex items-center gap-2">
-              <input type="checkbox" name="remember" class="w-4 h-4 rounded" />
-              Remember me
-            </label>
-            <a href="#" class="text-sm" style="color:var(--color-google-light-blue);">Forgot?</a>
-          </div>
-
-          <div>
-            <button type="submit" class="w-full py-3 rounded-3xl font-semibold" style="background:var(--color-primary); color:#fff; box-shadow: 0 8px 24px rgba(66,133,244,0.18); transition:transform .18s ease;">Sign in</button>
-          </div>
-        </form>
-
-        <div class="mt-6 text-center text-xs text-gray-400">
-          <p>Protected admin area — authorized access only.</p>
+        <div id="g_id_onload"
+        class="rounded-3xl"
+          data-client_id="YOUR_GOOGLE_CLIENT_ID"
+          data-callback="handleCredentialResponse">
         </div>
+        <div class="w-full flex justify-center rounded-3xl" id="g_id_signin" data-type="standard" data-size="medium" data-theme="dark"></div>
+
+        <div set:html={gsiHtml}></div>
       </div>
     </section>
   </main>
-</AdminLayout>
+</BackgroundBaseLayout>
