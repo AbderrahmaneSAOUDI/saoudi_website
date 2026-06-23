@@ -2,13 +2,101 @@
 import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
 import '../../styles/global.css';
 import { UserLock } from '@lucide/astro';
+import { OAuth2Client } from 'google-auth-library';
+import { createSessionToken } from '../../lib/server/session';
+
+import fs from 'node:fs';
+import path from 'node:path';
+
+function getEnvFallback(key: string): string | undefined {
+  try {
+    const envPath = path.resolve(process.cwd(), '.env');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf8');
+      for (const line of content.split('\n')) {
+        const parts = line.split('=');
+        if (parts.length >= 2) {
+          const k = parts[0].trim();
+          let v = parts.slice(1).join('=').trim();
+          if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+            v = v.slice(1, -1);
+          }
+          if (k === key) {
+            return v.replace(/\\n/g, '\n');
+          }
+        }
+      }
+    }
+  } catch {}
+  return undefined;
+}
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || import.meta.env.GOOGLE_CLIENT_ID || getEnvFallback('GOOGLE_CLIENT_ID') || '863682225036-gsh98s9rql7kfvfj2p0kthrnhufbs780.apps.googleusercontent.com';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL || getEnvFallback('ADMIN_EMAIL');
+
+// Handle authentication POST request
+if (Astro.request.method === 'POST') {
+  try {
+    const { credential } = await Astro.request.json();
+    if (!credential) {
+      return new Response(JSON.stringify({ error: 'Missing credential token' }), { status: 400 });
+    }
+
+    if (!ADMIN_EMAIL) {
+      console.error('ADMIN_EMAIL environment variable is not configured.');
+      return new Response(JSON.stringify({ error: 'Server authentication misconfigured.' }), { status: 500 });
+    }
+
+    // Verify the Google GSI ID Token
+    const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+
+    if (!payload || !payload.email) {
+      return new Response(JSON.stringify({ error: 'Invalid token payload.' }), { status: 400 });
+    }
+
+    // Strictly check if the email matches the hardcoded ADMIN_EMAIL
+    if (payload.email !== ADMIN_EMAIL) {
+      console.warn(`Unauthorized admin login attempt from: ${payload.email}`);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized access. Email does not match ADMIN_EMAIL.' }),
+        { status: 403 }
+      );
+    }
+
+    // Issue a secure HTTP-Only, Secure, SameSite cookie configured with a 7-day expiration
+    const sessionToken = createSessionToken(payload.email);
+    
+    Astro.cookies.set('admin_session', sessionToken, {
+      path: '/',
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+    });
+
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error: any) {
+    console.error('Google GSI verification error:', error);
+    return new Response(
+      JSON.stringify({ error: error.message || 'Token verification failed.' }),
+      { status: 400 }
+    );
+  }
+}
 
 const title = "Admin — Login";
 const gsiHtml = `
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
   function handleCredentialResponse(response) {
-    // Send the token to your backend for verification
     fetch('/admin/login', {
       method: 'POST',
       headers: {
@@ -18,17 +106,23 @@ const gsiHtml = `
         credential: response.credential
       })
     })
-    .then(res => {
+    .then(async res => {
+      const data = await res.json();
       if (res.ok) {
         window.location.href = '/admin';
+      } else {
+        alert(data.error || 'Login verification failed.');
       }
     })
-    .catch(err => console.error('Login failed:', err));
+    .catch(err => {
+      console.error('Login failed:', err);
+      alert('An error occurred during authentication.');
+    });
   }
 
   window.onload = function () {
     google.accounts.id.initialize({
-      client_id: '863682225036-gsh98s9rql7kfvfj2p0kthrnhufbs780.apps.googleusercontent.com',
+      client_id: '${GOOGLE_CLIENT_ID}',
       callback: handleCredentialResponse
     });
     google.accounts.id.renderButton(
@@ -48,15 +142,16 @@ const gsiHtml = `
 
 <BackgroundBaseLayout title={title}>
   <main class="min-h-screen flex items-center justify-center">
-    <section class="max-w-md" aria-labelledby="login-heading">
-      <div class="p-6 rounded-3xl shadow-lg" style="background:var(--color-surface-container); color:var(--color-google-white);">
+    <section class="max-w-md w-full px-4" aria-labelledby="login-heading">
+      <div class="p-6 rounded-3xl shadow-lg border border-[var(--color-surface-container)]" style="background:var(--color-surface-container); color:var(--color-google-white);">
         <header class="mb-6 text-center flex flex-col items-center">
-          <UserLock class="w-12 h-12" style="color:var(--color-primary);" />
+          <UserLock class="w-12 h-12 mb-3" style="color:var(--color-primary);" />
+          <h1 id="login-heading" class="text-2xl font-bold tracking-tight text-[#FFFFFF]">saoudi.online</h1>
         </header>
 
         <div id="g_id_onload"
-        class="rounded-3xl"
-          data-client_id="YOUR_GOOGLE_CLIENT_ID"
+          class="rounded-3xl"
+          data-client_id={GOOGLE_CLIENT_ID}
           data-callback="handleCredentialResponse">
         </div>
         <div class="w-full flex justify-center rounded-3xl" id="g_id_signin" data-type="standard" data-size="medium" data-theme="dark"></div>
