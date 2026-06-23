@@ -1,9 +1,65 @@
 ---
 import BackgroundBaseLayout from "../layouts/BackgroundBaseLayout.astro";
 import '../styles/global.css';
+import AdminDashboard from "../components/AdminDashboard";
+import { getFirebaseAdminDb } from "../lib/server/firebase-admin";
 
+// Extra safety: double-check that the middleware successfully set Astro.locals.adminEmail
+const adminEmail = Astro.locals.adminEmail;
+if (!adminEmail) {
+  return Astro.redirect("/admin/login");
+}
+
+let projectsCount = 0;
+let experienceCount = 0;
+let designsCount = 0;
+let certificatesCount = 0;
+let volunteeringCount = 0;
+let systemStatus = "Connected";
+
+try {
+  const db = getFirebaseAdminDb();
+  
+  // Parallel asynchronous fetching of the collections' count metrics
+  const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, volunteeringSnap] = await Promise.all([
+    db.collection("projects").count().get(),
+    db.collection("experience").count().get(),
+    db.collection("designs").count().get(),
+    db.collection("certificates").count().get(),
+    db.collection("volunteering").count().get(),
+  ]);
+
+  projectsCount = projectsSnap.data().count;
+  experienceCount = experienceSnap.data().count;
+  designsCount = designsSnap.data().count;
+  certificatesCount = certificatesSnap.data().count;
+  volunteeringCount = volunteeringSnap.data().count;
+} catch (error) {
+  console.warn("Firestore access degraded or unconfigured. Falling back to mock dashboard metrics.", error);
+  systemStatus = "Degraded (Mock Stats)";
+  
+  // Clean mock statistics matching user's collections structure
+  projectsCount = 14;
+  experienceCount = 4;
+  designsCount = 8;
+  certificatesCount = 12;
+  volunteeringCount = 5;
+}
+
+const metrics = {
+  counts: {
+    projects: projectsCount,
+    experience: experienceCount,
+    designs: designsCount,
+    certificates: certificatesCount,
+    volunteering: volunteeringCount,
+  },
+  adminEmail: adminEmail,
+  systemStatus: systemStatus,
+  lastUpdated: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+};
 ---
 
-<BackgroundBaseLayout title="Admin">
-    
+<BackgroundBaseLayout title="Admin Workspace Dashboard">
+  <AdminDashboard client:only="react" metrics={metrics} />
 </BackgroundBaseLayout>
