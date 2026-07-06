@@ -1,0 +1,311 @@
+---
+interface Props {
+	currentPath?: string;
+}
+
+const { currentPath = '/admin' } = Astro.props;
+
+const navItems = [
+	{ label: 'Overview', path: '/admin' },
+	{ label: 'Experience', path: '/admin/admin_experience' },
+	{ label: 'Projects', path: '/admin/admin_projects' },
+	{ label: 'Designs', path: '/admin/admin_designs' },
+	{ label: 'Certificates', path: '/admin/admin_certificates' },
+	{ label: 'Volunteering', path: '/admin/admin_volunteering' },
+	{ label: 'Resume', path: '/admin/admin_resume' },
+	{ label: 'Timeline', path: '/admin/admin_timeline', disabled: true },
+];
+
+const createOptions = [
+	{ label: 'Experience', path: '/admin/admin_experience' },
+	{ label: 'Project', path: '/admin/admin_projects' },
+	{ label: 'Design', path: '/admin/admin_designs' },
+	{ label: 'Certificate', path: '/admin/admin_certificates' },
+	{ label: 'Volunteering', path: '/admin/admin_volunteering' },
+];
+---
+
+<div
+	id="admin-nav-dock"
+	class="bottom-6 left-1/2 z-50 fixed -translate-x-1/2"
+>
+	<!-- Floating Navigation Dock -->
+	<div
+		class="flex items-center gap-6 bg-[#211F26] shadow-2xl px-4 py-3 border border-white/10 rounded-3xl"
+	>
+		<!-- Left Slot: Image Optimization Trigger -->
+		<button
+			id="image-settings-btn"
+			class="flex justify-center items-center bg-white/5 hover:bg-white/10 rounded-full w-10 h-10 transition-colors"
+			aria-label="Image optimization settings"
+		>
+			<svg
+				class="w-5 h-5 text-white"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+				/>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+				/>
+			</svg>
+		</button>
+
+		<!-- Center Slot: Navigation Links -->
+		<nav class="flex items-center gap-1">
+			{
+				navItems.map((item) => {
+					const isActive =
+						item.path === '/admin'
+							? currentPath === '/admin' || currentPath === '/admin/'
+							: currentPath === item.path;
+
+					return (
+						<a
+							href={item.disabled ? undefined : item.path}
+							class={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+								item.disabled
+									? 'text-white/30 cursor-not-allowed'
+									: isActive
+									? 'bg-[#4285F4] text-white'
+									: 'text-white/70 hover:text-white hover:bg-white/5'
+							}`}
+							onClick={
+								item.disabled
+									? (e) => {
+											e.preventDefault();
+									  }
+									: undefined
+							}
+						>
+							{item.label}
+						</a>
+					);
+				})
+			}
+		</nav>
+
+		<!-- Right Slot: FAB with Dropdown -->
+		<div class="relative">
+			<button
+				id="create-fab"
+				class="flex justify-center items-center bg-[#4285F4] hover:bg-[#3367BE] shadow-lg rounded-full w-12 h-12 transition-colors"
+				aria-label="Create new item"
+			>
+				<svg
+					class="w-6 h-6 text-white"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M12 4v16m8-8H4"
+					/>
+				</svg>
+			</button>
+
+			<!-- Dropdown Menu -->
+			<div
+				id="create-dropdown"
+				class="hidden right-0 bottom-14 z-50 absolute bg-[#211F26] shadow-2xl border border-white/10 rounded-2xl w-48 overflow-hidden"
+			>
+				<div class="p-2">
+					<p class="mb-1 px-3 py-2 text-white/50 text-xs">
+						What would you like to create?
+					</p>
+					{
+						createOptions.map((option) => (
+							<a
+								href={option.path}
+								class="block hover:bg-white/5 px-3 py-2 rounded-xl text-white/70 hover:text-white text-sm transition-colors"
+							>
+								{option.label}
+							</a>
+						))
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Image Optimization Modal -->
+	<div
+		id="image-modal-backdrop"
+		class="hidden z-40 fixed inset-0 bg-black/60 backdrop-blur-sm"
+	></div>
+	<div
+		id="image-modal"
+		class="hidden z-50 fixed inset-0 justify-center items-center p-4"
+	>
+		<div class="bg-[#211F26] shadow-2xl p-6 border border-white/10 rounded-3xl w-full max-w-md">
+			<div class="flex justify-between items-center mb-6">
+				<h2 class="font-semibold text-white text-lg">
+					Image Optimization Settings
+				</h2>
+				<button
+					id="close-modal-btn"
+					class="flex justify-center items-center hover:bg-white/10 rounded-full w-8 h-8 transition-colors"
+				>
+					<svg
+						class="w-5 h-5 text-white/70"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						/>
+					</svg>
+				</button>
+			</div>
+
+			<div class="space-y-6">
+				<!-- Quality Slider -->
+				<div>
+					<label class="block mb-3 font-medium text-white text-sm">
+						Quality: <span id="quality-value">80</span>%
+					</label>
+					<input
+						type="range"
+						id="quality-slider"
+						min="1"
+						max="100"
+						value="80"
+						class="bg-white/10 rounded-full w-full h-2 accent-[#4285F4] appearance-none cursor-pointer"
+					/>
+					<div class="flex justify-between mt-1 text-white/40 text-xs">
+						<span>1%</span>
+						<span>100%</span>
+					</div>
+				</div>
+
+				<!-- Max Width Input -->
+				<div>
+					<label class="block mb-2 font-medium text-white text-sm">
+						Max Width (px)
+					</label>
+					<input
+						type="number"
+						id="max-width-input"
+						min="100"
+						max="4096"
+						value="1920"
+						class="bg-white/5 px-4 py-2 border border-white/10 focus:border-[#4285F4] rounded-xl focus:outline-none w-full text-white transition-colors placeholder-white/40"
+					/>
+				</div>
+
+				<!-- Action Buttons -->
+				<div class="flex gap-3 pt-2">
+					<button
+						id="cancel-settings-btn"
+						class="flex-1 bg-white/5 hover:bg-white/10 px-4 py-2.5 rounded-xl font-medium text-white transition-colors"
+					>
+						Cancel
+					</button>
+					<button
+						id="apply-settings-btn"
+						class="flex-1 bg-[#4285F4] hover:bg-[#3367BE] px-4 py-2.5 rounded-xl font-medium text-white transition-colors"
+					>
+						Apply Settings
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	// Vanilla JavaScript for interactivity
+	document.addEventListener('DOMContentLoaded', () => {
+		const imageSettingsBtn = document.getElementById('image-settings-btn');
+		const createFab = document.getElementById('create-fab');
+		const createDropdown = document.getElementById('create-dropdown');
+		const imageModalBackdrop = document.getElementById('image-modal-backdrop');
+		const imageModal = document.getElementById('image-modal');
+		const closeModalBtn = document.getElementById('close-modal-btn');
+		const cancelSettingsBtn = document.getElementById('cancel-settings-btn');
+		const applySettingsBtn = document.getElementById('apply-settings-btn');
+		const qualitySlider = document.getElementById('quality-slider');
+		const qualityValue = document.getElementById('quality-value');
+		const maxWidthInput = document.getElementById('max-width-input');
+
+		// Image modal controls
+		const openImageModal = () => {
+			imageModalBackdrop?.classList.remove('hidden');
+			imageModal?.classList.remove('hidden');
+		};
+
+		const closeImageModal = () => {
+			imageModalBackdrop?.classList.add('hidden');
+			imageModal?.classList.add('hidden');
+		};
+
+		imageSettingsBtn?.addEventListener('click', openImageModal);
+		imageModalBackdrop?.addEventListener('click', closeImageModal);
+		closeModalBtn?.addEventListener('click', closeImageModal);
+		cancelSettingsBtn?.addEventListener('click', closeImageModal);
+		applySettingsBtn?.addEventListener('click', () => {
+			// Apply settings logic here
+			console.log('Settings applied:', {
+				quality: qualitySlider?.value,
+				maxWidth: maxWidthInput?.value,
+			});
+			closeImageModal();
+		});
+
+		// Quality slider update
+		qualitySlider?.addEventListener('input', (e) => {
+			if (qualityValue) {
+				qualityValue.textContent = e.target.value;
+			}
+		});
+
+		// Create dropdown toggle
+		let isDropdownOpen = false;
+
+		const toggleDropdown = () => {
+			isDropdownOpen = !isDropdownOpen;
+			if (isDropdownOpen) {
+				createDropdown?.classList.remove('hidden');
+			} else {
+				createDropdown?.classList.add('hidden');
+			}
+		};
+
+		createFab?.addEventListener('click', (e) => {
+			e.stopPropagation();
+			toggleDropdown();
+		});
+
+		// Close dropdown when clicking outside
+		document.addEventListener('click', (e) => {
+			if (isDropdownOpen && !createDropdown?.contains(e.target as Node) && e.target !== createFab) {
+				isDropdownOpen = false;
+				createDropdown?.classList.add('hidden');
+			}
+		});
+
+		// Close dropdown when clicking an option
+		createDropdown?.querySelectorAll('a').forEach((link) => {
+			link.addEventListener('click', () => {
+				isDropdownOpen = false;
+				createDropdown?.classList.add('hidden');
+			});
+		});
+	});
+</script>

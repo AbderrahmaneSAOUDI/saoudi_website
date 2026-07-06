@@ -1,0 +1,43 @@
+---
+interface Props {
+	children?: any;
+}
+
+const { children } = Astro.props;
+---
+
+<div
+	class="min-h-screen text-[#E6E1E5] p-6 md:p-8 pb-24"
+	style="background: #141218"
+>
+	<!-- Header -->
+	<header
+		class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-[#2B2930] pb-6 mb-8"
+	>
+		<div>
+			<div class="flex items-center gap-2 mb-1">
+				<span class="w-2.5 h-2.5 rounded-full bg-[#0F9D58] animate-pulse"></span>
+				<span
+					class="text-xs uppercase tracking-widest text-[#4285F4] font-semibold"
+				>
+					Active Session
+				</span>
+			</div>
+			<h1 class="text-3xl font-extrabold text-white tracking-tight">
+				Admin Control Panel
+			</h1>
+		</div>
+
+		<div class="flex items-center gap-3">
+			<a
+				href="/admin/admin_logout"
+				class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 border border-[#DB4437]/40 hover:bg-[#DB4437] hover:text-white hover:border-transparent hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#DB4437]/50"
+			>
+				Sign Out
+			</a>
+		</div>
+	</header>
+
+	<!-- Page Content -->
+	<slot />
+</div>

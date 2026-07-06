@@ -5,5 +5,5 @@ export const GET: APIRoute = async (context) => {
   context.cookies.delete('admin_session', { path: '/' });
   
   // Clean redirect back to the admin login page
-  return context.redirect('/admin/login');
+  return context.redirect('/admin/admin_login');
 };

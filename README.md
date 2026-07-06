@@ -358,13 +358,13 @@ To prevent data fragmentation and storage bloat inside the Firebase Storage buck
 
 - **Home Page (`/`)**
   - [x] Build responsive Hero section layout
-  - [ ] Set up animated headers and greeting text
-  - [ ] Code static metrics/stats count grid panel
-  - [ ] Design visual navigation hub using rounded M3 cards
-  - [ ] Implement slow-floating radial CSS-only background motion
+  - [x] Set up animated headers and greeting text
+  - [x] Code static metrics/stats count grid panel
+  - [x] Design visual navigation hub using rounded M3 cards
+  - [x] Implement slow-floating radial CSS-only background motion
 - **Resume Page (`/resume`)**
-  - [ ] Embed custom PDF viewer container layout
-  - [ ] Add download action button pointing to public asset
+  - [x] Build public resume page with preview container and download CTA
+  - [x] Add download action button pointing to public asset
   - [ ] Pull live resume document path reference from database
 - **Projects Page (`/projects`)**
   - [ ] Build dynamic project card grid layout
@@ -392,14 +392,14 @@ To prevent data fragmentation and storage bloat inside the Firebase Storage buck
 ### Phase 3: Admin Dashboard & Secure Pipelines
 
 - **Authentication & Server-Side Access Middleware**
-  - [ ] Build standalone `/admin/login` page layout using M3 dark styles
+  - [x] Build standalone `/admin/login` page layout using M3 dark styles
   - [ ] Add visual validation styles on email and password inputs
-  - [ ] Setup Astro middleware (`src/middleware.ts`) to intercept `/admin` routes (excluding `/admin/login`)
-  - [ ] Implement secure verification cookie setting (e.g. `session`) upon successful client login
-  - [ ] Program middleware check: read cookie and perform server-side redirect `context.redirect('/admin/login')` if absent
-  - [ ] Bind login form actions to email/password client validation
+  - [x] Setup Astro middleware (`src/middleware.ts`) to intercept `/admin` routes (excluding `/admin/login`)
+  - [x] Implement secure verification cookie setting upon successful login
+  - [x] Program middleware check: read cookie and perform server-side redirect `context.redirect('/admin/login')` if absent
+  - [x] Bind login form actions to email/password client validation
   - [ ] Implement Client Firebase Auth SDK state checks inside React island
-  - [ ] Add sign-out action (clearing verification cookies and executing Auth SDK sign-out)
+  - [x] Add sign-out action (clearing verification cookies)
 - **Universal Floating Admin Navigation Dock**
   - [ ] Design fixed floating container with absolute viewport tracking
   - [ ] Style active routes using Google Blue pill shape indicators
