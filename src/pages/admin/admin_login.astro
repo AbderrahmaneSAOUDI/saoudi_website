@@ -31,7 +31,7 @@ function getEnvFallback(key: string): string | undefined {
   return undefined;
 }
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || import.meta.env.GOOGLE_CLIENT_ID || getEnvFallback('GOOGLE_CLIENT_ID') || '863682225036-gsh98s9rql7kfvfj2p0kthrnhufbs780.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || import.meta.env.GOOGLE_CLIENT_ID || getEnvFallback('GOOGLE_CLIENT_ID');
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL || getEnvFallback('ADMIN_EMAIL');
 
 // Handle authentication POST request
@@ -97,7 +97,7 @@ const gsiHtml = `
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
   function handleCredentialResponse(response) {
-    fetch('/admin/login', {
+    fetch('/admin/admin_login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

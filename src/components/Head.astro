@@ -1,13 +1,11 @@
 ---
 import '../styles/global.css';
-import { getRandomColor } from '../lib/colors.ts';
 
 interface Props {
 	title?: string;
 }
 
 const { title = 'saoudi.online' } = Astro.props;
-const primaryColor = getRandomColor();
 ---
 
 <head>

@@ -38,7 +38,7 @@ export default function AdminDashboard({ metrics }: AdminDashboardProps) {
           
           <div className="flex items-center gap-3">
             <a 
-              href="/admin/logout" 
+              href="/admin/admin_logout" 
               className="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 border border-[#DB4437]/40 hover:bg-[#DB4437] hover:text-white hover:border-transparent hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#DB4437]/50"
             >
               Sign Out
@@ -156,11 +156,11 @@ export default function AdminDashboard({ metrics }: AdminDashboardProps) {
           <div className="p-6 rounded-3xl border border-[#2B2930]" style={{ background: '#211F26' }}>
             <h3 className="text-lg font-bold text-white mb-4">Quick Shortcuts</h3>
             <div className="flex flex-wrap gap-3">
-              <a href="/admin/projects" className="px-4 py-2 rounded-xl bg-[#1D1B20] hover:bg-[#4285F4]/10 hover:text-[#4285F4] transition-all text-sm font-medium border border-[#2B2930]">Manage Projects</a>
-              <a href="/admin/experience" className="px-4 py-2 rounded-xl bg-[#1D1B20] hover:bg-[#0F9D58]/10 hover:text-[#0F9D58] transition-all text-sm font-medium border border-[#2B2930]">Manage Experience</a>
-              <a href="/admin/designs" className="px-4 py-2 rounded-xl bg-[#1D1B20] hover:bg-[#F4B400]/10 hover:text-[#F4B400] transition-all text-sm font-medium border border-[#2B2930]">Manage Designs</a>
-              <a href="/admin/certificates" className="px-4 py-2 rounded-xl bg-[#1D1B20] hover:bg-[#4285F4]/10 hover:text-[#4285F4] transition-all text-sm font-medium border border-[#2B2930]">Manage Certificates</a>
-              <a href="/admin/volunteering" className="px-4 py-2 rounded-xl bg-[#1D1B20] hover:bg-[#0F9D58]/10 hover:text-[#0F9D58] transition-all text-sm font-medium border border-[#2B2930]">Manage Volunteering</a>
+              <a href="/admin/admin_projects" className="px-4 py-2 rounded-xl bg-[#1D1B20] hover:bg-[#4285F4]/10 hover:text-[#4285F4] transition-all text-sm font-medium border border-[#2B2930]">Manage Projects</a>
+              <a href="/admin/admin_experience" className="px-4 py-2 rounded-xl bg-[#1D1B20] hover:bg-[#0F9D58]/10 hover:text-[#0F9D58] transition-all text-sm font-medium border border-[#2B2930]">Manage Experience</a>
+              <a href="/admin/admin_designs" className="px-4 py-2 rounded-xl bg-[#1D1B20] hover:bg-[#F4B400]/10 hover:text-[#F4B400] transition-all text-sm font-medium border border-[#2B2930]">Manage Designs</a>
+              <a href="/admin/admin_certificates" className="px-4 py-2 rounded-xl bg-[#1D1B20] hover:bg-[#4285F4]/10 hover:text-[#4285F4] transition-all text-sm font-medium border border-[#2B2930]">Manage Certificates</a>
+              <a href="/admin/admin_volunteering" className="px-4 py-2 rounded-xl bg-[#1D1B20] hover:bg-[#0F9D58]/10 hover:text-[#0F9D58] transition-all text-sm font-medium border border-[#2B2930]">Manage Volunteering</a>
               <span className="px-4 py-2 rounded-xl bg-[#141218] text-[#E6E1E5]/30 cursor-not-allowed text-sm font-medium border border-[#2B2930]/40">Manage Resume (Phase 3)</span>
             </div>
           </div>

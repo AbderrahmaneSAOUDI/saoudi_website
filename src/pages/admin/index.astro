@@ -1,14 +1,15 @@
 ---
-import BackgroundBaseLayout from "../layouts/BackgroundBaseLayout.astro";
-import '../styles/global.css';
-import AdminDashboard from "../components/AdminDashboard";
-import { getFirebaseAdminDb } from "../lib/server/firebase-admin";
+import '../../styles/global.css';
+
+import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
+import AdminLayout from "../../components/admin/AdminLayout.astro";
+import AdminDashboard from "../../components/AdminDashboard.astro";
+import AdminNavDock from "../../components/admin/AdminNavDock.astro";
+import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
 
 // Extra safety: double-check that the middleware successfully set Astro.locals.adminEmail
 const adminEmail = Astro.locals.adminEmail;
-if (!adminEmail) {
-  return Astro.redirect("/admin/login");
-}
+if (!adminEmail) return Astro.redirect("/admin/admin_login");
 
 let projectsCount = 0;
 let experienceCount = 0;
@@ -39,11 +40,11 @@ try {
   systemStatus = "Degraded (Mock Stats)";
   
   // Clean mock statistics matching user's collections structure
-  projectsCount = 14;
-  experienceCount = 4;
-  designsCount = 8;
-  certificatesCount = 12;
-  volunteeringCount = 5;
+  projectsCount = -1;
+  experienceCount = -1;
+  designsCount = -1;
+  certificatesCount = -1;
+  volunteeringCount = -1;
 }
 
 const metrics = {
@@ -61,5 +62,8 @@ const metrics = {
 ---
 
 <BackgroundBaseLayout title="Admin Workspace Dashboard">
-  <AdminDashboard client:only="react" metrics={metrics} />
+  <AdminLayout>
+    <AdminDashboard metrics={metrics} />
+  </AdminLayout>
+  <AdminNavDock currentPath={Astro.url.pathname} />
 </BackgroundBaseLayout>

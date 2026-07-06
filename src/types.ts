@@ -2,19 +2,33 @@ import { z } from 'zod';
 
 /**
  * Firebase Data Schema
- * Canonical type definitions for the two-collection model
- * See README.md for the single-authoritative schema
+ * Canonical type definitions for the multi-collection model.
+ *
+ * Collections:
+ *   - configuration  → single document "static_data" (StaticData)
+ *   - experience     → Experience documents
+ *   - projects       → Project documents
+ *   - designs        → Design documents
+ *   - certificates   → Certificate documents
+ *   - volunteering   → Volunteering documents
+ *
+ * See README.md for the single-authoritative schema.
  */
 
+// ─── Collection: configuration (singleton document: static_data) ──────────
+
 /**
- * Collection 1: configuration (single document: static_data)
  * Stores global site settings, profile info, and persistent admin configurations.
  */
 export interface StaticData {
 	name: string;
 	title: string;
 	bio: string;
-	skills: string[];
+	skills: {
+		languages: string[];
+		frameworks: string[];
+		tools: string[];
+	};
 	resumeUrl: string;
 	contact: {
 		email: string; // stored plain; obfuscated at render time
@@ -29,31 +43,15 @@ export interface StaticData {
 	};
 }
 
-/**
- * Collection 2: entries (dynamic, all portfolio items)
- * Unified collection for all portfolio content, differentiated only by a constrained type literal.
- */
-export interface PortfolioEntry {
-	id: string;
-	type: 'project' | 'experience' | 'volunteering' | 'certificate';
-	title: string;
-	description: string;
-	/**
-	 * Expected formats:
-	 * - ISO date string (YYYY-MM-DD)
-	 * - year range (YYYY-YYYY)
-	 * - human-readable period label (e.g. "Jan 2020 - Dec 2022")
-	 */
-	dateOrPeriod: string;
-	imageUrl?: string;
-	tags?: string[];
-}
-
 export const staticDataSchema = z.object({
 	name: z.string().min(1),
 	title: z.string().min(1),
 	bio: z.string().min(1),
-	skills: z.array(z.string().min(1)),
+	skills: z.object({
+		languages: z.array(z.string().min(1)),
+		frameworks: z.array(z.string().min(1)),
+		tools: z.array(z.string().min(1)),
+	}),
 	resumeUrl: z.string().min(1),
 	contact: z.object({
 		email: z.string().min(1),
@@ -66,47 +64,162 @@ export const staticDataSchema = z.object({
 	}),
 });
 
-export const portfolioEntrySchema = z.object({
+// ─── Collection: experience ───────────────────────────────────────────────
+
+export interface Experience {
+	id: string;
+	order: number;
+	role: string;
+	company: string;
+	location: string;
+	date: string; // ISO 8601 string for sorting
+	period: string; // Human readable label (e.g. "Jan 2024 - Present")
+	descriptionPoints: string[];
+	technologies: string[];
+}
+
+export const experienceSchema = z.object({
 	id: z.string().min(1),
-	type: z.enum(['project', 'experience', 'volunteering', 'certificate']),
+	order: z.number().int(),
+	role: z.string().min(1),
+	company: z.string().min(1),
+	location: z.string().min(1),
+	date: z.string().min(1),
+	period: z.string().min(1),
+	descriptionPoints: z.array(z.string().min(1)),
+	technologies: z.array(z.string().min(1)),
+});
+
+// ─── Collection: projects ─────────────────────────────────────────────────
+
+export interface Project {
+	id: string;
+	order: number;
+	title: string;
+	tagline: string;
+	description: string;
+	imageUrl: string;
+	projectUrl: string;
+	githubUrl: string;
+	date: string; // ISO 8601
+	technologies: string[];
+	featured: boolean;
+}
+
+export const projectSchema = z.object({
+	id: z.string().min(1),
+	order: z.number().int(),
+	title: z.string().min(1),
+	tagline: z.string().min(1),
+	description: z.string().min(1),
+	imageUrl: z.string().min(1),
+	projectUrl: z.string().min(1),
+	githubUrl: z.string().min(1),
+	date: z.string().min(1),
+	technologies: z.array(z.string().min(1)),
+	featured: z.boolean(),
+});
+
+// ─── Collection: designs ──────────────────────────────────────────────────
+
+export interface Design {
+	id: string;
+	order: number;
+	title: string;
+	description: string;
+	imageUrl: string;
+	figmaUrl?: string;
+	date: string; // ISO 8601
+	category: string;
+	tags: string[];
+}
+
+export const designSchema = z.object({
+	id: z.string().min(1),
+	order: z.number().int(),
 	title: z.string().min(1),
 	description: z.string().min(1),
-	dateOrPeriod: z.string().min(1),
-	imageUrl: z.string().min(1).optional(),
-	tags: z.array(z.string().min(1)).optional(),
+	imageUrl: z.string().min(1),
+	figmaUrl: z.string().min(1).optional(),
+	date: z.string().min(1),
+	category: z.string().min(1),
+	tags: z.array(z.string().min(1)),
 });
+
+// ─── Collection: certificates ─────────────────────────────────────────────
+
+export interface Certificate {
+	id: string;
+	order: number;
+	title: string;
+	issuer: string;
+	date: string; // ISO 8601 string for chronological sorting
+	period: string; // Display label (e.g. "May 2024")
+	credentialUrl: string;
+	credentialId?: string;
+}
+
+export const certificateSchema = z.object({
+	id: z.string().min(1),
+	order: z.number().int(),
+	title: z.string().min(1),
+	issuer: z.string().min(1),
+	date: z.string().min(1),
+	period: z.string().min(1),
+	credentialUrl: z.string().min(1),
+	credentialId: z.string().min(1).optional(),
+});
+
+// ─── Collection: volunteering ─────────────────────────────────────────────
+
+export interface Volunteering {
+	id: string;
+	order: number;
+	role: string;
+	organization: string;
+	date: string; // ISO 8601
+	period: string;
+	description: string;
+	impactMetric?: string;
+}
+
+export const volunteeringSchema = z.object({
+	id: z.string().min(1),
+	order: z.number().int(),
+	role: z.string().min(1),
+	organization: z.string().min(1),
+	date: z.string().min(1),
+	period: z.string().min(1),
+	description: z.string().min(1),
+	impactMetric: z.string().min(1).optional(),
+});
+
+// ─── Parse & Validation Helpers ───────────────────────────────────────────
 
 export const parseStaticData = (data: unknown): StaticData => {
 	return staticDataSchema.parse(data);
-};
-
-export const parsePortfolioEntry = (entry: unknown): PortfolioEntry => {
-	return portfolioEntrySchema.parse(entry);
 };
 
 export const isValidStaticData = (data: unknown): data is StaticData => {
 	return staticDataSchema.safeParse(data).success;
 };
 
-export const isValidPortfolioEntry = (entry: unknown): entry is PortfolioEntry => {
-	return portfolioEntrySchema.safeParse(entry).success;
+export const parseExperience = (data: unknown): Experience => {
+	return experienceSchema.parse(data);
 };
 
-/**
- * Type guard helpers for PortfolioEntry
- */
-export const isProject = (entry: PortfolioEntry): entry is PortfolioEntry & { type: 'project' } => {
-	return entry.type === 'project';
+export const parseProject = (data: unknown): Project => {
+	return projectSchema.parse(data);
 };
 
-export const isExperience = (entry: PortfolioEntry): entry is PortfolioEntry & { type: 'experience' } => {
-	return entry.type === 'experience';
+export const parseDesign = (data: unknown): Design => {
+	return designSchema.parse(data);
 };
 
-export const isVolunteering = (entry: PortfolioEntry): entry is PortfolioEntry & { type: 'volunteering' } => {
-	return entry.type === 'volunteering';
+export const parseCertificate = (data: unknown): Certificate => {
+	return certificateSchema.parse(data);
 };
 
-export const isCertificate = (entry: PortfolioEntry): entry is PortfolioEntry & { type: 'certificate' } => {
-	return entry.type === 'certificate';
+export const parseVolunteering = (data: unknown): Volunteering => {
+	return volunteeringSchema.parse(data);
 };
