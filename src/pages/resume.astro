@@ -1,6 +1,21 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { resumePreviewUrl, resumeUrl } from '../lib/resume.ts';
+import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
+
+let resumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
+let resumePreviewUrl = '/resume.jpg';
+
+try {
+	const db = getFirebaseAdminDb();
+	const configDoc = await db.collection('configuration').doc('static_data').get();
+	if (configDoc.exists) {
+		const data = configDoc.data();
+		if (data?.resumeUrl) resumeUrl = data.resumeUrl;
+		if (data?.previewUrl) resumePreviewUrl = data.previewUrl;
+	}
+} catch (error) {
+	console.warn('Failed to fetch resume config in public page:', error);
+}
 ---
 
 <BaseLayout title="Resume">

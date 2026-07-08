@@ -4,15 +4,684 @@ import '../../styles/global.css';
 import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
 import AdminLayout from "../../components/admin/AdminLayout.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
+import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
+import { Palette, Plus, Search, Image as ImageIcon, ExternalLink, Calendar, Trash2, Save, AlertCircle } from '@lucide/astro';
 
-// Extra safety: double-check that the middleware successfully set Astro.locals.adminEmail
+// Extra safety: double-check authentication
 const adminEmail = Astro.locals.adminEmail;
 if (!adminEmail) return Astro.redirect("/admin/admin_login");
+
+let designs: any[] = [];
+let errorMsg = '';
+
+try {
+	const db = getFirebaseAdminDb();
+	const snapshot = await db.collection("designs").orderBy("order", "asc").get();
+	designs = snapshot.docs.map(doc => ({
+		id: doc.id,
+		...doc.data()
+	}));
+} catch (error: any) {
+	console.warn("Failed to fetch designs from Firestore:", error);
+	errorMsg = "Degraded mode: Firestore is not configured or offline.";
+}
 ---
 
 <BackgroundBaseLayout title="Designs Workspace">
-  <AdminLayout title="Designs">
+	<AdminLayout title="Designs">
+		<div class="flex flex-col lg:flex-row gap-6">
+			
+			<!-- Left Column: 66% List/Grid -->
+			<div class="w-full lg:w-2/3 space-y-6">
+				
+				<!-- Top Controls Strip -->
+				<div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 bg-[#1D1B20] p-4 rounded-3xl border border-[#2B2930]">
+					<div class="relative flex-grow">
+						<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#E6E1E5]/40">
+							<Search class="w-4 h-4" />
+						</span>
+						<input
+							type="text"
+							id="search-input"
+							placeholder="Search designs by title, category, tags..."
+							class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
+						/>
+					</div>
+					<div class="flex items-center gap-2 shrink-0">
+						<button
+							id="btn-new-design"
+							class="w-full sm:w-auto px-5 py-2.5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
+						>
+							<Plus class="w-4 h-4" />
+							New Design
+						</button>
+					</div>
+				</div>
 
-  </AdminLayout>
-  <AdminNavDock currentPath={Astro.url.pathname} />
+				{errorMsg && (
+					<div class="p-4 rounded-2xl bg-[#DB4437]/10 border border-[#DB4437]/30 text-[#DB4437] text-sm flex items-center gap-2.5">
+						<AlertCircle class="w-5 h-5 shrink-0" />
+						<span>{errorMsg}</span>
+					</div>
+				)}
+
+				<!-- Grid of Designs -->
+				<div id="designs-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+					{designs.map(design => (
+						<div
+							class="design-card p-4 rounded-3xl border border-[#2B2930] bg-[#1D1B20] hover:ring-2 hover:ring-primary/40 transition-all duration-300 cursor-pointer group flex flex-col justify-between"
+							data-id={design.id}
+						>
+							<div>
+								<div class="relative aspect-video rounded-2xl overflow-hidden mb-3 border border-[#2B2930] bg-[#141218]">
+									<img
+										src={design.imageUrl}
+										alt={design.title}
+										class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+										loading="lazy"
+									/>
+									<span class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-[#211F26]/90 border border-[#2B2930] text-primary">
+										{design.category}
+									</span>
+								</div>
+								<h3 class="font-bold text-white text-base group-hover:text-primary transition-colors line-clamp-1">
+									{design.title}
+								</h3>
+								<p class="text-xs text-[#E6E1E5]/60 mt-1 line-clamp-2 min-h-[2rem]">
+									{design.description}
+								</p>
+							</div>
+
+							<div class="mt-4 pt-3 border-t border-[#2B2930]/40 flex justify-between items-center text-xs">
+								<span class="text-[#E6E1E5]/40 flex items-center gap-1">
+									<Calendar class="w-3.5 h-3.5" />
+									{design.date}
+								</span>
+								<div class="flex items-center gap-2">
+									{design.figmaUrl && (
+										<a
+											href={design.figmaUrl}
+											target="_blank"
+											rel="noopener noreferrer"
+											class="text-primary hover:text-white transition-colors"
+											onclick="event.stopPropagation();"
+											title="Open Figma File"
+										>
+											<ExternalLink class="w-4 h-4" />
+										</a>
+									)}
+									<span class="px-2.5 py-0.5 rounded bg-[#211F26] border border-[#2B2930] text-[#E6E1E5]/50 text-[10px]">
+										Order: {design.order}
+									</span>
+								</div>
+							</div>
+						</div>
+					))}
+
+					{designs.length === 0 && (
+						<div class="col-span-full py-16 text-center text-[#E6E1E5]/40 bg-[#1D1B20] rounded-3xl border border-[#2B2930]">
+							<Palette class="w-12 h-12 mx-auto mb-3 opacity-30 text-primary" />
+							<p class="font-medium text-white">No designs found</p>
+							<p class="text-xs mt-1">Click "New Design" to add your first mockup.</p>
+						</div>
+					)}
+				</div>
+			</div>
+
+			<!-- Right Column: 33% Detail Editor -->
+			<div class="w-full lg:w-1/3">
+				<div class="sticky top-6 p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] space-y-6">
+					<div class="border-b border-[#2B2930]/60 pb-4">
+						<h2 id="editor-heading" class="text-lg font-bold text-white">Create Design</h2>
+						<p id="editor-subheading" class="text-xs text-[#E6E1E5]/50 mt-1">Add a new portfolio entry</p>
+					</div>
+
+					<form id="design-form" class="space-y-4" onsubmit="event.preventDefault();">
+						<!-- Read-only design ID -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Design ID</label>
+							<input
+								type="text"
+								id="form-id"
+								name="id"
+								readonly
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-[#E6E1E5]/40 text-xs focus:outline-none"
+							/>
+						</div>
+
+						<!-- Title -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Title *</label>
+							<input
+								type="text"
+								id="form-title"
+								name="title"
+								required
+								placeholder="e.g., E-Commerce App Dashboard"
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
+							/>
+						</div>
+
+						<!-- Category -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Category *</label>
+							<select
+								id="form-category"
+								name="category"
+								required
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+							>
+								<option value="UI/UX">UI/UX Design</option>
+								<option value="Web Design">Web Design</option>
+								<option value="Mobile App">Mobile App Design</option>
+								<option value="Graphic Design">Graphic Design</option>
+								<option value="Branding">Branding</option>
+							</select>
+						</div>
+
+						<!-- Description -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Description *</label>
+							<textarea
+								id="form-description"
+								name="description"
+								required
+								rows="3"
+								placeholder="Brief details about the mockup..."
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors resize-none"
+							></textarea>
+						</div>
+
+						<!-- Figma URL -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Figma File URL</label>
+							<input
+								type="url"
+								id="form-figmaUrl"
+								name="figmaUrl"
+								placeholder="https://figma.com/file/..."
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
+							/>
+						</div>
+
+						<!-- Date -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Project Date *</label>
+							<input
+								type="date"
+								id="form-date"
+								name="date"
+								required
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+							/>
+						</div>
+
+						<!-- Order & Tags Grid -->
+						<div class="grid grid-cols-3 gap-3">
+							<div class="col-span-1">
+								<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Order</label>
+								<input
+									type="number"
+									id="form-order"
+									name="order"
+									value="0"
+									required
+									class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
+								/>
+							</div>
+							<div class="col-span-2">
+								<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Tags (Comma-sep)</label>
+								<input
+									type="text"
+									id="form-tags"
+									name="tags"
+									placeholder="figma, dashboard, dashboard"
+									class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
+								/>
+							</div>
+						</div>
+
+						<!-- Image Dropzone -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Mockup Image *</label>
+							<div
+								id="image-drop-zone"
+								class="border-2 border-dashed border-[#2B2930] hover:border-primary/50 rounded-2xl p-4 text-center transition-all duration-300 cursor-pointer group relative overflow-hidden min-h-[140px] flex flex-col items-center justify-center bg-[#141218]"
+							>
+								<input
+									type="file"
+									id="image-file-input"
+									accept="image/jpeg,image/png,image/webp"
+									class="hidden"
+								/>
+								
+								<!-- Hover/Preview overlay -->
+								<img
+									id="image-preview"
+									src=""
+									alt="Preview"
+									class="hidden absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-all duration-500"
+								/>
+
+								<div id="drop-zone-prompt" class="relative z-10 flex flex-col items-center gap-1.5">
+									<div class="p-2 rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+										<ImageIcon class="w-5 h-5" />
+									</div>
+									<div>
+										<p class="text-xs font-medium text-white">
+											Drop cover or <span class="text-primary font-semibold">browse</span>
+										</p>
+										<p class="text-[10px] text-[#E6E1E5]/40 mt-0.5">JPEG, PNG, WebP (Max 10MB)</p>
+									</div>
+								</div>
+
+								<div id="file-details" class="hidden relative z-10 text-[10px] bg-[#0F9D58]/10 text-[#0F9D58] border border-[#0F9D58]/20 px-2 py-1 rounded-md font-semibold mt-2">
+									✓ File Selected
+								</div>
+							</div>
+						</div>
+
+						<!-- Status Panel -->
+						<div id="form-status" class="hidden p-3.5 rounded-xl border text-xs font-medium text-center"></div>
+
+						<!-- Form Buttons -->
+						<div class="flex gap-3 pt-2">
+							<button
+								type="button"
+								id="btn-delete"
+								class="hidden flex-1 py-3 px-4 rounded-xl border border-[#DB4437]/40 hover:bg-[#DB4437] text-white font-semibold text-sm transition-all duration-300 cursor-pointer text-center"
+							>
+								Delete
+							</button>
+							<button
+								type="submit"
+								id="btn-save"
+								class="flex-1 py-3 px-4 rounded-xl bg-[#0F9D58] hover:bg-[#0F9D58]/90 text-white font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+							>
+								<Save class="w-4 h-4" />
+								<span id="save-btn-text">Save</span>
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+		</div>
+	</AdminLayout>
+	<AdminNavDock currentPath={Astro.url.pathname} />
 </BackgroundBaseLayout>
+
+<script define:vars={{ designs }}>
+	// Make server-fetched items available to client script
+	window.designs = designs || [];
+</script>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		// Element Declarations
+		const searchInput = document.getElementById('search-input') as HTMLInputElement;
+		const btnNewDesign = document.getElementById('btn-new-design') as HTMLButtonElement;
+		const designsGrid = document.getElementById('designs-grid') as HTMLDivElement;
+		const designCards = document.querySelectorAll('.design-card') as NodeListOf<HTMLDivElement>;
+
+		const editorHeading = document.getElementById('editor-heading') as HTMLHeadingElement;
+		const editorSubheading = document.getElementById('editor-subheading') as HTMLParagraphElement;
+		
+		const designForm = document.getElementById('design-form') as HTMLFormElement;
+		const formId = document.getElementById('form-id') as HTMLInputElement;
+		const formTitle = document.getElementById('form-title') as HTMLInputElement;
+		const formCategory = document.getElementById('form-category') as HTMLSelectElement;
+		const formDescription = document.getElementById('form-description') as HTMLTextAreaElement;
+		const formFigmaUrl = document.getElementById('form-figmaUrl') as HTMLInputElement;
+		const formDate = document.getElementById('form-date') as HTMLInputElement;
+		const formOrder = document.getElementById('form-order') as HTMLInputElement;
+		const formTags = document.getElementById('form-tags') as HTMLInputElement;
+
+		const imageDropZone = document.getElementById('image-drop-zone') as HTMLDivElement;
+		const imageFileInput = document.getElementById('image-file-input') as HTMLInputElement;
+		const imagePreview = document.getElementById('image-preview') as HTMLImageElement;
+		const dropZonePrompt = document.getElementById('drop-zone-prompt') as HTMLDivElement;
+		const fileDetails = document.getElementById('file-details') as HTMLDivElement;
+
+		const formStatus = document.getElementById('form-status') as HTMLDivElement;
+		const btnDelete = document.getElementById('btn-delete') as HTMLButtonElement;
+		const btnSave = document.getElementById('btn-save') as HTMLButtonElement;
+		const saveBtnText = document.getElementById('save-btn-text') as HTMLSpanElement;
+
+		// Local State
+		let selectedImageFile: File | null = null;
+		let currentSelectedId: string | null = null;
+
+		// --- Core Setup & Initialization ---
+		initFromUrl();
+
+		// Handle category options sync or clean initial state
+		function initFromUrl() {
+			const urlParams = new URLSearchParams(window.location.search);
+			const urlId = urlParams.get('id');
+
+			if (urlId) {
+				const design = (window as any).designs.find((d: any) => d.id === urlId);
+				if (design) {
+					selectDesign(design);
+					return;
+				}
+			}
+
+			// Default: Select/Initialize New Design state
+			setNewDesignState();
+		}
+
+		// --- Form State Management ---
+		function setNewDesignState() {
+			currentSelectedId = null;
+			
+			// Generate short safe random UUID/ID
+			const shortId = (crypto && crypto.randomUUID) 
+				? crypto.randomUUID().substring(0, 8) 
+				: Math.random().toString(36).substring(2, 10);
+			
+			formId.value = `design_${shortId}`;
+			formTitle.value = '';
+			formCategory.value = 'UI/UX';
+			formDescription.value = '';
+			formFigmaUrl.value = '';
+			
+			// Set today's date formatted as YYYY-MM-DD
+			const today = new Date().toISOString().split('T')[0];
+			formDate.value = today;
+			
+			// Default order: count of current designs + 1
+			formOrder.value = String((window as any).designs.length + 1);
+			formTags.value = '';
+
+			// Reset image preview state
+			selectedImageFile = null;
+			imageFileInput.value = '';
+			imagePreview.classList.add('hidden');
+			imagePreview.src = '';
+			dropZonePrompt.classList.remove('hidden');
+			fileDetails.classList.add('hidden');
+
+			// Adjust UI panel headers and buttons
+			editorHeading.textContent = 'Create Design';
+			editorSubheading.textContent = 'Add a new portfolio entry';
+			btnDelete.classList.add('hidden');
+			
+			// Remove cards highlight
+			designCards.forEach(c => c.classList.remove('ring-2', 'ring-primary/60', 'border-primary/50'));
+
+			// Clear status alert
+			clearStatus();
+		}
+
+		function selectDesign(design: any) {
+			currentSelectedId = design.id;
+
+			formId.value = design.id;
+			formTitle.value = design.title || '';
+			formCategory.value = design.category || 'UI/UX';
+			formDescription.value = design.description || '';
+			formFigmaUrl.value = design.figmaUrl || '';
+			formDate.value = design.date ? design.date.split('T')[0] : '';
+			formOrder.value = String(design.order ?? 0);
+			formTags.value = Array.isArray(design.tags) ? design.tags.join(', ') : '';
+
+			// Setup preview image
+			selectedImageFile = null;
+			imageFileInput.value = '';
+			if (design.imageUrl) {
+				imagePreview.src = design.imageUrl;
+				imagePreview.classList.remove('hidden');
+				dropZonePrompt.classList.add('hidden');
+				fileDetails.classList.add('hidden');
+			} else {
+				imagePreview.classList.add('hidden');
+				imagePreview.src = '';
+				dropZonePrompt.classList.remove('hidden');
+				fileDetails.classList.add('hidden');
+			}
+
+			// Highlights active design card in list
+			designCards.forEach(c => {
+				if (c.getAttribute('data-id') === design.id) {
+					c.classList.add('ring-2', 'ring-primary/60', 'border-primary/50');
+					// Scroll card into view smoothly if not visible
+					c.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+				} else {
+					c.classList.remove('ring-2', 'ring-primary/60', 'border-primary/50');
+				}
+			});
+
+			editorHeading.textContent = 'Edit Design';
+			editorSubheading.textContent = 'Modify your mockup credentials';
+			btnDelete.classList.remove('hidden');
+
+			clearStatus();
+		}
+
+		// --- Search & Filter Logic ---
+		searchInput.addEventListener('input', () => {
+			const query = searchInput.value.toLowerCase().trim();
+			let matches = 0;
+
+			designCards.forEach(card => {
+				const cardId = card.getAttribute('data-id') || '';
+				const design = (window as any).designs.find((d: any) => d.id === cardId);
+				if (!design) return;
+
+				const title = (design.title || '').toLowerCase();
+				const category = (design.category || '').toLowerCase();
+				const desc = (design.description || '').toLowerCase();
+				const tags = (Array.isArray(design.tags) ? design.tags.join(' ') : '').toLowerCase();
+
+				const isMatch = title.includes(query) || 
+												category.includes(query) || 
+												desc.includes(query) || 
+												tags.includes(query);
+
+				if (isMatch) {
+					card.classList.remove('hidden');
+					matches++;
+				} else {
+					card.classList.add('hidden');
+				}
+			});
+		});
+
+		// --- Card Click Events ---
+		designCards.forEach(card => {
+			card.addEventListener('click', () => {
+				const id = card.getAttribute('data-id');
+				const design = (window as any).designs.find((d: any) => d.id === id);
+				if (design) {
+					// Set URL query param
+					const newUrl = new URL(window.location.href);
+					newUrl.searchParams.set('id', design.id);
+					window.history.pushState(null, '', newUrl.toString());
+					
+					selectDesign(design);
+				}
+			});
+		});
+
+		btnNewDesign.addEventListener('click', () => {
+			const newUrl = new URL(window.location.href);
+			newUrl.searchParams.delete('id');
+			window.history.pushState(null, '', newUrl.toString());
+			setNewDesignState();
+		});
+
+		// --- Image Drop Zone Controls ---
+		imageDropZone.addEventListener('click', () => imageFileInput.click());
+
+		imageFileInput.addEventListener('change', () => {
+			const file = imageFileInput.files?.[0];
+			if (file) handleFileSelection(file);
+		});
+
+		imageDropZone.addEventListener('dragover', (e) => {
+			e.preventDefault();
+			imageDropZone.classList.add('border-primary', 'bg-primary/5');
+		});
+
+		imageDropZone.addEventListener('dragleave', () => {
+			imageDropZone.classList.remove('border-primary', 'bg-primary/5');
+		});
+
+		imageDropZone.addEventListener('drop', (e) => {
+			e.preventDefault();
+			imageDropZone.classList.remove('border-primary', 'bg-primary/5');
+			const file = e.dataTransfer?.files?.[0];
+			if (file) handleFileSelection(file);
+		});
+
+		function handleFileSelection(file: File) {
+			const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+			if (!allowedTypes.includes(file.type)) {
+				showStatus('error', 'Only JPEG, PNG, or WebP files are allowed.');
+				return;
+			}
+			if (file.size > 10 * 1024 * 1024) {
+				showStatus('error', 'Image size must be under 10MB.');
+				return;
+			}
+
+			selectedImageFile = file;
+
+			// Generate locally readable preview URL
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				if (e.target?.result) {
+					imagePreview.src = e.target.result as string;
+					imagePreview.classList.remove('hidden');
+					dropZonePrompt.classList.add('hidden');
+					fileDetails.classList.remove('hidden');
+					fileDetails.textContent = `✓ ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+				}
+			};
+			reader.readAsDataURL(file);
+		}
+
+		// --- CRUD Network Handlers ---
+		
+		// SAVE (Create or Update)
+		designForm.addEventListener('submit', async (e) => {
+			e.preventDefault();
+
+			// Image validation for new creation
+			if (!currentSelectedId && !selectedImageFile) {
+				showStatus('error', 'Please upload a mockup image for the new design.');
+				return;
+			}
+
+			// Lock buttons
+			setFormLoading(true, 'Saving...');
+
+			const formData = new FormData();
+			formData.append('action', 'save');
+			formData.append('id', formId.value);
+			formData.append('title', formTitle.value);
+			formData.append('category', formCategory.value);
+			formData.append('description', formDescription.value);
+			formData.append('figmaUrl', formFigmaUrl.value);
+			formData.append('date', formDate.value);
+			formData.append('order', formOrder.value);
+			formData.append('tags', formTags.value);
+
+			if (selectedImageFile) {
+				formData.append('image', selectedImageFile);
+			}
+
+			try {
+				const response = await fetch('/admin/admin_designs_api', {
+					method: 'POST',
+					body: formData
+				});
+				const result = await response.json();
+
+				if (response.ok && result.success) {
+					showStatus('success', 'Design saved successfully! Refreshing...');
+					// Keep active ID in query params after refresh
+					setTimeout(() => {
+						window.location.search = `?id=${formId.value}`;
+					}, 1000);
+				} else {
+					showStatus('error', result.error || 'Failed to save design.');
+					setFormLoading(false);
+				}
+			} catch (err) {
+				showStatus('error', 'A network error occurred. Please try again.');
+				setFormLoading(false);
+			}
+		});
+
+		// DELETE
+		btnDelete.addEventListener('click', async () => {
+			if (!currentSelectedId) return;
+
+			const confirmed = confirm('Are you sure you want to delete this design project? This action will permanently remove the record and its cover image.');
+			if (!confirmed) return;
+
+			setFormLoading(true, 'Deleting...');
+
+			const formData = new FormData();
+			formData.append('action', 'delete');
+			formData.append('id', currentSelectedId);
+
+			try {
+				const response = await fetch('/admin/admin_designs_api', {
+					method: 'POST',
+					body: formData
+				});
+				const result = await response.json();
+
+				if (response.ok && result.success) {
+					showStatus('success', 'Design deleted successfully! Syncing...');
+					setTimeout(() => {
+						window.location.search = '';
+					}, 1000);
+				} else {
+					showStatus('error', result.error || 'Failed to delete design.');
+					setFormLoading(false);
+				}
+			} catch (err) {
+				showStatus('error', 'A network error occurred. Please try again.');
+				setFormLoading(false);
+			}
+		});
+
+		// --- Helper Utilities ---
+		function showStatus(type: 'success' | 'error', message: string) {
+			formStatus.classList.remove('hidden', 'bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border-[#0F9D58]/30', 'bg-[#DB4437]/10', 'text-[#DB4437]', 'border-[#DB4437]/30');
+			
+			if (type === 'success') {
+				formStatus.classList.add('bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border', 'border-[#0F9D58]/30');
+			} else {
+				formStatus.classList.add('bg-[#DB4437]/10', 'text-[#DB4437]', 'border', 'border-[#DB4437]/30');
+			}
+			
+			formStatus.textContent = message;
+			formStatus.classList.remove('hidden');
+		}
+
+		function clearStatus() {
+			formStatus.classList.add('hidden');
+			formStatus.textContent = '';
+		}
+
+		function setFormLoading(loading: boolean, label = 'Save') {
+			if (loading) {
+				btnSave.disabled = true;
+				btnDelete.disabled = true;
+				saveBtnText.textContent = label;
+				btnSave.classList.add('opacity-75', 'cursor-not-allowed');
+			} else {
+				btnSave.disabled = false;
+				btnDelete.disabled = false;
+				saveBtnText.textContent = 'Save';
+				btnSave.classList.remove('opacity-75', 'cursor-not-allowed');
+			}
+		}
+	});
+</script>
