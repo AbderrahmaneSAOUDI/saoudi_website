@@ -124,6 +124,18 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				await previewFile.makePublic();
 				results.previewUrl = previewFile.publicUrl();
 			}
+
+			// Update Firestore configuration
+			const updateData: Record<string, string> = {};
+			if (results.resumeUrl) updateData.resumeUrl = results.resumeUrl;
+			if (results.previewUrl) updateData.previewUrl = results.previewUrl;
+
+			if (Object.keys(updateData).length > 0) {
+				await db.collection('configuration').doc('static_data').set(
+					updateData,
+					{ merge: true }
+				);
+			}
 		} catch (storageError: any) {
 			console.warn('Firebase Storage upload failed:', storageError);
 			storageFailed = true;
@@ -140,23 +152,42 @@ export const POST: APIRoute = async ({ locals, request }) => {
 					const localPdfPath = path.join(process.cwd(), 'public', 'Abderrahmane_SAOUDI_Resume.pdf');
 					fs.writeFileSync(localPdfPath, pdfBuffer);
 					results.resumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
-
-					try {
-						const db = getFirebaseAdminDb();
-						await db.collection('configuration').doc('static_data').set(
-							{ resumeUrl: results.resumeUrl },
-							{ merge: true }
-						);
-					} catch (dbErr) {
-						console.warn('Could not update Firestore config:', dbErr);
-					}
 				}
 
 				if (resumePreview && resumePreview.size > 0) {
+					const extMap: Record<string, string> = {
+						'image/jpeg': 'jpg',
+						'image/png': 'png',
+						'image/webp': 'webp',
+					};
+					const ext = extMap[resumePreview.type] || 'jpg';
 					const previewBuffer = Buffer.from(await resumePreview.arrayBuffer());
-					const localPreviewPath = path.join(process.cwd(), 'public', 'resume.jpg');
+					const localPreviewPath = path.join(process.cwd(), 'public', `resume.${ext}`);
+
+					// Delete old preview files locally to prevent stale caches
+					for (const oldExt of ['jpg', 'png', 'webp']) {
+						try { fs.unlinkSync(path.join(process.cwd(), 'public', `resume.${oldExt}`)); } catch { /* ignore */ }
+					}
+
 					fs.writeFileSync(localPreviewPath, previewBuffer);
-					results.previewUrl = '/resume.jpg';
+					results.previewUrl = `/resume.${ext}`;
+				}
+
+				// Update local Firestore with fallback URLs
+				try {
+					const db = getFirebaseAdminDb();
+					const updateData: Record<string, string> = {};
+					if (results.resumeUrl) updateData.resumeUrl = results.resumeUrl;
+					if (results.previewUrl) updateData.previewUrl = results.previewUrl;
+
+					if (Object.keys(updateData).length > 0) {
+						await db.collection('configuration').doc('static_data').set(
+							updateData,
+							{ merge: true }
+						);
+					}
+				} catch (dbErr) {
+					console.warn('Could not update local Firestore config:', dbErr);
 				}
 
 				return new Response(JSON.stringify({

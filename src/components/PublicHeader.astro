@@ -1,9 +1,22 @@
 ---
 import '../styles/global.css';
-import { resumeUrl } from '../lib/resume.ts';
 import { Home, Award, FolderOpen, Heart, FileText, Download, Briefcase, Code } from '@lucide/astro';
 import NavItem from '../components/NavItem.astro';
 import ActionButton from '../components/ActionButton.astro';
+import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
+
+let resumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
+
+try {
+	const db = getFirebaseAdminDb();
+	const configDoc = await db.collection('configuration').doc('static_data').get();
+	if (configDoc.exists) {
+		const data = configDoc.data();
+		if (data?.resumeUrl) resumeUrl = data.resumeUrl;
+	}
+} catch (error) {
+	console.warn('Failed to fetch resumeUrl in header:', error);
+}
 
 const { pathname } = Astro.url;
 

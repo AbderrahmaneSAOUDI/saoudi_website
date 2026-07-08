@@ -5,7 +5,7 @@ import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
 import AdminLayout from "../../components/admin/AdminLayout.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
 import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
-import { FileText, Upload, Image, Download, ExternalLink, CheckCircle, AlertCircle } from '@lucide/astro';
+import { FileText, Upload, Image, Download, AlertCircle } from '@lucide/astro';
 
 // Extra safety: double-check that the middleware successfully set Astro.locals.adminEmail
 const adminEmail = Astro.locals.adminEmail;
@@ -14,7 +14,6 @@ if (!adminEmail) return Astro.redirect("/admin/admin_login");
 // Fetch current resume data from Firestore configuration
 let currentResumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
 let currentPreviewUrl = '/resume.jpg';
-let firestoreStatus = 'connected';
 
 try {
 	const db = getFirebaseAdminDb();
@@ -23,14 +22,17 @@ try {
 	if (configDoc.exists) {
 		const data = configDoc.data();
 		if (data?.resumeUrl) currentResumeUrl = data.resumeUrl;
+		if (data?.previewUrl) currentPreviewUrl = data.previewUrl;
 	}
 } catch (error) {
 	console.warn('Failed to fetch resume config from Firestore:', error);
-	firestoreStatus = 'degraded';
 }
 ---
 
 <BackgroundBaseLayout title="Resume Workspace">
+	<!-- Load PDF.js CDN -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" is:inline></script>
+
 	<AdminLayout title="Resume">
 
 		<!-- Main Content: Two Column Layout -->
@@ -47,14 +49,14 @@ try {
 						</div>
 						<div>
 							<h3 class="text-base font-bold text-white">Upload New PDF</h3>
-							<p class="text-xs text-[#E6E1E5]/50">Replace the current resume file</p>
+							<p class="text-xs text-[#E6E1E5]/50">Choose a new PDF file to process</p>
 						</div>
 					</div>
 
 					<!-- Drop Zone for PDF -->
 					<div
 						id="pdf-drop-zone"
-						class="border-2 border-dashed border-[#2B2930] hover:border-[#4285F4]/50 rounded-2xl p-6 text-center transition-all duration-300 cursor-pointer group"
+						class="border-2 border-dashed border-[#2B2930] hover:border-primary/50 rounded-2xl p-6 text-center transition-all duration-300 cursor-pointer group"
 					>
 						<input
 							type="file"
@@ -63,12 +65,12 @@ try {
 							class="hidden"
 						/>
 						<div class="flex flex-col items-center gap-3">
-							<div class="p-3 rounded-full bg-[#4285F4]/10 text-[#4285F4] group-hover:bg-[#4285F4]/20 transition-colors">
+							<div class="p-3 rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
 								<FileText class="w-6 h-6" />
 							</div>
 							<div>
 								<p class="text-sm font-medium text-white">
-									Drop PDF here or <span class="text-[#4285F4]">browse</span>
+									Drop PDF here or <span class="text-primary">browse</span>
 								</p>
 								<p class="text-xs text-[#E6E1E5]/40 mt-1">PDF only, max 10MB</p>
 							</div>
@@ -78,42 +80,55 @@ try {
 					</div>
 				</div>
 
-				<!-- Upload Preview Image Card -->
-				<div class="p-6 rounded-3xl border border-[#2B2930]" style="background: #1D1B20">
+				<!-- Preview Generation Settings Card (Hidden until PDF is chosen) -->
+				<div id="settings-card" class="hidden p-6 rounded-3xl border border-[#2B2930]" style="background: #1D1B20">
 					<div class="flex items-center gap-3 mb-5">
 						<div class="p-2.5 rounded-xl bg-[#F9AB00]/10 text-[#F9AB00]">
 							<Image class="w-5 h-5" />
 						</div>
 						<div>
-							<h3 class="text-base font-bold text-white">Upload Preview Image</h3>
-							<p class="text-xs text-[#E6E1E5]/50">Screenshot of the resume for display</p>
+							<h3 class="text-base font-bold text-white">Image Options</h3>
+							<p class="text-xs text-[#E6E1E5]/50">Configure PDF to image rendering</p>
 						</div>
 					</div>
 
-					<!-- Drop Zone for Image -->
-					<div
-						id="preview-drop-zone"
-						class="border-2 border-dashed border-[#2B2930] hover:border-[#F9AB00]/50 rounded-2xl p-6 text-center transition-all duration-300 cursor-pointer group"
-					>
-						<input
-							type="file"
-							id="preview-file-input"
-							accept="image/jpeg,image/png,image/webp"
-							class="hidden"
-						/>
-						<div class="flex flex-col items-center gap-3">
-							<div class="p-3 rounded-full bg-[#F9AB00]/10 text-[#F9AB00] group-hover:bg-[#F9AB00]/20 transition-colors">
-								<Image class="w-6 h-6" />
-							</div>
-							<div>
-								<p class="text-sm font-medium text-white">
-									Drop image here or <span class="text-[#F9AB00]">browse</span>
-								</p>
-								<p class="text-xs text-[#E6E1E5]/40 mt-1">JPEG, PNG, or WebP, max 10MB</p>
-							</div>
+					<div class="space-y-4">
+						<!-- Output Format -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Output Format</label>
+							<select id="format-select" class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer">
+								<option value="image/webp">WebP (Recommended)</option>
+								<option value="image/jpeg">JPEG</option>
+								<option value="image/png">PNG</option>
+							</select>
 						</div>
-						<!-- Selected file name -->
-						<div id="preview-file-name" class="hidden mt-3 px-3 py-1.5 rounded-xl bg-[#F9AB00]/10 text-[#F9AB00] text-xs font-medium"></div>
+
+						<!-- Scale / Resolution -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Resolution Scale</label>
+							<select id="scale-select" class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer">
+								<option value="1.0">Standard (1.0x)</option>
+								<option value="1.5">Medium (1.5x)</option>
+								<option value="2.0">High-Res (2.0x)</option>
+								<option value="2.5" selected>Ultra (2.5x)</option>
+							</select>
+						</div>
+
+						<!-- Quality (WebP/JPEG only) -->
+						<div id="quality-container">
+							<div class="flex justify-between items-center mb-1.5">
+								<label class="text-xs font-semibold text-[#E6E1E5]/70">Compression Quality</label>
+								<span id="quality-val" class="text-xs font-bold text-primary">100%</span>
+							</div>
+							<input
+								type="range"
+								id="quality-slider"
+								min="10"
+								max="100"
+								value="100"
+								class="w-full h-1.5 bg-[#2B2930] rounded-lg appearance-none cursor-pointer accent-primary"
+							/>
+						</div>
 					</div>
 				</div>
 
@@ -121,10 +136,10 @@ try {
 				<button
 					id="upload-btn"
 					disabled
-					class="w-full py-3 px-6 rounded-xl font-semibold text-white transition-all duration-300 bg-[#0F9D58] hover:bg-[#0F9D58]/90 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#0F9D58] flex items-center justify-center gap-2"
+					class="w-full py-3.5 px-6 rounded-xl font-semibold text-white transition-all duration-300 bg-[#0F9D58] hover:bg-[#0F9D58]/90 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#0F9D58] flex items-center justify-center gap-2"
 				>
 					<Upload class="w-4 h-4" />
-					<span id="upload-btn-text">Upload Selected Files</span>
+					<span id="upload-btn-text">Upload to Database</span>
 				</button>
 
 				<!-- Status Messages -->
@@ -139,26 +154,35 @@ try {
 				<div class="p-6 rounded-3xl border border-[#2B2930] h-full flex flex-col" style="background: #1D1B20">
 					<div class="flex items-center justify-between mb-5 shrink-0">
 						<div class="flex items-center gap-3">
-							<div class="p-2.5 rounded-xl bg-[#4285F4]/10 text-[#4285F4]">
+							<div class="p-2.5 rounded-xl bg-primary/10 text-primary">
 								<FileText class="w-5 h-5" />
 							</div>
 							<div>
-								<h2 class="text-lg font-bold text-white">Current Resume</h2>
-								<p class="text-xs text-[#E6E1E5]/50">Preview of the active resume file</p>
+								<div class="flex items-center gap-2">
+									<h2 class="text-lg font-bold text-white">Current Resume</h2>
+									<span id="preview-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#2B2930] text-[#E6E1E5]/70 border border-primary/20">Active</span>
+								</div>
+								<p class="text-xs text-[#E6E1E5]/50">Preview of the resume display image</p>
 							</div>
 						</div>
 						<a
 							href={currentResumeUrl}
 							download
-							class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border border-[#4285F4]/40 text-[#4285F4] hover:bg-[#4285F4] hover:text-white"
+							class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border border-primary/40 text-primary hover:bg-primary hover:text-white"
 						>
 							<Download class="w-4 h-4" />
 							<span class="hidden sm:inline">Download PDF</span>
 						</a>
 					</div>
 
-					<!-- Preview Image -->
-					<div class="border border-[#2B2930] rounded-2xl overflow-hidden bg-[#141218] flex-1 flex items-center justify-center min-h-[300px]">
+					<!-- Preview Image Container -->
+					<div class="relative border border-[#2B2930] rounded-2xl overflow-hidden bg-[#141218] flex-1 flex items-center justify-center min-h-[350px]">
+						<!-- Spinner Overlay -->
+						<div id="preview-loading" class="hidden absolute inset-0 bg-[#141218]/90 flex flex-col items-center justify-center gap-3 z-10">
+							<div class="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+							<p id="loading-text" class="text-xs text-[#E6E1E5]/70">Rendering PDF...</p>
+						</div>
+
 						<img
 							id="resume-preview-img"
 							src={currentPreviewUrl}
@@ -176,24 +200,40 @@ try {
 
 <script>
 	document.addEventListener('DOMContentLoaded', () => {
+		// Elements
 		const pdfDropZone = document.getElementById('pdf-drop-zone') as HTMLDivElement;
 		const pdfFileInput = document.getElementById('pdf-file-input') as HTMLInputElement;
 		const pdfFileName = document.getElementById('pdf-file-name') as HTMLDivElement;
 
-		const previewDropZone = document.getElementById('preview-drop-zone') as HTMLDivElement;
-		const previewFileInput = document.getElementById('preview-file-input') as HTMLInputElement;
-		const previewFileName = document.getElementById('preview-file-name') as HTMLDivElement;
+		const settingsCard = document.getElementById('settings-card') as HTMLDivElement;
+		const formatSelect = document.getElementById('format-select') as HTMLSelectElement;
+		const scaleSelect = document.getElementById('scale-select') as HTMLSelectElement;
+		const qualityContainer = document.getElementById('quality-container') as HTMLDivElement;
+		const qualitySlider = document.getElementById('quality-slider') as HTMLInputElement;
+		const qualityVal = document.getElementById('quality-val') as HTMLSpanElement;
 
 		const uploadBtn = document.getElementById('upload-btn') as HTMLButtonElement;
 		const uploadBtnText = document.getElementById('upload-btn-text') as HTMLSpanElement;
 		const uploadStatus = document.getElementById('upload-status') as HTMLDivElement;
-		const previewImg = document.getElementById('resume-preview-img') as HTMLImageElement;
 
+		const previewImg = document.getElementById('resume-preview-img') as HTMLImageElement;
+		const previewBadge = document.getElementById('preview-badge') as HTMLSpanElement;
+		const previewLoading = document.getElementById('preview-loading') as HTMLDivElement;
+		const loadingText = document.getElementById('loading-text') as HTMLParagraphElement;
+
+		// State
 		let selectedPdf: File | null = null;
-		let selectedPreview: File | null = null;
+		let selectedPreviewBlob: Blob | null = null;
+		let pdfDocument: any = null;
+		let pdfUploaded = false; // Tracks if the current PDF has been uploaded to the database
+
+		// Initial PDF.js Setup
+		const pdfjsLib = (window as any)['pdfjs-dist/build/pdf'];
+		if (pdfjsLib) {
+			pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+		}
 
 		// --- Drop Zone Helpers ---
-
 		function setupDropZone(
 			dropZone: HTMLDivElement,
 			fileInput: HTMLInputElement,
@@ -201,10 +241,8 @@ try {
 			acceptTypes: string[],
 			onFileSelected: (file: File) => void
 		) {
-			// Click to browse
 			dropZone.addEventListener('click', () => fileInput.click());
 
-			// File input change
 			fileInput.addEventListener('change', () => {
 				const file = fileInput.files?.[0];
 				if (file && acceptTypes.some(t => file.type === t || file.name.endsWith(t))) {
@@ -212,19 +250,18 @@ try {
 				}
 			});
 
-			// Drag & drop
 			dropZone.addEventListener('dragover', (e) => {
 				e.preventDefault();
-				dropZone.classList.add('border-[#4285F4]', 'bg-[#4285F4]/5');
+				dropZone.classList.add('border-primary', 'bg-primary/5');
 			});
 
 			dropZone.addEventListener('dragleave', () => {
-				dropZone.classList.remove('border-[#4285F4]', 'bg-[#4285F4]/5');
+				dropZone.classList.remove('border-primary', 'bg-primary/5');
 			});
 
 			dropZone.addEventListener('drop', (e) => {
 				e.preventDefault();
-				dropZone.classList.remove('border-[#4285F4]', 'bg-[#4285F4]/5');
+				dropZone.classList.remove('border-primary', 'bg-primary/5');
 				const file = e.dataTransfer?.files[0];
 				if (file && acceptTypes.some(t => file.type === t || file.name.endsWith(t))) {
 					onFileSelected(file);
@@ -239,7 +276,73 @@ try {
 		}
 
 		function updateUploadButton() {
-			uploadBtn.disabled = !selectedPdf && !selectedPreview;
+			uploadBtn.disabled = !selectedPdf || !selectedPreviewBlob;
+		}
+
+		// --- PDF to Image Converter Logic ---
+		async function loadPdf(file: File) {
+			previewLoading.classList.remove('hidden');
+			loadingText.textContent = 'Parsing PDF...';
+			
+			try {
+				const arrayBuffer = await file.arrayBuffer();
+				pdfDocument = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+				await renderPage();
+			} catch (err) {
+				console.error('PDF parsing failed:', err);
+				showStatus('error', 'Failed to read PDF. Please select a valid PDF file.');
+				previewLoading.classList.add('hidden');
+			}
+		}
+
+		async function renderPage() {
+			if (!pdfDocument) return;
+			previewLoading.classList.remove('hidden');
+			loadingText.textContent = 'Rendering preview image...';
+
+			try {
+				// Render the first page
+				const page = await pdfDocument.getPage(1);
+				const scale = parseFloat(scaleSelect.value);
+				const viewport = page.getViewport({ scale });
+
+				// Prepare canvas
+				const canvas = document.createElement('canvas');
+				canvas.width = viewport.width;
+				canvas.height = viewport.height;
+				const context = canvas.getContext('2d');
+
+				if (!context) throw new Error('Could not get canvas context');
+
+				// Render PDF page to canvas context
+				await page.render({
+					canvasContext: context,
+					viewport: viewport
+				}).promise;
+
+				const outputType = formatSelect.value;
+				const quality = parseFloat(qualitySlider.value) / 100;
+
+				// Generate data URL for browser display
+				const dataUrl = canvas.toDataURL(outputType, quality);
+				previewImg.src = dataUrl;
+
+				// Update preview badge
+				previewBadge.textContent = 'Generated Preview';
+				previewBadge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-[#F9AB00]/10 text-[#F9AB00] border border-[#F9AB00]/20 animate-pulse';
+
+				// Convert to Blob for upload
+				canvas.toBlob((blob) => {
+					selectedPreviewBlob = blob;
+					updateUploadButton();
+					previewLoading.classList.add('hidden');
+				}, outputType, quality);
+
+			} catch (err) {
+				console.error('PDF page rendering failed:', err);
+				showStatus('error', 'Failed to generate preview image from PDF.');
+				previewLoading.classList.add('hidden');
+			}
 		}
 
 		// --- Setup PDF Drop Zone ---
@@ -250,45 +353,60 @@ try {
 			['application/pdf', '.pdf'],
 			(file) => {
 				selectedPdf = file;
+				pdfUploaded = false; // Reset uploaded flag on new selection
 				showFileName(pdfFileName, file.name, file.size);
-				updateUploadButton();
+				settingsCard.classList.remove('hidden');
+				loadPdf(file);
 			}
 		);
 
-		// --- Setup Preview Image Drop Zone ---
-		setupDropZone(
-			previewDropZone,
-			previewFileInput,
-			previewFileName,
-			['image/jpeg', 'image/png', 'image/webp'],
-			(file) => {
-				selectedPreview = file;
-				showFileName(previewFileName, file.name, file.size);
-				updateUploadButton();
-
-				// Live preview
-				const reader = new FileReader();
-				reader.onload = (e) => {
-					if (previewImg && e.target?.result) {
-						previewImg.src = e.target.result as string;
-					}
-				};
-				reader.readAsDataURL(file);
+		// --- Settings Listeners ---
+		scaleSelect.addEventListener('change', renderPage);
+		
+		formatSelect.addEventListener('change', () => {
+			if (formatSelect.value === 'image/png') {
+				qualityContainer.style.opacity = '0.3';
+				qualitySlider.disabled = true;
+			} else {
+				qualityContainer.style.opacity = '1';
+				qualitySlider.disabled = false;
 			}
-		);
+			renderPage();
+		});
 
-		// --- Upload Handler ---
+		qualitySlider.addEventListener('input', () => {
+			qualityVal.textContent = `${qualitySlider.value}%`;
+		});
+		
+		qualitySlider.addEventListener('change', renderPage);
+
+		// --- Upload Handler (Update DB) ---
 		uploadBtn.addEventListener('click', async () => {
-			if (!selectedPdf && !selectedPreview) return;
+			if (!selectedPdf || !selectedPreviewBlob) return;
 
-			// Disable button, show loading
+			// Disable buttons & show loader
 			uploadBtn.disabled = true;
-			uploadBtnText.textContent = 'Uploading...';
+			uploadBtnText.textContent = 'Updating database...';
 			uploadStatus.classList.add('hidden');
 
 			const formData = new FormData();
-			if (selectedPdf) formData.append('resumePdf', selectedPdf);
-			if (selectedPreview) formData.append('resumePreview', selectedPreview);
+			
+			// Only append the PDF if it has not been uploaded yet!
+			if (!pdfUploaded) {
+				formData.append('resumePdf', selectedPdf);
+			}
+
+			// Map MIME type to file extension
+			const extMap: Record<string, string> = {
+				'image/webp': 'webp',
+				'image/jpeg': 'jpg',
+				'image/png': 'png',
+			};
+			const ext = extMap[formatSelect.value] || 'webp';
+			
+			// Create a File from the Blob
+			const previewFile = new File([selectedPreviewBlob], `resume_preview.${ext}`, { type: formatSelect.value });
+			formData.append('resumePreview', previewFile);
 
 			try {
 				const response = await fetch('/admin/admin_resume_upload', {
@@ -299,15 +417,25 @@ try {
 				const result = await response.json();
 
 				if (response.ok && result.success) {
-					showStatus('success', 'Resume updated successfully! Changes will appear on the public page.');
+					showStatus('success', 'Resume database updated successfully!');
+					
+					// Mark PDF as uploaded and clear preview blob until next adjustment
+					pdfUploaded = true;
+					selectedPreviewBlob = null;
+					
+					previewBadge.textContent = 'Active';
+					previewBadge.className = 'px-2 py-0.5 rounded text-[10px] font-semibold bg-[#0F9D58]/10 text-[#0F9D58] border border-[#0F9D58]/20';
 
-					// Reset selections
-					selectedPdf = null;
-					selectedPreview = null;
-					pdfFileName.classList.add('hidden');
-					previewFileName.classList.add('hidden');
-					pdfFileInput.value = '';
-					previewFileInput.value = '';
+					// Update page download link if returned
+					if (result.resumeUrl) {
+						const downloadBtn = document.querySelector('a[download]') as HTMLAnchorElement;
+						if (downloadBtn) downloadBtn.href = result.resumeUrl;
+					}
+
+					// Update preview image with the new URL and cache-buster
+					if (result.previewUrl) {
+						previewImg.src = result.previewUrl + '?t=' + Date.now();
+					}
 				} else {
 					showStatus('error', result.error || 'Upload failed. Please try again.');
 				}
@@ -315,7 +443,7 @@ try {
 				showStatus('error', 'Network error. Please check your connection and try again.');
 			}
 
-			uploadBtnText.textContent = 'Upload Selected Files';
+			uploadBtnText.textContent = 'Update Database';
 			updateUploadButton();
 		});
 
