@@ -1,7 +1,18 @@
 ---
-import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
+import '../../styles/global.css';
 
+import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
+import AdminLayout from "../../components/admin/AdminLayout.astro";
+import AdminNavDock from "../../components/admin/AdminNavDock.astro";
+
+// Extra safety: double-check that the middleware successfully set Astro.locals.adminEmail
+const adminEmail = Astro.locals.adminEmail;
+if (!adminEmail) return Astro.redirect("/admin/admin_login");
 ---
 
 <BackgroundBaseLayout title="Global Settings">
+  <AdminLayout title="Global Settings">
+
+  </AdminLayout>
+  <AdminNavDock currentPath={Astro.url.pathname} />
 </BackgroundBaseLayout>

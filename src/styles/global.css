@@ -48,4 +48,40 @@
     .nav-icon { display: none !important; }
     .nav-label { display: inline !important; }
   }
+
+  /* Admin nav dock: icons on mobile, labels on ≥920px */
+  .admin-nav-icon { display: inline-flex !important; }
+  .admin-nav-label { display: none !important; }
+
+  @media (min-width: 920px) {
+    .admin-nav-icon { display: none !important; }
+    .admin-nav-label { display: inline !important; }
+
+    /* Dock: floating centered pill on desktop */
+    .admin-dock-wrapper {
+      width: auto;
+      bottom: 1.5rem;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .admin-dock-inner {
+      gap: 1.5rem;
+      padding: 0.75rem 1rem;
+      border-radius: 1.5rem;
+      justify-content: flex-start;
+    }
+    .admin-dock-inner nav { gap: 0.25rem; }
+    .admin-fab { width: 3rem; height: 3rem; }
+    #image-settings-btn { width: 2.5rem; height: 2.5rem; }
+  }
+
+  /* Hide scrollbar for horizontal nav overflow */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
+

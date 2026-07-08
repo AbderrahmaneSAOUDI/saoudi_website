@@ -62,8 +62,8 @@ const metrics = {
 ---
 
 <BackgroundBaseLayout title="Admin Workspace Dashboard">
-  <AdminLayout>
-    <AdminDashboard metrics={metrics} />
+  <AdminLayout subtitle={`Authenticated as ${metrics.adminEmail}`}>
+    <!-- <AdminDashboard metrics={metrics} /> -->
   </AdminLayout>
   <AdminNavDock currentPath={Astro.url.pathname} />
 </BackgroundBaseLayout>

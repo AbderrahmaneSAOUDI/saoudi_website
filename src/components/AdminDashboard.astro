@@ -20,30 +20,8 @@ const { metrics } = Astro.props;
 const { counts, adminEmail, systemStatus, lastUpdated } = metrics;
 ---
 
-<div class="min-h-screen text-[#E6E1E5] p-6 md:p-8 flex flex-col justify-between" style="background: #141218">
+<div class="text-[#E6E1E5] flex flex-col justify-between">
   <div>
-    <!-- Header -->
-    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-[#2B2930] pb-6 mb-8">
-      <div>
-        <div class="flex items-center gap-2 mb-1">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#0F9D58] animate-pulse"></span>
-          <span class="text-xs uppercase tracking-widest text-[#4285F4] font-semibold">Active Session</span>
-        </div>
-        <h1 class="text-3xl font-extrabold text-white tracking-tight">Admin Control Panel</h1>
-        <p class="text-sm text-[#E6E1E5]/60 mt-1">
-          Authenticated as <span class="text-[#4285F4] font-medium">{adminEmail}</span>
-        </p>
-      </div>
-      
-      <div class="flex items-center gap-3">
-        <a 
-          href="/admin/admin_logout" 
-          class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 border border-[#DB4437]/40 hover:bg-[#DB4437] hover:text-white hover:border-transparent hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#DB4437]/50"
-        >
-          Sign Out
-        </a>
-      </div>
-    </header>
 
     <!-- System Status Banner -->
     <div class="mb-8 p-4 rounded-2xl bg-[#1D1B20] border border-[#2B2930] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -165,9 +143,4 @@ const { counts, adminEmail, systemStatus, lastUpdated } = metrics;
       </div>
     </section>
   </div>
-
-  <footer class="text-center text-xs text-[#E6E1E5]/40 mt-8 pt-6 border-t border-[#2B2930]">
-    <p>Dashboard last synced on {lastUpdated}</p>
-    <p class="mt-1">&copy; {new Date().getFullYear()} saoudi.online secure dashboard</p>
-  </footer>
 </div>
