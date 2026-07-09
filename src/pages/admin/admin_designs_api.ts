@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
-import { getFirebaseAdminDb, getFirebaseAdminStorage } from '../../lib/server/firebase-admin';
-import fs from 'node:fs';
-import path from 'node:path';
+import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
+import { saveFile, deleteFile, cleanOldExtensions } from '../../lib/server/storage';
 
 export const POST: APIRoute = async ({ locals, request }) => {
 	// Auth check: verify session token
@@ -14,10 +13,10 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 	try {
 		const formData = await request.formData();
-		const action = formData.get('action') as string; // 'save' or 'delete'
+		const action = formData.get('action') as string; // 'save', 'delete', or 'update_category'
 		const designId = formData.get('id') as string;
 
-		if (!designId) {
+		if (action !== 'update_category' && action !== 'save_categories' && action !== 'save_companies' && !designId) {
 			return new Response(JSON.stringify({ error: 'Missing Design ID' }), {
 				status: 400,
 				headers: { 'Content-Type': 'application/json' },
@@ -43,7 +42,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			// 1. Delete Storage / local image file first (atomic policy)
 			if (imageUrl) {
-				await deleteImageFile(imageUrl);
+				await deleteFile(imageUrl, 'uploads/designs');
 			}
 
 			// 2. Delete Firestore document
@@ -55,26 +54,117 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			});
 		}
 
+		// ─── ACTION: SAVE CATEGORIES (CRUD & REORDER) ────────────────────────
+		if (action === 'save_categories') {
+			const categoriesListJson = formData.get('categories') as string;
+			const renamesJson = formData.get('renames') as string;
+
+			if (!categoriesListJson) {
+				return new Response(JSON.stringify({ error: 'Categories list is required.' }), {
+					status: 400,
+					headers: { 'Content-Type': 'application/json' },
+				});
+			}
+
+			const categoriesList = JSON.parse(categoriesListJson) as string[];
+			const renames = renamesJson ? JSON.parse(renamesJson) as Record<string, string> : {};
+
+			// 1. Update the configuration document
+			const configRef = db.collection('configuration').doc('designs_categories');
+			await configRef.set({ categories: categoriesList });
+
+			// 2. Perform category renames in designs collection
+			const renameKeys = Object.keys(renames);
+			if (renameKeys.length > 0) {
+				const batch = db.batch();
+				let hasUpdates = false;
+
+				for (const oldCat of renameKeys) {
+					const newCat = renames[oldCat];
+					if (oldCat.trim() !== newCat.trim()) {
+						const snapshot = await db.collection('designs').where('category', '==', oldCat.trim()).get();
+						snapshot.docs.forEach(doc => {
+							batch.update(doc.ref, { category: newCat.trim() });
+							hasUpdates = true;
+						});
+					}
+				}
+
+				if (hasUpdates) {
+					await batch.commit();
+				}
+			}
+
+			return new Response(JSON.stringify({ success: true }), {
+				status: 200,
+				headers: { 'Content-Type': 'application/json' },
+			});
+		}
+
+		// ─── ACTION: SAVE COMPANIES (CRUD & REORDER) ────────────────────────
+		if (action === 'save_companies') {
+			const companiesListJson = formData.get('companies') as string;
+			const renamesJson = formData.get('renames') as string;
+
+			if (!companiesListJson) {
+				return new Response(JSON.stringify({ error: 'Companies list is required.' }), {
+					status: 400,
+					headers: { 'Content-Type': 'application/json' },
+				});
+			}
+
+			const companiesList = JSON.parse(companiesListJson) as string[];
+			const renames = renamesJson ? JSON.parse(renamesJson) as Record<string, string> : {};
+
+			// 1. Update the configuration document
+			const configRef = db.collection('configuration').doc('designs_companies');
+			await configRef.set({ companies: companiesList });
+
+			// 2. Perform company renames in designs collection
+			const renameKeys = Object.keys(renames);
+			if (renameKeys.length > 0) {
+				const batch = db.batch();
+				let hasUpdates = false;
+
+				for (const oldComp of renameKeys) {
+					const newComp = renames[oldComp];
+					if (oldComp.trim() !== newComp.trim()) {
+						const snapshot = await db.collection('designs').where('company', '==', oldComp.trim()).get();
+						snapshot.docs.forEach(doc => {
+							batch.update(doc.ref, { company: newComp.trim() });
+							hasUpdates = true;
+						});
+					}
+				}
+
+				if (hasUpdates) {
+					await batch.commit();
+				}
+			}
+
+			return new Response(JSON.stringify({ success: true }), {
+				status: 200,
+				headers: { 'Content-Type': 'application/json' },
+			});
+		}
+
 		// ─── ACTION: SAVE (CREATE OR UPDATE) ─────────────────────────────────
 		if (action === 'save') {
 			const title = formData.get('title') as string;
-			const description = formData.get('description') as string;
 			const category = formData.get('category') as string;
-			const figmaUrl = formData.get('figmaUrl') as string | null;
+			const company = (formData.get('company') as string | null) || '';
 			const date = formData.get('date') as string;
-			const orderStr = formData.get('order') as string;
 			const tagsStr = formData.get('tags') as string;
 			const imageFile = formData.get('image') as File | null;
 
-			// Server validation
-			if (!title || !description || !category || !date) {
+			// Server validation (description and company are not strictly required here)
+			if (!title || !category || !date) {
 				return new Response(
-					JSON.stringify({ error: 'Title, description, category, and date are required.' }),
+					JSON.stringify({ error: 'Title, category, and date are required.' }),
 					{ status: 400, headers: { 'Content-Type': 'application/json' } }
 				);
 			}
 
-			const order = orderStr ? parseInt(orderStr, 10) : 0;
 			const tags = tagsStr
 				? tagsStr.split(',').map((t) => t.trim()).filter((t) => t.length > 0)
 				: [];
@@ -102,11 +192,32 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 				// If updating, delete the old image file first
 				if (imageUrl) {
-					await deleteImageFile(imageUrl);
+					await deleteFile(imageUrl, 'uploads/designs');
 				}
 
 				// Upload/save new image
-				imageUrl = await saveImageFile(designId, imageFile);
+				const extMap: Record<string, string> = {
+					'image/jpeg': 'jpg',
+					'image/png': 'png',
+					'image/webp': 'webp',
+				};
+				const ext = extMap[imageFile.type] || 'jpg';
+				const filename = `${designId}.${ext}`;
+
+				// Clean up old extension variations first (jpg, png, webp)
+				await cleanOldExtensions({
+					baseId: designId,
+					destinationDir: 'designs',
+					localFallbackPath: 'uploads/designs',
+				});
+
+				imageUrl = await saveFile({
+					file: imageFile,
+					destinationDir: 'designs',
+					filename,
+					contentType: imageFile.type,
+					localFallbackPath: 'uploads/designs',
+				});
 			}
 
 			if (!imageUrl) {
@@ -119,21 +230,13 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			// Prepare document fields
 			const designPayload: Record<string, any> = {
 				id: designId,
-				order,
 				title,
-				description,
 				imageUrl,
-				category,
+				category: category.trim(),
+				company: company.trim(),
 				tags,
 				date,
 			};
-
-			if (figmaUrl && figmaUrl.trim().length > 0) {
-				designPayload.figmaUrl = figmaUrl.trim();
-			} else {
-				// Delete field / store null
-				designPayload.figmaUrl = null;
-			}
 
 			// Save/Merge in Firestore
 			await docRef.set(designPayload, { merge: true });
@@ -159,106 +262,3 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		);
 	}
 };
-
-// ─── Helper Functions ──────────────────────────────────────────────────
-
-async function saveImageFile(designId: string, file: File): Promise<string> {
-	const extMap: Record<string, string> = {
-		'image/jpeg': 'jpg',
-		'image/png': 'png',
-		'image/webp': 'webp',
-	};
-	const ext = extMap[file.type] || 'jpg';
-	const filename = `${designId}.${ext}`;
-
-	try {
-		const storage = getFirebaseAdminStorage();
-		const bucket = storage.bucket();
-		const storagePath = `designs/${filename}`;
-		const storageFile = bucket.file(storagePath);
-		const buffer = Buffer.from(await file.arrayBuffer());
-
-		// Delete old files from bucket to keep storage clean
-		for (const oldExt of ['jpg', 'png', 'webp']) {
-			try {
-				await bucket.file(`designs/${designId}.${oldExt}`).delete();
-			} catch {
-				/* ignore */
-			}
-		}
-
-		await storageFile.save(buffer, {
-			metadata: {
-				contentType: file.type,
-				cacheControl: 'public, max-age=31536000, immutable',
-			},
-		});
-
-		await storageFile.makePublic();
-		return storageFile.publicUrl();
-	} catch (error) {
-		console.warn('Firebase Storage upload failed; writing file locally to public/uploads/designs/...', error);
-
-		// Fallback: Local directory
-		const localDir = path.join(process.cwd(), 'public', 'uploads', 'designs');
-		if (!fs.existsSync(localDir)) {
-			fs.mkdirSync(localDir, { recursive: true });
-		}
-		
-		// Clean up old local extensions
-		for (const oldExt of ['jpg', 'png', 'webp']) {
-			try {
-				fs.unlinkSync(path.join(localDir, `${designId}.${oldExt}`));
-			} catch {
-				/* ignore */
-			}
-		}
-
-		const localPath = path.join(localDir, filename);
-		const buffer = Buffer.from(await file.arrayBuffer());
-		fs.writeFileSync(localPath, buffer);
-
-		return `/uploads/designs/${filename}`;
-	}
-}
-
-async function deleteImageFile(url: string) {
-	try {
-		if (url.startsWith('/uploads/designs/')) {
-			// Local fallback deletion
-			const filename = url.replace('/uploads/designs/', '');
-			const localPath = path.join(process.cwd(), 'public', 'uploads', 'designs', filename);
-			if (fs.existsSync(localPath)) {
-				fs.unlinkSync(localPath);
-			}
-		} else {
-			// Firebase Storage deletion
-			const storage = getFirebaseAdminStorage();
-			const bucket = storage.bucket();
-
-			let storagePath = '';
-			if (url.includes('/o/')) {
-				const match = url.match(/\/o\/([^?]+)/);
-				if (match && match[1]) {
-					storagePath = decodeURIComponent(match[1]);
-				}
-			} else if (url.includes('storage.googleapis.com')) {
-				// Parse path after bucket name
-				const parts = url.split('/');
-				const bucketIndex = parts.findIndex(p => p.includes('storage.googleapis.com') || p.includes('appspot.com'));
-				if (bucketIndex !== -1 && parts.length > bucketIndex + 1) {
-					storagePath = parts.slice(bucketIndex + 2).join('/'); // skip bucket name part
-				} else {
-					storagePath = parts.slice(4).join('/'); // default fallback
-				}
-			}
-
-			if (storagePath) {
-				const file = bucket.file(storagePath);
-				await file.delete();
-			}
-		}
-	} catch (error) {
-		console.warn('Failed to delete image file:', url, error);
-	}
-}

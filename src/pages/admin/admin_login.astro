@@ -5,34 +5,10 @@ import { UserLock } from '@lucide/astro';
 import { OAuth2Client } from 'google-auth-library';
 import { createSessionToken } from '../../lib/server/session';
 
-import fs from 'node:fs';
-import path from 'node:path';
+import { getEnv } from '../../lib/server/env';
 
-function getEnvFallback(key: string): string | undefined {
-  try {
-    const envPath = path.resolve(process.cwd(), '.env');
-    if (fs.existsSync(envPath)) {
-      const content = fs.readFileSync(envPath, 'utf8');
-      for (const line of content.split('\n')) {
-        const parts = line.split('=');
-        if (parts.length >= 2) {
-          const k = parts[0].trim();
-          let v = parts.slice(1).join('=').trim();
-          if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
-            v = v.slice(1, -1);
-          }
-          if (k === key) {
-            return v.replace(/\\n/g, '\n');
-          }
-        }
-      }
-    }
-  } catch {}
-  return undefined;
-}
-
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || import.meta.env.GOOGLE_CLIENT_ID || getEnvFallback('GOOGLE_CLIENT_ID');
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL || getEnvFallback('ADMIN_EMAIL');
+const GOOGLE_CLIENT_ID = getEnv('GOOGLE_CLIENT_ID');
+const ADMIN_EMAIL = getEnv('ADMIN_EMAIL');
 
 // Handle authentication POST request
 if (Astro.request.method === 'POST') {

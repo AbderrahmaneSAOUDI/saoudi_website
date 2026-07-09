@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
-import { getFirebaseAdminStorage, getFirebaseAdminDb } from '../../lib/server/firebase-admin';
-import fs from 'fs';
-import path from 'path';
+import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
+import { saveFile, cleanOldExtensions } from '../../lib/server/storage';
 
 /**
  * POST /admin/admin_resume_upload
@@ -65,153 +64,84 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		}
 
 		const results: { resumeUrl?: string; previewUrl?: string; warning?: string } = {};
-		let storageFailed = false;
-		let storageErrorMessage = '';
+		let warning = '';
 
-		try {
-			const storage = getFirebaseAdminStorage();
-			const bucket = storage.bucket();
-			const db = getFirebaseAdminDb();
-
-			// Upload resume PDF
-			if (resumePdf && resumePdf.size > 0) {
-				const pdfBuffer = Buffer.from(await resumePdf.arrayBuffer());
-				const pdfFile = bucket.file('resume/Abderrahmane_SAOUDI_Resume.pdf');
-
-				// Delete old file if exists
-				try { await pdfFile.delete(); } catch { /* ignore */ }
-
-				await pdfFile.save(pdfBuffer, {
-					metadata: {
-						contentType: 'application/pdf',
-						cacheControl: 'public, max-age=31536000, immutable',
-					},
-				});
-
-				await pdfFile.makePublic();
-				results.resumeUrl = pdfFile.publicUrl();
-
-				// Update Firestore configuration
-				await db.collection('configuration').doc('static_data').set(
-					{ resumeUrl: results.resumeUrl },
-					{ merge: true }
-				);
+		// 1. Process Resume PDF
+		if (resumePdf && resumePdf.size > 0) {
+			results.resumeUrl = await saveFile({
+				file: resumePdf,
+				destinationDir: 'resume',
+				filename: 'Abderrahmane_SAOUDI_Resume.pdf',
+				contentType: 'application/pdf',
+				localFallbackPath: '',
+			});
+			if (results.resumeUrl.startsWith('/')) {
+				warning = 'Wrote files locally as Firebase Storage is not configured/available.';
 			}
+		}
 
-			// Upload resume preview image
-			if (resumePreview && resumePreview.size > 0) {
-				const extMap: Record<string, string> = {
-					'image/jpeg': 'jpg',
-					'image/png': 'png',
-					'image/webp': 'webp',
-				};
-				const ext = extMap[resumePreview.type] || 'jpg';
-				const previewBuffer = Buffer.from(await resumePreview.arrayBuffer());
-				const previewFile = bucket.file(`resume/resume_preview.${ext}`);
+		// 2. Process Resume Preview Image
+		if (resumePreview && resumePreview.size > 0) {
+			const extMap: Record<string, string> = {
+				'image/jpeg': 'jpg',
+				'image/png': 'png',
+				'image/webp': 'webp',
+			};
+			const ext = extMap[resumePreview.type] || 'jpg';
+			const filename = `resume_preview.${ext}`;
 
-				// Delete old preview files
-				for (const oldExt of ['jpg', 'png', 'webp']) {
-					try { await bucket.file(`resume/resume_preview.${oldExt}`).delete(); } catch { /* ignore */ }
-				}
+			// Clean up old preview extensions to prevent stale caches (both in Firebase Storage and locally)
+			await cleanOldExtensions({
+				baseId: 'resume_preview',
+				destinationDir: 'resume',
+				localFallbackPath: '',
+			});
 
-				await previewFile.save(previewBuffer, {
-					metadata: {
-						contentType: resumePreview.type,
-						cacheControl: 'public, max-age=31536000, immutable',
-					},
-				});
+			// If saving locally, let's also clean up old resume.ext files (which might have been saved by legacy code)
+			await cleanOldExtensions({
+				baseId: 'resume',
+				destinationDir: 'resume',
+				localFallbackPath: '',
+			});
 
-				await previewFile.makePublic();
-				results.previewUrl = previewFile.publicUrl();
+			results.previewUrl = await saveFile({
+				file: resumePreview,
+				destinationDir: 'resume',
+				filename: filename,
+				contentType: resumePreview.type,
+				localFallbackPath: '',
+			});
+			if (results.previewUrl.startsWith('/')) {
+				warning = 'Wrote files locally as Firebase Storage is not configured/available.';
 			}
+		}
 
-			// Update Firestore configuration
-			const updateData: Record<string, string> = {};
-			if (results.resumeUrl) updateData.resumeUrl = results.resumeUrl;
-			if (results.previewUrl) updateData.previewUrl = results.previewUrl;
+		// 3. Update Firestore configuration document 'static_data'
+		const updateData: Record<string, string> = {};
+		if (results.resumeUrl) updateData.resumeUrl = results.resumeUrl;
+		if (results.previewUrl) updateData.previewUrl = results.previewUrl;
 
-			if (Object.keys(updateData).length > 0) {
+		if (Object.keys(updateData).length > 0) {
+			try {
+				const db = getFirebaseAdminDb();
 				await db.collection('configuration').doc('static_data').set(
 					updateData,
 					{ merge: true }
 				);
-			}
-		} catch (storageError: any) {
-			console.warn('Firebase Storage upload failed:', storageError);
-			storageFailed = true;
-			storageErrorMessage = storageError.message || String(storageError);
-		}
-
-		// Fallback to local writes in local dev environment
-		if (storageFailed) {
-			if (import.meta.env.DEV) {
-				console.log('Firebase Storage failed. Falling back to local public directory writing...');
-
-				if (resumePdf && resumePdf.size > 0) {
-					const pdfBuffer = Buffer.from(await resumePdf.arrayBuffer());
-					const localPdfPath = path.join(process.cwd(), 'public', 'Abderrahmane_SAOUDI_Resume.pdf');
-					fs.writeFileSync(localPdfPath, pdfBuffer);
-					results.resumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
-				}
-
-				if (resumePreview && resumePreview.size > 0) {
-					const extMap: Record<string, string> = {
-						'image/jpeg': 'jpg',
-						'image/png': 'png',
-						'image/webp': 'webp',
-					};
-					const ext = extMap[resumePreview.type] || 'jpg';
-					const previewBuffer = Buffer.from(await resumePreview.arrayBuffer());
-					const localPreviewPath = path.join(process.cwd(), 'public', `resume.${ext}`);
-
-					// Delete old preview files locally to prevent stale caches
-					for (const oldExt of ['jpg', 'png', 'webp']) {
-						try { fs.unlinkSync(path.join(process.cwd(), 'public', `resume.${oldExt}`)); } catch { /* ignore */ }
-					}
-
-					fs.writeFileSync(localPreviewPath, previewBuffer);
-					results.previewUrl = `/resume.${ext}`;
-				}
-
-				// Update local Firestore with fallback URLs
-				try {
-					const db = getFirebaseAdminDb();
-					const updateData: Record<string, string> = {};
-					if (results.resumeUrl) updateData.resumeUrl = results.resumeUrl;
-					if (results.previewUrl) updateData.previewUrl = results.previewUrl;
-
-					if (Object.keys(updateData).length > 0) {
-						await db.collection('configuration').doc('static_data').set(
-							updateData,
-							{ merge: true }
-						);
-					}
-				} catch (dbErr) {
-					console.warn('Could not update local Firestore config:', dbErr);
-				}
-
-				return new Response(JSON.stringify({
-					success: true,
-					...results,
-					warning: 'Wrote files locally as Firebase Storage is not configured/available.',
-				}), {
-					status: 200,
-					headers: { 'Content-Type': 'application/json' },
-				});
-			} else {
-				return new Response(JSON.stringify({
-					error: `Upload failed: ${storageErrorMessage}. Make sure Firebase Storage is enabled in the console.`,
-				}), {
-					status: 500,
-					headers: { 'Content-Type': 'application/json' },
-				});
+			} catch (dbErr) {
+				console.warn('Could not update Firestore configuration:', dbErr);
 			}
 		}
 
-		return new Response(JSON.stringify({
+		const responseData: Record<string, any> = {
 			success: true,
 			...results,
-		}), {
+		};
+		if (warning) {
+			responseData.warning = warning;
+		}
+
+		return new Response(JSON.stringify(responseData), {
 			status: 200,
 			headers: { 'Content-Type': 'application/json' },
 		});

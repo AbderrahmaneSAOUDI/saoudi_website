@@ -124,25 +124,23 @@ export const projectSchema = z.object({
 
 export interface Design {
 	id: string;
-	order: number;
 	title: string;
-	description: string;
+	description?: string;
 	imageUrl: string;
-	figmaUrl?: string;
 	date: string; // ISO 8601
 	category: string;
+	company?: string;
 	tags: string[];
 }
 
 export const designSchema = z.object({
 	id: z.string().min(1),
-	order: z.number().int(),
 	title: z.string().min(1),
-	description: z.string().min(1),
+	description: z.string().optional(),
 	imageUrl: z.string().min(1),
-	figmaUrl: z.string().min(1).optional(),
 	date: z.string().min(1),
 	category: z.string().min(1),
+	company: z.string().optional(),
 	tags: z.array(z.string().min(1)),
 });
 

@@ -1,8 +1,161 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Construction from '../layouts/Construction.astro';
+import DesignCard from '../components/DesignCard.astro';
+import DesignLightbox from '../components/DesignLightbox.astro';
+import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
+import { Palette } from '@lucide/astro';
+
+let designs: any[] = [];
+let companies: string[] = ['Google', 'GDG', 'Freelance', 'Personal'];
+let errorMsg = '';
+
+try {
+	const db = getFirebaseAdminDb();
+
+	// Fetch companies from the database configuration
+	const companiesDoc = await db.collection("configuration").doc("designs_companies").get();
+	if (companiesDoc.exists) {
+		companies = companiesDoc.data()?.companies || companies;
+	}
+
+	// Fetch all designs sorted by date descending
+	const snapshot = await db.collection("designs").orderBy("date", "desc").get();
+	designs = snapshot.docs.map(doc => ({
+		id: doc.id,
+		...doc.data()
+	}));
+} catch (error: any) {
+	console.warn("Failed to fetch designs from Firestore for public page:", error);
+	errorMsg = "Degraded mode: Designs are currently offline or unavailable.";
+}
+
+// Group designs by company
+const designsByCompany: Record<string, any[]> = {};
+const personalKey = 'Personal / Freelance';
+
+// Initialize all groups
+companies.forEach(co => {
+	designsByCompany[co] = [];
+});
+designsByCompany[personalKey] = [];
+
+// Distribute designs
+designs.forEach(design => {
+	const co = design.company ? design.company : personalKey;
+	if (!designsByCompany[co]) {
+		designsByCompany[co] = [];
+	}
+	designsByCompany[co].push(design);
+});
+
+// Filter and sort active company groups
+const activeGroups = Object.keys(designsByCompany)
+	.filter(co => designsByCompany[co].length > 0)
+	.sort((a, b) => {
+		if (a === personalKey) return 1;
+		if (b === personalKey) return -1;
+		
+		const indexA = companies.indexOf(a);
+		const indexB = companies.indexOf(b);
+		if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+		return a.localeCompare(b);
+	});
 ---
 
 <BaseLayout title="Designs">
-  <Construction></Construction>
+	<div class="mx-auto px-4 sm:px-6 lg:px-8 py-16 max-w-7xl">
+
+
+		{errorMsg && (
+			<div class="mb-10 p-4 rounded-2xl bg-[#EA4335]/10 border border-[#EA4335]/30 text-[#EA4335] text-sm text-center">
+				{errorMsg}
+			</div>
+		)}
+
+		<!-- Grouped Lists: Title, Grid, Title, Grid -->
+		<div class="space-y-16">
+			{activeGroups.map((companyName, groupIndex) => {
+				const groupDesigns = designsByCompany[companyName];
+				return (
+					<section class="space-y-6 animate-slide-up" style={`animation-delay: ${100 + groupIndex * 100}ms`}>
+						<!-- Section Title -->
+						<div class="flex items-center justify-between border-b border-white/5 pb-3">
+							<div class="flex items-center gap-3">
+								<div class="w-1.5 h-6 bg-primary rounded-full"></div>
+								<h2 class="font-bold text-white text-xl tracking-tight">{companyName}</h2>
+								<span class="text-xs text-white/40 font-semibold bg-white/5 px-2.5 py-0.5 rounded-full border border-white/5">
+									{groupDesigns.length}
+								</span>
+							</div>
+							<span class="text-[10px] text-white/30 uppercase tracking-widest font-semibold hidden sm:inline">
+								{companyName === personalKey ? 'Independent Creations' : 'Company Collaborations'}
+							</span>
+						</div>
+
+						<!-- Grid of Designs -->
+						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+							{groupDesigns.map((design, index) => (
+								<div class="animate-card-fade" style={`animation-delay: ${index * 50}ms`}>
+									<DesignCard design={design} />
+								</div>
+							))}
+						</div>
+					</section>
+				);
+			})}
+
+			{designs.length === 0 && !errorMsg && (
+				<div class="py-24 text-center text-white/40 bg-surface-container rounded-3xl border border-white/10 flex flex-col items-center justify-center animate-fade-in">
+					<div class="p-4 rounded-full bg-primary/10 text-primary mb-4">
+						<Palette class="w-12 h-12" />
+					</div>
+					<p class="font-bold text-white text-lg">No designs uploaded yet</p>
+					<p class="text-xs mt-1 text-white/60 max-w-sm">Please check back later or visit the admin panel to add mockups.</p>
+				</div>
+			)}
+		</div>
+	</div>
+
+	<!-- Render Lightboxes outside transform scopes -->
+	{designs.map(design => (
+		<DesignLightbox design={design} />
+	))}
 </BaseLayout>
+
+<style>
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+			transform: translateY(15px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@keyframes slide-up {
+		from {
+			opacity: 0;
+			transform: translateY(25px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.animate-fade-in {
+		animation: fade-in 0.8s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+	}
+
+	.animate-slide-up {
+		opacity: 0;
+		animation: slide-up 0.6s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+	}
+
+	.animate-card-fade {
+		opacity: 0;
+		animation: slide-up 0.5s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+	}
+</style>

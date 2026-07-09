@@ -200,8 +200,9 @@ const createOptions = [
 </div>
 
 <script>
-	// Vanilla JavaScript for interactivity
+	// Vanilla JavaScript for admin navigation dock interactivity
 	document.addEventListener('DOMContentLoaded', () => {
+		// Element Selectors
 		const imageSettingsBtn = document.getElementById('image-settings-btn');
 		const createFab = document.getElementById('create-fab');
 		const createDropdown = document.getElementById('create-dropdown');
@@ -210,11 +211,13 @@ const createOptions = [
 		const closeModalBtn = document.getElementById('close-modal-btn');
 		const cancelSettingsBtn = document.getElementById('cancel-settings-btn');
 		const applySettingsBtn = document.getElementById('apply-settings-btn');
-		const qualitySlider = document.getElementById('quality-slider');
 		const qualityValue = document.getElementById('quality-value');
-		const maxWidthInput = document.getElementById('max-width-input');
 
-		// Image modal controls
+		// Correctly cast input elements for TypeScript property access
+		const qualitySlider = document.getElementById('quality-slider') as HTMLInputElement | null;
+		const maxWidthInput = document.getElementById('max-width-input') as HTMLInputElement | null;
+
+		// --- Image Settings Modal Controls ---
 		const openImageModal = () => {
 			imageModalBackdrop?.classList.remove('hidden');
 			imageModal?.classList.remove('hidden');
@@ -229,8 +232,9 @@ const createOptions = [
 		imageModalBackdrop?.addEventListener('click', closeImageModal);
 		closeModalBtn?.addEventListener('click', closeImageModal);
 		cancelSettingsBtn?.addEventListener('click', closeImageModal);
+		
 		applySettingsBtn?.addEventListener('click', () => {
-			// Apply settings logic here
+			// Apply settings logic (e.g. print/save current quality and maximum dimension bounds)
 			console.log('Settings applied:', {
 				quality: qualitySlider?.value,
 				maxWidth: maxWidthInput?.value,
@@ -238,14 +242,14 @@ const createOptions = [
 			closeImageModal();
 		});
 
-		// Quality slider update
+		// Dynamic quality display slider text update
 		qualitySlider?.addEventListener('input', (e) => {
-			if (qualityValue) {
-				qualityValue.textContent = e.target.value;
+			if (qualityValue && e.target) {
+				qualityValue.textContent = (e.target as HTMLInputElement).value;
 			}
 		});
 
-		// Create dropdown toggle
+		// --- Floating Action Button & Dropdown Menu ---
 		let isDropdownOpen = false;
 
 		const toggleDropdown = () => {
@@ -262,7 +266,7 @@ const createOptions = [
 			toggleDropdown();
 		});
 
-		// Close dropdown when clicking outside
+		// Close dropdown when user clicks anywhere else on the document
 		document.addEventListener('click', (e) => {
 			if (isDropdownOpen && !createDropdown?.contains(e.target as Node) && e.target !== createFab) {
 				isDropdownOpen = false;
@@ -270,7 +274,7 @@ const createOptions = [
 			}
 		});
 
-		// Close dropdown when clicking an option
+		// Close dropdown menu when a creation option is clicked
 		createDropdown?.querySelectorAll('a').forEach((link) => {
 			link.addEventListener('click', () => {
 				isDropdownOpen = false;
