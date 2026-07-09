@@ -128,8 +128,7 @@ export interface Design {
 	description?: string;
 	imageUrl: string;
 	date: string; // ISO 8601
-	category: string;
-	company?: string;
+	company: string;
 	tags: string[];
 }
 
@@ -139,8 +138,7 @@ export const designSchema = z.object({
 	description: z.string().optional(),
 	imageUrl: z.string().min(1),
 	date: z.string().min(1),
-	category: z.string().min(1),
-	company: z.string().optional(),
+	company: z.string().min(1),
 	tags: z.array(z.string().min(1)),
 });
 

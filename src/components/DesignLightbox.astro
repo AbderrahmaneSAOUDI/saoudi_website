@@ -11,8 +11,7 @@ interface Props {
 		id: string;
 		title: string;
 		imageUrl: string;
-		category: string;
-		company?: string;
+		company: string;
 	};
 }
 
@@ -35,7 +34,7 @@ const { design } = Astro.props;
 		/>
 		<div class="mt-4 text-center">
 			<p class="text-white font-bold text-lg">{design.title}</p>
-			<p class="text-primary text-xs font-semibold uppercase tracking-wider mt-1">{design.category} {design.company ? `• ${design.company}` : ''}</p>
+			<p class="text-primary text-xs font-semibold uppercase tracking-wider mt-1">{design.company}</p>
 		</div>
 	</div>
 </div>
