@@ -14,22 +14,13 @@ const adminEmail = Astro.locals.adminEmail;
 if (!adminEmail) return Astro.redirect("/admin/admin_login");
 
 let designs: any[] = [];
-let categories: string[] = ['UI/UX', 'Web Design', 'Mobile App', 'Graphic Design', 'Branding'];
 let companies: string[] = ['Google', 'GDG', 'Freelance', 'Personal'];
+let years: string[] = [];
 let errorMsg = '';
 
 try {
 	const db = getFirebaseAdminDb();
 	
-	// Fetch categories from the database configuration
-	const configDoc = await db.collection("configuration").doc("designs_categories").get();
-	if (configDoc.exists) {
-		categories = configDoc.data()?.categories || categories;
-	} else {
-		// Auto-initialize categories configuration in DB
-		await db.collection("configuration").doc("designs_categories").set({ categories });
-	}
-
 	// Fetch companies from the database configuration
 	const companiesDoc = await db.collection("configuration").doc("designs_companies").get();
 	if (companiesDoc.exists) {
@@ -45,6 +36,14 @@ try {
 		id: doc.id,
 		...doc.data()
 	}));
+	
+	// Extract unique sorted years
+	years = [...new Set(designs.map(d => {
+		if (typeof d.date === 'string' && d.date.includes('-')) {
+			return d.date.split('-')[0];
+		}
+		return null;
+	}).filter(Boolean))].sort((a, b) => b.localeCompare(a));
 } catch (error: any) {
 	console.warn("Failed to fetch designs from Firestore:", error);
 	errorMsg = "Degraded mode: Firestore is not configured or offline.";
@@ -77,7 +76,7 @@ try {
 							<input
 								type="text"
 								id="search-input"
-								placeholder="Search designs by title, category, company, tags..."
+								placeholder="Search designs by title, company, tags..."
 								class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
 							/>
 						</div>
@@ -89,51 +88,6 @@ try {
 						>
 							<Plus class="w-4 h-4" />
 							New
-						</button>
-					</div>
-				</div>
-
-				<!-- Collapsible Filter Panel -->
-				<div id="filter-panel" class="hidden bg-[#1D1B20] p-5 rounded-3xl border border-[#2B2930] space-y-4">
-					<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-						<!-- Category Select -->
-						<div>
-							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Category</label>
-							<select
-								id="filter-category"
-								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
-							>
-								<option value="">All Categories</option>
-								{categories.map(cat => (
-									<option value={cat}>{cat}</option>
-								))}
-							</select>
-						</div>
-
-						<!-- Company Select -->
-						<div>
-							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Company</label>
-							<select
-								id="filter-company"
-								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
-							>
-								<option value="">All Companies</option>
-								<option value="__none__">None (Personal / Freelance)</option>
-								{companies.map(comp => (
-									<option value={comp}>{comp}</option>
-								))}
-							</select>
-						</div>
-					</div>
-
-					<div class="flex justify-end gap-2 pt-2 border-t border-[#2B2930]/40">
-						<button
-							id="btn-clear-filters"
-							type="button"
-							class="px-4 py-2 rounded-xl border border-[#2B2930] hover:bg-[#2B2930] text-[#E6E1E5] font-semibold text-xs transition-all cursor-pointer opacity-50 cursor-not-allowed"
-							disabled
-						>
-							Clear Filters
 						</button>
 					</div>
 				</div>
@@ -164,13 +118,98 @@ try {
 			<!-- Drawer Backdrop -->
 			<div
 				id="editor-backdrop"
-				class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-30 transition-opacity duration-300 opacity-0"
+				class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] transition-opacity duration-300 opacity-0"
 			></div>
+
+			<!-- Sliding Filter Drawer (Starts offscreen translated left) -->
+			<div
+				id="filter-panel"
+				class="fixed top-0 left-0 h-full w-full sm:w-[360px] bg-[#1D1B20] border-r border-[#2B2930] shadow-2xl transition-transform duration-350 ease-[cubic-bezier(0.2,0,0.2,1)] transform -translate-x-full z-[70] p-6 pb-28 sm:pb-6 overflow-y-auto flex flex-col justify-between"
+			>
+				<div class="space-y-5">
+					<div class="border-b border-[#2B2930]/60 pb-4 flex justify-between items-center">
+						<div>
+							<h2 class="text-lg font-bold text-white">Filter Designs</h2>
+							<p class="text-xs text-[#E6E1E5]/50 mt-1">Refine mockup listing</p>
+						</div>
+						<button
+							type="button"
+							id="btn-close-filters"
+							class="text-[#E6E1E5]/60 hover:text-white transition-colors cursor-pointer text-xl font-bold"
+						>
+							&times;
+						</button>
+					</div>
+
+					<div class="space-y-4">
+						<!-- Company Select -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Company</label>
+							<select
+								id="filter-company"
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+							>
+								<option value="">All Companies</option>
+								{companies.map(comp => (
+									<option value={comp}>{comp}</option>
+								))}
+							</select>
+						</div>
+
+						<!-- Year Select -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Year</label>
+							<select
+								id="filter-year"
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+							>
+								<option value="">All Years</option>
+								{years.map(y => (
+									<option value={y}>{y}</option>
+								))}
+							</select>
+						</div>
+
+						<!-- Date Interval -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Date Interval</label>
+							<div class="grid grid-cols-2 gap-2">
+								<div>
+									<span class="text-[10px] text-[#E6E1E5]/40 mb-1 block">From</span>
+									<input
+										type="date"
+										id="filter-start-date"
+										class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors cursor-pointer"
+									/>
+								</div>
+								<div>
+									<span class="text-[10px] text-[#E6E1E5]/40 mb-1 block">To</span>
+									<input
+										type="date"
+										id="filter-end-date"
+										class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors cursor-pointer"
+									/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="flex gap-3 mt-8 pt-4 border-t border-[#2B2930]/40">
+					<button
+						type="button"
+						id="btn-clear-filters"
+						class="w-full py-2.5 bg-transparent border border-[#2B2930] hover:bg-[#2B2930] text-[#E6E1E5]/60 hover:text-white font-semibold rounded-xl text-xs transition-all cursor-pointer text-center"
+					>
+						Clear Filters
+					</button>
+				</div>
+			</div>
 
 			<!-- Sliding Drawer Detail Editor (Starts offscreen translated right) -->
 			<div
 				id="editor-panel"
-				class="fixed top-0 right-0 h-full w-full sm:w-[460px] bg-[#1D1B20] border-l border-[#2B2930] shadow-2xl transition-transform duration-350 ease-[cubic-bezier(0.2,0,0.2,1)] transform translate-x-full z-40 p-6 pb-28 sm:pb-6 overflow-y-auto flex flex-col justify-between"
+				class="fixed top-0 right-0 h-full w-full sm:w-[460px] bg-[#1D1B20] border-l border-[#2B2930] shadow-2xl transition-transform duration-350 ease-[cubic-bezier(0.2,0,0.2,1)] transform translate-x-full z-[70] p-6 pb-28 sm:pb-6 overflow-y-auto flex flex-col justify-between"
 			>
 				<div class="space-y-5">
 					<div class="border-b border-[#2B2930]/60 pb-4 flex justify-between items-center">
@@ -231,7 +270,7 @@ try {
 						</div>
 
 						<!-- Read-only design ID -->
-						<div>
+						<div class="hidden">
 							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Design ID</label>
 							<input
 								type="text"
@@ -255,41 +294,16 @@ try {
 							/>
 						</div>
 
-						<!-- Category Dropdown with Manage Button -->
-						<div>
-							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Category *</label>
-							<div class="flex gap-2 items-center">
-								<select
-									id="form-category"
-									name="category"
-									required
-									class="flex-grow px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
-								>
-									{categories.map(cat => (
-										<option value={cat}>{cat}</option>
-									))}
-								</select>
-								<button
-									type="button"
-									id="btn-edit-categories"
-									title="Manage Categories"
-									class="p-2.5 rounded-xl border border-[#2B2930] hover:bg-[#2B2930] hover:border-primary/50 text-primary transition-all cursor-pointer flex items-center justify-center shrink-0"
-								>
-									<Settings class="w-5 h-5" />
-								</button>
-							</div>
-						</div>
-
 						<!-- Company Dropdown with Manage Button -->
 						<div>
-							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Company</label>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Company *</label>
 							<div class="flex gap-2 items-center">
 								<select
 									id="form-company"
 									name="company"
+									required
 									class="flex-grow px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
 								>
-									<option value="">None (Personal / Freelance)</option>
 									{companies.map(comp => (
 										<option value={comp}>{comp}</option>
 									))}
@@ -344,7 +358,7 @@ try {
 							<button
 								type="submit"
 								id="btn-save"
-								class="flex-1 py-3 px-4 rounded-xl bg-[#0F9D58] hover:bg-[#0F9D58]/90 text-white font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md"
+								class="flex-1 py-3 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md"
 							>
 								<Save class="w-4 h-4" />
 								<span id="save-btn-text">Save</span>
@@ -357,50 +371,8 @@ try {
 		</div>
 
 		<!-- Manage Categories Modal -->
-		<div id="categories-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-			<div class="bg-[#1D1B20] border border-[#2B2930] w-full max-w-md rounded-3xl p-6 space-y-6 shadow-2xl relative max-h-[90vh] flex flex-col justify-between">
-				<div>
-					<div class="border-b border-[#2B2930]/60 pb-3 flex justify-between items-center mb-4">
-						<h3 class="text-lg font-bold text-white">Manage Categories</h3>
-						<button id="close-categories-modal" class="text-[#E6E1E5]/60 hover:text-white transition-colors cursor-pointer text-xl font-bold">&times;</button>
-					</div>
-
-					<div id="modal-categories-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-						<!-- Dynamically populated via JS -->
-					</div>
-
-					<div class="mt-4 pt-4 border-t border-[#2B2930]/60 flex gap-2">
-						<input
-							type="text"
-							id="new-category-input"
-							placeholder="New category name..."
-							class="flex-grow bg-[#141218] border border-[#2B2930] rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-primary transition-colors"
-						/>
-						<button
-							type="button"
-							id="btn-add-category"
-							class="px-4 py-2 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl text-xs transition-all cursor-pointer"
-						>
-							Add
-						</button>
-					</div>
-				</div>
-
-				<div class="flex flex-col gap-3 mt-4 pt-4 border-t border-[#2B2930]/40">
-					<button
-						type="button"
-						id="btn-save-categories"
-						class="w-full py-2.5 bg-[#0F9D58] hover:bg-[#0F9D58]/90 text-white font-semibold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-2"
-					>
-						<Save class="w-3.5 h-3.5" />
-						Save Category Ordering & Changes
-					</button>
-				</div>
-			</div>
-		</div>
-
 		<!-- Manage Companies Modal -->
-		<div id="companies-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+		<div id="companies-modal" class="hidden fixed inset-0 z-[80] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
 			<div class="bg-[#1D1B20] border border-[#2B2930] w-full max-w-md rounded-3xl p-6 space-y-6 shadow-2xl relative max-h-[90vh] flex flex-col justify-between">
 				<div>
 					<div class="border-b border-[#2B2930]/60 pb-3 flex justify-between items-center mb-4">
@@ -431,14 +403,21 @@ try {
 					</div>
 				</div>
 
-				<div class="flex flex-col gap-3 mt-4 pt-4 border-t border-[#2B2930]/40">
+				<div class="flex gap-3 mt-4 pt-4 border-t border-[#2B2930]/40">
+					<button
+						type="button"
+						id="close-companies-modal-btn"
+						class="flex-grow py-2.5 bg-transparent border border-[#2B2930] hover:bg-[#2B2930] text-[#E6E1E5]/60 hover:text-white font-semibold rounded-xl text-xs transition-all cursor-pointer text-center"
+					>
+						Cancel
+					</button>
 					<button
 						type="button"
 						id="btn-save-companies"
-						class="w-full py-2.5 bg-[#0F9D58] hover:bg-[#0F9D58]/90 text-white font-semibold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-2"
+						class="flex-grow py-2.5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-2"
 					>
 						<Save class="w-3.5 h-3.5" />
-						Save Company Ordering & Changes
+						Save Changes
 					</button>
 				</div>
 			</div>
@@ -453,10 +432,9 @@ try {
 	))}
 </BackgroundBaseLayout>
 
-<script define:vars={{ designs, initialCategories: categories, initialCompanies: companies }}>
+<script define:vars={{ designs, initialCompanies: companies }}>
 	// Make server-fetched items available to client script
 	window.designs = designs || [];
-	window.categories = initialCategories || [];
 	window.companies = initialCompanies || [];
 </script>
 
@@ -472,9 +450,12 @@ try {
 		const btnFilterToggle = document.getElementById('btn-filter-toggle') as HTMLButtonElement;
 		const filterBadge = document.getElementById('filter-badge') as HTMLSpanElement;
 		const filterPanel = document.getElementById('filter-panel') as HTMLDivElement;
-		const filterCategory = document.getElementById('filter-category') as HTMLSelectElement;
 		const filterCompany = document.getElementById('filter-company') as HTMLSelectElement;
+		const filterYear = document.getElementById('filter-year') as HTMLSelectElement;
+		const filterStartDate = document.getElementById('filter-start-date') as HTMLInputElement;
+		const filterEndDate = document.getElementById('filter-end-date') as HTMLInputElement;
 		const btnClearFilters = document.getElementById('btn-clear-filters') as HTMLButtonElement;
+		const btnCloseFilters = document.getElementById('btn-close-filters') as HTMLButtonElement;
 
 		// Drawer Elements
 		const editorPanel = document.getElementById('editor-panel') as HTMLDivElement;
@@ -487,7 +468,6 @@ try {
 		const designForm = document.getElementById('design-form') as HTMLFormElement;
 		const formId = document.getElementById('form-id') as HTMLInputElement;
 		const formTitle = document.getElementById('form-title') as HTMLInputElement;
-		const formCategory = document.getElementById('form-category') as HTMLSelectElement;
 		const formCompany = document.getElementById('form-company') as HTMLSelectElement;
 		const formDate = document.getElementById('form-date') as HTMLInputElement;
 		const formTags = document.getElementById('form-tags') as HTMLInputElement;
@@ -503,19 +483,11 @@ try {
 		const btnSave = document.getElementById('btn-save') as HTMLButtonElement;
 		const saveBtnText = document.getElementById('save-btn-text') as HTMLSpanElement;
 
-		// Categories Modal Elements
-		const btnEditCategories = document.getElementById('btn-edit-categories') as HTMLButtonElement;
-		const categoriesModal = document.getElementById('categories-modal') as HTMLDivElement;
-		const closeCategoriesModal = document.getElementById('close-categories-modal') as HTMLButtonElement;
-		const modalCategoriesList = document.getElementById('modal-categories-list') as HTMLDivElement;
-		const newCategoryInput = document.getElementById('new-category-input') as HTMLInputElement;
-		const btnAddCategory = document.getElementById('btn-add-category') as HTMLButtonElement;
-		const btnSaveCategories = document.getElementById('btn-save-categories') as HTMLButtonElement;
-
 		// Companies Modal Elements
 		const btnEditCompanies = document.getElementById('btn-edit-companies') as HTMLButtonElement;
 		const companiesModal = document.getElementById('companies-modal') as HTMLDivElement;
 		const closeCompaniesModal = document.getElementById('close-companies-modal') as HTMLButtonElement;
+		const closeCompaniesModalBtn = document.getElementById('close-companies-modal-btn') as HTMLButtonElement;
 		const modalCompaniesList = document.getElementById('modal-companies-list') as HTMLDivElement;
 		const newCompanyInput = document.getElementById('new-company-input') as HTMLInputElement;
 		const btnAddCompany = document.getElementById('btn-add-company') as HTMLButtonElement;
@@ -530,11 +502,9 @@ try {
 			originalName: string;
 			currentName: string;
 		}
-		let modalCategories: ModalItem[] = [];
 		let modalCompanies: ModalItem[] = [];
 
 		// --- Core Setup & Initialization ---
-		populateCategoryDropdown();
 		populateCompanyDropdown();
 		initFromUrl();
 
@@ -582,8 +552,34 @@ try {
 			}, 350);
 		}
 
+		function openFilterDrawer() {
+			editorBackdrop.classList.remove('hidden');
+			// Allow reflow for transition
+			setTimeout(() => {
+				editorBackdrop.classList.add('opacity-100');
+				filterPanel.classList.remove('-translate-x-full');
+				filterPanel.classList.add('translate-x-0');
+			}, 10);
+		}
+
+		function closeFilterDrawer() {
+			editorBackdrop.classList.remove('opacity-100');
+			filterPanel.classList.remove('translate-x-0');
+			filterPanel.classList.add('-translate-x-full');
+
+			setTimeout(() => {
+				editorBackdrop.classList.add('hidden');
+			}, 350);
+		}
+
 		btnCancel.addEventListener('click', closeDrawer);
-		editorBackdrop.addEventListener('click', closeDrawer);
+		if (btnCloseFilters) {
+			btnCloseFilters.addEventListener('click', closeFilterDrawer);
+		}
+		editorBackdrop.addEventListener('click', () => {
+			closeDrawer();
+			closeFilterDrawer();
+		});
 
 		// --- Form State Management ---
 		function setNewDesignState() {
@@ -596,14 +592,10 @@ try {
 			
 			formId.value = `design_${shortId}`;
 			formTitle.value = '';
-			
-			// Default category selection
-			const cats = (window as any).categories || [];
-			formCategory.value = cats.length > 0 ? cats[0] : '';
 
 			// Default company selection
-			formCompany.value = '';
-
+			const comps = (window as any).companies || [];
+			formCompany.value = comps.length > 0 ? comps[0] : '';
 			
 			// Set today's date formatted as YYYY-MM-DD
 			const today = new Date().toISOString().split('T')[0];
@@ -632,7 +624,6 @@ try {
 
 			formId.value = design.id;
 			formTitle.value = design.title || '';
-			formCategory.value = design.category || '';
 			formCompany.value = design.company || '';
 			formDate.value = design.date ? design.date.split('T')[0] : '';
 			formTags.value = Array.isArray(design.tags) ? design.tags.join(', ') : '';
@@ -670,53 +661,16 @@ try {
 
 		// --- Populating selects dropdowns ---
 		
-		function populateCategoryDropdown(selectedValue = '') {
-			const activeValue = selectedValue || formCategory.value;
-			formCategory.innerHTML = '';
-			
-			const filterActiveValue = filterCategory ? filterCategory.value : '';
-			if (filterCategory) {
-				filterCategory.innerHTML = '<option value="">All Categories</option>';
-			}
-			
-			const categories = (window as any).categories || [];
-			categories.forEach((cat: string) => {
-				const opt = document.createElement('option');
-				opt.value = cat;
-				opt.textContent = cat;
-				formCategory.appendChild(opt);
-
-				if (filterCategory) {
-					const filterOpt = document.createElement('option');
-					filterOpt.value = cat;
-					filterOpt.textContent = cat;
-					filterCategory.appendChild(filterOpt);
-				}
-			});
-
-			if (categories.includes(activeValue)) {
-				formCategory.value = activeValue;
-			}
-			if (filterCategory && categories.includes(filterActiveValue)) {
-				filterCategory.value = filterActiveValue;
-			}
-		}
-
+		// --- Populating selects dropdowns ---
+		
 		function populateCompanyDropdown(selectedValue = '') {
 			const activeValue = selectedValue || formCompany.value;
 			formCompany.innerHTML = '';
-
-			// Include empty/none choice
-			const noneOpt = document.createElement('option');
-			noneOpt.value = '';
-			noneOpt.textContent = 'None (Personal / Freelance)';
-			formCompany.appendChild(noneOpt);
 
 			const filterActiveValue = filterCompany ? filterCompany.value : '';
 			if (filterCompany) {
 				filterCompany.innerHTML = `
 					<option value="">All Companies</option>
-					<option value="__none__">None (Personal / Freelance)</option>
 				`;
 			}
 			
@@ -735,220 +689,15 @@ try {
 				}
 			});
 
-			if (activeValue === '' || companies.includes(activeValue)) {
+			if (companies.includes(activeValue)) {
 				formCompany.value = activeValue;
+			} else if (companies.length > 0) {
+				formCompany.value = companies[0];
 			}
-			if (filterCompany && (filterActiveValue === '__none__' || companies.includes(filterActiveValue))) {
+			if (filterCompany && companies.includes(filterActiveValue)) {
 				filterCompany.value = filterActiveValue;
 			}
 		}
-
-		// --- Categories management modal logic ---
-		
-		function renderModalCategories() {
-			if (!modalCategoriesList) return;
-			modalCategoriesList.innerHTML = '';
-
-			if (modalCategories.length === 0) {
-				modalCategoriesList.innerHTML = '<p class="text-xs text-[#E6E1E5]/50 text-center py-6">No categories. Create one below.</p>';
-				return;
-			}
-
-			modalCategories.forEach((cat, index) => {
-				const designCount = ((window as any).designs || []).filter((d: any) => d.category === cat.originalName).length;
-
-				const row = document.createElement('div');
-				row.className = 'flex items-center gap-2.5 bg-[#211F26] p-2.5 rounded-xl border border-[#2B2930]';
-				
-				row.innerHTML = `
-					<div class="flex flex-col gap-1 shrink-0">
-						<button 
-							type="button" 
-							class="btn-move-up-cat p-1 rounded hover:bg-[#141218] text-[#E6E1E5]/60 hover:text-primary transition-all disabled:opacity-20 cursor-pointer"
-							data-index="${index}"
-							${index === 0 ? 'disabled' : ''}
-							title="Move Up"
-						>
-							<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
-						</button>
-						<button 
-							type="button" 
-							class="btn-move-down-cat p-1 rounded hover:bg-[#141218] text-[#E6E1E5]/60 hover:text-primary transition-all disabled:opacity-20 cursor-pointer"
-							data-index="${index}"
-							${index === modalCategories.length - 1 ? 'disabled' : ''}
-							title="Move Down"
-						>
-							<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-						</button>
-					</div>
-					<div class="flex-grow min-w-0">
-						<input 
-							type="text" 
-							value="${cat.currentName}" 
-							class="category-input-field w-full bg-[#141218] border border-[#2B2930] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-primary transition-colors font-medium"
-							data-index="${index}"
-						/>
-						<span class="text-[9px] text-[#E6E1E5]/40 ml-1 mt-0.5 block">${designCount} associated designs</span>
-					</div>
-					<button 
-						type="button" 
-						class="btn-delete-cat p-2 rounded-lg bg-[#DB4437]/10 border border-[#DB4437]/20 hover:bg-[#DB4437] text-[#DB4437] hover:text-white transition-all shrink-0 cursor-pointer"
-						data-index="${index}"
-						title="Delete Category"
-					>
-						<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
-					</button>
-				`;
-
-				modalCategoriesList.appendChild(row);
-			});
-
-			modalCategoriesList.querySelectorAll('.btn-move-up-cat').forEach(btn => {
-				btn.addEventListener('click', () => {
-					const idx = parseInt(btn.getAttribute('data-index') || '0', 10);
-					moveCategoryItem(idx, -1);
-				});
-			});
-
-			modalCategoriesList.querySelectorAll('.btn-move-down-cat').forEach(btn => {
-				btn.addEventListener('click', () => {
-					const idx = parseInt(btn.getAttribute('data-index') || '0', 10);
-					moveCategoryItem(idx, 1);
-				});
-			});
-
-			modalCategoriesList.querySelectorAll('.btn-delete-cat').forEach(btn => {
-				btn.addEventListener('click', () => {
-					const idx = parseInt(btn.getAttribute('data-index') || '0', 10);
-					const item = modalCategories[idx];
-					if (item.originalName) {
-						const count = ((window as any).designs || []).filter((d: any) => d.category === item.originalName).length;
-						if (count > 0) {
-							const confirmDelete = confirm(`Warning: "${item.originalName}" is associated with ${count} designs. Do you still want to delete it?`);
-							if (!confirmDelete) return;
-						}
-					}
-					modalCategories.splice(idx, 1);
-					renderModalCategories();
-				});
-			});
-
-			modalCategoriesList.querySelectorAll('.category-input-field').forEach(input => {
-				input.addEventListener('input', (e) => {
-					const idx = parseInt(input.getAttribute('data-index') || '0', 10);
-					modalCategories[idx].currentName = (e.target as HTMLInputElement).value;
-				});
-			});
-		}
-
-		function moveCategoryItem(index: number, shift: number) {
-			const targetIndex = index + shift;
-			if (targetIndex < 0 || targetIndex >= modalCategories.length) return;
-			
-			const temp = modalCategories[index];
-			modalCategories[index] = modalCategories[targetIndex];
-			modalCategories[targetIndex] = temp;
-			renderModalCategories();
-		}
-
-		btnEditCategories.addEventListener('click', () => {
-			const currentCats = (window as any).categories || [];
-			modalCategories = currentCats.map((name: string) => ({
-				originalName: name,
-				currentName: name
-			}));
-			categoriesModal.classList.remove('hidden');
-			renderModalCategories();
-		});
-
-		closeCategoriesModal.addEventListener('click', () => {
-			categoriesModal.classList.add('hidden');
-		});
-
-		// Add Category
-		btnAddCategory.addEventListener('click', () => {
-			const newName = newCategoryInput.value.trim();
-			if (!newName) return;
-			
-			if (modalCategories.some(c => c.currentName.toLowerCase() === newName.toLowerCase())) {
-				alert('Category already exists!');
-				return;
-			}
-
-			modalCategories.push({ originalName: '', currentName: newName });
-			newCategoryInput.value = '';
-			renderModalCategories();
-		});
-
-		// Save Categories Changes
-		btnSaveCategories.addEventListener('click', async () => {
-			const cleanCats = modalCategories.map(c => ({
-				originalName: c.originalName,
-				currentName: c.currentName.trim()
-			})).filter(c => c.currentName !== '');
-
-			if (cleanCats.length === 0) {
-				alert('You must have at least one category.');
-				return;
-			}
-
-			btnSaveCategories.disabled = true;
-			btnSaveCategories.textContent = 'Saving...';
-
-			const categoriesList = cleanCats.map(c => c.currentName);
-			const renames: Record<string, string> = {};
-			
-			cleanCats.forEach(c => {
-				if (c.originalName && c.originalName !== c.currentName) {
-					renames[c.originalName] = c.currentName;
-				}
-			});
-
-			try {
-				const formData = new FormData();
-				formData.append('action', 'save_categories');
-				formData.append('categories', JSON.stringify(categoriesList));
-				formData.append('renames', JSON.stringify(renames));
-
-				const res = await fetch('/admin/admin_designs_api', {
-					method: 'POST',
-					body: formData
-				});
-				const data = await res.json();
-
-				if (res.ok && data.success) {
-					(window as any).categories = categoriesList;
-					
-					Object.keys(renames).forEach(oldCat => {
-						const newCat = renames[oldCat];
-						((window as any).designs || []).forEach((d: any) => {
-							if (d.category === oldCat) d.category = newCat;
-						});
-					});
-
-					// Update DOM badges
-					document.querySelectorAll('.design-card').forEach(card => {
-						const cardId = card.getAttribute('data-id');
-						const design = ((window as any).designs || []).find((d: any) => d && d.id === cardId);
-						if (design) {
-							const badge = card.querySelector('.flex.justify-between.items-center span');
-							if (badge) badge.textContent = design.category;
-						}
-					});
-
-					populateCategoryDropdown();
-					categoriesModal.classList.add('hidden');
-					alert('Categories updated successfully!');
-				} else {
-					alert(data.error || 'Failed to save categories.');
-				}
-			} catch (err: any) {
-				alert('Error saving categories: ' + (err?.message || err));
-			} finally {
-				btnSaveCategories.disabled = false;
-				btnSaveCategories.textContent = 'Save Category Ordering & Changes';
-			}
-		});
 
 		// --- Companies management modal logic ---
 
@@ -1072,6 +821,12 @@ try {
 			companiesModal.classList.add('hidden');
 		});
 
+		if (closeCompaniesModalBtn) {
+			closeCompaniesModalBtn.addEventListener('click', () => {
+				companiesModal.classList.add('hidden');
+			});
+		}
+
 		// Add Company
 		btnAddCompany.addEventListener('click', () => {
 			const newName = newCompanyInput.value.trim();
@@ -1134,14 +889,14 @@ try {
 						const design = ((window as any).designs || []).find((d: any) => d && d.id === cardId);
 						if (design) {
 							// Update company pill if it exists or delete it
-							const header = card.querySelector('.flex.justify-between.items-center');
-							if (header) {
-								let companySpan = header.children[1] as HTMLElement | undefined;
+							const footer = card.querySelector('.design-card-footer');
+							if (footer) {
+								let companySpan = footer.querySelector('.company-pill') as HTMLElement | undefined;
 								if (design.company) {
 									if (!companySpan) {
 										companySpan = document.createElement('span');
-										companySpan.className = 'px-2.5 py-0.5 rounded-md text-[9px] font-medium bg-[#2D2D2D] border border-white/5 text-white/70';
-										header.appendChild(companySpan);
+										companySpan.className = 'company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary';
+										footer.appendChild(companySpan);
 									}
 									companySpan.textContent = design.company;
 								} else if (companySpan) {
@@ -1161,19 +916,23 @@ try {
 				alert('Error saving companies: ' + (err?.message || err));
 			} finally {
 				btnSaveCompanies.disabled = false;
-				btnSaveCompanies.textContent = 'Save Company Ordering & Changes';
+				btnSaveCompanies.textContent = 'Save Changes';
 			}
 		});
 
 		// --- Search & Filter Logic ---
 		function applyFilters() {
 			const query = searchInput.value.toLowerCase().trim();
-			const selectedCategory = filterCategory.value;
 			const selectedCompany = filterCompany.value;
+			const selectedYear = filterYear.value;
+			const startDateVal = filterStartDate.value;
+			const endDateVal = filterEndDate.value;
 
 			let activeFiltersCount = 0;
-			if (selectedCategory) activeFiltersCount++;
 			if (selectedCompany) activeFiltersCount++;
+			if (selectedYear) activeFiltersCount++;
+			if (startDateVal) activeFiltersCount++;
+			if (endDateVal) activeFiltersCount++;
 
 			// Update badge and clear button state
 			if (activeFiltersCount > 0) {
@@ -1189,31 +948,53 @@ try {
 				btnFilterToggle.classList.remove('border-primary', 'bg-primary/5');
 			}
 
+			// Parse date limits if provided
+			const startDate = startDateVal ? new Date(startDateVal) : null;
+			const endDate = endDateVal ? new Date(endDateVal) : null;
+
 			designCards.forEach(card => {
 				const cardId = card.getAttribute('data-id') || '';
 				const design = (window as any).designs.find((d: any) => d.id === cardId);
 				if (!design) return;
 
 				const title = (design.title || '').toLowerCase();
-				const category = (design.category || '');
 				const company = (design.company || '');
 				const tags = (Array.isArray(design.tags) ? design.tags.join(' ') : '').toLowerCase();
 
 				const matchesSearch = !query || 
 					title.includes(query) || 
-					category.toLowerCase().includes(query) || 
 					company.toLowerCase().includes(query) || 
 					tags.includes(query);
 
-				const matchesCategory = !selectedCategory || category === selectedCategory;
 				let matchesCompany = true;
-				if (selectedCompany === '__none__') {
-					matchesCompany = !design.company;
-				} else if (selectedCompany !== '') {
+				if (selectedCompany !== '') {
 					matchesCompany = design.company === selectedCompany;
 				}
 
-				if (matchesSearch && matchesCategory && matchesCompany) {
+				let matchesYear = true;
+				if (selectedYear !== '') {
+					if (typeof design.date === 'string' && design.date.includes('-')) {
+						const year = design.date.split('-')[0];
+						matchesYear = year === selectedYear;
+					} else {
+						matchesYear = false;
+					}
+				}
+
+				let matchesDateInterval = true;
+				if (design.date) {
+					const designDate = new Date(design.date);
+					if (startDate && designDate < startDate) {
+						matchesDateInterval = false;
+					}
+					if (endDate && designDate > endDate) {
+						matchesDateInterval = false;
+					}
+				} else if (startDate || endDate) {
+					matchesDateInterval = false;
+				}
+
+				if (matchesSearch && matchesCompany && matchesYear && matchesDateInterval) {
 					card.classList.remove('hidden');
 				} else {
 					card.classList.add('hidden');
@@ -1223,19 +1004,23 @@ try {
 
 		// Filter Toggle Panel
 		btnFilterToggle.addEventListener('click', () => {
-			filterPanel.classList.toggle('hidden');
+			openFilterDrawer();
 		});
 
 		// Clear Filters
 		btnClearFilters.addEventListener('click', () => {
-			filterCategory.value = '';
 			filterCompany.value = '';
+			filterYear.value = '';
+			filterStartDate.value = '';
+			filterEndDate.value = '';
 			applyFilters();
 		});
 
 		// Event Listeners for Filters
-		filterCategory.addEventListener('change', applyFilters);
 		filterCompany.addEventListener('change', applyFilters);
+		filterYear.addEventListener('change', applyFilters);
+		filterStartDate.addEventListener('change', applyFilters);
+		filterEndDate.addEventListener('change', applyFilters);
 		searchInput.addEventListener('input', applyFilters);
 
 		// --- Card Click Events ---
@@ -1399,7 +1184,6 @@ try {
 			formData.append('action', 'save');
 			formData.append('id', formId.value);
 			formData.append('title', formTitle.value);
-			formData.append('category', formCategory.value);
 			formData.append('company', formCompany.value);
 			formData.append('date', formDate.value);
 			formData.append('tags', formTags.value);

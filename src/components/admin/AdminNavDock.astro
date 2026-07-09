@@ -35,15 +35,6 @@ const createOptions = [
 	<div
 		class="admin-dock-inner flex items-center gap-2 bg-[#211F26] shadow-2xl px-3 py-2.5 border border-white/10 rounded-t-2xl justify-between"
 	>
-		<!-- Left Slot: Image Optimization Trigger -->
-		<button
-			id="image-settings-btn"
-			class="flex justify-center items-center bg-white/5 hover:bg-white/10 rounded-full w-9 h-9 transition-colors shrink-0"
-			aria-label="Image optimization settings"
-		>
-			<Settings class="w-4 h-4 text-white" />
-		</button>
-
 		<!-- Center Slot: Navigation Links -->
 		<nav class="flex items-center gap-0.5 overflow-x-auto scrollbar-hide">
 			{
@@ -106,94 +97,6 @@ const createOptions = [
 						))
 					}
 				</div>
-			</div>
-		</div>
-	</div>
-</div>
-
-<!-- Image Optimization Modal (outside dock for proper viewport centering) -->
-<div
-	id="image-modal-backdrop"
-	class="hidden z-[60] fixed inset-0 bg-black/60 backdrop-blur-sm"
-></div>
-<div
-	id="image-modal"
-	class="hidden z-[70] fixed inset-0 flex justify-center items-center p-4"
->
-	<div class="bg-[#211F26] shadow-2xl p-6 border border-white/10 rounded-3xl w-full max-w-md">
-		<div class="flex justify-between items-center mb-6">
-			<h2 class="font-semibold text-white text-lg">
-				Image Optimization Settings
-			</h2>
-			<button
-				id="close-modal-btn"
-				class="flex justify-center items-center hover:bg-white/10 rounded-full w-8 h-8 transition-colors"
-			>
-				<svg
-					class="w-5 h-5 text-white/70"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M6 18L18 6M6 6l12 12"
-					/>
-				</svg>
-			</button>
-		</div>
-
-		<div class="space-y-6">
-			<!-- Quality Slider -->
-			<div>
-				<label class="block mb-3 font-medium text-white text-sm">
-					Quality: <span id="quality-value">80</span>%
-				</label>
-				<input
-					type="range"
-					id="quality-slider"
-					min="1"
-					max="100"
-					value="80"
-					class="bg-white/10 rounded-full w-full h-2 accent-primary appearance-none cursor-pointer"
-				/>
-				<div class="flex justify-between mt-1 text-white/40 text-xs">
-					<span>1%</span>
-					<span>100%</span>
-				</div>
-			</div>
-
-			<!-- Max Width Input -->
-			<div>
-				<label class="block mb-2 font-medium text-white text-sm">
-					Max Width (px)
-				</label>
-				<input
-					type="number"
-					id="max-width-input"
-					min="100"
-					max="4096"
-					value="1920"
-					class="bg-white/5 px-4 py-2 border border-white/10 focus:border-primary rounded-xl focus:outline-none w-full text-white transition-colors placeholder-white/40"
-				/>
-			</div>
-
-			<!-- Action Buttons -->
-			<div class="flex gap-3 pt-2">
-				<button
-					id="cancel-settings-btn"
-					class="flex-1 bg-white/5 hover:bg-white/10 px-4 py-2.5 rounded-xl font-medium text-white transition-colors"
-				>
-					Cancel
-				</button>
-				<button
-					id="apply-settings-btn"
-					class="flex-1 bg-primary hover:bg-primary/85 px-4 py-2.5 rounded-xl font-medium text-white transition-colors"
-				>
-					Apply Settings
-				</button>
 			</div>
 		</div>
 	</div>

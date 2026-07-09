@@ -16,7 +16,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		const action = formData.get('action') as string; // 'save', 'delete', or 'update_category'
 		const designId = formData.get('id') as string;
 
-		if (action !== 'update_category' && action !== 'save_categories' && action !== 'save_companies' && !designId) {
+		if (action !== 'save_companies' && !designId) {
 			return new Response(JSON.stringify({ error: 'Missing Design ID' }), {
 				status: 400,
 				headers: { 'Content-Type': 'application/json' },
@@ -47,53 +47,6 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			// 2. Delete Firestore document
 			await docRef.delete();
-
-			return new Response(JSON.stringify({ success: true }), {
-				status: 200,
-				headers: { 'Content-Type': 'application/json' },
-			});
-		}
-
-		// ─── ACTION: SAVE CATEGORIES (CRUD & REORDER) ────────────────────────
-		if (action === 'save_categories') {
-			const categoriesListJson = formData.get('categories') as string;
-			const renamesJson = formData.get('renames') as string;
-
-			if (!categoriesListJson) {
-				return new Response(JSON.stringify({ error: 'Categories list is required.' }), {
-					status: 400,
-					headers: { 'Content-Type': 'application/json' },
-				});
-			}
-
-			const categoriesList = JSON.parse(categoriesListJson) as string[];
-			const renames = renamesJson ? JSON.parse(renamesJson) as Record<string, string> : {};
-
-			// 1. Update the configuration document
-			const configRef = db.collection('configuration').doc('designs_categories');
-			await configRef.set({ categories: categoriesList });
-
-			// 2. Perform category renames in designs collection
-			const renameKeys = Object.keys(renames);
-			if (renameKeys.length > 0) {
-				const batch = db.batch();
-				let hasUpdates = false;
-
-				for (const oldCat of renameKeys) {
-					const newCat = renames[oldCat];
-					if (oldCat.trim() !== newCat.trim()) {
-						const snapshot = await db.collection('designs').where('category', '==', oldCat.trim()).get();
-						snapshot.docs.forEach(doc => {
-							batch.update(doc.ref, { category: newCat.trim() });
-							hasUpdates = true;
-						});
-					}
-				}
-
-				if (hasUpdates) {
-					await batch.commit();
-				}
-			}
 
 			return new Response(JSON.stringify({ success: true }), {
 				status: 200,
@@ -151,16 +104,15 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		// ─── ACTION: SAVE (CREATE OR UPDATE) ─────────────────────────────────
 		if (action === 'save') {
 			const title = formData.get('title') as string;
-			const category = formData.get('category') as string;
-			const company = (formData.get('company') as string | null) || '';
+			const company = formData.get('company') as string;
 			const date = formData.get('date') as string;
 			const tagsStr = formData.get('tags') as string;
 			const imageFile = formData.get('image') as File | null;
 
-			// Server validation (description and company are not strictly required here)
-			if (!title || !category || !date) {
+			// Server validation: title, company, and date are required
+			if (!title || !company || !date) {
 				return new Response(
-					JSON.stringify({ error: 'Title, category, and date are required.' }),
+					JSON.stringify({ error: 'Title, company, and date are required.' }),
 					{ status: 400, headers: { 'Content-Type': 'application/json' } }
 				);
 			}
@@ -232,7 +184,6 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				id: designId,
 				title,
 				imageUrl,
-				category: category.trim(),
 				company: company.trim(),
 				tags,
 				date,
