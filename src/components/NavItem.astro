@@ -1,7 +1,13 @@
 ---
+/**
+ * NavItem Component
+ * 
+ * Renders a pill-shaped navigation link. Includes hover lift animations
+ * and active-state styles that inherit the primary accent color.
+ */
 interface Props {
-	href: string;
-	isActive?: boolean;
+	href: string;     // Target URL path
+	isActive?: boolean; // Highlight style flag if matching the current route
 }
 
 const { href, isActive = false } = Astro.props;
@@ -11,9 +17,10 @@ const { href, isActive = false } = Astro.props;
 	href={href}
 	class={`flex items-center gap-2 px-3 py-1.5 rounded-full font-medium text-sm transition-all hover:-translate-y-0.5 duration-300 ${
 		isActive
-			? 'bg-primary text-white'
-			: 'text-white/70 hover:text-white hover:bg-white/10'
+			? 'bg-primary text-white' // Accent highlighted active link
+			: 'text-white/70 hover:text-white hover:bg-white/10' // Subtle muted inactive link
 	}`}
 >
+	{/* Renders the inner content (such as icon and text labels) passed inside the slot */}
 	<slot />
 </a>

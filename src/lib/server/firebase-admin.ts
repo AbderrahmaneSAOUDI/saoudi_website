@@ -3,6 +3,8 @@ import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 
+import { getEnv } from './env';
+
 type FirebaseAdminEnv = {
   projectId: string;
   clientEmail: string;
@@ -11,10 +13,10 @@ type FirebaseAdminEnv = {
 };
 
 function readFirebaseAdminEnv(): FirebaseAdminEnv {
-  const projectId = process.env.FIREBASE_PROJECT_ID || import.meta.env.FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || import.meta.env.FIREBASE_CLIENT_EMAIL;
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY || import.meta.env.FIREBASE_PRIVATE_KEY;
-  const storageBucket = process.env.FIREBASE_STORAGE_BUCKET || import.meta.env.FIREBASE_STORAGE_BUCKET;
+  const projectId = getEnv('FIREBASE_PROJECT_ID');
+  const clientEmail = getEnv('FIREBASE_CLIENT_EMAIL');
+  const privateKey = getEnv('FIREBASE_PRIVATE_KEY');
+  const storageBucket = getEnv('FIREBASE_STORAGE_BUCKET');
 
   if (!projectId || !clientEmail || !privateKey) {
     throw new Error(
