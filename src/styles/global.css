@@ -72,7 +72,6 @@
     }
     .admin-dock-inner nav { gap: 0.25rem; }
     .admin-fab { width: 3rem; height: 3rem; }
-    #image-settings-btn { width: 2.5rem; height: 2.5rem; }
   }
 
   /* Hide scrollbar for horizontal nav overflow */

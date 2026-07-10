@@ -1,5 +1,5 @@
 ---
-import { LayoutDashboard, Briefcase, FolderOpen, Palette, Award, Heart, FileText, Clock, Settings, Plus } from '@lucide/astro';
+import { LayoutDashboard, Briefcase, FolderOpen, Palette, Award, Heart, FileText, Clock, Plus } from '@lucide/astro';
 
 interface Props {
 	currentPath?: string;
@@ -106,51 +106,8 @@ const createOptions = [
 	// Vanilla JavaScript for admin navigation dock interactivity
 	document.addEventListener('DOMContentLoaded', () => {
 		// Element Selectors
-		const imageSettingsBtn = document.getElementById('image-settings-btn');
 		const createFab = document.getElementById('create-fab');
 		const createDropdown = document.getElementById('create-dropdown');
-		const imageModalBackdrop = document.getElementById('image-modal-backdrop');
-		const imageModal = document.getElementById('image-modal');
-		const closeModalBtn = document.getElementById('close-modal-btn');
-		const cancelSettingsBtn = document.getElementById('cancel-settings-btn');
-		const applySettingsBtn = document.getElementById('apply-settings-btn');
-		const qualityValue = document.getElementById('quality-value');
-
-		// Correctly cast input elements for TypeScript property access
-		const qualitySlider = document.getElementById('quality-slider') as HTMLInputElement | null;
-		const maxWidthInput = document.getElementById('max-width-input') as HTMLInputElement | null;
-
-		// --- Image Settings Modal Controls ---
-		const openImageModal = () => {
-			imageModalBackdrop?.classList.remove('hidden');
-			imageModal?.classList.remove('hidden');
-		};
-
-		const closeImageModal = () => {
-			imageModalBackdrop?.classList.add('hidden');
-			imageModal?.classList.add('hidden');
-		};
-
-		imageSettingsBtn?.addEventListener('click', openImageModal);
-		imageModalBackdrop?.addEventListener('click', closeImageModal);
-		closeModalBtn?.addEventListener('click', closeImageModal);
-		cancelSettingsBtn?.addEventListener('click', closeImageModal);
-		
-		applySettingsBtn?.addEventListener('click', () => {
-			// Apply settings logic (e.g. print/save current quality and maximum dimension bounds)
-			console.log('Settings applied:', {
-				quality: qualitySlider?.value,
-				maxWidth: maxWidthInput?.value,
-			});
-			closeImageModal();
-		});
-
-		// Dynamic quality display slider text update
-		qualitySlider?.addEventListener('input', (e) => {
-			if (qualityValue && e.target) {
-				qualityValue.textContent = (e.target as HTMLInputElement).value;
-			}
-		});
 
 		// --- Floating Action Button & Dropdown Menu ---
 		let isDropdownOpen = false;
