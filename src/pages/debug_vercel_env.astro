@@ -1,0 +1,82 @@
+---
+import { getEnv } from '../lib/server/env';
+import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
+
+let dbError: string | null = null;
+let dbSuccess = false;
+let collections: string[] = [];
+
+// Retrieve keys
+const projectId = getEnv('FIREBASE_PROJECT_ID');
+const clientEmail = getEnv('FIREBASE_CLIENT_EMAIL');
+const privateKey = getEnv('FIREBASE_PRIVATE_KEY');
+const storageBucket = getEnv('FIREBASE_STORAGE_BUCKET');
+const adminEmail = getEnv('ADMIN_EMAIL');
+const googleClientId = getEnv('GOOGLE_CLIENT_ID');
+
+// Helper to mask sensitive values
+const maskVal = (val: string | undefined) => {
+  if (!val) return 'MISSING (undefined)';
+  if (val.length <= 10) return `Present, length ${val.length} (too short?)`;
+  return `${val.substring(0, 8)}...${val.substring(val.length - 8)} (length: ${val.length})`;
+};
+
+const keyStats = {
+  FIREBASE_PROJECT_ID: maskVal(projectId),
+  FIREBASE_CLIENT_EMAIL: maskVal(clientEmail),
+  FIREBASE_STORAGE_BUCKET: maskVal(storageBucket),
+  ADMIN_EMAIL: maskVal(adminEmail),
+  GOOGLE_CLIENT_ID: maskVal(googleClientId),
+  FIREBASE_PRIVATE_KEY: privateKey 
+    ? `Length: ${privateKey.length}, Starts with: "${privateKey.substring(0, 30)}", Ends with: "${privateKey.substring(privateKey.length - 30)}"`
+    : 'MISSING'
+};
+
+// Try initializing database and listing collections
+if (projectId && clientEmail && privateKey) {
+  try {
+    const db = getFirebaseAdminDb();
+    const cols = await db.listCollections();
+    collections = cols.map(c => c.id);
+    dbSuccess = true;
+  } catch (err: any) {
+    dbError = err.stack || err.message || String(err);
+  }
+} else {
+  dbError = "Skipped DB initialization because required keys are missing.";
+}
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vercel Env Debugger</title>
+  <style>
+    body { background: #121212; color: #fff; font-family: monospace; padding: 2rem; }
+    h1, h2 { color: #4285F4; }
+    pre { background: #1e1e1e; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; white-space: pre-wrap; }
+    .success { color: #34A853; font-weight: bold; }
+    .error { color: #EA4335; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Vercel Env Debugger</h1>
+  
+  <h2>Environment Variables Status</h2>
+  <pre>{JSON.stringify(keyStats, null, 2)}</pre>
+
+  <h2>Firebase Initialization & Connection Test</h2>
+  {dbSuccess ? (
+    <div>
+      <p class="success">SUCCESS: Connected to Firestore!</p>
+      <p>Collections found: {collections.length > 0 ? collections.join(', ') : 'None (empty database)'}</p>
+    </div>
+  ) : (
+    <div>
+      <p class="error">FAILED: Firebase connection failed</p>
+      <pre>{dbError}</pre>
+    </div>
+  )}
+</body>
+</html>
