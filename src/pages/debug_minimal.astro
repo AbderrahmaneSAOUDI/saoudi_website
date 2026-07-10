@@ -1,0 +1,32 @@
+---
+const envKeys = Object.keys(process.env).sort();
+const hasFirebaseId = !!process.env.FIREBASE_PROJECT_ID;
+const hasFirebaseEmail = !!process.env.FIREBASE_CLIENT_EMAIL;
+const hasFirebaseKey = !!process.env.FIREBASE_PRIVATE_KEY;
+
+let keyDetails = '';
+if (hasFirebaseKey) {
+  const k = process.env.FIREBASE_PRIVATE_KEY || '';
+  keyDetails = `length: ${k.length}, starts with: "${k.substring(0, 20)}", ends with: "${k.substring(k.length - 20)}", contains literal \\n: ${k.includes('\\n')}, contains actual newlines: ${k.includes('\n')}`;
+}
+---
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Minimal Debug</title>
+</head>
+<body style="background: #121212; color: #fff; font-family: monospace; padding: 20px;">
+  <h1>Minimal Debug Page</h1>
+  <p><strong>FIREBASE_PROJECT_ID:</strong> {hasFirebaseId ? 'YES' : 'NO'}</p>
+  <p><strong>FIREBASE_CLIENT_EMAIL:</strong> {hasFirebaseEmail ? 'YES' : 'NO'}</p>
+  <p><strong>FIREBASE_PRIVATE_KEY:</strong> {hasFirebaseKey ? 'YES' : 'NO'}</p>
+  <p><strong>Key Details:</strong> {keyDetails}</p>
+  
+  <h2>All Env Keys:</h2>
+  <ul>
+    {envKeys.map(k => (
+      <li>{k}</li>
+    ))}
+  </ul>
+</body>
+</html>
