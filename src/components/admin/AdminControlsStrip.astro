@@ -1,0 +1,69 @@
+---
+import { Filter, Search, Plus } from '@lucide/astro';
+
+interface Props {
+	searchId?: string;
+	searchPlaceholder?: string;
+	filterToggleId?: string;
+	filterBadgeId?: string;
+	newBtnId?: string;
+	newBtnLabel?: string;
+	showFilter?: boolean;
+	showSearch?: boolean;
+	showNew?: boolean;
+}
+
+const {
+	searchId = "search-input",
+	searchPlaceholder = "Search...",
+	filterToggleId = "btn-filter-toggle",
+	filterBadgeId = "filter-badge",
+	newBtnId = "btn-new-design",
+	newBtnLabel = "New",
+	showFilter = true,
+	showSearch = true,
+	showNew = true,
+} = Astro.props;
+---
+
+<div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 bg-[#1D1B20] p-4 rounded-3xl border border-[#2B2930]">
+	<div class="flex flex-col sm:flex-row gap-3 flex-grow items-stretch sm:items-center">
+		{showFilter && (
+			<button
+				id={filterToggleId}
+				type="button"
+				class="px-4 py-2.5 bg-[#211F26] border border-[#2B2930] text-[#E6E1E5] font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-all cursor-pointer hover:bg-[#2B2930] shrink-0"
+			>
+				<Filter class="w-4 h-4 text-primary" />
+				<span>Filter</span>
+				<span id={filterBadgeId} class="hidden px-2 py-0.5 rounded-full bg-primary text-white text-[10px]">0</span>
+			</button>
+		)}
+		
+		{showSearch && (
+			<div class="relative flex-grow">
+				<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#E6E1E5]/40">
+					<Search class="w-4 h-4" />
+				</span>
+				<input
+					type="text"
+					id={searchId}
+					placeholder={searchPlaceholder}
+					class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
+				/>
+			</div>
+		)}
+	</div>
+
+	{showNew && (
+		<div class="flex items-center gap-2 shrink-0">
+			<button
+				id={newBtnId}
+				class="w-full sm:w-auto px-5 py-2.5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
+			>
+				<Plus class="w-4 h-4" />
+				{newBtnLabel}
+			</button>
+		</div>
+	)}
+</div>
