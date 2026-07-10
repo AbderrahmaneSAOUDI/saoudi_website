@@ -1,0 +1,37 @@
+---
+let appImportResult = '';
+let firestoreImportResult = '';
+
+try {
+  const app = await import('firebase-admin/app');
+  appImportResult = `SUCCESS: firebase-admin/app loaded. Available exports: ${Object.keys(app).join(', ')}`;
+} catch (e: any) {
+  appImportResult = `FAILURE: ${e.message}\n${e.stack || ''}`;
+}
+
+try {
+  const firestore = await import('firebase-admin/firestore');
+  firestoreImportResult = `SUCCESS: firebase-admin/firestore loaded. Available exports: ${Object.keys(firestore).join(', ')}`;
+} catch (e: any) {
+  firestoreImportResult = `FAILURE: ${e.message}\n${e.stack || ''}`;
+}
+---
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Debug Import</title>
+</head>
+<body style="background: #121212; color: #fff; font-family: monospace; padding: 20px;">
+  <h1>Dynamic Import Debug</h1>
+  
+  <h2>firebase-admin/app Import Status:</h2>
+  <pre style="background: #1e1e1e; padding: 15px; border-radius: 8px; border: 1px solid #333; overflow-x: auto;">
+{appImportResult}
+  </pre>
+
+  <h2>firebase-admin/firestore Import Status:</h2>
+  <pre style="background: #1e1e1e; padding: 15px; border-radius: 8px; border: 1px solid #333; overflow-x: auto;">
+{firestoreImportResult}
+  </pre>
+</body>
+</html>
