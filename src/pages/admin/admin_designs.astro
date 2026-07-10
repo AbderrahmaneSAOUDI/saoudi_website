@@ -1094,7 +1094,7 @@ try {
 						} else {
 							resolve(file);
 						}
-					}, 'image/webp', 1.0);
+					}, 'image/webp', 0.8);
 				};
 
 				img.onerror = () => {
@@ -1118,6 +1118,11 @@ try {
 
 			try {
 				const processedFile = await processAndCompressImage(file);
+				if (processedFile.size > 800 * 1024) {
+					showStatus('error', `Optimized image is too large (${(processedFile.size / 1024).toFixed(0)}KB). Please upload a smaller or less complex image.`);
+					selectedImageFile = null;
+					return;
+				}
 				selectedImageFile = processedFile;
 				clearStatus();
 

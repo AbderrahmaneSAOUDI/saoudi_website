@@ -41,7 +41,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const imageUrl = designData?.imageUrl as string | undefined;
 
 			// 1. Delete Storage / local image file first (atomic policy)
-			if (imageUrl) {
+			if (imageUrl && !imageUrl.startsWith('data:')) {
 				await deleteFile(imageUrl, 'uploads/designs');
 			}
 
@@ -135,41 +135,22 @@ export const POST: APIRoute = async ({ locals, request }) => {
 						{ status: 400, headers: { 'Content-Type': 'application/json' } }
 					);
 				}
-				if (imageFile.size > 10 * 1024 * 1024) {
+				if (imageFile.size > 800 * 1024) {
 					return new Response(
-						JSON.stringify({ error: 'Image file size must be under 10MB.' }),
+						JSON.stringify({ error: 'Image file size must be under 800KB to store in Firestore.' }),
 						{ status: 400, headers: { 'Content-Type': 'application/json' } }
 					);
 				}
 
-				// If updating, delete the old image file first
-				if (imageUrl) {
+				// If updating and the old image was NOT base64, delete it from storage
+				if (imageUrl && !imageUrl.startsWith('data:')) {
 					await deleteFile(imageUrl, 'uploads/designs');
 				}
 
-				// Upload/save new image
-				const extMap: Record<string, string> = {
-					'image/jpeg': 'jpg',
-					'image/png': 'png',
-					'image/webp': 'webp',
-				};
-				const ext = extMap[imageFile.type] || 'jpg';
-				const filename = `${designId}.${ext}`;
-
-				// Clean up old extension variations first (jpg, png, webp)
-				await cleanOldExtensions({
-					baseId: designId,
-					destinationDir: 'designs',
-					localFallbackPath: 'uploads/designs',
-				});
-
-				imageUrl = await saveFile({
-					file: imageFile,
-					destinationDir: 'designs',
-					filename,
-					contentType: imageFile.type,
-					localFallbackPath: 'uploads/designs',
-				});
+				// Convert the file buffer to Base64 data URL
+				const arrayBuffer = await imageFile.arrayBuffer();
+				const buffer = Buffer.from(arrayBuffer);
+				imageUrl = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
 			}
 
 			if (!imageUrl) {
