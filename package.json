@@ -30,7 +30,8 @@
     "overrides": {
       "uuid": "^11.0.0",
       "glob": "^13.0.0",
-      "node-domexception": "^2.0.0"
+      "node-domexception": "^2.0.0",
+      "jose": "5.9.6"
     }
   }
 }
