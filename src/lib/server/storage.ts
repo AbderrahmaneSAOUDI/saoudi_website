@@ -67,6 +67,16 @@ export async function saveFile({
 		await storageFile.makePublic();
 		return storageFile.publicUrl();
 	} catch (error) {
+		if (process.env.VERCEL) {
+			console.error(
+				`Firebase Storage upload failed for ${destinationDir}/${filename} on Vercel:`,
+				error
+			);
+			throw new Error(
+				`Firebase Storage upload failed: ${(error as any).message || 'Unknown error'}. Please ensure Cloud Storage is enabled in the Firebase Console (Build > Storage > Get Started) for this project.`
+			);
+		}
+
 		console.warn(
 			`Firebase Storage upload failed for ${destinationDir}/${filename}; falling back to local filesystem:`,
 			error

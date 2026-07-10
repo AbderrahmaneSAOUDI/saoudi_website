@@ -39,8 +39,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 					headers: { 'Content-Type': 'application/json' },
 				});
 			}
-			if (resumePdf.size > 10 * 1024 * 1024) {
-				return new Response(JSON.stringify({ error: 'PDF must be under 10MB' }), {
+			if (resumePdf.size > 800 * 1024) {
+				return new Response(JSON.stringify({ error: 'PDF must be under 800KB to store in Firestore' }), {
 					status: 400,
 					headers: { 'Content-Type': 'application/json' },
 				});
@@ -55,8 +55,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 					headers: { 'Content-Type': 'application/json' },
 				});
 			}
-			if (resumePreview.size > 10 * 1024 * 1024) {
-				return new Response(JSON.stringify({ error: 'Preview image must be under 10MB' }), {
+			if (resumePreview.size > 800 * 1024) {
+				return new Response(JSON.stringify({ error: 'Preview image must be under 800KB to store in Firestore' }), {
 					status: 400,
 					headers: { 'Content-Type': 'application/json' },
 				});
@@ -64,56 +64,19 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		}
 
 		const results: { resumeUrl?: string; previewUrl?: string; warning?: string } = {};
-		let warning = '';
 
 		// 1. Process Resume PDF
 		if (resumePdf && resumePdf.size > 0) {
-			results.resumeUrl = await saveFile({
-				file: resumePdf,
-				destinationDir: 'resume',
-				filename: 'Abderrahmane_SAOUDI_Resume.pdf',
-				contentType: 'application/pdf',
-				localFallbackPath: '',
-			});
-			if (results.resumeUrl.startsWith('/')) {
-				warning = 'Wrote files locally as Firebase Storage is not configured/available.';
-			}
+			const arrayBuffer = await resumePdf.arrayBuffer();
+			const buffer = Buffer.from(arrayBuffer);
+			results.resumeUrl = `data:application/pdf;base64,${buffer.toString('base64')}`;
 		}
 
 		// 2. Process Resume Preview Image
 		if (resumePreview && resumePreview.size > 0) {
-			const extMap: Record<string, string> = {
-				'image/jpeg': 'jpg',
-				'image/png': 'png',
-				'image/webp': 'webp',
-			};
-			const ext = extMap[resumePreview.type] || 'jpg';
-			const filename = `resume_preview.${ext}`;
-
-			// Clean up old preview extensions to prevent stale caches (both in Firebase Storage and locally)
-			await cleanOldExtensions({
-				baseId: 'resume_preview',
-				destinationDir: 'resume',
-				localFallbackPath: '',
-			});
-
-			// If saving locally, let's also clean up old resume.ext files (which might have been saved by legacy code)
-			await cleanOldExtensions({
-				baseId: 'resume',
-				destinationDir: 'resume',
-				localFallbackPath: '',
-			});
-
-			results.previewUrl = await saveFile({
-				file: resumePreview,
-				destinationDir: 'resume',
-				filename: filename,
-				contentType: resumePreview.type,
-				localFallbackPath: '',
-			});
-			if (results.previewUrl.startsWith('/')) {
-				warning = 'Wrote files locally as Firebase Storage is not configured/available.';
-			}
+			const arrayBuffer = await resumePreview.arrayBuffer();
+			const buffer = Buffer.from(arrayBuffer);
+			results.previewUrl = `data:${resumePreview.type};base64,${buffer.toString('base64')}`;
 		}
 
 		// 3. Update Firestore configuration document 'static_data'
@@ -137,9 +100,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			success: true,
 			...results,
 		};
-		if (warning) {
-			responseData.warning = warning;
-		}
+
 
 		return new Response(JSON.stringify(responseData), {
 			status: 200,
