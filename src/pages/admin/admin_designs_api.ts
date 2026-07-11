@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
-import { saveFile, deleteFile, cleanOldExtensions } from '../../lib/server/storage';
+import { deleteFile } from '../../lib/server/storage';
 
 export const POST: APIRoute = async ({ locals, request }) => {
 	// Auth check: verify session token
