@@ -1,5 +1,5 @@
 ---
-import { LayoutDashboard, Briefcase, FolderOpen, Palette, Award, Heart, FileText, Clock, Plus } from '@lucide/astro';
+import { LayoutDashboard, Briefcase, FolderOpen, Palette, Award, Heart, FileText, Clock } from '@lucide/astro';
 
 interface Props {
 	currentPath?: string;
@@ -17,14 +17,6 @@ const navItems = [
 	{ label: 'Resume', path: '/admin/admin_resume', icon: FileText },
 	{ label: 'Timeline', path: '/admin/admin_timeline', icon: Clock, disabled: true },
 ];
-
-const createOptions = [
-	{ label: 'Experience', path: '/admin/admin_experience', icon: Briefcase },
-	{ label: 'Project', path: '/admin/admin_projects', icon: FolderOpen },
-	{ label: 'Design', path: '/admin/admin_designs', icon: Palette },
-	{ label: 'Certificate', path: '/admin/admin_certificates', icon: Award },
-	{ label: 'Volunteering', path: '/admin/admin_volunteering', icon: Heart },
-];
 ---
 
 <div
@@ -33,7 +25,7 @@ const createOptions = [
 >
 	<!-- Floating Navigation Dock -->
 	<div
-		class="admin-dock-inner flex items-center gap-2 bg-[#211F26] shadow-2xl px-3 py-2.5 border border-white/10 rounded-t-2xl justify-between"
+		class="admin-dock-inner flex items-center gap-2 bg-[#211F26] shadow-2xl px-3 py-2.5 border border-white/10 rounded-t-2xl justify-center"
 	>
 		<!-- Center Slot: Navigation Links -->
 		<nav class="flex items-center gap-0.5 overflow-x-auto scrollbar-hide">
@@ -65,81 +57,5 @@ const createOptions = [
 				})
 			}
 		</nav>
-
-		<!-- Right Slot: FAB with Dropdown -->
-		<div class="relative shrink-0">
-			<button
-				id="create-fab"
-				class="admin-fab flex justify-center items-center bg-primary hover:bg-primary/80 shadow-lg rounded-full w-10 h-10 transition-colors"
-				aria-label="Create new item"
-			>
-				<Plus class="w-5 h-5 text-white" />
-			</button>
-
-			<!-- Dropdown Menu -->
-			<div
-				id="create-dropdown"
-				class="hidden right-0 bottom-14 z-50 absolute bg-[#211F26] shadow-2xl border border-white/10 rounded-2xl w-48 overflow-hidden"
-			>
-				<div class="p-2">
-					<p class="mb-1 px-3 py-2 text-white/50 text-xs">
-						What would you like to create?
-					</p>
-					{
-						createOptions.map((option) => (
-							<a
-								href={option.path}
-								class="flex items-center gap-2.5 hover:bg-white/5 px-3 py-2 rounded-xl text-white/70 hover:text-white text-sm transition-colors"
-							>
-								<option.icon class="w-4 h-4 text-white/50" />
-								{option.label}
-							</a>
-						))
-					}
-				</div>
-			</div>
-		</div>
 	</div>
 </div>
-
-<script>
-	// Vanilla JavaScript for admin navigation dock interactivity
-	document.addEventListener('DOMContentLoaded', () => {
-		// Element Selectors
-		const createFab = document.getElementById('create-fab');
-		const createDropdown = document.getElementById('create-dropdown');
-
-		// --- Floating Action Button & Dropdown Menu ---
-		let isDropdownOpen = false;
-
-		const toggleDropdown = () => {
-			isDropdownOpen = !isDropdownOpen;
-			if (isDropdownOpen) {
-				createDropdown?.classList.remove('hidden');
-			} else {
-				createDropdown?.classList.add('hidden');
-			}
-		};
-
-		createFab?.addEventListener('click', (e) => {
-			e.stopPropagation();
-			toggleDropdown();
-		});
-
-		// Close dropdown when user clicks anywhere else on the document
-		document.addEventListener('click', (e) => {
-			if (isDropdownOpen && !createDropdown?.contains(e.target as Node) && e.target !== createFab) {
-				isDropdownOpen = false;
-				createDropdown?.classList.add('hidden');
-			}
-		});
-
-		// Close dropdown menu when a creation option is clicked
-		createDropdown?.querySelectorAll('a').forEach((link) => {
-			link.addEventListener('click', () => {
-				isDropdownOpen = false;
-				createDropdown?.classList.add('hidden');
-			});
-		});
-	});
-</script>
