@@ -1,7 +1,7 @@
 {
   "name": "saoudi_website",
   "type": "module",
-  "version": "1.4.76",
+  "version": "1.40.78",
   "engines": {
     "node": ">=22.12.0"
   },

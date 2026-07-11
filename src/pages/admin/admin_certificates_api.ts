@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
-import { saveFile, deleteFile, cleanOldExtensions } from '../../lib/server/storage';
 
 export const POST: APIRoute = async ({ locals, request }) => {
 	// Auth check: verify session token
@@ -37,15 +36,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				});
 			}
 
-			const certData = docSnap.data();
-			const imageUrl = certData?.imageUrl as string | undefined;
-
-			// Delete storage/local image file first if it exists
-			if (imageUrl && !imageUrl.startsWith('data:')) {
-				await deleteFile(imageUrl, 'uploads/certificates');
-			}
-
-			// Delete Firestore document
+			// Delete Firestore document (image is stored as Base64 inside the doc)
 			await docRef.delete();
 
 			return new Response(JSON.stringify({ success: true }), {
@@ -98,27 +89,10 @@ export const POST: APIRoute = async ({ locals, request }) => {
 						{ status: 400, headers: { 'Content-Type': 'application/json' } }
 					);
 				}
-
-				// If updating and the old image was NOT base64, delete it
-				if (imageUrl && !imageUrl.startsWith('data:')) {
-					await deleteFile(imageUrl, 'uploads/certificates');
-				}
-
-				// Clean up old variations of the file with other extensions
-				await cleanOldExtensions({
-					baseId: certificateId,
-					destinationDir: 'uploads/certificates',
-					localFallbackPath: 'uploads/certificates',
-				});
-
-				// Save file to Storage
-				imageUrl = await saveFile({
-					file: imageFile,
-					destinationDir: 'uploads/certificates',
-					filename: `${certificateId}.webp`,
-					contentType: 'image/webp',
-					localFallbackPath: 'uploads/certificates',
-				});
+				// Convert the file buffer to Base64 data URL
+				const arrayBuffer = await imageFile.arrayBuffer();
+				const buffer = Buffer.from(arrayBuffer);
+				imageUrl = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
 			}
 
 			// Prepare document fields
