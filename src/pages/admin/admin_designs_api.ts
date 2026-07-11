@@ -128,10 +128,10 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			// Handle image upload / replacement
 			if (imageFile && imageFile.size > 0) {
-				const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+				const allowedTypes = ['image/webp'];
 				if (!allowedTypes.includes(imageFile.type)) {
 					return new Response(
-						JSON.stringify({ error: 'Image must be a JPEG, PNG, or WebP file.' }),
+						JSON.stringify({ error: 'Image must be a WebP file.' }),
 						{ status: 400, headers: { 'Content-Type': 'application/json' } }
 					);
 				}

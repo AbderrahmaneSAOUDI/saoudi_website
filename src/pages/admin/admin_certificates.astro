@@ -4,15 +4,893 @@ import '../../styles/global.css';
 import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
 import AdminLayout from "../../components/admin/AdminLayout.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
+import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
+import { Award, Calendar, ExternalLink, Trash2, Save, CircleAlert, Image as ImageIcon } from '@lucide/astro';
+import Card from "../../components/Card.astro";
+import AdminControlsStrip from "../../components/admin/AdminControlsStrip.astro";
 
 // Extra safety: double-check that the middleware successfully set Astro.locals.adminEmail
 const adminEmail = Astro.locals.adminEmail;
 if (!adminEmail) return Astro.redirect("/admin/admin_login");
+
+let certificates: any[] = [];
+let issuers: string[] = [];
+let years: string[] = [];
+let errorMsg = '';
+
+try {
+	const db = getFirebaseAdminDb();
+	
+	// Fetch all certificates sorted by date descending
+	const snapshot = await db.collection("certificates").orderBy("date", "desc").get();
+	certificates = snapshot.docs.map(doc => ({
+		id: doc.id,
+		...doc.data()
+	}));
+
+	// Extract unique sorted issuers
+	issuers = [...new Set(certificates.map(c => c.issuer).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+	
+	// Extract unique sorted years from date (YYYY-MM-DD)
+	years = [...new Set(certificates.map(c => {
+		if (typeof c.date === 'string' && c.date.includes('-')) {
+			return c.date.split('-')[0];
+		}
+		return null;
+	}).filter(Boolean))].sort((a, b) => b.localeCompare(a));
+} catch (error: any) {
+	console.warn("Failed to fetch certificates from Firestore:", error);
+	errorMsg = "Degraded mode: Firestore is not configured or offline.";
+}
 ---
 
 <BackgroundBaseLayout title="Certificates Workspace">
-  <AdminLayout title="Certificates">
+	<AdminLayout title="Certificates">
+		<div class="relative min-h-[calc(100vh-140px)]">
+			
+			<!-- Main Content Area -->
+			<div class="space-y-6">
+				
+				<!-- Top Controls Strip -->
+				<AdminControlsStrip
+					searchId="search-input"
+					searchPlaceholder="Search certificates by title, issuer..."
+					filterToggleId="btn-filter-toggle"
+					filterBadgeId="filter-badge"
+					newBtnId="btn-new-certificate"
+					newBtnLabel="New"
+				/>
 
-  </AdminLayout>
-  <AdminNavDock currentPath={Astro.url.pathname} />
+				{errorMsg && (
+					<div class="p-4 rounded-2xl bg-[#DB4437]/10 border border-[#DB4437]/30 text-[#DB4437] text-sm flex items-center gap-2.5">
+						<CircleAlert class="w-5 h-5 shrink-0" />
+						<span>{errorMsg}</span>
+					</div>
+				)}
+
+				<!-- Grid of Certificates -->
+				<div id="certificates-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+					{certificates.map(cert => (
+						<Card item={cert} type="certificate" isAdmin={true} />
+					))}
+
+					{certificates.length === 0 && (
+						<div class="col-span-full py-16 text-center text-[#E6E1E5]/40 bg-[#1D1B20] rounded-3xl border border-[#2B2930]">
+							<Award class="w-12 h-12 mx-auto mb-3 opacity-30 text-primary" />
+							<p class="font-medium text-white">No certificates found</p>
+							<p class="text-xs mt-1">Click "New" to add your first credential.</p>
+						</div>
+					)}
+				</div>
+			</div>
+
+			<!-- Drawer Backdrop -->
+			<div
+				id="editor-backdrop"
+				class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] transition-opacity duration-300 opacity-0"
+			></div>
+
+			<!-- Sliding Filter Drawer (Starts offscreen translated left) -->
+			<div
+				id="filter-panel"
+				class="fixed top-0 left-0 h-full w-full sm:w-[360px] bg-[#1D1B20] border-r border-[#2B2930] shadow-2xl transition-transform duration-350 ease-[cubic-bezier(0.2,0,0.2,1)] transform -translate-x-full z-[70] p-6 pb-28 sm:pb-6 overflow-y-auto flex flex-col justify-between"
+			>
+				<div class="space-y-5">
+					<div class="border-b border-[#2B2930]/60 pb-4 flex justify-between items-center">
+						<div>
+							<h2 class="text-lg font-bold text-white">Filter Credentials</h2>
+							<p class="text-xs text-[#E6E1E5]/50 mt-1">Refine certificate listing</p>
+						</div>
+						<button
+							type="button"
+							id="btn-close-filters"
+							class="text-[#E6E1E5]/60 hover:text-white transition-colors cursor-pointer text-xl font-bold"
+						>
+							&times;
+						</button>
+					</div>
+
+					<div class="space-y-4">
+						<!-- Issuer Select -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Issuer</label>
+							<select
+								id="filter-issuer"
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+							>
+								<option value="">All Issuers</option>
+								{issuers.map(issuer => (
+									<option value={issuer}>{issuer}</option>
+								))}
+							</select>
+						</div>
+
+						<!-- Year Select -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Year</label>
+							<select
+								id="filter-year"
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+							>
+								<option value="">All Years</option>
+								{years.map(y => (
+									<option value={y}>{y}</option>
+								))}
+							</select>
+						</div>
+
+						<!-- Date Interval -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Date Interval</label>
+							<div class="grid grid-cols-2 gap-2">
+								<div>
+									<span class="text-[10px] text-[#E6E1E5]/40 mb-1 block">From</span>
+									<input
+										type="date"
+										id="filter-start-date"
+										class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors cursor-pointer"
+									/>
+								</div>
+								<div>
+									<span class="text-[10px] text-[#E6E1E5]/40 mb-1 block">To</span>
+									<input
+										type="date"
+										id="filter-end-date"
+										class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors cursor-pointer"
+									/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="flex gap-3 mt-8 pt-4 border-t border-[#2B2930]/40">
+					<button
+						type="button"
+						id="btn-clear-filters"
+						class="w-full py-2.5 bg-transparent border border-[#2B2930] hover:bg-[#2B2930] text-[#E6E1E5]/60 hover:text-white font-semibold rounded-xl text-xs transition-all cursor-pointer text-center"
+					>
+						Clear Filters
+					</button>
+				</div>
+			</div>
+
+			<!-- Sliding Drawer Detail Editor (Starts offscreen translated right) -->
+			<div
+				id="editor-panel"
+				class="fixed top-0 right-0 h-full w-full sm:w-[460px] bg-[#1D1B20] border-l border-[#2B2930] shadow-2xl transition-transform duration-350 ease-[cubic-bezier(0.2,0,0.2,1)] transform translate-x-full z-[70] p-6 pb-28 sm:pb-6 overflow-y-auto flex flex-col justify-between"
+			>
+				<div class="space-y-5">
+					<div class="border-b border-[#2B2930]/60 pb-4 flex justify-between items-center">
+						<div>
+							<h2 id="editor-heading" class="text-lg font-bold text-white">Create Certificate</h2>
+							<p id="editor-subheading" class="text-xs text-[#E6E1E5]/50 mt-1">Add a new professional credential</p>
+						</div>
+						<button
+							type="button"
+							id="btn-delete"
+							class="hidden p-2.5 rounded-xl text-[#DB4437] hover:bg-[#DB4437]/10 border border-transparent hover:border-[#DB4437]/20 transition-all cursor-pointer shrink-0"
+							title="Delete Certificate"
+						>
+							<Trash2 class="w-5 h-5" />
+						</button>
+					</div>
+
+					<form id="certificate-form" class="space-y-4" onsubmit="event.preventDefault();">
+						<!-- Image Dropzone (Moved to the Top) -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Certificate Image (Optional)</label>
+							<div
+								id="image-drop-zone"
+								class="border-2 border-dashed border-[#2B2930] hover:border-primary/50 rounded-2xl p-4 text-center transition-all duration-300 cursor-pointer group relative overflow-hidden min-h-[140px] flex flex-col items-center justify-center bg-[#141218]"
+							>
+								<input
+									type="file"
+									id="image-file-input"
+									accept="image/jpeg,image/png,image/webp"
+									class="hidden"
+								/>
+								
+								<!-- Hover/Preview overlay -->
+								<img
+									id="image-preview"
+									src=""
+									alt="Preview"
+									class="hidden absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-all duration-500"
+								/>
+
+								<div id="drop-zone-prompt" class="relative z-10 flex flex-col items-center gap-1.5">
+									<div class="p-2 rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+										<ImageIcon class="w-5 h-5" />
+									</div>
+									<div>
+										<p class="text-xs font-medium text-white">
+											Drop image or <span class="text-primary font-semibold">browse</span>
+										</p>
+										<p class="text-[10px] text-[#E6E1E5]/40 mt-0.5">JPEG, PNG, WebP (Max 10MB)</p>
+									</div>
+								</div>
+
+								<div id="file-details" class="hidden relative z-10 text-[10px] bg-[#0F9D58]/10 text-[#0F9D58] border border-[#0F9D58]/20 px-2 py-1 rounded-md font-semibold mt-2">
+									✓ File Selected
+								</div>
+							</div>
+						</div>
+
+						<!-- Read-only certificate ID -->
+						<div class="hidden">
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Certificate ID</label>
+							<input
+								type="text"
+								id="form-id"
+								name="id"
+								readonly
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-[#E6E1E5]/40 text-xs focus:outline-none"
+							/>
+						</div>
+
+						<!-- Title -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Credential Title *</label>
+							<input
+								type="text"
+								id="form-title"
+								name="title"
+								required
+								placeholder="e.g., Professional Cloud Architect"
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
+							/>
+						</div>
+
+						<!-- Issuer -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Issuer *</label>
+							<input
+								type="text"
+								id="form-issuer"
+								name="issuer"
+								required
+								placeholder="e.g., Google Cloud, Coursera, Udemy"
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
+							/>
+						</div>
+
+						<!-- Date Selection -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Earned Date *</label>
+							<input
+								type="month"
+								id="form-date"
+								name="date"
+								required
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+							/>
+						</div>
+
+						<!-- Credential URL -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Credential URL (Optional)</label>
+							<input
+								type="url"
+								id="form-credential-url"
+								name="credentialUrl"
+								placeholder="https://..."
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
+							/>
+						</div>
+
+						<!-- Status Panel -->
+						<div id="form-status" class="hidden p-3.5 rounded-xl border text-xs font-medium text-center"></div>
+
+						<!-- Form Buttons -->
+						<div class="flex gap-3 pt-2">
+							<button
+								type="button"
+								id="btn-cancel"
+								class="flex-1 py-3 px-4 rounded-xl border border-[#2B2930] hover:bg-[#2B2930] text-[#E6E1E5] font-semibold text-sm transition-all duration-300 cursor-pointer text-center"
+							>
+								Cancel
+							</button>
+							<button
+								type="submit"
+								id="btn-save"
+								class="flex-1 py-3 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md"
+							>
+								<Save class="w-4 h-4" />
+								<span id="save-btn-text">Save</span>
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+		</div>
+	</AdminLayout>
+	<AdminNavDock currentPath={Astro.url.pathname} />
 </BackgroundBaseLayout>
+
+<script define:vars={{ initialCertificates: certificates }}>
+	// Make server-fetched items available to client script
+	window.certificates = initialCertificates || [];
+</script>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		// Element Declarations
+		const searchInput = document.getElementById('search-input') as HTMLInputElement;
+		const btnNewCertificate = document.getElementById('btn-new-certificate') as HTMLButtonElement;
+		const certificatesGrid = document.getElementById('certificates-grid') as HTMLDivElement;
+		const certificateCards = document.querySelectorAll('.certificate-card') as NodeListOf<HTMLDivElement>;
+
+		// Filter Elements
+		const btnFilterToggle = document.getElementById('btn-filter-toggle') as HTMLButtonElement;
+		const filterBadge = document.getElementById('filter-badge') as HTMLSpanElement;
+		const filterPanel = document.getElementById('filter-panel') as HTMLDivElement;
+		const filterIssuer = document.getElementById('filter-issuer') as HTMLSelectElement;
+		const filterYear = document.getElementById('filter-year') as HTMLSelectElement;
+		const filterStartDate = document.getElementById('filter-start-date') as HTMLInputElement;
+		const filterEndDate = document.getElementById('filter-end-date') as HTMLInputElement;
+		const btnClearFilters = document.getElementById('btn-clear-filters') as HTMLButtonElement;
+		const btnCloseFilters = document.getElementById('btn-close-filters') as HTMLButtonElement;
+
+		// Drawer Elements
+		const editorPanel = document.getElementById('editor-panel') as HTMLDivElement;
+		const editorBackdrop = document.getElementById('editor-backdrop') as HTMLDivElement;
+		const btnCancel = document.getElementById('btn-cancel') as HTMLButtonElement;
+
+		const editorHeading = document.getElementById('editor-heading') as HTMLHeadingElement;
+		const editorSubheading = document.getElementById('editor-subheading') as HTMLParagraphElement;
+		
+		const certificateForm = document.getElementById('certificate-form') as HTMLFormElement;
+		const formId = document.getElementById('form-id') as HTMLInputElement;
+		const formTitle = document.getElementById('form-title') as HTMLInputElement;
+		const formIssuer = document.getElementById('form-issuer') as HTMLInputElement;
+		const formDate = document.getElementById('form-date') as HTMLInputElement;
+		const formCredentialUrl = document.getElementById('form-credential-url') as HTMLInputElement;
+
+		const formStatus = document.getElementById('form-status') as HTMLDivElement;
+		const btnDelete = document.getElementById('btn-delete') as HTMLButtonElement;
+		const btnSave = document.getElementById('btn-save') as HTMLButtonElement;
+		const saveBtnText = document.getElementById('save-btn-text') as HTMLSpanElement;
+
+		// Image Drop Zone Elements
+		const imageDropZone = document.getElementById('image-drop-zone') as HTMLDivElement;
+		const imageFileInput = document.getElementById('image-file-input') as HTMLInputElement;
+		const imagePreview = document.getElementById('image-preview') as HTMLImageElement;
+		const dropZonePrompt = document.getElementById('drop-zone-prompt') as HTMLDivElement;
+		const fileDetails = document.getElementById('file-details') as HTMLDivElement;
+
+		// Local State
+		let currentSelectedId: string | null = null;
+		let selectedImageFile: File | null = null;
+
+		// --- Core Setup & Initialization ---
+		initFromUrl();
+
+		// Handle URL state initialization
+		function initFromUrl() {
+			const urlParams = new URLSearchParams(window.location.search);
+			const urlId = urlParams.get('id');
+
+			if (urlId) {
+				const cert = (window as any).certificates.find((c: any) => c.id === urlId);
+				if (cert) {
+					selectCertificate(cert);
+					openDrawer();
+					return;
+				}
+			}
+		}
+
+		// --- Drawer Controls ---
+		function openDrawer() {
+			editorBackdrop.classList.remove('hidden');
+			setTimeout(() => {
+				editorBackdrop.classList.add('opacity-100');
+				editorPanel.classList.remove('translate-x-full');
+				editorPanel.classList.add('translate-x-0');
+			}, 10);
+		}
+
+		function closeDrawer() {
+			editorBackdrop.classList.remove('opacity-100');
+			editorPanel.classList.remove('translate-x-0');
+			editorPanel.classList.add('translate-x-full');
+
+			// Clean query params on close
+			const newUrl = new URL(window.location.href);
+			newUrl.searchParams.delete('id');
+			window.history.pushState(null, '', newUrl.toString());
+
+			// Highlights cards off
+			certificateCards.forEach(c => c.classList.remove('ring-2', 'ring-primary/60', 'border-primary/50'));
+
+			setTimeout(() => {
+				editorBackdrop.classList.add('hidden');
+			}, 350);
+		}
+
+		function openFilterDrawer() {
+			editorBackdrop.classList.remove('hidden');
+			setTimeout(() => {
+				editorBackdrop.classList.add('opacity-100');
+				filterPanel.classList.remove('-translate-x-full');
+				filterPanel.classList.add('translate-x-0');
+			}, 10);
+		}
+
+		function closeFilterDrawer() {
+			editorBackdrop.classList.remove('opacity-100');
+			filterPanel.classList.remove('translate-x-0');
+			filterPanel.classList.add('-translate-x-full');
+
+			setTimeout(() => {
+				editorBackdrop.classList.add('hidden');
+			}, 350);
+		}
+
+		btnCancel.addEventListener('click', closeDrawer);
+		if (btnCloseFilters) {
+			btnCloseFilters.addEventListener('click', closeFilterDrawer);
+		}
+		editorBackdrop.addEventListener('click', () => {
+			closeDrawer();
+			closeFilterDrawer();
+		});
+
+		// --- Form State Management ---
+		function setNewCertificateState() {
+			currentSelectedId = null;
+			
+			// Generate short safe random ID
+			const shortId = (crypto && crypto.randomUUID) 
+				? crypto.randomUUID().substring(0, 8) 
+				: Math.random().toString(36).substring(2, 10);
+			
+			formId.value = `cert_${shortId}`;
+			formTitle.value = '';
+			formIssuer.value = '';
+			
+			// Set today's date formatted as YYYY-MM
+			const now = new Date();
+			const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+			formDate.value = currentMonth;
+
+			formCredentialUrl.value = '';
+
+			// Reset image dropzone
+			selectedImageFile = null;
+			imagePreview.src = '';
+			imagePreview.classList.add('hidden');
+			dropZonePrompt.classList.remove('hidden');
+			fileDetails.classList.add('hidden');
+			fileDetails.textContent = '';
+
+			// Adjust UI panel headers and buttons
+			editorHeading.textContent = 'Create Certificate';
+			editorSubheading.textContent = 'Add a new professional credential';
+			btnDelete.classList.add('hidden');
+			
+			clearStatus();
+		}
+
+		function selectCertificate(cert: any) {
+			currentSelectedId = cert.id;
+
+			formId.value = cert.id;
+			formTitle.value = cert.title || '';
+			formIssuer.value = cert.issuer || '';
+			formDate.value = cert.date ? cert.date.substring(0, 7) : '';
+			formCredentialUrl.value = cert.credentialUrl || '';
+
+			// Handle image preview
+			selectedImageFile = null;
+			if (cert.imageUrl) {
+				imagePreview.src = cert.imageUrl;
+				imagePreview.classList.remove('hidden');
+				dropZonePrompt.classList.add('hidden');
+				fileDetails.textContent = '✓ Current Image';
+				fileDetails.classList.remove('hidden');
+			} else {
+				imagePreview.src = '';
+				imagePreview.classList.add('hidden');
+				dropZonePrompt.classList.remove('hidden');
+				fileDetails.classList.add('hidden');
+				fileDetails.textContent = '';
+			}
+
+			// Highlights active card in list
+			certificateCards.forEach(c => {
+				if (c.getAttribute('data-id') === cert.id) {
+					c.classList.add('ring-2', 'ring-primary/60', 'border-primary/50');
+				} else {
+					c.classList.remove('ring-2', 'ring-primary/60', 'border-primary/50');
+				}
+			});
+
+			editorHeading.textContent = 'Edit Certificate';
+			editorSubheading.textContent = 'Modify credential details';
+			btnDelete.classList.remove('hidden');
+
+			clearStatus();
+		}
+
+		// --- Search & Filter Logic ---
+		function applyFilters() {
+			const query = searchInput.value.toLowerCase().trim();
+			const selectedIssuer = filterIssuer.value;
+			const selectedYear = filterYear.value;
+			const startDateVal = filterStartDate.value;
+			const endDateVal = filterEndDate.value;
+
+			let activeFiltersCount = 0;
+			if (selectedIssuer) activeFiltersCount++;
+			if (selectedYear) activeFiltersCount++;
+			if (startDateVal) activeFiltersCount++;
+			if (endDateVal) activeFiltersCount++;
+
+			// Update badge and clear button state
+			if (activeFiltersCount > 0) {
+				filterBadge.textContent = String(activeFiltersCount);
+				filterBadge.classList.remove('hidden');
+				btnClearFilters.classList.remove('opacity-50', 'cursor-not-allowed');
+				btnClearFilters.disabled = false;
+				btnFilterToggle.classList.add('border-primary', 'bg-primary/5');
+			} else {
+				filterBadge.classList.add('hidden');
+				btnClearFilters.classList.add('opacity-50', 'cursor-not-allowed');
+				btnClearFilters.disabled = true;
+				btnFilterToggle.classList.remove('border-primary', 'bg-primary/5');
+			}
+
+			const startDate = startDateVal ? new Date(startDateVal) : null;
+			const endDate = endDateVal ? new Date(endDateVal) : null;
+
+			certificateCards.forEach(card => {
+				const cardId = card.getAttribute('data-id') || '';
+				const cert = (window as any).certificates.find((c: any) => c.id === cardId);
+				if (!cert) return;
+
+				const title = (cert.title || '').toLowerCase();
+				const issuer = (cert.issuer || '').toLowerCase();
+
+				const matchesSearch = !query || 
+					title.includes(query) || 
+					issuer.includes(query);
+
+				let matchesIssuer = true;
+				if (selectedIssuer !== '') {
+					matchesIssuer = cert.issuer === selectedIssuer;
+				}
+
+				let matchesYear = true;
+				if (selectedYear !== '') {
+					if (typeof cert.date === 'string' && cert.date.includes('-')) {
+						const year = cert.date.split('-')[0];
+						matchesYear = year === selectedYear;
+					} else {
+						matchesYear = false;
+					}
+				}
+
+				let matchesDateInterval = true;
+				if (cert.date) {
+					const certDate = new Date(cert.date);
+					if (startDate && certDate < startDate) {
+						matchesDateInterval = false;
+					}
+					if (endDate && certDate > endDate) {
+						matchesDateInterval = false;
+					}
+				} else if (startDate || endDate) {
+					matchesDateInterval = false;
+				}
+
+				if (matchesSearch && matchesIssuer && matchesYear && matchesDateInterval) {
+					card.classList.remove('hidden');
+				} else {
+					card.classList.add('hidden');
+				}
+			});
+		}
+
+		// Filter Toggle Panel
+		btnFilterToggle.addEventListener('click', () => {
+			openFilterDrawer();
+		});
+
+		// Clear Filters
+		btnClearFilters.addEventListener('click', () => {
+			filterIssuer.value = '';
+			filterYear.value = '';
+			filterStartDate.value = '';
+			filterEndDate.value = '';
+			applyFilters();
+		});
+
+		// Event Listeners for Filters
+		filterIssuer.addEventListener('change', applyFilters);
+		filterYear.addEventListener('change', applyFilters);
+		filterStartDate.addEventListener('change', applyFilters);
+		filterEndDate.addEventListener('change', applyFilters);
+		searchInput.addEventListener('input', applyFilters);
+
+		// --- Card Click Events ---
+		certificateCards.forEach(card => {
+			card.addEventListener('click', (e) => {
+				// Don't open drawer if clicking on the external verification link
+				if ((e.target as HTMLElement).closest('.stop-propagation')) {
+					return;
+				}
+				const id = card.getAttribute('data-id');
+				const cert = (window as any).certificates.find((c: any) => c.id === id);
+				if (cert) {
+					const newUrl = new URL(window.location.href);
+					newUrl.searchParams.set('id', cert.id);
+					window.history.pushState(null, '', newUrl.toString());
+					
+					selectCertificate(cert);
+					openDrawer();
+				}
+			});
+		});
+
+		btnNewCertificate.addEventListener('click', () => {
+			setNewCertificateState();
+			openDrawer();
+		});
+
+		// --- Image Drop Zone Controls ---
+		imageDropZone.addEventListener('click', () => imageFileInput.click());
+
+		imageFileInput.addEventListener('change', () => {
+			const file = imageFileInput.files?.[0];
+			if (file) handleFileSelection(file);
+		});
+
+		imageDropZone.addEventListener('dragover', (e) => {
+			e.preventDefault();
+			imageDropZone.classList.add('border-primary', 'bg-primary/5');
+		});
+
+		imageDropZone.addEventListener('dragleave', () => {
+			imageDropZone.classList.remove('border-primary', 'bg-primary/5');
+		});
+
+		imageDropZone.addEventListener('drop', (e) => {
+			e.preventDefault();
+			imageDropZone.classList.remove('border-primary', 'bg-primary/5');
+			const file = e.dataTransfer?.files?.[0];
+			if (file) handleFileSelection(file);
+		});
+
+		function processAndCompressImage(file: File): Promise<File> {
+			return new Promise((resolve, reject) => {
+				const img = new Image();
+				img.src = URL.createObjectURL(file);
+				
+				img.onload = () => {
+					URL.revokeObjectURL(img.src);
+
+					const maxDim = 1024;
+					let width = img.width;
+					let height = img.height;
+					const needsResize = width > maxDim || height > maxDim;
+
+					if (needsResize) {
+						if (width > height) {
+							height = Math.round((height * maxDim) / width);
+							width = maxDim;
+						} else {
+							width = Math.round((width * maxDim) / height);
+							height = maxDim;
+						}
+					}
+
+					const canvas = document.createElement('canvas');
+					canvas.width = width;
+					canvas.height = height;
+					const ctx = canvas.getContext('2d');
+					if (!ctx) {
+						resolve(file);
+						return;
+					}
+
+					ctx.drawImage(img, 0, 0, width, height);
+
+					canvas.toBlob((blob) => {
+						if (blob) {
+							const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+							const newFile = new File([blob], `${baseName}.webp`, {
+								type: 'image/webp',
+								lastModified: Date.now()
+							});
+							resolve(newFile);
+						} else {
+							resolve(file);
+						}
+					}, 'image/webp', 0.8);
+				};
+
+				img.onerror = () => {
+					reject(new Error('Failed to load image file for processing.'));
+				};
+			});
+		}
+
+		async function handleFileSelection(file: File) {
+			const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+			if (!allowedTypes.includes(file.type)) {
+				showStatus('error', 'Only JPEG, PNG, or WebP files are allowed.');
+				return;
+			}
+			if (file.size > 10 * 1024 * 1024) {
+				showStatus('error', 'Image size must be under 10MB.');
+				return;
+			}
+
+			showStatus('success', 'Optimizing and converting image to WebP...');
+
+			try {
+				const processedFile = await processAndCompressImage(file);
+				if (processedFile.size > 800 * 1024) {
+					showStatus('error', `Optimized image is too large (${(processedFile.size / 1024).toFixed(0)}KB). Please upload a smaller or less complex image.`);
+					selectedImageFile = null;
+					return;
+				}
+				selectedImageFile = processedFile;
+				clearStatus();
+
+				// Generate locally readable preview URL
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					if (e.target?.result) {
+						imagePreview.src = e.target.result as string;
+						imagePreview.classList.remove('hidden');
+						dropZonePrompt.classList.add('hidden');
+						fileDetails.classList.remove('hidden');
+						
+						const originalSize = (file.size / 1024 / 1024).toFixed(2);
+						const processedSize = (processedFile.size / 1024 / 1024).toFixed(2);
+						fileDetails.textContent = `✓ ${processedFile.name} (${processedSize} MB, was ${originalSize} MB)`;
+					}
+				};
+				reader.readAsDataURL(processedFile);
+			} catch (err: any) {
+				showStatus('error', err.message || 'Failed to process image.');
+			}
+		}
+
+		// --- CRUD Network Handlers ---
+		
+		// SAVE (Create or Update)
+		certificateForm.addEventListener('submit', async (e) => {
+			e.preventDefault();
+
+			// Lock buttons
+			setFormLoading(true, 'Saving...');
+
+			const formData = new FormData();
+			formData.append('action', 'save');
+			formData.append('id', formId.value);
+			formData.append('title', formTitle.value);
+			formData.append('issuer', formIssuer.value);
+			formData.append('date', formDate.value);
+			formData.append('credentialUrl', formCredentialUrl.value);
+			if (selectedImageFile) {
+				formData.append('image', selectedImageFile);
+			}
+
+			try {
+				const response = await fetch('/admin/admin_certificates_api', {
+					method: 'POST',
+					body: formData
+				});
+				const result = await response.json();
+
+				if (response.ok && result.success) {
+					showStatus('success', 'Certificate saved successfully! Refreshing...');
+					setTimeout(() => {
+						window.location.search = `?id=${formId.value}`;
+					}, 1000);
+				} else {
+					showStatus('error', result.error || 'Failed to save certificate.');
+					setFormLoading(false);
+				}
+			} catch (err) {
+				showStatus('error', 'A network error occurred. Please try again.');
+				setFormLoading(false);
+			}
+		});
+
+		// DELETE
+		btnDelete.addEventListener('click', async () => {
+			if (!currentSelectedId) return;
+
+			const confirmed = confirm('Are you sure you want to delete this certificate? This action will permanently remove the record.');
+			if (!confirmed) return;
+
+			setFormLoading(true, 'Deleting...');
+
+			const formData = new FormData();
+			formData.append('action', 'delete');
+			formData.append('id', currentSelectedId);
+
+			try {
+				const response = await fetch('/admin/admin_certificates_api', {
+					method: 'POST',
+					body: formData
+				});
+				const result = await response.json();
+
+				if (response.ok && result.success) {
+					showStatus('success', 'Certificate deleted successfully! Syncing...');
+					setTimeout(() => {
+						window.location.search = '';
+					}, 1000);
+				} else {
+					showStatus('error', result.error || 'Failed to delete certificate.');
+					setFormLoading(false);
+				}
+			} catch (err) {
+				showStatus('error', 'A network error occurred. Please try again.');
+				setFormLoading(false);
+			}
+		});
+
+		// --- Helper Utilities ---
+		function showStatus(type: 'success' | 'error', message: string) {
+			formStatus.classList.remove('hidden', 'bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border-[#0F9D58]/30', 'bg-[#DB4437]/10', 'text-[#DB4437]', 'border-[#DB4437]/30');
+			
+			if (type === 'success') {
+				formStatus.classList.add('bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border', 'border-[#0F9D58]/30');
+			} else {
+				formStatus.classList.add('bg-[#DB4437]/10', 'text-[#DB4437]', 'border', 'border-[#DB4437]/30');
+			}
+			
+			formStatus.textContent = message;
+			formStatus.classList.remove('hidden');
+		}
+
+		function clearStatus() {
+			formStatus.classList.add('hidden');
+			formStatus.textContent = '';
+		}
+
+		function setFormLoading(loading: boolean, label = 'Save') {
+			if (loading) {
+				btnSave.disabled = true;
+				btnCancel.disabled = true;
+				btnDelete.disabled = true;
+				saveBtnText.textContent = label;
+				btnSave.classList.add('opacity-75', 'cursor-not-allowed');
+			} else {
+				btnSave.disabled = false;
+				btnCancel.disabled = false;
+				btnDelete.disabled = false;
+				saveBtnText.textContent = 'Save';
+				btnSave.classList.remove('opacity-75', 'cursor-not-allowed');
+			}
+		}
+	});
+</script>

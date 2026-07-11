@@ -1,8 +1,137 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import Construction from "../layouts/Construction.astro";
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Card from '../components/Card.astro';
+import CertificateLightbox from '../components/CertificateLightbox.astro';
+import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
+import { Award } from '@lucide/astro';
+
+let certificates: any[] = [];
+let errorMsg = '';
+
+try {
+	const db = getFirebaseAdminDb();
+
+	// Fetch all certificates sorted by date descending
+	const snapshot = await db.collection("certificates").orderBy("date", "desc").get();
+	certificates = snapshot.docs.map(doc => ({
+		id: doc.id,
+		...doc.data()
+	}));
+} catch (error: any) {
+	console.warn("Failed to fetch certificates from Firestore for public page:", error);
+	errorMsg = "Degraded mode: Certificates are currently offline or unavailable.";
+}
+
+// Group certificates by year
+const certificatesByYear: Record<string, any[]> = {};
+
+certificates.forEach(cert => {
+	let year = 'Other';
+	if (cert.date && typeof cert.date === 'string') {
+		const parts = cert.date.split('-');
+		if (parts[0] && parts[0].length === 4) {
+			year = parts[0];
+		}
+	}
+	if (!certificatesByYear[year]) {
+		certificatesByYear[year] = [];
+	}
+	certificatesByYear[year].push(cert);
+});
+
+// Sort years descending
+const activeYears = Object.keys(certificatesByYear).sort((a, b) => b.localeCompare(a));
 ---
 
 <BaseLayout title="Certificates">
-	<Construction></Construction>
+	<div class="mx-auto px-4 sm:px-6 lg:px-8 py-16 max-w-7xl">
+		{errorMsg && (
+			<div class="mb-10 p-4 rounded-2xl bg-[#EA4335]/10 border border-[#EA4335]/30 text-[#EA4335] text-sm text-center">
+				{errorMsg}
+			</div>
+		)}
+
+		<!-- Grouped Lists: Year, Grid -->
+		<div class="space-y-16">
+			{activeYears.map((year, groupIndex) => {
+				const groupCerts = certificatesByYear[year];
+				return (
+					<section class="space-y-6 animate-slide-up" style={`animation-delay: ${100 + groupIndex * 100}ms`}>
+						<!-- Section Title -->
+						<div class="flex items-center justify-between border-b border-white/5 pb-3">
+							<div class="flex items-center gap-3">
+								<div class="w-1.5 h-6 bg-primary rounded-full"></div>
+								<h2 class="font-bold text-white text-xl tracking-tight">{year}</h2>
+								<span class="text-xs text-white/40 font-semibold bg-white/5 px-2.5 py-0.5 rounded-full border border-white/5">
+									{groupCerts.length}
+								</span>
+							</div>
+						</div>
+
+						<!-- Grid of Certificates -->
+						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+							{groupCerts.map((cert, index) => (
+								<div class="animate-card-fade animate-fade-in" style={`animation-delay: ${index * 50}ms`}>
+									<Card item={cert} type="certificate" />
+								</div>
+							))}
+						</div>
+					</section>
+				);
+			})}
+
+			{certificates.length === 0 && !errorMsg && (
+				<div class="py-24 text-center text-white/40 bg-surface-container rounded-3xl border border-white/10 flex flex-col items-center justify-center animate-fade-in">
+					<div class="p-4 rounded-full bg-primary/10 text-primary mb-4">
+						<Award class="w-12 h-12" />
+					</div>
+					<p class="font-bold text-white text-lg">No certificates found</p>
+					<p class="text-xs mt-1 text-white/60 max-w-sm">Please check back later or visit the admin panel to add credentials.</p>
+				</div>
+			)}
+		</div>
+	</div>
+
+	{/* Render Lightboxes outside transform scopes */}
+	{certificates.filter(cert => cert.imageUrl).map(cert => (
+		<CertificateLightbox certificate={cert} />
+	))}
 </BaseLayout>
+
+<style>
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+			transform: translateY(15px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@keyframes slide-up {
+		from {
+			opacity: 0;
+			transform: translateY(25px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.animate-fade-in {
+		animation: fade-in 0.8s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+	}
+
+	.animate-slide-up {
+		opacity: 0;
+		animation: slide-up 0.6s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+	}
+
+	.animate-card-fade {
+		opacity: 0;
+		animation: slide-up 0.5s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+	}
+</style>

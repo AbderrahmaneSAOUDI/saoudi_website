@@ -146,24 +146,20 @@ export const designSchema = z.object({
 
 export interface Certificate {
 	id: string;
-	order: number;
 	title: string;
 	issuer: string;
-	date: string; // ISO 8601 string for chronological sorting
-	period: string; // Display label (e.g. "May 2024")
-	credentialUrl: string;
-	credentialId?: string;
+	date: string; // ISO 8601 string for chronological sorting (YYYY-MM or YYYY-MM-DD)
+	credentialUrl?: string | null;
+	imageUrl?: string | null;
 }
 
 export const certificateSchema = z.object({
 	id: z.string().min(1),
-	order: z.number().int(),
 	title: z.string().min(1),
 	issuer: z.string().min(1),
 	date: z.string().min(1),
-	period: z.string().min(1),
-	credentialUrl: z.string().min(1),
-	credentialId: z.string().min(1).optional(),
+	credentialUrl: z.string().nullable().optional(),
+	imageUrl: z.string().nullable().optional(),
 });
 
 // ─── Collection: volunteering ─────────────────────────────────────────────

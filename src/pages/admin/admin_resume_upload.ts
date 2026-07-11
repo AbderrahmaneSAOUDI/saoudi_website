@@ -48,9 +48,9 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		}
 
 		if (resumePreview && resumePreview.size > 0) {
-			const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+			const allowedTypes = ['image/webp'];
 			if (!allowedTypes.includes(resumePreview.type)) {
-				return new Response(JSON.stringify({ error: 'Preview must be a JPEG, PNG, or WebP image' }), {
+				return new Response(JSON.stringify({ error: 'Preview must be a WebP image' }), {
 					status: 400,
 					headers: { 'Content-Type': 'application/json' },
 				});
