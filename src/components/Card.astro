@@ -16,8 +16,8 @@ interface Props {
 
 const { item, type, isAdmin = false } = Astro.props;
 
-// Format certificate date dynamically: "YYYY-MM" -> "Month YYYY"
-const formatCertificateDate = (dateStr: string) => {
+// Format date dynamically: ISO string -> "Month YYYY" with short month names
+const formatDate = (dateStr: string) => {
 	if (!dateStr) return '';
 	try {
 		const parts = dateStr.split('-');
@@ -26,18 +26,18 @@ const formatCertificateDate = (dateStr: string) => {
 			const month = parseInt(parts[1], 10) - 1;
 			const date = new Date(year, month, 1);
 			if (!isNaN(date.getTime())) {
-				return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+				return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 			}
 		}
 		const date = new Date(dateStr);
 		if (!isNaN(date.getTime())) {
-			return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+			return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 		}
 	} catch (e) {}
 	return dateStr;
 };
 
-const formattedDate = type === 'certificate' ? formatCertificateDate(item.date) : item.date;
+const formattedDate = formatDate(item.date);
 const isDesign = type === 'design';
 const certType = type === 'certificate' ? (item as Certificate).type : undefined;
 
