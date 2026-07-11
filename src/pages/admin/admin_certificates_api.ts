@@ -59,13 +59,22 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const title = formData.get('title') as string;
 			const issuer = formData.get('issuer') as string;
 			const date = formData.get('date') as string;
+			const type = formData.get('type') as string;
 			const credentialUrl = formData.get('credentialUrl') as string;
 			const imageFile = formData.get('image') as File | null;
 
-			// Server validation: title, issuer, and date are required
-			if (!title || !issuer || !date) {
+			// Server validation: title, issuer, date, and type are required
+			if (!title || !issuer || !date || !type) {
 				return new Response(
-					JSON.stringify({ error: 'Title, issuer, and date are required.' }),
+					JSON.stringify({ error: 'Title, issuer, date, and certificate type are required.' }),
+					{ status: 400, headers: { 'Content-Type': 'application/json' } }
+				);
+			}
+
+			const validTypes = ['Online', 'In-Person', 'Hybrid'];
+			if (!validTypes.includes(type)) {
+				return new Response(
+					JSON.stringify({ error: 'Invalid certificate type.' }),
 					{ status: 400, headers: { 'Content-Type': 'application/json' } }
 				);
 			}
@@ -118,6 +127,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				title: title.trim(),
 				issuer: issuer.trim(),
 				date: date.trim(),
+				type: type,
 			};
 
 			if (credentialUrl && credentialUrl.trim() !== '') {
