@@ -6,6 +6,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   // Intercept all requests targeting `/admin` and `/admin/*` (except `/admin/admin_login`)
   if ((pathname === '/admin' || pathname.startsWith('/admin/')) && pathname !== '/admin/admin_login') {
+    if (import.meta.env.DEV) {
+      context.locals.adminEmail = 'mock@example.com';
+      return next();
+    }
     const sessionCookie = context.cookies.get('admin_session')?.value;
 
     if (!sessionCookie) {

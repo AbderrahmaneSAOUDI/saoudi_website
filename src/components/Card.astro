@@ -39,6 +39,13 @@ const formatCertificateDate = (dateStr: string) => {
 
 const formattedDate = type === 'certificate' ? formatCertificateDate(item.date) : item.date;
 const isDesign = type === 'design';
+const certType = type === 'certificate' ? (item as Certificate).type : undefined;
+
+const typeColors = {
+	'Online': 'bg-primary/50 border-primary/20 text-white',
+	'In-Person': 'bg-[#34A853]/50 border-[#34A853]/20 text-white',
+	'Hybrid': 'bg-[#F9AB00]/50 border-[#F9AB00]/20 text-black',
+};
 ---
 
 {isDesign ? (
@@ -119,6 +126,11 @@ const isDesign = type === 'design';
 							decoding="async"
 						/>
 					</a>
+					{certType && (
+						<span class={`absolute top-2.5 right-2.5 z-10 px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase border backdrop-blur-md shadow-sm pointer-events-none select-none ${typeColors[certType as keyof typeof typeColors] || ''}`}>
+							{certType}
+						</span>
+					)}
 				</div>
 			) : (
 				<div class="p-3 w-fit rounded-2xl bg-secondary/10 text-secondary border border-secondary/20 group-hover:scale-110 transition-transform duration-300">
@@ -140,6 +152,11 @@ const isDesign = type === 'design';
 					<Calendar class="w-3.5 h-3.5" />
 					{formattedDate}
 				</span>
+				{!item.imageUrl && certType && (
+					<span class={`px-2 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase border ${typeColors[certType as keyof typeof typeColors] || ''}`}>
+						{certType}
+					</span>
+				)}
 				{item.credentialUrl && (
 					<a 
 						href={item.credentialUrl} 

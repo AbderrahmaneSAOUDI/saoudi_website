@@ -286,6 +286,41 @@ try {
 								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
 							/>
 						</div>
+ 
+						<!-- Certificate Type -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-2">Certificate Type *</label>
+							<div class="grid grid-cols-3 gap-3">
+								<label class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm cursor-pointer hover:border-primary/50 transition-all select-none">
+									<input
+										type="radio"
+										name="type"
+										value="Online"
+										required
+										class="w-4 h-4 accent-primary cursor-pointer"
+									/>
+									<span class="text-xs sm:text-sm">Online</span>
+								</label>
+								<label class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm cursor-pointer hover:border-primary/50 transition-all select-none">
+									<input
+										type="radio"
+										name="type"
+										value="In-Person"
+										class="w-4 h-4 accent-primary cursor-pointer"
+									/>
+									<span class="text-xs sm:text-sm">In-Person</span>
+								</label>
+								<label class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm cursor-pointer hover:border-primary/50 transition-all select-none">
+									<input
+										type="radio"
+										name="type"
+										value="Hybrid"
+										class="w-4 h-4 accent-primary cursor-pointer"
+									/>
+									<span class="text-xs sm:text-sm">Hybrid</span>
+								</label>
+							</div>
+						</div>
 
 						<!-- Credential URL -->
 						<div>
@@ -477,6 +512,11 @@ try {
 			formDate.value = currentMonth;
 
 			formCredentialUrl.value = '';
+ 
+			// Reset radio buttons
+			document.querySelectorAll('input[name="type"]').forEach((radio: any) => {
+				radio.checked = false;
+			});
 
 			// Reset image dropzone
 			selectedImageFile = null;
@@ -502,6 +542,18 @@ try {
 			formIssuer.value = cert.issuer || '';
 			formDate.value = cert.date ? cert.date.substring(0, 7) : '';
 			formCredentialUrl.value = cert.credentialUrl || '';
+ 
+			// Set radio button selection
+			if (cert.type) {
+				const radio = document.querySelector(`input[name="type"][value="${cert.type}"]`) as HTMLInputElement;
+				if (radio) {
+					radio.checked = true;
+				}
+			} else {
+				document.querySelectorAll('input[name="type"]').forEach((radio: any) => {
+					radio.checked = false;
+				});
+			}
 
 			// Handle image preview
 			selectedImageFile = null;
@@ -790,12 +842,21 @@ try {
 			// Lock buttons
 			setFormLoading(true, 'Saving...');
 
+			const selectedTypeEl = document.querySelector('input[name="type"]:checked') as HTMLInputElement;
+			if (!selectedTypeEl) {
+				showStatus('error', 'Please select a Certificate Type.');
+				setFormLoading(false);
+				return;
+			}
+			const selectedType = selectedTypeEl.value;
+
 			const formData = new FormData();
 			formData.append('action', 'save');
 			formData.append('id', formId.value);
 			formData.append('title', formTitle.value);
 			formData.append('issuer', formIssuer.value);
 			formData.append('date', formDate.value);
+			formData.append('type', selectedType);
 			formData.append('credentialUrl', formCredentialUrl.value);
 			if (selectedImageFile) {
 				formData.append('image', selectedImageFile);
@@ -811,7 +872,7 @@ try {
 				if (response.ok && result.success) {
 					showStatus('success', 'Certificate saved successfully! Refreshing...');
 					setTimeout(() => {
-						window.location.search = `?id=${formId.value}`;
+						window.location.href = window.location.pathname;
 					}, 1000);
 				} else {
 					showStatus('error', result.error || 'Failed to save certificate.');
@@ -846,7 +907,7 @@ try {
 				if (response.ok && result.success) {
 					showStatus('success', 'Certificate deleted successfully! Syncing...');
 					setTimeout(() => {
-						window.location.search = '';
+						window.location.href = window.location.pathname;
 					}, 1000);
 				} else {
 					showStatus('error', result.error || 'Failed to delete certificate.');

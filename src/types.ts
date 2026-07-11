@@ -149,6 +149,7 @@ export interface Certificate {
 	title: string;
 	issuer: string;
 	date: string; // ISO 8601 string for chronological sorting (YYYY-MM or YYYY-MM-DD)
+	type: 'Online' | 'In-Person' | 'Hybrid';
 	credentialUrl?: string | null;
 	imageUrl?: string | null;
 }
@@ -158,6 +159,7 @@ export const certificateSchema = z.object({
 	title: z.string().min(1),
 	issuer: z.string().min(1),
 	date: z.string().min(1),
+	type: z.enum(['Online', 'In-Person', 'Hybrid']),
 	credentialUrl: z.string().nullable().optional(),
 	imageUrl: z.string().nullable().optional(),
 });

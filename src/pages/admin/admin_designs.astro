@@ -1183,7 +1183,7 @@ try {
 				if (response.ok && result.success) {
 					showStatus('success', 'Design saved successfully! Refreshing...');
 					setTimeout(() => {
-						window.location.search = `?id=${formId.value}`;
+						window.location.href = window.location.pathname;
 					}, 1000);
 				} else {
 					showStatus('error', result.error || 'Failed to save design.');
@@ -1218,7 +1218,7 @@ try {
 				if (response.ok && result.success) {
 					showStatus('success', 'Design deleted successfully! Syncing...');
 					setTimeout(() => {
-						window.location.search = '';
+						window.location.href = window.location.pathname;
 					}, 1000);
 				} else {
 					showStatus('error', result.error || 'Failed to delete design.');
