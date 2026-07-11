@@ -77,17 +77,17 @@ try {
 
 				<!-- Grid of Designs -->
 				<div id="designs-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-					{designs.map(design => (
-						<Card item={design} type="design" isAdmin={true} />
-					))}
+					{/* Cards will be dynamically rendered via JS */}
+				</div>
 
-					{designs.length === 0 && (
-						<div class="col-span-full py-16 text-center text-[#E6E1E5]/40 bg-[#1D1B20] rounded-3xl border border-[#2B2930]">
-							<Palette class="w-12 h-12 mx-auto mb-3 opacity-30 text-primary" />
-							<p class="font-medium text-white">No designs found</p>
-							<p class="text-xs mt-1">Click "New" to add your first mockup.</p>
-						</div>
-					)}
+				<!-- Load More Button -->
+				<div id="load-more-container" class="flex justify-center">
+					<button
+						id="btn-load-more"
+						class="px-6 py-2.5 rounded-xl border border-[#2B2930] hover:bg-[#2B2930] text-[#E6E1E5] font-semibold text-sm transition-all duration-300 cursor-pointer"
+					>
+						Load More
+					</button>
 				</div>
 			</div>
 
@@ -420,7 +420,13 @@ try {
 		const searchInput = document.getElementById('search-input') as HTMLInputElement;
 		const btnNewDesign = document.getElementById('btn-new-design') as HTMLButtonElement;
 		const designsGrid = document.getElementById('designs-grid') as HTMLDivElement;
-		const designCards = document.querySelectorAll('.design-card') as NodeListOf<HTMLDivElement>;
+		const loadMoreBtn = document.getElementById('btn-load-more') as HTMLButtonElement;
+		const loadMoreContainer = document.getElementById('load-more-container') as HTMLDivElement;
+
+		// Local State
+		const ITEMS_PER_PAGE = 5;
+		let displayedCount = 0;
+		let allDesigns: any[] = (window as any).designs || [];
 
 		// Filter Elements
 		const btnFilterToggle = document.getElementById('btn-filter-toggle') as HTMLButtonElement;
@@ -482,7 +488,157 @@ try {
 
 		// --- Core Setup & Initialization ---
 		populateCompanyDropdown();
+		renderDesigns();
 		initFromUrl();
+
+		function renderDesigns() {
+			const newCards = allDesigns.slice(displayedCount, displayedCount + ITEMS_PER_PAGE);
+			
+			newCards.forEach(design => {
+				const card = createDesignCard(design);
+				designsGrid.appendChild(card);
+			});
+			
+			displayedCount += newCards.length;
+			
+			if (displayedCount >= allDesigns.length) {
+				loadMoreContainer.classList.add('hidden');
+			} else {
+				loadMoreContainer.classList.remove('hidden');
+			}
+
+			// Check if we need to show the "no designs" message
+			if (displayedCount === 0 && allDesigns.length === 0) {
+				const noDesignsDiv = document.createElement('div');
+				noDesignsDiv.className = 'col-span-full py-16 text-center text-[#E6E1E5]/40 bg-[#1D1B20] rounded-3xl border border-[#2B2930]';
+				noDesignsDiv.innerHTML = `
+					<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12 mx-auto mb-3 opacity-30 text-primary">
+					  <circle cx="12" cy="12" r="10"></circle>
+					  <path d="M8 12l2 2 4-4"></path>
+					</svg>
+					<p class="font-medium text-white">No designs found</p>
+					<p class="text-xs mt-1">Click "New" to add your first mockup.</p>
+				`;
+				designsGrid.appendChild(noDesignsDiv);
+			}
+			
+			// Re-attach event listeners to new cards
+			attachCardEventListeners();
+		}
+
+		function createDesignCard(design: any) {
+			const formattedDate = (() => {
+				if (!design.date) return '';
+				try {
+					const parts = design.date.split('-');
+					if (parts.length >= 2) {
+						const year = parseInt(parts[0], 10);
+						const month = parseInt(parts[1], 10) - 1;
+						const d = new Date(year, month, 1);
+						if (!isNaN(d.getTime())) {
+							return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+						}
+					}
+					const d = new Date(design.date);
+					if (!isNaN(d.getTime())) {
+						return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+					}
+				} catch (e) {}
+				return design.date;
+			})();
+
+			const tagsHtml = design.tags && design.tags.length > 0 
+				? `<div class="flex flex-wrap gap-1.5 mt-2">
+						${design.tags.map((tag: string) => `
+							<span class="text-[10px] text-primary/80 font-bold flex items-center gap-0.5 bg-[#2D2D2D] border border-white/5 px-2 py-0.5 rounded-md">
+								<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-2.5 h-2.5 text-primary/60">
+								  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+								  <line x1="7" y1="7" x2="7.01" y2="7"></line>
+								</svg>
+								${tag}
+							</span>
+						`).join('')}
+					</div>`
+				: '';
+
+			const cardWrapper = document.createElement('div');
+			cardWrapper.innerHTML = `
+				<article 
+					class="design-card group border rounded-3xl p-4 transition-all duration-300 flex flex-col justify-between h-full border-[#2B2930] bg-[#1D1B20] hover:ring-2 hover:ring-primary/40 cursor-pointer"
+					data-id="${design.id}"
+				>
+					<div>
+						<a 
+							href="#lightbox-${design.id}" 
+							class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-4 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block"
+						>
+							<div class="absolute inset-0 skeleton" id="skeleton-${design.id}"></div>
+							<img
+								src="${design.imageUrl}"
+								alt="${design.title}"
+								class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10"
+								loading="lazy"
+								decoding="async"
+								onload="document.getElementById('skeleton-${design.id}').style.display = 'none'"
+								onerror="document.getElementById('skeleton-${design.id}').style.display = 'none'"
+							/>
+						</a>
+
+						<h3 class="font-bold text-white text-lg group-hover:text-primary transition-colors line-clamp-1">
+							${design.title}
+						</h3>
+
+						${tagsHtml}
+					</div>
+
+					<div class="design-card-footer mt-4 pt-3 flex justify-between items-center text-xs border-t border-white/5">
+						<span class="text-white/40 flex items-center gap-1 font-medium">
+							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+							  <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+							  <line x1="16" x2="16" y1="2" y2="6"></line>
+							  <line x1="8" x2="8" y1="2" y2="6"></line>
+							  <line x1="3" x2="21" y1="10" y2="10"></line>
+							</svg>
+							${formattedDate}
+						</span>
+						${design.company ? `
+							<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary">
+								${design.company}
+							</span>
+						` : ''}
+					</div>
+				</article>
+			`;
+
+			return cardWrapper.firstElementChild as HTMLElement;
+		}
+
+		function attachCardEventListeners() {
+			const designCards = designsGrid.querySelectorAll('.design-card') as NodeListOf<HTMLDivElement>;
+			designCards.forEach(card => {
+				card.addEventListener('click', (e) => {
+					// If clicking the image link, let the CSS lightbox handle it and stop propagation
+					if ((e.target as HTMLElement).closest('.image-zoom-trigger')) {
+						return;
+					}
+					const id = card.getAttribute('data-id');
+					const design = allDesigns.find((d: any) => d.id === id);
+					if (design) {
+						// Set URL query param
+						const newUrl = new URL(window.location.href);
+						newUrl.searchParams.set('id', design.id);
+						window.history.pushState(null, '', newUrl.toString());
+						
+						selectDesign(design);
+						openDrawer();
+					}
+				});
+			});
+		}
+
+		loadMoreBtn.addEventListener('click', () => {
+			renderDesigns();
+		});
 
 		// Handle URL state initialization
 		function initFromUrl() {
@@ -490,7 +646,7 @@ try {
 			const urlId = urlParams.get('id');
 
 			if (urlId) {
-				const design = (window as any).designs.find((d: any) => d.id === urlId);
+				const design = allDesigns.find((d: any) => d.id === urlId);
 				if (design) {
 					selectDesign(design);
 					openDrawer();
@@ -521,6 +677,7 @@ try {
 			window.history.pushState(null, '', newUrl.toString());
 
 			// Highlights cards off
+			const designCards = designsGrid.querySelectorAll('.design-card') as NodeListOf<HTMLDivElement>;
 			designCards.forEach(c => c.classList.remove('ring-2', 'ring-primary/60', 'border-primary/50'));
 
 			setTimeout(() => {
@@ -620,6 +777,7 @@ try {
 			}
 
 			// Highlights active design card in list
+			const designCards = designsGrid.querySelectorAll('.design-card') as NodeListOf<HTMLDivElement>;
 			designCards.forEach(c => {
 				if (c.getAttribute('data-id') === design.id) {
 					c.classList.add('ring-2', 'ring-primary/60', 'border-primary/50');
@@ -687,7 +845,7 @@ try {
 			}
 
 			modalCompanies.forEach((comp, index) => {
-				const designCount = ((window as any).designs || []).filter((d: any) => d.company === comp.originalName).length;
+				const designCount = allDesigns.filter((d: any) => d.company === comp.originalName).length;
 
 				const row = document.createElement('div');
 				row.className = 'flex items-center gap-2.5 bg-[#211F26] p-2.5 rounded-xl border border-[#2B2930]';
@@ -854,7 +1012,7 @@ try {
 					
 					Object.keys(renames).forEach(oldComp => {
 						const newComp = renames[oldComp];
-						((window as any).designs || []).forEach((d: any) => {
+						allDesigns.forEach((d: any) => {
 							if (d.company === oldComp) d.company = newComp;
 						});
 					});
@@ -862,7 +1020,7 @@ try {
 					// Update DOM cards displaying company names
 					document.querySelectorAll('.design-card').forEach(card => {
 						const cardId = card.getAttribute('data-id');
-						const design = ((window as any).designs || []).find((d: any) => d && d.id === cardId);
+						const design = allDesigns.find((d: any) => d && d.id === cardId);
 						if (design) {
 							// Update company pill if it exists or delete it
 							const footer = card.querySelector('.design-card-footer');
@@ -928,9 +1086,10 @@ try {
 			const startDate = startDateVal ? new Date(startDateVal) : null;
 			const endDate = endDateVal ? new Date(endDateVal) : null;
 
+			const designCards = designsGrid.querySelectorAll('.design-card') as NodeListOf<HTMLDivElement>;
 			designCards.forEach(card => {
 				const cardId = card.getAttribute('data-id') || '';
-				const design = (window as any).designs.find((d: any) => d.id === cardId);
+				const design = allDesigns.find((d: any) => d.id === cardId);
 				if (!design) return;
 
 				const title = (design.title || '').toLowerCase();
@@ -998,27 +1157,6 @@ try {
 		filterStartDate.addEventListener('change', applyFilters);
 		filterEndDate.addEventListener('change', applyFilters);
 		searchInput.addEventListener('input', applyFilters);
-
-		// --- Card Click Events ---
-		designCards.forEach(card => {
-			card.addEventListener('click', (e) => {
-				// If clicking the image link, let the CSS lightbox handle it and stop propagation
-				if ((e.target as HTMLElement).closest('.image-zoom-trigger')) {
-					return;
-				}
-				const id = card.getAttribute('data-id');
-				const design = (window as any).designs.find((d: any) => d.id === id);
-				if (design) {
-					// Set URL query param
-					const newUrl = new URL(window.location.href);
-					newUrl.searchParams.set('id', design.id);
-					window.history.pushState(null, '', newUrl.toString());
-					
-					selectDesign(design);
-					openDrawer();
-				}
-			});
-		});
 
 		btnNewDesign.addEventListener('click', () => {
 			setNewDesignState();
