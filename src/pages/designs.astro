@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import DesignCard from '../components/DesignCard.astro';
+import Card from '../components/Card.astro';
 import DesignLightbox from '../components/DesignLightbox.astro';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
 import { Palette } from '@lucide/astro';
@@ -96,7 +96,7 @@ const activeGroups = Object.keys(designsByCompany)
 						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
 							{groupDesigns.map((design, index) => (
 								<div class="animate-card-fade" style={`animation-delay: ${index * 50}ms`}>
-									<DesignCard design={design} />
+									<Card item={design} type="design" />
 								</div>
 							))}
 						</div>

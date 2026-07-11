@@ -6,7 +6,7 @@ import AdminLayout from "../../components/admin/AdminLayout.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
 import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
 import { Palette, Image as ImageIcon, Trash2, Save, CircleAlert, Settings } from '@lucide/astro';
-import DesignCard from "../../components/DesignCard.astro";
+import Card from "../../components/Card.astro";
 import DesignLightbox from "../../components/DesignLightbox.astro";
 import AdminControlsStrip from "../../components/admin/AdminControlsStrip.astro";
 
@@ -78,7 +78,7 @@ try {
 				<!-- Grid of Designs -->
 				<div id="designs-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
 					{designs.map(design => (
-						<DesignCard design={design} isAdmin={true} />
+						<Card item={design} type="design" isAdmin={true} />
 					))}
 
 					{designs.length === 0 && (
