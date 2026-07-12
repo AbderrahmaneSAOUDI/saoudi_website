@@ -5,6 +5,9 @@ import { getStorage } from 'firebase-admin/storage';
 
 import { getEnv } from './env';
 
+/**
+ * Type definition for the required Firebase Admin environment variables.
+ */
 type FirebaseAdminEnv = {
   projectId: string;
   clientEmail: string;
@@ -12,6 +15,13 @@ type FirebaseAdminEnv = {
   storageBucket?: string;
 };
 
+/**
+ * Reads Firebase configuration from the environment.
+ * Throws an error if required credentials are not found.
+ * Handles the formatting of the private key.
+ *
+ * @returns {FirebaseAdminEnv} The parsed Firebase Admin environment variables.
+ */
 function readFirebaseAdminEnv(): FirebaseAdminEnv {
   const projectId = getEnv('FIREBASE_PROJECT_ID');
   const clientEmail = getEnv('FIREBASE_CLIENT_EMAIL');
@@ -27,20 +37,29 @@ function readFirebaseAdminEnv(): FirebaseAdminEnv {
   return {
     projectId,
     clientEmail,
+    // Ensure the private key has correct newline formatting when read from environment variables
     privateKey: privateKey.replace(/\\n/g, '\n'),
     storageBucket,
   };
 }
 
+/**
+ * Initializes and returns the Firebase Admin App instance as a singleton.
+ * Prevents multiple initializations during hot reloads or multiple invocations.
+ *
+ * @returns {App} The initialized Firebase Admin application instance.
+ */
 export function getFirebaseAdminApp(): App {
   const existingApp = getApps()[0];
 
+  // Return existing instance if it was already initialized
   if (existingApp) {
     return existingApp;
   }
 
   const firebaseAdminEnv = readFirebaseAdminEnv();
 
+  // Initialize a new Firebase Admin app using the provided credentials
   return initializeApp({
     credential: cert({
       projectId: firebaseAdminEnv.projectId,
@@ -51,14 +70,23 @@ export function getFirebaseAdminApp(): App {
   });
 }
 
+/**
+ * Retrieves the Firebase Auth service instance.
+ */
 export function getFirebaseAdminAuth() {
   return getAuth(getFirebaseAdminApp());
 }
 
+/**
+ * Retrieves the Firestore Database service instance.
+ */
 export function getFirebaseAdminDb() {
   return getFirestore(getFirebaseAdminApp());
 }
 
+/**
+ * Retrieves the Firebase Storage service instance.
+ */
 export function getFirebaseAdminStorage() {
   return getStorage(getFirebaseAdminApp());
 }

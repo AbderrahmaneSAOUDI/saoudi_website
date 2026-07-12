@@ -1,83 +1,90 @@
 ---
+/**
+ * Main Landing Page (Home)
+ * Displays the hero section.
+ * Uses BaseLayout for the main site wrapper and provides animated entry sections.
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ActionButton from '../components/ActionButton.astro';
-import { ArrowRight, Code, Briefcase, Heart, Award, FileText } from '@lucide/astro';
-
-const navCards = [
-	{ href: '/projects', icon: Code, title: 'Projects', description: 'Explore my personal and professional projects' },
-	{ href: '/designs', icon: Code, title: 'Designs', description: 'View my visual and UI design explorations' },
-	{ href: '/experience', icon: Briefcase, title: 'Experience', description: 'View my work history and career journey' },
-	{ href: '/volunteering', icon: Heart, title: 'Volunteering', description: 'See my community contributions and GDG leadership' },
-	{ href: '/certificates', icon: Award, title: 'Certificates', description: 'Browse my professional certifications' },
-	{ href: '/resume', icon: FileText, title: 'Resume', description: 'Download my full resume in PDF format' },
-];
-
-const stats = [
-	{ value: '5+', label: 'Years Experience' },
-	{ value: '20+', label: 'Projects Completed' },
-	{ value: '10+', label: 'Certifications' },
-	{ value: '500+', label: 'Community Impact' },
-];
+import { ArrowRight, Award, FileText } from '@lucide/astro';
 ---
 
 <BaseLayout title="Home">
 	<div class="mx-auto px-4 sm:px-6 lg:px-8 py-16 max-w-7xl">
 		<!-- Hero Section -->
-		<section class="mb-20 text-center animate-fade-in h-[80dvh] flex flex-col justify-center">
-			<h1 class="mb-6 font-bold text-white text-5xl md:text-6xl">
-				Hi, I'm <span class="text-primary">Abderrahmane SAOUDI</span>
-			</h1>
-			<p class="mx-auto mb-8 max-w-2xl text-white/70 text-lg md:text-xl">
-				A passionate developer building modern web experiences with Material 3 design principles and clean code.
-			</p>
-			<div class="flex sm:flex-row flex-col justify-center gap-4">
-				<ActionButton href="/projects" type="primary">
-					View Projects
-					<ArrowRight class="w-4 h-4" />
-				</ActionButton>
-				<ActionButton href="/resume" type="surface">
-					Download Resume
-				</ActionButton>
-			</div>
-		</section>
-
-		<!-- Stats Section -->
-		<section class="mb-20">
-			<div class="gap-4 grid grid-cols-2 md:grid-cols-4">
-				{stats.map((stat, index) => (
-					<div
-						class={`bg-surface-container border border-white/10 rounded-3xl p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10 animate-slide-up`}
-						style={`animation-delay: ${index * 100}ms`}
-					>
-						<div class="mb-2 font-bold text-primary text-3xl md:text-4xl">{stat.value}</div>
-						<div class="text-white/60 text-sm">{stat.label}</div>
-					</div>
-				))}
-			</div>
-		</section>
-
-		<!-- Navigation Hub -->
-		<section>
-			<h2 class="mb-8 font-bold text-white text-3xl text-center">Explore My Work</h2>
-			<div class="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-				{navCards.map((card, index) => (
-					<a
-						href={card.href}
-						class={`group relative overflow-hidden bg-surface-container border border-white/10 rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10 hover:border-primary/30 animate-slide-up`}
-						style={`animation-delay: ${(index + 4) * 100}ms`}
-					>
-						<div class="top-0 right-0 absolute bg-primary/5 group-hover:bg-primary/10 blur-3xl rounded-full w-32 h-32 transition-all duration-500"></div>
-						<div class="relative">
-							<div class="inline-flex justify-center items-center bg-primary/10 group-hover:bg-primary/20 mb-4 rounded-2xl w-12 h-12 transition-all duration-300">
-								<card.icon class="w-6 h-6 text-primary" />
+		<section class="mb-20 animate-fade-in min-h-[80dvh] flex items-center">
+			<div class="relative w-full">
+				<!-- Background Glow -->
+				<div class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-secondary/5 blur-3xl"></div>
+				
+				<div class="relative bg-surface/30 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-12 lg:p-16 shadow-2xl">
+					<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+						<!-- Left: Profile Picture -->
+						<div class="flex justify-center lg:justify-start">
+							<div class="relative">
+								<div class="absolute inset-0 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-full blur-2xl"></div>
+								<div class="relative w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full border-4 border-primary/40 shadow-2xl shadow-primary/20 overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
+									<img 
+										src="/profile.webp" 
+										alt="Abderrahmane SAOUDI Profile Picture"
+										class="w-full h-full object-cover"
+									/>
+								</div>
 							</div>
-							<h3 class="mb-2 font-bold text-white group-hover:text-primary text-xl transition-colors duration-300">
-								{card.title}
-							</h3>
-							<p class="text-white/60 text-sm">{card.description}</p>
 						</div>
-					</a>
-				))}
+						
+						<!-- Right: Text Content -->
+						<div class="text-center lg:text-left lg:col-span-2">
+							<h1 class="mb-4 font-bold text-white text-4xl md:text-5xl lg:text-6xl">
+								Hi, I'm <span class="text-primary">Abderrahmane SAOUDI</span>
+							</h1>
+							<p class="text-white/80 text-xl md:text-2xl mb-8 leading-relaxed font-light">
+								Passionate technologist and community leader crafting digital experiences
+							</p>
+							
+							<div class="space-y-6">
+								<!-- Professional Roles Group -->
+								<div class="space-y-3">
+									<h3 class="text-white/60 text-sm font-semibold uppercase tracking-wider">Professional Roles</h3>
+									<div class="flex flex-wrap justify-center lg:justify-start gap-2">
+										<span class="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-semibold">n8n Developer</span>
+										<span class="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-semibold">Mobile Developer</span>
+										<span class="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-semibold">Graphic Designer</span>
+									</div>
+								</div>
+								
+								<!-- Community & Leadership Group -->
+								<div class="space-y-3">
+									<h3 class="text-white/60 text-sm font-semibold uppercase tracking-wider">Community & Leadership</h3>
+									<div class="flex flex-wrap justify-center lg:justify-start gap-2">
+										<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">GDG Ghardaia President (2022-Now)</span>
+										<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">University Teacher</span>
+										<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">DevFest Lead 2023-2025</span>
+										<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">Google I/O Lead 2023-2025</span>
+									</div>
+								</div>
+								
+								<!-- Achievements Group -->
+								<div class="space-y-3">
+									<h3 class="text-white/60 text-sm font-semibold uppercase tracking-wider">Achievements</h3>
+									<div class="flex flex-wrap justify-center lg:justify-start gap-2">
+										<span class="px-4 py-2 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-xl text-sm font-semibold">🥉 3rd Place - StartUp City Hackathon</span>
+									</div>
+								</div>
+							</div>
+							
+							<div class="mt-10 flex sm:flex-row flex-col justify-center lg:justify-start gap-4">
+								<ActionButton href="/certificates" type="primary">
+									View Certificates
+									<ArrowRight class="w-4 h-4" />
+								</ActionButton>
+								<ActionButton href="/resume" type="surface">
+									Download CV
+								</ActionButton>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</section>
 	</div>
@@ -95,23 +102,7 @@ const stats = [
 		}
 	}
 
-	@keyframes slide-up {
-		from {
-			opacity: 0;
-			transform: translateY(30px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-
 	.animate-fade-in {
 		animation: fade-in 0.8s ease-out forwards;
-	}
-
-	.animate-slide-up {
-		opacity: 0;
-		animation: slide-up 0.6s ease-out forwards;
 	}
 </style>

@@ -9,11 +9,11 @@ const { currentPath = '/admin' } = Astro.props;
 
 const navItems = [
 	{ label: 'Overview', path: '/admin', icon: LayoutDashboard },
-	{ label: 'Experience', path: '/admin/admin_experience', icon: Briefcase },
-	{ label: 'Projects', path: '/admin/admin_projects', icon: FolderOpen },
+	{ label: 'Experience', path: '/admin/admin_experience', icon: Briefcase, disabled: true },
+	{ label: 'Projects', path: '/admin/admin_projects', icon: FolderOpen, disabled: true },
 	{ label: 'Designs', path: '/admin/admin_designs', icon: Palette },
 	{ label: 'Certificates', path: '/admin/admin_certificates', icon: Award },
-	{ label: 'Volunteering', path: '/admin/admin_volunteering', icon: Heart },
+	{ label: 'Volunteering', path: '/admin/admin_volunteering', icon: Heart, disabled: true },
 	{ label: 'Resume', path: '/admin/admin_resume', icon: FileText },
 	{ label: 'Timeline', path: '/admin/admin_timeline', icon: Clock, disabled: true },
 ];
