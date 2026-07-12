@@ -110,7 +110,7 @@ graph TD
 
 - **Astro SSR Output Mode:** Public routes are server-rendered HTML with zero client-side Firebase SDK usage.
 - **Isolated Admin Workspace:** `/admin` is the only route running client-side JS (React island) and initializing the Client Firebase SDK. Access is gated by server-rendered middleware checks.
-- **Decoupled Multi-Collection Schema:** Content is split across individual Firestore collections (`experience`, `projects`, `designs`, `certificates`, `volunteering`) and configuration documents.
+- **Decoupled Multi-Collection Schema:** Content is split across individual Firestore collections (`experience`, `projects`, `designs`, `certifications`, `volunteering`) and configuration documents.
 - **Zero-JS Obfuscation:** Public pages hide contact emails and phones using CSS reversed text order (`unicode-bidi: bidi-override; direction: rtl;`) or data attributes styled in pseudo-elements, ensuring crawlers cannot parse details without running JS.
 
 ---
@@ -125,7 +125,7 @@ Fixed globally across the `/admin` view context, this layout element offers seam
   - Experience
   - Projects
   - Designs
-  - Certificates
+  - Certifications
   - Volunteering
   - Resume
   - Timeline (*Explicitly styled as disabled/future feature*)
@@ -377,7 +377,7 @@ To prevent data fragmentation and storage bloat inside the Firebase Storage buck
   - [ ] Structure GDG & community activity timeline layout
   - [ ] Create high-visibility volunteer impact metric banners
   - [ ] Style volunteering project cards using Google brand borders
-- **Certificates Page (`/certificates`)**
+- **Certifications Page (`/certifications`)**
   - [ ] Design two-column responsive gallery grid layout
   - [ ] Build certificate card with issuer and date tags
   - [ ] Add external verification links to credential actions
@@ -400,7 +400,7 @@ To prevent data fragmentation and storage bloat inside the Firebase Storage buck
 - **Universal Floating Admin Navigation Dock**
   - [ ] Design fixed floating container with absolute viewport tracking
   - [ ] Style active routes using Google Blue pill shape indicators
-  - [ ] Map center segments to: Overview, Experience, Projects, Designs, Certificates, Volunteering, Resume, Timeline, and Global
+  - [ ] Map center segments to: Overview, Experience, Projects, Designs, Certifications, Volunteering, Resume, Timeline, and Global
   - [ ] Render "Timeline" link with disabled hover properties
   - [ ] Set up right-anchored Google Blue Creative FAB (`+`)
   - [ ] Code drop-down menu triggered by FAB click
@@ -424,7 +424,7 @@ To prevent data fragmentation and storage bloat inside the Firebase Storage buck
   - [ ] Setup page layout wrappers for Experience data views
   - [ ] Setup page layout wrappers for Projects data views
   - [ ] Setup page layout wrappers for Designs data views
-  - [ ] Setup page layout wrappers for Certificates data views
+  - [ ] Setup page layout wrappers for Certifications data views
   - [ ] Setup page layout wrappers for Volunteering data views
   - [ ] Create top strip with filter searches and Grid/List toggle buttons
   - [ ] Build 66% width left column area showing compact card lists

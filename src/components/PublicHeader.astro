@@ -7,7 +7,7 @@
  * Produces ZERO client-side JavaScript as per strict architecture requirements.
  */
 import '../styles/global.css';
-import { Home, Award, FolderOpen, Heart, FileText, Download, Briefcase, Code } from '@lucide/astro';
+import { House, Award, FileText, Download, Code } from '@lucide/astro';
 import NavItem from '../components/NavItem.astro';
 import ActionButton from '../components/ActionButton.astro';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
@@ -32,9 +32,9 @@ const { pathname } = Astro.url;
 
 // Define navigation route map
 const navLinks = [
-	{ href: '/', label: 'Home', icon: Home },
+	{ href: '/', label: 'Home', icon: House },
 	{ href: '/designs', label: 'Designs', icon: Code },
-	{ href: '/certificates', label: 'Certificates', icon: Award },
+	{ href: '/certifications', label: 'Certifications', icon: Award },
 	{ href: '/resume', label: 'Resume', icon: FileText },
 ];
 ---

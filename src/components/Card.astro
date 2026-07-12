@@ -65,7 +65,9 @@ const typeColors = {
 			<div class="skeleton h-4 w-16"></div>
 		</div>
 	</article>
-) : isDesign ? (
+) : null}
+
+{!isLoading && isDesign ? (
 	(() => {
 		const design = item as Design;
 		return (
@@ -124,7 +126,9 @@ const typeColors = {
 			</article>
 		);
 	})()
-) : (
+) : null}
+
+{!isLoading && !isDesign ? (
 	(() => {
 		const certificate = item as Certificate;
 		return (
@@ -207,4 +211,4 @@ const typeColors = {
 			</article>
 		);
 	})()
-)}
+) : null}
