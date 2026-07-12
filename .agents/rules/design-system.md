@@ -8,7 +8,7 @@ All visual output must comply with these Material 3 Dark Mode constraints.
 ## Color Palette (Strict Google Brand Colors)
 
 | Role | Color Name | Hex Code | CSS Token |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Primary / Accent | Google Blue | `#4285F4` | `--color-primary` |
 | Secondary / Success | Google Green | `#34A853` (or `#0F9D58`) | `--color-secondary` |
 | Tertiary / Warning | Google Yellow | `#F9AB00` (or `#F4B400`) | `--color-tertiary` |
@@ -17,7 +17,7 @@ All visual output must comply with these Material 3 Dark Mode constraints.
 ### Surfaces (M3 Dark Baseline)
 
 | Surface Level | Hex | Tailwind Token |
-|---|---|---|
+| --- | --- | --- |
 | Background | `#121212` | `bg-surface` |
 | Container | `#1E1E1E` | `bg-surface-container` |
 | Container High | `#2D2D2D` | `bg-surface-container-high` |

@@ -6,6 +6,7 @@ interface Props {
 }
 
 const { title = 'saoudi.online' } = Astro.props;
+const pageTitle = title === 'saoudi.online' ? title : `${title} | saoudi.online`;
 ---
 
 <head>
@@ -14,5 +15,5 @@ const { title = 'saoudi.online' } = Astro.props;
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title} - saoudi.online</title>
+    <title>{pageTitle}</title>
 </head>
