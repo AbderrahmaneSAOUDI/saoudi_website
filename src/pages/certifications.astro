@@ -5,14 +5,14 @@ import CertificateLightbox from '../components/CertificateLightbox.astro';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
 import { Award } from '@lucide/astro';
 
-let certifications: any[] = [];
+let certificates: any[] = [];
 let errorMsg = '';
 
 try {
 	const db = getFirebaseAdminDb();
 
 	// Fetch all certificates sorted by date descending
-	const snapshot = await db.collection("certifications").orderBy("date", "desc").get();
+	const snapshot = await db.collection("certificates").orderBy("date", "desc").get();
 	certificates = snapshot.docs.map(doc => ({
 		id: doc.id,
 		...doc.data()
@@ -25,7 +25,7 @@ try {
 // Group certifications by year
 const certificatesByYear: Record<string, any[]> = {};
 
-certifications.forEach(cert => {
+certificates.forEach(cert => {
 	let year = 'Other';
 	if (cert.date && typeof cert.date === 'string') {
 		const parts = cert.date.split('-');
@@ -69,7 +69,7 @@ const activeYears = Object.keys(certificatesByYear).sort((a, b) => b.localeCompa
 						</div>
 
 						<!-- Grid of Certificates -->
-						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
 							{groupCerts.map((cert, index) => (
 								<div class="animate-card-fade animate-fade-in" style={`animation-delay: ${index * 50}ms`}>
 									<Card item={cert} type="certificate" />
@@ -93,7 +93,7 @@ const activeYears = Object.keys(certificatesByYear).sort((a, b) => b.localeCompa
 	</div>
 
 	{/* Render Lightboxes outside transform scopes */}
-	{certifications.filter(cert => cert.imageUrl).map(cert => (
+	{certificates.filter(cert => cert.imageUrl).map(cert => (
 		<CertificateLightbox certificate={cert} />
 	))}
 </BaseLayout>

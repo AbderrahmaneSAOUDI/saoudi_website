@@ -5,8 +5,7 @@ import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
 import AdminLayout from "../../components/admin/AdminLayout.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
 import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
-import { Palette, Image as ImageIcon, Trash2, Save, CircleAlert, Settings } from '@lucide/astro';
-import Card from "../../components/Card.astro";
+import { Image as ImageIcon, Trash2, Save, CircleAlert, Settings } from '@lucide/astro';
 import DesignLightbox from "../../components/DesignLightbox.astro";
 import AdminControlsStrip from "../../components/admin/AdminControlsStrip.astro";
 
@@ -408,7 +407,7 @@ try {
 	))}
 </BackgroundBaseLayout>
 
-<script define:vars={{ designs, initialCompanies: companies }}>
+<script define:vars={{ designs, initialCompanies: companies }} is:inline>
 	// Make server-fetched items available to client script
 	window.designs = designs || [];
 	window.companies = initialCompanies || [];
