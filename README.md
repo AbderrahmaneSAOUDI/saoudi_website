@@ -232,13 +232,11 @@ interface Project {
 ```typescript
 interface Design {
       id: string;
-      order: number;
       title: string;
-      description: string;
+      description?: string;
       imageUrl: string;
-      figmaUrl?: string;
       date: string; // ISO 8601
-      category: string;
+      company: string;
       tags: string[];
 }
 ```
@@ -248,13 +246,12 @@ interface Design {
 ```typescript
 interface Certificate {
       id: string;
-      order: number;
       title: string;
       issuer: string;
-      date: string; // ISO 8601 string for chronological sorting
-      period: string; // Display label (e.g. "May 2024")
-      credentialUrl: string;
-      credentialId?: string;
+      date: string; // ISO 8601 string for chronological sorting (YYYY-MM or YYYY-MM-DD)
+      type: 'Online' | 'In-Person' | 'Hybrid';
+      credentialUrl?: string | null;
+      imageUrl?: string | null;
 }
 ```
 
@@ -332,39 +329,39 @@ To prevent data fragmentation and storage bloat inside the Firebase Storage buck
 ### Phase 1: Foundation & Infrastructure
 
 - **Astro & Vercel SSR Setup**
-  - [x] Initialize Astro project codebase
-  - [x] Install Vercel adapter (`@astrojs/vercel`)
-  - [x] Configure Astro in SSR output mode (`output: 'server'`)
-  - [x] Set up standard project folder structure (components, layouts, pages)
+  - [ ] Initialize Astro project codebase
+  - [ ] Install Vercel adapter (`@astrojs/vercel`)
+  - [ ] Configure Astro in SSR output mode (`output: 'server'`)
+  - [ ] Set up standard project folder structure (components, layouts, pages)
 - **Tailwind & Theme Tokens**
-  - [x] Install and configure Tailwind CSS
-  - [x] Map Google brand color codes and background darks to CSS variables
-  - [x] Set up Material 3 desaturated dark tokens in `tailwind.config.mjs`
-  - [x] Register custom `@keyframes` for ambient animations in `global.css`
+  - [ ] Install and configure Tailwind CSS
+  - [ ] Map Google brand color codes and background darks to CSS variables
+  - [ ] Set up Material 3 desaturated dark tokens in `tailwind.config.mjs`
+  - [ ] Register custom `@keyframes` for ambient animations in `global.css`
 - **Firebase Admin Integration**
-  - [x] Install `firebase-admin` dependency
-  - [x] Configure server-only environment variables verification
-  - [x] Initialize Firestore and Storage server-side clients
+  - [ ] Install `firebase-admin` dependency
+  - [ ] Configure server-only environment variables verification
+  - [ ] Initialize Firestore and Storage server-side clients
 - **Base Layout & Navigation**
-  - [x] Build root HTML layout wrapper (`src/layouts/`)
-  - [x] Create responsive public navigation header (shortcut icons on mobile, avoiding hamburger menus and JS)
-  - [x] Set up global typography and Google Fonts integrations
+  - [ ] Build root HTML layout wrapper (`src/layouts/`)
+  - [ ] Create responsive public navigation header (shortcut icons on mobile, avoiding hamburger menus and JS)
+  - [ ] Set up global typography and Google Fonts integrations
 - **TypeScript Foundation**
-  - [x] Define global content interfaces in `src/types.ts`
-  - [x] Create Zod schemas for data validation
-  - [x] Implement type guard helpers for Firebase schema structures
+  - [ ] Define global content interfaces in `src/types.ts`
+  - [ ] Create Zod schemas for data validation
+  - [ ] Implement type guard helpers for Firebase schema structures
 
 ### Phase 2: Public Pages
 
 - **Home Page (`/`)**
-  - [x] Build responsive Hero section layout
-  - [x] Set up animated headers and greeting text
-  - [x] Code static metrics/stats count grid panel
-  - [x] Design visual navigation hub using rounded M3 cards
-  - [x] Implement slow-floating radial CSS-only background motion
+  - [ ] Build responsive Hero section layout
+  - [ ] Set up animated headers and greeting text
+  - [ ] Code static metrics/stats count grid panel
+  - [ ] Design visual navigation hub using rounded M3 cards
+  - [ ] Implement slow-floating radial CSS-only background motion
 - **Resume Page (`/resume`)**
-  - [x] Build public resume page with preview container and download CTA
-  - [x] Add download action button pointing to public asset
+  - [ ] Build public resume page with preview container and download CTA
+  - [ ] Add download action button pointing to public asset
   - [ ] Pull live resume document path reference from database
 - **Projects Page (`/projects`)**
   - [ ] Build dynamic project card grid layout
@@ -392,14 +389,14 @@ To prevent data fragmentation and storage bloat inside the Firebase Storage buck
 ### Phase 3: Admin Dashboard & Secure Pipelines
 
 - **Authentication & Server-Side Access Middleware**
-  - [x] Build standalone `/admin/login` page layout using M3 dark styles
+  - [ ] Build standalone `/admin/login` page layout using M3 dark styles
   - [ ] Add visual validation styles on email and password inputs
-  - [x] Setup Astro middleware (`src/middleware.ts`) to intercept `/admin` routes (excluding `/admin/login`)
-  - [x] Implement secure verification cookie setting upon successful login
-  - [x] Program middleware check: read cookie and perform server-side redirect `context.redirect('/admin/login')` if absent
-  - [x] Bind login form actions to email/password client validation
+  - [ ] Setup Astro middleware (`src/middleware.ts`) to intercept `/admin` routes (excluding `/admin/login`)
+  - [ ] Implement secure verification cookie setting upon successful login
+  - [ ] Program middleware check: read cookie and perform server-side redirect `context.redirect('/admin/login')` if absent
+  - [ ] Bind login form actions to email/password client validation
   - [ ] Implement Client Firebase Auth SDK state checks inside React island
-  - [x] Add sign-out action (clearing verification cookies)
+  - [ ] Add sign-out action (clearing verification cookies)
 - **Universal Floating Admin Navigation Dock**
   - [ ] Design fixed floating container with absolute viewport tracking
   - [ ] Style active routes using Google Blue pill shape indicators

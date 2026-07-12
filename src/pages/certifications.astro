@@ -5,27 +5,27 @@ import CertificateLightbox from '../components/CertificateLightbox.astro';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
 import { Award } from '@lucide/astro';
 
-let certificates: any[] = [];
+let certifications: any[] = [];
 let errorMsg = '';
 
 try {
 	const db = getFirebaseAdminDb();
 
 	// Fetch all certificates sorted by date descending
-	const snapshot = await db.collection("certificates").orderBy("date", "desc").get();
+	const snapshot = await db.collection("certifications").orderBy("date", "desc").get();
 	certificates = snapshot.docs.map(doc => ({
 		id: doc.id,
 		...doc.data()
 	}));
 } catch (error: any) {
 	console.warn("Failed to fetch certificates from Firestore for public page:", error);
-	errorMsg = "Degraded mode: Certificates are currently offline or unavailable.";
+	errorMsg = "Degraded mode: Certifications are currently offline or unavailable.";
 }
 
-// Group certificates by year
+// Group certifications by year
 const certificatesByYear: Record<string, any[]> = {};
 
-certificates.forEach(cert => {
+certifications.forEach(cert => {
 	let year = 'Other';
 	if (cert.date && typeof cert.date === 'string') {
 		const parts = cert.date.split('-');
@@ -43,7 +43,7 @@ certificates.forEach(cert => {
 const activeYears = Object.keys(certificatesByYear).sort((a, b) => b.localeCompare(a));
 ---
 
-<BaseLayout title="Certificates">
+<BaseLayout title="Certifications">
 	<div class="mx-auto px-4 sm:px-6 lg:px-8 py-16 max-w-7xl">
 		{errorMsg && (
 			<div class="mb-10 p-4 rounded-2xl bg-[#EA4335]/10 border border-[#EA4335]/30 text-[#EA4335] text-sm text-center">
@@ -85,7 +85,7 @@ const activeYears = Object.keys(certificatesByYear).sort((a, b) => b.localeCompa
 					<div class="p-4 rounded-full bg-primary/10 text-primary mb-4">
 						<Award class="w-12 h-12" />
 					</div>
-					<p class="font-bold text-white text-lg">No certificates found</p>
+					<p class="font-bold text-white text-lg">No certifications found</p>
 					<p class="text-xs mt-1 text-white/60 max-w-sm">Please check back later or visit the admin panel to add credentials.</p>
 				</div>
 			)}
@@ -93,7 +93,7 @@ const activeYears = Object.keys(certificatesByYear).sort((a, b) => b.localeCompa
 	</div>
 
 	{/* Render Lightboxes outside transform scopes */}
-	{certificates.filter(cert => cert.imageUrl).map(cert => (
+	{certifications.filter(cert => cert.imageUrl).map(cert => (
 		<CertificateLightbox certificate={cert} />
 	))}
 </BaseLayout>
