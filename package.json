@@ -1,7 +1,7 @@
 {
   "name": "saoudi_website",
   "type": "module",
-  "version": "1.41.99",
+  "version": "1.41.100",
   "engines": {
     "node": ">=22.12.0"
   },
@@ -27,13 +27,5 @@
     "tailwindcss": "^4.3.0",
     "typescript": "^7.0.2",
     "zod": "^4.4.3"
-  },
-  "pnpm": {
-    "overrides": {
-      "uuid": "^11.0.0",
-      "glob": "^13.0.0",
-      "node-domexception": "^2.0.0",
-      "jose": "5.9.6"
     }
-  }
 }

@@ -2,7 +2,7 @@
 /**
  * Card Component
  * 
- * Unified card component that handles rendering both design mockups and professional certificates.
+ * Unified card component that handles rendering both design mockups and professional certifications.
  * Supports both public views and interactive admin workspace grids.
  */
 import { Calendar, Tag, Award, ExternalLink } from '@lucide/astro';
@@ -16,6 +16,8 @@ interface Props {
 }
 
 const { item, type, isAdmin = false, isLoading = false } = Astro.props;
+const design = !isLoading && type === 'design' ? (item as Design) : undefined;
+const certificate = !isLoading && type === 'certificate' ? (item as Certificate) : undefined;
 
 // Format date dynamically: ISO string -> "Month YYYY" with short month names
 const formatDate = (dateStr: string) => {
@@ -39,8 +41,8 @@ const formatDate = (dateStr: string) => {
 };
 
 const formattedDate = formatDate(item.date);
-const isDesign = type === 'design';
-const certType = type === 'certificate' ? (item as Certificate).type : undefined;
+const certType = certificate?.type;
+const hideSkeleton = (id: string) => `document.getElementById('skeleton-${id}')?.style.display = 'none'`;
 
 const typeColors = {
 	'Online': 'bg-primary/50 border-primary/20 text-white',
@@ -67,148 +69,138 @@ const typeColors = {
 	</article>
 ) : null}
 
-{!isLoading && isDesign ? (
-	(() => {
-		const design = item as Design;
-		return (
-			<article 
-				class={`group border rounded-3xl p-4 transition-all duration-300 flex flex-col justify-between h-full ${
-					isAdmin 
-						? 'design-card border-[#2B2930] bg-[#1D1B20] hover:ring-2 hover:ring-primary/40 cursor-pointer' 
-						: 'bg-surface-container border-white/10 hover:-translate-y-1.5 hover:shadow-lg hover:shadow-primary/10 hover:ring-2 hover:ring-primary/40'
-				}`}
-				data-id={isAdmin ? design.id : undefined}
+{design ? (
+	<article
+		class={`group border rounded-3xl p-4 transition-all duration-300 flex flex-col justify-between h-full ${
+			isAdmin
+				? 'design-card border-[#2B2930] bg-[#1D1B20] hover:ring-2 hover:ring-primary/40 cursor-pointer'
+				: 'bg-surface-container border-white/10 hover:-translate-y-1.5 hover:shadow-lg hover:shadow-primary/10 hover:ring-2 hover:ring-primary/40'
+		}`}
+		data-id={isAdmin ? design.id : undefined}
+	>
+		<div>
+			<a
+				href={`#lightbox-${design.id}`}
+				class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-4 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block"
 			>
-				<div>
-					<a 
-						href={`#lightbox-${design.id}`} 
-						class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-4 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block"
+				<div class="absolute inset-0 skeleton" id={`skeleton-${design.id}`}></div>
+				<img
+					src={design.imageUrl}
+					alt={design.title}
+					class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10"
+					loading="lazy"
+					decoding="async"
+					onload={hideSkeleton(design.id)}
+					onerror={hideSkeleton(design.id)}
+				/>
+			</a>
+
+			<h3 class="font-bold text-white text-lg group-hover:text-primary transition-colors line-clamp-1">
+				{design.title}
+			</h3>
+
+			{design.tags && design.tags.length > 0 && (
+				<div class="flex flex-wrap gap-1.5 mt-2">
+					{design.tags.map((tag: string) => (
+						<span class="text-[10px] text-primary/80 font-bold flex items-center gap-0.5 bg-[#2D2D2D] border border-white/5 px-2 py-0.5 rounded-md">
+							<Tag class="w-2.5 h-2.5 text-primary/60" />
+							{tag}
+						</span>
+					))}
+				</div>
+			)}
+		</div>
+
+		<div class="design-card-footer mt-4 pt-3 flex justify-between items-center text-xs border-t border-white/5">
+			<span class="text-white/40 flex items-center gap-1 font-medium">
+				<Calendar class="w-3.5 h-3.5" />
+				{formattedDate}
+			</span>
+			{design.company && (
+				<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary">
+					{design.company}
+				</span>
+			)}
+		</div>
+	</article>
+) : null}
+
+{certificate ? (
+	<article
+		class={`group border rounded-3xl p-5 transition-all duration-300 flex flex-col justify-between h-full ${
+			isAdmin
+				? 'certificate-card border-[#2B2930] bg-[#1D1B20] hover:ring-2 hover:ring-primary/40 cursor-pointer'
+				: 'bg-surface-container border-white/10 hover:-translate-y-1.5 hover:shadow-lg hover:shadow-primary/10 hover:ring-2 hover:ring-primary/40'
+		}`}
+		data-id={isAdmin ? certificate.id : undefined}
+	>
+		<div class="space-y-4">
+			{certificate.imageUrl ? (
+				<div class="relative">
+					<a
+						href={isAdmin ? undefined : `#lightbox-${certificate.id}`}
+						class={`relative aspect-[16/10] rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center cursor-pointer ${!isAdmin ? 'image-zoom-trigger' : ''} block bg-[#1D1B20]`}
 					>
-						<div class="absolute inset-0 skeleton" id={`skeleton-${design.id}`}></div>
+						<div class="absolute inset-0 skeleton" id={`skeleton-${certificate.id}`}></div>
 						<img
-							src={design.imageUrl}
-							alt={design.title}
+							src={certificate.imageUrl}
+							alt={certificate.title}
 							class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10"
 							loading="lazy"
 							decoding="async"
-							onload={`document.getElementById('skeleton-${design.id}').style.display = 'none'`}
-							onerror={`document.getElementById('skeleton-${design.id}').style.display = 'none'`}
+							onload={hideSkeleton(certificate.id)}
+							onerror={hideSkeleton(certificate.id)}
 						/>
 					</a>
-
-					<h3 class="font-bold text-white text-lg group-hover:text-primary transition-colors line-clamp-1">
-						{design.title}
-					</h3>
-
-					{design.tags && design.tags.length > 0 && (
-						<div class="flex flex-wrap gap-1.5 mt-2">
-							{design.tags.map((tag: string) => (
-								<span class="text-[10px] text-primary/80 font-bold flex items-center gap-0.5 bg-[#2D2D2D] border border-white/5 px-2 py-0.5 rounded-md">
-									<Tag class="w-2.5 h-2.5 text-primary/60" />
-									{tag}
-								</span>
-							))}
-						</div>
-					)}
-				</div>
-
-				<div class="design-card-footer mt-4 pt-3 flex justify-between items-center text-xs border-t border-white/5">
-					<span class="text-white/40 flex items-center gap-1 font-medium">
-						<Calendar class="w-3.5 h-3.5" />
-						{formattedDate}
+					{certType && (
+						<span class={`absolute top-2.5 right-2.5 z-20 px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase border backdrop-blur-md shadow-sm pointer-events-none select-none ${typeColors[certType as keyof typeof typeColors] || ''}`}>
+							{certType}
 					</span>
-					{design.company && (
-						<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary">
-							{design.company}
-						</span>
 					)}
 				</div>
-			</article>
-		);
-	})()
-) : null}
-
-{!isLoading && !isDesign ? (
-	(() => {
-		const certificate = item as Certificate;
-		return (
-			<article 
-				class={`group border rounded-3xl p-5 transition-all duration-300 flex flex-col justify-between h-full ${
-					isAdmin 
-						? 'certificate-card border-[#2B2930] bg-[#1D1B20] hover:ring-2 hover:ring-primary/40 cursor-pointer' 
-						: 'bg-surface-container border-white/10 hover:-translate-y-1.5 hover:shadow-lg hover:shadow-primary/10 hover:ring-2 hover:ring-primary/40'
-				}`}
-				data-id={isAdmin ? certificate.id : undefined}
-			>
-				<div class="space-y-4">
-					{certificate.imageUrl ? (
-						<div class="relative">
-							<a 
-								href={isAdmin ? undefined : `#lightbox-${certificate.id}`} 
-								class={`relative aspect-[16/10] rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center cursor-pointer ${!isAdmin ? 'image-zoom-trigger' : ''} block bg-[#1D1B20]`}
-							>
-								<div class="absolute inset-0 skeleton" id={`skeleton-${certificate.id}`}></div>
-								<img
-									src={certificate.imageUrl}
-									alt={certificate.title}
-									class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10"
-									loading="lazy"
-									decoding="async"
-									onload={`document.getElementById('skeleton-${certificate.id}').style.display = 'none'`}
-									onerror={`document.getElementById('skeleton-${certificate.id}').style.display = 'none'`}
-								/>
-							</a>
-							{certType && (
-								<span class={`absolute top-2.5 right-2.5 z-20 px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase border backdrop-blur-md shadow-sm pointer-events-none select-none ${typeColors[certType as keyof typeof typeColors] || ''}`}>
-									{certType}
-								</span>
-							)}
-						</div>
-					) : (
-						<div class="p-3 w-fit rounded-2xl bg-secondary/10 text-secondary border border-secondary/20 group-hover:scale-110 transition-transform duration-300">
-							<Award class="w-6 h-6" />
-						</div>
-					)}
-
-					<div>
-						<h3 class="font-bold text-white text-lg group-hover:text-primary transition-colors line-clamp-2">
-							{certificate.title}
-						</h3>
-					</div>
+			) : (
+				<div class="p-3 w-fit rounded-2xl bg-secondary/10 text-secondary border border-secondary/20 group-hover:scale-110 transition-transform duration-300">
+					<Award class="w-6 h-6" />
 				</div>
+			)}
 
-				<div class="mt-4 pt-3 flex justify-between items-center text-xs border-t border-white/5 text-white/40 font-medium">
-					<div class="flex items-center gap-2">
-						<span class="flex items-center gap-1">
-							<Calendar class="w-3.5 h-3.5" />
-							{formattedDate}
-						</span>
-						{!certificate.imageUrl && certType && (
-							<span class={`px-2 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase border ${typeColors[certType as keyof typeof typeColors] || ''}`}>
-								{certType}
-							</span>
-						)}
-						{certificate.credentialUrl && (
-							<a 
-								href={certificate.credentialUrl} 
-								target="_blank" 
-								rel="noopener noreferrer"
-								class={`transition-all duration-300 cursor-pointer text-white/40 hover:text-primary ${
-									isAdmin ? 'stop-propagation' : ''
-								}`}
-								title="Verify Credential"
-							>
-								<ExternalLink class="w-3.5 h-3.5" />
-							</a>
-						)}
-					</div>
-					{certificate.issuer && (
-						<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary">
-							{certificate.issuer}
-						</span>
-					)}
-				</div>
-			</article>
-		);
-	})()
+			<div>
+				<h3 class="font-bold text-white text-lg group-hover:text-primary transition-colors line-clamp-2">
+					{certificate.title}
+				</h3>
+			</div>
+		</div>
+
+		<div class="mt-4 pt-3 flex justify-between items-center text-xs border-t border-white/5 text-white/40 font-medium">
+			<div class="flex items-center gap-2">
+				<span class="flex items-center gap-1">
+					<Calendar class="w-3.5 h-3.5" />
+					{formattedDate}
+				</span>
+				{!certificate.imageUrl && certType && (
+					<span class={`px-2 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase border ${typeColors[certType as keyof typeof typeColors] || ''}`}>
+						{certType}
+					</span>
+				)}
+				{certificate.credentialUrl && (
+					<a
+						href={certificate.credentialUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						class={`transition-all duration-300 cursor-pointer text-white/40 hover:text-primary ${
+							isAdmin ? 'stop-propagation' : ''
+						}`}
+						title="Verify Credential"
+					>
+						<ExternalLink class="w-3.5 h-3.5" />
+					</a>
+				)}
+			</div>
+			{certificate.issuer && (
+				<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary">
+					{certificate.issuer}
+				</span>
+			)}
+		</div>
+	</article>
 ) : null}

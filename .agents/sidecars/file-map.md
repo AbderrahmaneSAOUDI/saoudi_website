@@ -2,7 +2,7 @@
 
 ## Directory Tree (Key Files Only)
 
-```
+```text
 .
 ├── .agents/               # AI agent configuration (THIS directory)
 ├── .env                   # Environment variables (gitignored)
@@ -70,7 +70,7 @@
 
 ## Import Dependency Graph
 
-```
+```mermaid
 BaseLayout.astro
   → global.css → @theme tokens → background_animation.css
   → Head.astro → colors.ts

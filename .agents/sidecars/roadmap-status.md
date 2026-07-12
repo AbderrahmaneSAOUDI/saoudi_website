@@ -3,6 +3,7 @@
 ## Current Phase: Phase 2 (Public Pages) + Phase 3 (Admin) in parallel
 
 ### ✅ Phase 1: Foundation & Infrastructure — COMPLETE
+
 - Astro SSR + Vercel adapter configured
 - Tailwind v4 + M3 dark tokens in global.css
 - Firebase Admin SDK initialized (singleton)
@@ -10,6 +11,7 @@
 - TypeScript interfaces + Zod schemas in types.ts
 
 ### 🔄 Phase 2: Public Pages — IN PROGRESS
+
 - ✅ Home page (hero, stats, nav cards) — DONE
 - ✅ Resume page (preview + download) — DONE
 - ⬜ Projects page — Construction placeholder
@@ -19,6 +21,7 @@
 - ⬜ Volunteering page — Construction placeholder
 
 ### 🔄 Phase 3: Admin Dashboard — IN PROGRESS
+
 - ✅ Login page (Google GSI) — DONE
 - ✅ Session middleware — DONE
 - ✅ Logout endpoint — DONE
@@ -31,6 +34,7 @@
 - ⬜ Firestore security rules deployment
 
 ### ⬜ Phase 4: Polish & Launch — NOT STARTED
+
 - ⬜ SEO meta tags
 - ⬜ Contact obfuscation
 - ⬜ Analytics
