@@ -1,29 +1,43 @@
 ---
+/**
+ * BaseLayout Component
+ * Provides the foundational HTML structure, global CSS imports, and common UI elements
+ * like the PublicHeader and PublicFooter. Used across most public-facing pages.
+ */
 import '../styles/global.css';
 import PublicHeader from '../components/PublicHeader.astro';
 import PublicFooter from '../components/PublicFooter.astro';
 import Head from '../components/Head.astro';
 import { getRandomColor } from '../lib/colors.ts';
 
+// Define the properties expected by this layout
 interface Props {
+	/** The title of the page, injected into the <title> tag via the Head component */
 	title: string;
 }
 
 const { title } = Astro.props;
+
+// Generate a random primary color to theme the page dynamically on load
 const primaryColor = getRandomColor();
 ---
 
 <!DOCTYPE html>
 <html lang="en" style={`--color-primary: ${primaryColor}`}>
+	<!-- Injects head metadata including title, meta tags, and favicons -->
 	<Head title={title} />
 	<body class="relative flex flex-col min-h-screen">
+		<!-- Main wrapper constraining the maximum width of the content -->
 		<div class="flex flex-col mx-auto w-full max-w-[1280px] min-h-screen">
+			<!-- Global Navigation Header -->
 			<PublicHeader />
 
+			<!-- Page-specific content is injected here -->
 			<main class="flex-1">
 				<slot />
 			</main>
 
+			<!-- Global Footer -->
 			<PublicFooter />
 		</div>
 	</body>

@@ -424,7 +424,7 @@ try {
 		const loadMoreContainer = document.getElementById('load-more-container') as HTMLDivElement;
 
 		// Local State
-		const ITEMS_PER_PAGE = 5;
+		let ITEMS_PER_PAGE = 5;
 		let displayedCount = 0;
 		let allDesigns: any[] = (window as any).designs || [];
 
@@ -637,6 +637,7 @@ try {
 		}
 
 		loadMoreBtn.addEventListener('click', () => {
+			ITEMS_PER_PAGE = allDesigns.length;
 			renderDesigns();
 		});
 

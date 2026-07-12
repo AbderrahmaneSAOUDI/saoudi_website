@@ -1,4 +1,12 @@
 ---
+/**
+ * Admin Workspace Dashboard Page
+ * 
+ * Main entry point for the protected admin area. 
+ * Connects to Firebase Firestore to fetch aggregate statistics 
+ * (counts of projects, experience, designs, certificates, volunteering).
+ * Requires the user to be authenticated (enforced via middleware).
+ */
 import '../../styles/global.css';
 
 import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
