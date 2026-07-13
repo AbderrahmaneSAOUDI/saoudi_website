@@ -4,7 +4,6 @@
  * Displays the hero section.
  * Uses BaseLayout for the main site wrapper and provides animated entry sections.
  */
-import BaseLayout from '../layouts/BaseLayout.astro';
 import {
 	ChartNoAxesCombined,
 	Check,
@@ -16,6 +15,7 @@ import {
 	Plug,
 	Toolbox,
 } from '@lucide/astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Home">
@@ -401,7 +401,7 @@ import {
 	}
 
 	.animate-photo-halo {
-		animation: photo-halo 4.5s ease-in-out infinite;
+		animation: photo-halo 4.5s cubic-bezier(0.2, 0, 0.2, 1) infinite;
 	}
 
 	.hero-photo-light {
@@ -412,9 +412,10 @@ import {
 		width: 82%;
 		height: 2.5rem;
 		border-radius: 9999px;
-		background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-primary) 85%, white 15%), var(--color-secondary), transparent);
+		background: var(--color-primary);
+		box-shadow: 0 0 2rem var(--color-primary);
 		filter: blur(14px);
-		animation: photo-light 3.2s ease-in-out infinite;
+		animation: photo-light 3.2s cubic-bezier(0.2, 0, 0.2, 1) infinite;
 	}
 
 	@keyframes timeline-progress {
