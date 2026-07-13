@@ -26,7 +26,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     // Verify the JWT-like session token
-    const session = verifySessionToken(sessionCookie);
+    const session = await verifySessionToken(sessionCookie);
     if (!session) {
       // Clear invalid cookie and redirect to login to ensure clean state
       context.cookies.delete('admin_session', { path: '/' });
