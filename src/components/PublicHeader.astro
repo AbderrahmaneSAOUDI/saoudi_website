@@ -10,22 +10,9 @@ import '../styles/global.css';
 import { House, Award, FileText, Download, Code } from '@lucide/astro';
 import NavItem from '../components/NavItem.astro';
 import ActionButton from '../components/ActionButton.astro';
-import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
 
-// Default static fallback for the resume link
+// Static resume link used on public routes to keep the homepage edge-safe.
 let resumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
-
-try {
-	// Query the firebase configuration document to check for custom upload overrides
-	const db = getFirebaseAdminDb();
-	const configDoc = await db.collection('configuration').doc('static_data').get();
-	if (configDoc.exists) {
-		const data = configDoc.data();
-		if (data?.resumeUrl) resumeUrl = data.resumeUrl;
-	}
-} catch (error) {
-	console.warn('Failed to fetch resumeUrl in header:', error);
-}
 
 // Read current request pathname to determine active route highlighting
 const { pathname } = Astro.url;
