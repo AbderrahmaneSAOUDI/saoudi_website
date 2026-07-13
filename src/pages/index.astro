@@ -4,13 +4,24 @@
  * Displays the hero section.
  * Uses BaseLayout for the main site wrapper and provides animated entry sections.
  */
+import {
+	ChartNoAxesCombined,
+	Check,
+	Cog,
+	Mail,
+	Medal,
+	Palette,
+	Phone,
+	Plug,
+	Toolbox,
+} from '@lucide/astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Home">
-	<div class="mx-auto px-4 sm:px-6 lg:px-8 py-16 max-w-7xl">
+	<div class="mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-1 max-w-7xl">
 		<!-- Hero Section -->
-		<section class="animate-fade-in min-h-[80dvh] flex items-center">
+		<section class="animate-fade-in flex items-center py-5">
 			<div class="relative w-full">
 				<div class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-secondary/5 blur-3xl"></div>
 				
@@ -18,7 +29,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 					<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
 						<div class="flex justify-center lg:justify-start">
 							<div class="relative">
-								<div class="absolute inset-0 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-full blur-2xl"></div>
+								<div class="absolute inset-0 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-full blur-2xl animate-photo-halo"></div>
+								<div class="hero-photo-light" aria-hidden="true"></div>
 								<div class="relative w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full border-4 border-primary/40 shadow-2xl shadow-primary/20 overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
 									<img 
 										src="/profile.webp" 
@@ -60,7 +72,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 								<div class="space-y-3 pt-4">
 									<h3 class="text-white/60 text-sm font-semibold uppercase tracking-wider">Achievements</h3>
 									<div class="flex flex-wrap justify-center lg:justify-start gap-2">
-										<span class="px-4 py-2 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-xl text-sm font-semibold">🥉 3rd Place - StartUp City Hackathon</span>
+										<span class="inline-flex items-center gap-2 px-4 py-2 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-xl text-sm font-semibold">
+											<Medal class="w-4 h-4" aria-hidden="true" />
+											3rd Place - StartUp City Hackathon
+										</span>
 									</div>
 								</div>
 							</div>
@@ -71,7 +86,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 		</section>
 
 		<!-- About Me & Education Row -->
-		<div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
+		<div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
 			<!-- Professional Summary -->
 			<section class="animate-fade-in" style="animation-delay: 0.2s;">
 				<div class="relative h-full">
@@ -79,8 +94,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 					<div class="relative bg-surface-container border border-white/10 rounded-3xl overflow-hidden shadow-2xl hover:shadow-primary/10 transition-all duration-300 h-full flex flex-col">
 						<img src="/cover.webp" alt="Profile" class="w-full h-48 object-cover" />
 						<div class="p-8 flex-1">
-							<h2 class="text-3xl font-bold text-white mb-6 flex items-center gap-3">
-								<span class="text-primary">About Me</span>
+							<h2 class="text-3xl md:text-4xl font-bold text-primary mb-6 flex items-center gap-3">
+								About Me
 							</h2>
 							<div class="text-white/80 text-lg leading-relaxed">
 								<p class="mb-4">
@@ -100,24 +115,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 				<div class="relative h-full">
 					<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"></div>
 					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 shadow-2xl hover:shadow-secondary/10 transition-all duration-300 h-full">
-						<h2 class="text-3xl font-bold text-white mb-6 flex items-center gap-3">
-							<span class="text-secondary">Education</span>
+						<h2 class="text-3xl md:text-4xl font-bold text-primary mb-6 flex items-center gap-3">
+							Education
 						</h2>
 						<div class="relative">
 							<!-- Timeline Line -->
-							<div class="absolute left-[23px] top-0 bottom-0 w-0.5 bg-primary/35 overflow-hidden">
+							<div class="absolute left-[15px] top-0 bottom-0 w-0.5 bg-primary/35 overflow-hidden">
 								<!-- Animated Gradient Line -->
 								<div class="absolute inset-0 bg-primary rounded-full animate-timeline-progress"></div>
 								<!-- Electricity Dots -->
-								<div class="electric-dot w-3 h-3 bg-primary rounded-full shadow-lg shadow-primary/60 absolute left-1/2"></div>
-								<div class="electric-dot w-2.5 h-2.5 bg-secondary rounded-full shadow-lg shadow-secondary/60 absolute left-1/2" style="animation-delay: 0.6s;"></div>
-								<div class="electric-dot w-2 h-2 bg-tertiary rounded-full shadow-lg shadow-tertiary/60 absolute left-1/2" style="animation-delay: 1.2s;"></div>
+								<div class="electric-dot w-2 h-2 bg-primary rounded-full shadow-lg shadow-primary/60 absolute left-1/2"></div>
+								<div class="electric-dot w-1.5 h-1.5 bg-secondary rounded-full shadow-lg shadow-secondary/60 absolute left-1/2" style="animation-delay: 0.6s;"></div>
+								<div class="electric-dot w-1 h-1 bg-tertiary rounded-full shadow-lg shadow-tertiary/60 absolute left-1/2" style="animation-delay: 1.2s;"></div>
 							</div>
 							
-							<div class="space-y-10 pl-12">
+							<div class="space-y-8 pl-8">
 								<!-- Item 1 -->
 								<div class="relative">
-									<div class="absolute -left-10 top-1.5 w-8 h-8 rounded-full bg-primary border-4 border-surface z-10 shadow-lg shadow-primary/30 animate-dot-pulse"></div>
+									<div class="absolute -left-[25px] top-2 w-4 h-4 rounded-full bg-primary border-2 border-surface z-10 shadow-lg shadow-primary/30 animate-dot-pulse"></div>
 									<div class="bg-surface-container-high border border-white/10 rounded-2xl p-5 hover:border-primary/30 transition-all duration-300">
 										<h3 class="text-lg font-bold text-white">University of Ghardaia</h3>
 										<p class="text-primary font-semibold">Master of Science in Intelligent Systems for Knowledge Extraction</p>
@@ -126,7 +141,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 								</div>
 								<!-- Item 2 -->
 								<div class="relative">
-									<div class="absolute -left-10 top-1.5 w-8 h-8 rounded-full bg-secondary border-4 border-surface z-10 shadow-lg shadow-secondary/30 animate-dot-pulse" style="animation-delay: 0.3s;"></div>
+									<div class="absolute -left-[25px] top-2 w-4 h-4 rounded-full bg-secondary border-2 border-surface z-10 shadow-lg shadow-secondary/30 animate-dot-pulse" style="animation-delay: 0.3s;"></div>
 									<div class="bg-surface-container-high border border-white/10 rounded-2xl p-5 hover:border-secondary/30 transition-all duration-300">
 										<h3 class="text-lg font-bold text-white">University of Ghardaia</h3>
 										<p class="text-secondary font-semibold">Bachelor of Science in Information Systems (SI)</p>
@@ -135,7 +150,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 								</div>
 								<!-- Item 3 -->
 								<div class="relative">
-									<div class="absolute -left-10 top-1.5 w-8 h-8 rounded-full bg-tertiary border-4 border-surface z-10 shadow-lg shadow-tertiary/30 animate-dot-pulse" style="animation-delay: 0.6s;"></div>
+									<div class="absolute -left-[25px] top-2 w-4 h-4 rounded-full bg-tertiary border-2 border-surface z-10 shadow-lg shadow-tertiary/30 animate-dot-pulse" style="animation-delay: 0.6s;"></div>
 									<div class="bg-surface-container-high border border-white/10 rounded-2xl p-5 hover:border-tertiary/30 transition-all duration-300">
 										<h3 class="text-lg font-bold text-white">Algerian Red Crescent</h3>
 										<p class="text-tertiary font-semibold">First Aid Trainee</p>
@@ -150,7 +165,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 		</div>
 
 		<!-- Technical Skills -->
-		<section class="mt-16 animate-fade-in" style="animation-delay: 0.5s;">
+		<section class="mt-8 animate-fade-in" style="animation-delay: 0.5s;">
 			<div class="relative">
 				<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"></div>
 				<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:shadow-secondary/10 transition-all duration-300 overflow-hidden">
@@ -158,8 +173,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 					<div class="relative">
 						<div class="flex flex-wrap items-end justify-between gap-4 mb-8">
 							<div>
-								<h2 class="text-3xl md:text-4xl font-bold text-white flex items-center gap-3">
-									<span class="text-secondary">Technical Skills</span>
+								<h2 class="text-3xl md:text-4xl font-bold text-primary flex items-center gap-3">
+									Technical Skills
 								</h2>
 							</div>
 						</div>
@@ -168,7 +183,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 							<div class="xl:col-span-5 bg-surface-container-high border border-secondary/20 rounded-2xl p-6 hover:border-secondary/40 transition-all duration-300 hover:-translate-y-1 group">
 								<div class="flex items-center justify-between mb-4">
 									<h3 class="text-secondary font-bold text-xl">Development</h3>
-									<span class="text-2xl" aria-hidden="true">⚙️</span>
+									<Cog class="w-6 h-6 text-primary" aria-hidden="true" />
 								</div>
 								<div class="flex flex-wrap gap-2.5">
 									<span class="px-3 py-1.5 bg-secondary/10 text-secondary border border-secondary/25 rounded-lg text-sm font-medium">Mobile development</span>
@@ -181,7 +196,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 								<div class="bg-surface-container-high border border-primary/20 rounded-2xl p-5 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1">
 									<div class="flex items-center justify-between mb-3">
 										<h3 class="text-primary font-bold text-lg">Automation</h3>
-										<span class="text-xl" aria-hidden="true">🔌</span>
+										<Plug class="w-5 h-5 text-primary" aria-hidden="true" />
 									</div>
 									<div class="flex flex-wrap gap-2">
 										<span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs">n8n workflow design</span>
@@ -193,7 +208,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 								<div class="bg-surface-container-high border border-tertiary/20 rounded-2xl p-5 hover:border-tertiary/40 transition-all duration-300 hover:-translate-y-1">
 									<div class="flex items-center justify-between mb-3">
 										<h3 class="text-tertiary font-bold text-lg">Design</h3>
-										<span class="text-xl" aria-hidden="true">🎨</span>
+										<Palette class="w-5 h-5 text-primary" aria-hidden="true" />
 									</div>
 									<div class="flex flex-wrap gap-2">
 										<span class="px-2.5 py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-md text-xs">Adobe Illustrator</span>
@@ -206,7 +221,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 								<div class="bg-surface-container-high border border-error/20 rounded-2xl p-5 hover:border-error/40 transition-all duration-300 hover:-translate-y-1">
 									<div class="flex items-center justify-between mb-3">
 										<h3 class="text-error font-bold text-lg">Business</h3>
-										<span class="text-xl" aria-hidden="true">📊</span>
+										<ChartNoAxesCombined class="w-5 h-5 text-primary" aria-hidden="true" />
 									</div>
 									<div class="flex flex-wrap gap-2">
 										<span class="px-2.5 py-1 bg-error/10 text-error border border-error/20 rounded-md text-xs">Design analysis</span>
@@ -219,7 +234,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 								<div class="bg-surface-container-high border border-primary/20 rounded-2xl p-5 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1">
 									<div class="flex items-center justify-between mb-3">
 										<h3 class="text-primary font-bold text-lg">Tools</h3>
-										<span class="text-xl" aria-hidden="true">🧰</span>
+										<Toolbox class="w-5 h-5 text-primary" aria-hidden="true" />
 									</div>
 									<div class="flex flex-wrap gap-2">
 										<span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs">Microsoft Office Suite</span>
@@ -235,37 +250,37 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 		</section>
 
 		<!-- Soft Skills & Languages -->
-		<section class="mt-16 animate-fade-in" style="animation-delay: 0.6s;">
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+		<section class="mt-8 animate-fade-in" style="animation-delay: 0.6s;">
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 				<div class="relative">
 					<div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 blur-3xl"></div>
 					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:shadow-primary/10 transition-all duration-300">
-						<h2 class="text-3xl font-bold text-white mb-6 flex items-center gap-3">
-							<span class="text-primary">Soft Skills</span>
+						<h2 class="text-3xl md:text-4xl font-bold text-primary mb-6 flex items-center gap-3">
+							Soft Skills
 						</h2>
 						<ul class="space-y-3">
 							<li class="flex items-center gap-3 text-white/80">
-								<span class="text-primary">✓</span>
+								<Check class="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
 								Team leadership & people management
 							</li>
 							<li class="flex items-center gap-3 text-white/80">
-								<span class="text-primary">✓</span>
+								<Check class="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
 								Rapid learning & cross-functional adaptability
 							</li>
 							<li class="flex items-center gap-3 text-white/80">
-								<span class="text-primary">✓</span>
+								<Check class="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
 								Cross-team collaboration & stakeholder communication
 							</li>
 							<li class="flex items-center gap-3 text-white/80">
-								<span class="text-primary">✓</span>
+								<Check class="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
 								Large-scale event planning & execution
 							</li>
 							<li class="flex items-center gap-3 text-white/80">
-								<span class="text-primary">✓</span>
+								<Check class="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
 								Creative problem solving
 							</li>
 							<li class="flex items-center gap-3 text-white/80">
-								<span class="text-primary">✓</span>
+								<Check class="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
 								End-to-end project responsibility
 							</li>
 						</ul>
@@ -275,8 +290,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 				<div class="relative">
 					<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"></div>
 					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:shadow-secondary/10 transition-all duration-300">
-						<h2 class="text-3xl font-bold text-white mb-6 flex items-center gap-3">
-							<span class="text-secondary">Languages</span>
+						<h2 class="text-3xl md:text-4xl font-bold text-primary mb-6 flex items-center gap-3">
+							Languages
 						</h2>
 						<div class="space-y-4">
 							<div>
@@ -313,17 +328,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 		</section>
 
 		<!-- Contact Information -->
-		<section class="mt-16 animate-fade-in" style="animation-delay: 0.4s;">
+		<section class="mt-8 animate-fade-in" style="animation-delay: 0.4s;">
 			<div class="relative">
 				<div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-tertiary/5 blur-3xl"></div>
 				<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:shadow-primary/10 transition-all duration-300">
-					<h2 class="text-3xl md:text-4xl font-bold text-white mb-8 flex items-center gap-3">
-						<span class="text-primary">Contact</span>
+					<h2 class="text-3xl md:text-4xl font-bold text-primary mb-8 flex items-center gap-3">
+						Contact
 					</h2>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 						<div class="bg-surface-container-high border border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1">
 							<div class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center text-primary flex-shrink-0 shadow-lg shadow-primary/10">
-								📞
+								<Phone class="w-6 h-6" aria-hidden="true" />
 							</div>
 							<div>
 								<h3 class="text-white font-semibold">Phone</h3>
@@ -333,31 +348,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 						</div>
 						<div class="bg-surface-container-high border border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-secondary/30 transition-all duration-300 hover:-translate-y-1">
 							<div class="w-12 h-12 bg-secondary/20 rounded-xl flex items-center justify-center text-secondary flex-shrink-0 shadow-lg shadow-secondary/10">
-								📧
+								<Mail class="w-6 h-6" aria-hidden="true" />
 							</div>
 							<div>
 								<h3 class="text-white font-semibold">Email</h3>
 								<p class="text-white/70">abderrahmane.saoudi.26@gmail.com</p>
-							</div>
-						</div>
-						<div class="bg-surface-container-high border border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-tertiary/30 transition-all duration-300 hover:-translate-y-1">
-							<div class="w-12 h-12 bg-tertiary/20 rounded-xl flex items-center justify-center text-tertiary flex-shrink-0 shadow-lg shadow-tertiary/10">
-								🌐
-							</div>
-							<div>
-								<h3 class="text-white font-semibold">Website</h3>
-								<a href="https://www.saoudi.online" target="_blank" rel="noopener noreferrer" class="text-white/70 hover:text-white transition-colors">
-									www.saoudi.online
-								</a>
-							</div>
-						</div>
-						<div class="bg-surface-container-high border border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-error/30 transition-all duration-300 hover:-translate-y-1">
-							<div class="w-12 h-12 bg-error/20 rounded-xl flex items-center justify-center text-error flex-shrink-0 shadow-lg shadow-error/10">
-								📍
-							</div>
-							<div>
-								<h3 class="text-white font-semibold">Location</h3>
-								<p class="text-white/70">El-Nakhil Street, Berriane, Ghardaia, Algeria</p>
 							</div>
 						</div>
 					</div>
@@ -381,6 +376,46 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 	.animate-fade-in {
 		animation: fade-in 0.8s ease-out forwards;
+	}
+
+	@keyframes photo-halo {
+		0%, 100% {
+			transform: scale(0.94);
+			opacity: 0.55;
+		}
+		50% {
+			transform: scale(1.08);
+			opacity: 0.9;
+		}
+	}
+
+	@keyframes photo-light {
+		0%, 100% {
+			transform: translateX(-50%) scaleX(0.84);
+			opacity: 0.55;
+		}
+		50% {
+			transform: translateX(-50%) scaleX(1.08);
+			opacity: 0.95;
+		}
+	}
+
+	.animate-photo-halo {
+		animation: photo-halo 4.5s cubic-bezier(0.2, 0, 0.2, 1) infinite;
+	}
+
+	.hero-photo-light {
+		position: absolute;
+		z-index: 0;
+		left: 50%;
+		bottom: -1.25rem;
+		width: 82%;
+		height: 2.5rem;
+		border-radius: 9999px;
+		background: var(--color-primary);
+		box-shadow: 0 0 2rem var(--color-primary);
+		filter: blur(14px);
+		animation: photo-light 3.2s cubic-bezier(0.2, 0, 0.2, 1) infinite;
 	}
 
 	@keyframes timeline-progress {
