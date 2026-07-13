@@ -28,7 +28,7 @@ const { counts, adminEmail, systemStatus, lastUpdated } = metrics;
   <div>
 
     <!-- System Status Banner -->
-    <div class="mb-8 p-4 rounded-2xl bg-[#1D1B20] border border-[#2B2930] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="mb-6 p-4 rounded-2xl bg-[#1D1B20] border border-[#2B2930] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <div class="p-2.5 rounded-xl bg-[#0F9D58]/10 text-[#0F9D58]">
           <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -51,14 +51,7 @@ const { counts, adminEmail, systemStatus, lastUpdated } = metrics;
     </div>
 
     <!-- Grid Statistics -->
-    <section class="mb-10">
-      <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-        <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-        </svg>
-        Content Collections Status
-      </h2>
-      
+    <section class="mb-10">      
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Projects Card -->
         <div class="p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-primary/40 border border-[#2B2930]" style="background: #1D1B20">
@@ -71,7 +64,6 @@ const { counts, adminEmail, systemStatus, lastUpdated } = metrics;
             <span class="text-2xl font-black text-white">{counts.projects}</span>
           </div>
           <h3 class="font-bold text-[#E6E1E5]">Projects</h3>
-          <p class="text-xs text-[#E6E1E5]/50 mt-1">Showcase items, links and tags.</p>
         </div>
 
         <!-- Experience Card -->
@@ -85,7 +77,6 @@ const { counts, adminEmail, systemStatus, lastUpdated } = metrics;
             <span class="text-2xl font-black text-white">{counts.experience}</span>
           </div>
           <h3 class="font-bold text-[#E6E1E5]">Experience</h3>
-          <p class="text-xs text-[#E6E1E5]/50 mt-1">Professional timeline events.</p>
         </div>
 
         <!-- Designs Card -->
@@ -99,7 +90,6 @@ const { counts, adminEmail, systemStatus, lastUpdated } = metrics;
             <span class="text-2xl font-black text-white">{counts.designs}</span>
           </div>
           <h3 class="font-bold text-[#E6E1E5]">Designs</h3>
-          <p class="text-xs text-[#E6E1E5]/50 mt-1">Figma mockups and image URLs.</p>
         </div>
 
         <!-- Certifications Card -->
@@ -113,7 +103,6 @@ const { counts, adminEmail, systemStatus, lastUpdated } = metrics;
             <span class="text-2xl font-black text-white">{counts.certificates}</span>
           </div>
           <h3 class="font-bold text-[#E6E1E5]">Certifications</h3>
-          <p class="text-xs text-[#E6E1E5]/50 mt-1">Credential records & links.</p>
         </div>
 
         <!-- Volunteering Card -->
@@ -127,7 +116,6 @@ const { counts, adminEmail, systemStatus, lastUpdated } = metrics;
             <span class="text-2xl font-black text-white">{counts.volunteering}</span>
           </div>
           <h3 class="font-bold text-[#E6E1E5]">Volunteering</h3>
-          <p class="text-xs text-[#E6E1E5]/50 mt-1">GDG & community efforts.</p>
         </div>
       </div>
     </section>

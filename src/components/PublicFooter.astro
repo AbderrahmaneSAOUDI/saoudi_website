@@ -6,15 +6,17 @@
  * Adheres to strict zero client-side JavaScript guidelines.
  */
 import '../styles/global.css';
-import { GitBranch, Users, MessageCircle, Mail } from '@lucide/astro';
 import SocialIconButton from '../components/SocialIconButton.astro';
+import Icon from './Icon.astro';
 
 // Setup list of contact methods and external links
 const socialLinks = [
-	{ icon: GitBranch, href: 'https://github.com/AbderrahmaneSAOUDI', label: 'GitHub' },
-	{ icon: Users, href: 'https://linkedin.com/in/abderrahmane-saoudi', label: 'LinkedIn' },
-	{ icon: MessageCircle, href: 'https://twitter.com/AbderrahmaneSAOUDI', label: 'Twitter' },
-	{ icon: Mail, href: 'mailto:contact@saoudi.online', label: 'Email' },
+	{ iconName: 'google', href: 'https://gdg.community.dev/u/mcmwd6/', label: 'GDG Profile' },
+	{ iconName: 'facebook', href: 'https://www.facebook.com/AbdouSaoudi26', label: 'Facebook' },
+	{ iconName: 'telegram', href: 'https://t.me/AbdouSAOUDI', label: 'Telegram', hoverIconName: 'telegram' },
+	{ iconName: 'linkedin', href: 'https://www.linkedin.com/in/abderrahmane-saoudi/', label: 'LinkedIn' },
+	{ iconName: 'github', href: 'https://github.com/AbderrahmaneSAOUDI', label: 'GitHub', hoverIconName: 'github' },
+	{ iconName: 'google', href: 'http://g.dev/Abdou_SAOUDI', label: 'Google Developer Profile' },
 ];
 ---
 
@@ -25,7 +27,8 @@ const socialLinks = [
 			<div class="flex items-center gap-4">
 				{socialLinks.map((social) => (
 					<SocialIconButton href={social.href} ariaLabel={social.label}>
-						<social.icon class="w-5 h-5" />
+						<Icon name={social.iconName} size={20} />
+						<Icon slot="hover-icon" name={social.hoverIconName || social.iconName} filled size={20} />
 					</SocialIconButton>
 				))}
 			</div>
