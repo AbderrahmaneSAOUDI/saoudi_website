@@ -45,7 +45,7 @@ if (Astro.request.method === 'POST') {
     }
 
     // Issue a secure HTTP-Only, Secure, SameSite cookie configured with a 7-day expiration
-    const sessionToken = createSessionToken(payload.email);
+    const sessionToken = await createSessionToken(payload.email);
     
     Astro.cookies.set('admin_session', sessionToken, {
       path: '/',

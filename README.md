@@ -115,369 +115,104 @@ graph TD
 
 ---
 
-## 🧭 The Universal Floating Administrative Navigation Dock
+# saoudi.online
 
-Fixed globally across the `/admin` view context, this layout element offers seamless management across the workspace:
+Personal portfolio and admin dashboard for Abderrahmane Saoudi, built with Astro SSR, Tailwind CSS, TypeScript, and Vercel.
 
-- **Left Slot Anchor:** Universal Image Optimization Engine toggle. Triggers an on-screen overlay control layer housing range sliders and inputs to adjust `compressorjs` parameters (Quality % and Max Width pixels) anywhere on the dashboard. Saving these rules commits them straight to a global storage or document space.
-- **Center Segment:** Horizontal grid of textual links routing directly to:
-  - Overview
-  - Experience
-  - Projects
-  - Designs
-  - Certifications
-  - Volunteering
-  - Resume
-  - Timeline (*Explicitly styled as disabled/future feature*)
-  - Global (*Renamed from Settings*)
-- **Right Slot Anchor:** Universal Creative Floating Action Button (`+`) styled in Google Blue. When clicked, it activates a drop-down menu asking: "What would you like to create?" Selecting a type instantly routes the user to that workspace page and opens a clear initialization sheet.
+## Overview
 
----
+The public site is server-rendered and styled with CSS and Tailwind utilities. The protected `/admin` area is the only place that runs React and handles authenticated content management.
 
-## 🖥️ Master-Detail Dashboard Visual Interface (The 66% / 33% UI Pattern)
+## Tech Stack
 
-- **Public Routing:** All filtering and searching on public pages trigger native HTTP transitions (full page reloads), maintaining a zero-JS delivery.
-- **Admin Routing:** Inside `/admin`, content pages implement a uniform split-screen layout:
-  - **Top Dashboard Strip:** Hosts context search inputs along with view toggles that smoothly change the presentation layer from a visual data grid into a text list view.
-  - **Left Column Area (66% Width):** Displays a compact list or grid containing current entries. Clicking any card updates URL state query parameters using `history.pushState` without reloading the page.
-  - **Right Details Area (33% Width):** Instantly displays the data parameters of the chosen entry inside a full-height editing canvas form layout. Houses Google Green "Update / Save" buttons and Google Red "Delete Item" actions.
+| Layer | Technology |
+| :---- | :--------- |
+| Framework | Astro 6 |
+| Language | TypeScript |
+| Styling | Tailwind CSS 4 + global CSS |
+| Admin UI | React island inside `/admin` |
+| Backend | Firebase Admin SDK |
+| Deployment | Vercel SSR |
 
-### ⚠️ Validation & Resilient UI States
+## Features
 
-To ensure admin operations do not fail silently or compromise stability:
+- Public pages for home, projects, experience, volunteering, certifications, designs, and resume.
+- SSR output with Astro and a Vercel adapter.
+- Animated public UI built with CSS keyframes and Tailwind transitions.
+- Protected admin routes guarded by `src/middleware.ts`.
+- Session-based admin access using the `admin_session` cookie.
+- Firebase Admin usage for server-side data and storage workflows.
 
-- **File Size Validation Guard:** The file upload dropzone enforces a strict limit (maximum 10MB) on raw assets *before* passing them to client-side `compressorjs` optimization, rejecting oversized files with clear error states.
-- **Upload Progress & Transaction Errors:** The details panel renders visual progress indicators during upload phases and displays distinct error states if a transaction fails.
-- **Network Resilience:** The dashboard displays local banner alerts for network disconnection or API request timeouts, preventing layout corruption during transient outages.
+## Routes
 
----
+Public pages:
 
-## 📂 Firebase Data Schema (Decoupled Multi-Collection Blueprint)
+- `/`
+- `/projects`
+- `/experience`
+- `/volunteering`
+- `/certifications`
+- `/designs`
+- `/resume`
 
-To simplify daily scaling, index management, and maintenance as entries grow to 50+ lines per table, the database schema is explicitly split across separate collections.
+Admin pages and endpoints:
 
-Dates are stored as standardized **ISO 8601 strings** (`YYYY-MM-DD` or `YYYY-MM`), allowing Firestore to natively sort documents chronologically via simple query configurations (`orderBy("date", "desc")`).
+- `/admin`
+- `/admin/admin_login`
+- `/admin/admin_logout`
+- `/admin/admin_global`
+- `/admin/admin_experience`
+- `/admin/admin_projects`
+- `/admin/admin_designs`
+- `/admin/admin_certifications`
+- `/admin/admin_volunteering`
+- `/admin/admin_resume`
+- `/admin/admin_resume_upload`
+- `/admin/admin_designs_api`
+- `/admin/admin_certificates_api`
 
-### 1. Configuration Collection (Singleton)
+## Development
 
-- **Collection:** `configuration`
-- **Document ID Name:** `static_data`
-- **Array Ceilings:** To prevent Firestore single-document scaling degradation, arrays such as `skills` are capped at a maximum of 100 entries.
-- **Data Shape:**
+Install dependencies:
 
-```typescript
-interface StaticData {
-      id: "static_data";
-      name: string;
-      title: string;
-      bio: string;
-      skills: {
-            languages: string[];
-            frameworks: string[];
-            tools: string[];
-      }; // Combined fields capped at 100 items max
-      resumeUrl: string;
-      contact: {
-            email: string;
-            telegram: string;
-            whatsapp: string;
-      };
-      imageSettings: {
-            quality: number;
-            maxWidth: number;
-      };
-}
+```bash
+pnpm install
 ```
 
-### 2. Content Collections
+Run the development server:
 
-Five separate database collections structured to align with their distinct properties. All entries contain a standard `id` string and an `order` number for manual prioritization.
-
-#### Collection: `experience`
-
-```typescript
-interface Experience {
-      id: string;
-      order: number; // For manual list ordering
-      role: string;
-      company: string;
-      location: string;
-      date: string; // ISO 8601 string (e.g. "2024-01-15") for sorting
-      period: string; // Human readable label (e.g. "Jan 2024 - Present")
-      descriptionPoints: string[];
-      technologies: string[];
-}
+```bash
+pnpm dev
 ```
 
-#### Collection: `projects`
+Build for production:
 
-```typescript
-interface Project {
-      id: string;
-      order: number;
-      title: string;
-      tagline: string;
-      description: string;
-      imageUrl: string; // Remote Firebase Storage URL
-      projectUrl: string;
-      githubUrl: string;
-      date: string; // ISO 8601 (e.g. "2024-05")
-      technologies: string[];
-      featured: boolean;
-}
+```bash
+pnpm build
 ```
 
-#### Collection: `designs`
+Preview the production build locally:
 
-```typescript
-interface Design {
-      id: string;
-      title: string;
-      description?: string;
-      imageUrl: string;
-      date: string; // ISO 8601
-      company: string;
-      tags: string[];
-}
+```bash
+pnpm preview
 ```
 
-#### Collection: `certificates`
+## Environment
 
-```typescript
-interface Certificate {
-      id: string;
-      title: string;
-      issuer: string;
-      date: string; // ISO 8601 string for chronological sorting (YYYY-MM or YYYY-MM-DD)
-      type: 'Online' | 'In-Person' | 'Hybrid';
-      credentialUrl?: string | null;
-      imageUrl?: string | null;
-}
-```
-
-#### Collection: `volunteering`
-
-```typescript
-interface Volunteering {
-      id: string;
-      order: number;
-      role: string;
-      organization: string;
-      date: string; // ISO 8601
-      period: string;
-      description: string;
-      impactMetric?: string;
-}
-```
-
----
-
-## 🔥 Free-Tier & Optimization Rules (Spark Plan)
-
-- Server-side reads via Admin SDK with Vercel Edge Cache (5-minute TTL) to protect Firestore read quotas.
-- No persistent real-time database listeners on public pipelines.
-- Images uploaded via the admin island are compressed client-side (`compressorjs`) and served via Astro `<Image />`.
-- **Edge Image Cache Conservation:** Astro's optimized outputs for remote image requests are configured with a long-lived `Cache-Control: public, max-age=31536000, immutable` header via Vercel Edge configurations. This ensures images are cached aggressively by Vercel CDN, protecting edge compute minutes and preventing dynamic resizing execution on every unique page view.
-- Whitelisting of dynamic image domains inside `astro.config.mjs` allows the server to optimize storage assets automatically.
-- **Vercel Serverless Execution Timeout Mitigation:** Because Vercel free-tier hobby accounts impose a strict **10-second serverless execution timeout**, the admin dashboard must avoid proxying large media uploads or file payloads through Astro server endpoints. The admin interface React components must initialize the client Firebase SDK and stream file uploads/deletions directly between the client browser and the Firebase Storage bucket.
-
----
-
-## 🔐 Firebase Admin SDK Setup
-
-Use server-only environment variables for the Admin SDK:
+Server-side Firebase Admin configuration expects these variables:
 
 - `FIREBASE_PROJECT_ID`
 - `FIREBASE_CLIENT_EMAIL`
 - `FIREBASE_PRIVATE_KEY`
 - `FIREBASE_STORAGE_BUCKET`
 
----
+## Notes
 
-## 🔒 Admin Security
+- `astro.config.mjs` is configured for SSR with the Vercel adapter.
+- `src/styles/global.css` contains the shared site styling and motion system.
+- Public pages should remain free of unnecessary client-side JavaScript.
+- The admin area is the right place for interactive CRUD and upload flows.
 
-- **Simple Authentication Gate & Server-Side Middleware:** To prevent unauthenticated users from bypassing the UI by manipulating client-side state in the browser developer tools, Astro middleware (`src/middleware.ts`) intercepts any request starting with `/admin` (except `/admin/login`).
-- **Verification Flow:** Successful login via Firebase Auth sets a simple, secure verification cookie (e.g., `session`). The server-side Astro middleware reads this cookie on every `/admin` request: if the verification flag is missing or invalid, it triggers a server-side redirect (`context.redirect('/admin/login')`), ensuring layout files, forms, and admin routes are never served to the client browser in an unauthenticated state.
-- **Firestore and Storage Rules:** Database security rules strictly restrict Firestore/Storage writes to the designated admin UID.
+## License
 
-### 🧹 Cascading Storage Deletion Policy (Preventing Ghost Files)
-
-To prevent data fragmentation and storage bloat inside the Firebase Storage bucket:
-
-- **Deletion Rule:** Whenever a document is deleted from `projects` or `designs` collections, the admin system must programmatically extract the linked `imageUrl` from the database document.
-- **Execution Sequence:** The deletion routine must first call the Storage SDK's `deleteObject()` on that image file path before deleting the Firestore database document itself.
-- **Upload Cleanup:** If an admin updates a card and uploads a replacement image, the system must invoke `deleteObject()` on the previous image path prior to committing the new `imageUrl`.
-
----
-
-## 🔐 Contact Link Security (Anti-Spam)
-
-- **Zero-JS CSS Obfuscation:** Public emails/contacts are rendered backwards in HTML and reversed using pure CSS (e.g., `<span class="obfuscated">ed.enilno.iduosas@tcatnoc</span>` with `.obfuscated { unicode-bidi: bidi-override; direction: rtl; }`), preventing email harvesting bots from collecting strings without loading JavaScript.
-
----
-
-## 💡 Notes for Implementers
-
-- Global motion definitions live in `src/styles/global.css` as the canonical CSS `@keyframes` for ambient background shapes and entrance/stagger animations.
-- Tailwind utility classes are the primary interface for motion and state transitions on public UI components.
-- Keep the admin island as the single allowed source of client-side JavaScript.
-
----
-
-## 🗓️ Roadmap (Synchronized 4-Phase Timeline)
-
-### Phase 1: Foundation & Infrastructure
-
-- **Astro & Vercel SSR Setup**
-  - [ ] Initialize Astro project codebase
-  - [ ] Install Vercel adapter (`@astrojs/vercel`)
-  - [ ] Configure Astro in SSR output mode (`output: 'server'`)
-  - [ ] Set up standard project folder structure (components, layouts, pages)
-- **Tailwind & Theme Tokens**
-  - [ ] Install and configure Tailwind CSS
-  - [ ] Map Google brand color codes and background darks to CSS variables
-  - [ ] Set up Material 3 desaturated dark tokens in `tailwind.config.mjs`
-  - [ ] Register custom `@keyframes` for ambient animations in `global.css`
-- **Firebase Admin Integration**
-  - [ ] Install `firebase-admin` dependency
-  - [ ] Configure server-only environment variables verification
-  - [ ] Initialize Firestore and Storage server-side clients
-- **Base Layout & Navigation**
-  - [ ] Build root HTML layout wrapper (`src/layouts/`)
-  - [ ] Create responsive public navigation header (shortcut icons on mobile, avoiding hamburger menus and JS)
-  - [ ] Set up global typography and Google Fonts integrations
-- **TypeScript Foundation**
-  - [ ] Define global content interfaces in `src/types.ts`
-  - [ ] Create Zod schemas for data validation
-  - [ ] Implement type guard helpers for Firebase schema structures
-
-### Phase 2: Public Pages
-
-- **Home Page (`/`)**
-  - [ ] Build responsive Hero section layout
-  - [ ] Set up animated headers and greeting text
-  - [ ] Code static metrics/stats count grid panel
-  - [ ] Design visual navigation hub using rounded M3 cards
-  - [ ] Implement slow-floating radial CSS-only background motion
-- **Resume Page (`/resume`)**
-  - [ ] Build public resume page with preview container and download CTA
-  - [ ] Add download action button pointing to public asset
-  - [ ] Pull live resume document path reference from database
-- **Projects Page (`/projects`)**
-  - [ ] Build dynamic project card grid layout
-  - [ ] Add responsive filter chips for categories/technologies
-  - [ ] Implement search/filter URL query parameter tracking (requires full page refresh on public routes)
-  - [ ] Apply M3 elevate-and-ring CSS hover effects
-- **Experience Page (`/experience`)**
-  - [ ] Set up vertical timeline layout tracker
-  - [ ] Create responsive experience info card components
-  - [ ] Add staggered fade-in entrance transitions via CSS
-  - [ ] Render tech tag arrays on each job entry card
-- **Volunteering Page (`/volunteering`)**
-  - [ ] Structure GDG & community activity timeline layout
-  - [ ] Create high-visibility volunteer impact metric banners
-  - [ ] Style volunteering project cards using Google brand borders
-- **Certifications Page (`/certifications`)**
-  - [ ] Design two-column responsive gallery grid layout
-  - [ ] Build certificate card with issuer and date tags
-  - [ ] Add external verification links to credential actions
-- **Designs Page (`/designs`)**
-  - [ ] Build visual mockup/UI design grid component
-  - [ ] Implement CSS-only lightbox preview modal
-  - [ ] Add links referencing Figma project URLs
-
-### Phase 3: Admin Dashboard & Secure Pipelines
-
-- **Authentication & Server-Side Access Middleware**
-  - [ ] Build standalone `/admin/login` page layout using M3 dark styles
-  - [ ] Add visual validation styles on email and password inputs
-  - [ ] Setup Astro middleware (`src/middleware.ts`) to intercept `/admin` routes (excluding `/admin/login`)
-  - [ ] Implement secure verification cookie setting upon successful login
-  - [ ] Program middleware check: read cookie and perform server-side redirect `context.redirect('/admin/login')` if absent
-  - [ ] Bind login form actions to email/password client validation
-  - [ ] Implement Client Firebase Auth SDK state checks inside React island
-  - [ ] Add sign-out action (clearing verification cookies)
-- **Universal Floating Admin Navigation Dock**
-  - [ ] Design fixed floating container with absolute viewport tracking
-  - [ ] Style active routes using Google Blue pill shape indicators
-  - [ ] Map center segments to: Overview, Experience, Projects, Designs, Certifications, Volunteering, Resume, Timeline, and Global
-  - [ ] Render "Timeline" link with disabled hover properties
-  - [ ] Set up right-anchored Google Blue Creative FAB (`+`)
-  - [ ] Code drop-down menu triggered by FAB click
-  - [ ] Map FAB drop-down choices to instantly route to workspace initialization sheets
-- **Universal Image Optimization Overlay**
-  - [ ] Build slide-in control overlay container
-  - [ ] Implement range slider for `compressorjs` Quality percentage (1-100)
-  - [ ] Create integer validation input field for Max Width in pixels
-  - [ ] Wire optimization Save button to commit metrics to configuration store
-- **Overview Workspace View**
-  - [ ] Set up `/admin/overview` dashboard page layout shell
-  - [ ] Build status summary panels for system health
-  - [ ] Fetch database collections to count active documents
-- **Global Configuration Workspace**
-  - [ ] Build `/admin/global` layout view (formerly settings)
-  - [ ] Implement input controls for Name, Title, and Bio
-  - [ ] Build skill token list editor with delete-chip controls
-  - [ ] Create text fields for Email, Telegram, and WhatsApp contacts
-  - [ ] Connect global save action to Firestore `configuration/static_data`
-- **Workspace Frameworks (All 5 Content Pages)**
-  - [ ] Setup page layout wrappers for Experience data views
-  - [ ] Setup page layout wrappers for Projects data views
-  - [ ] Setup page layout wrappers for Designs data views
-  - [ ] Setup page layout wrappers for Certifications data views
-  - [ ] Setup page layout wrappers for Volunteering data views
-  - [ ] Create top strip with filter searches and Grid/List toggle buttons
-  - [ ] Build 66% width left column area showing compact card lists
-  - [ ] Intercept card clicks to append active ID to URL query state using `history.pushState`
-  - [ ] Build 33% width right column editing panel with save/delete buttons
-- **CRUD Systems & File Uploads**
-  - [ ] Integrate form state hooks for all field edits
-  - [ ] Setup Firebase Storage bucket write permissions
-  - [ ] Add dragzone panel for image file uploads (Projects, Designs)
-  - [ ] Implement dropzone client-side file size guard (max 10MB limit check) before image processing
-  - [ ] Intercept upload stream to apply client-side `compressorjs` optimization rules
-  - [ ] Add visual upload progress state bars and upload transaction error handlers
-  - [ ] Connect Google Green "Save" triggers to targeted Firestore collections
-  - [ ] Program cascading deletion: call Storage `deleteObject()` on linked image path before removing the Firestore document
-  - [ ] Implement replacement cleanup: delete the previously referenced image file from Storage when saving a new upload
-  - [ ] Add global connection monitor alert banners to indicate timeout and offline states
-- **Resume Document Pipeline**
-  - [ ] Setup dedicated Resume route view
-  - [ ] Create PDF dropzone restricted strictly to `.pdf` extension uploads
-  - [ ] Code sequential script to call `deleteObject()` on existing storage path
-  - [ ] Code sequential script to upload replacement PDF file via `uploadBytes()`
-  - [ ] Update `resumeUrl` on successful replacement
-- **Security & Build Optimizations**
-  - [ ] Set up Firestore Security Rules locking writes to authenticated Admin UID
-  - [ ] Audit build configuration to keep Client Firebase SDK out of public page bundles
-  - [ ] Whitelist `firebasestorage.googleapis.com` under `image.domains` in `astro.config.mjs`
-  - [ ] Add Cache-Control config rules in astro.config.mjs or Vercel config headers for long-lived image caching
-
-### Phase 4: Polish & Launch
-
-- **SEO & Meta Validations**
-  - [ ] Ensure unique metadata titles and descriptions exist on all routes
-  - [ ] Implement OpenGraph tags and responsive layout constraints
-  - [ ] Inspect server-rendered output to confirm structured markup delivery
-- **Contact Security (Anti-Spam)**
-  - [ ] Implement zero-JS contact obfuscation using CSS direction reversal
-- **Analytics & Performance**
-  - [ ] Add server-side Vercel Analytics integration
-  - [ ] Perform Lighthouse performance tests to verify scores (target ≥ 90)
-  - [ ] Check Core Web Vitals (LCP, FID, CLS metrics)
-- **Final Deployment & Handover**
-  - [ ] Conduct cross-device responsive design review
-  - [ ] Verify custom domain redirection rules
-  - [ ] Perform final build deployment on Vercel production hosting
-
----
-
-## 🤝 Contributor
-
-- **Abderrahmane SAOUDI** - [GitHub](https://github.com/AbderrahmaneSAOUDI)
-
----
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT. See [LICENSE](LICENSE).
