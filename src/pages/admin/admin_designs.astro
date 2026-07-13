@@ -5,7 +5,7 @@ import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
 import AdminLayout from "../../components/admin/AdminLayout.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
 import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
-import { Image as ImageIcon, Trash2, Save, CircleAlert, Settings } from '@lucide/astro';
+import Icon from "../../components/Icon.astro";
 import DesignLightbox from "../../components/DesignLightbox.astro";
 import AdminControlsStrip from "../../components/admin/AdminControlsStrip.astro";
 
@@ -69,7 +69,7 @@ try {
 
 				{errorMsg && (
 					<div class="p-4 rounded-2xl bg-[#DB4437]/10 border border-[#DB4437]/30 text-[#DB4437] text-sm flex items-center gap-2.5">
-						<CircleAlert class="w-5 h-5 shrink-0" />
+						<Icon name="alert" size={20} class="w-5 h-5 shrink-0" />
 						<span>{errorMsg}</span>
 					</div>
 				)}
@@ -198,7 +198,7 @@ try {
 							class="hidden p-2.5 rounded-xl text-[#DB4437] hover:bg-[#DB4437]/10 border border-transparent hover:border-[#DB4437]/20 transition-all cursor-pointer shrink-0"
 							title="Delete Design"
 						>
-							<Trash2 class="w-5 h-5" />
+							<Icon name="trash" size={20} class="w-5 h-5" />
 						</button>
 					</div>
 
@@ -228,7 +228,7 @@ try {
 
 								<div id="drop-zone-prompt" class="relative z-10 flex flex-col items-center gap-1.5">
 									<div class="p-2 rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
-										<ImageIcon class="w-5 h-5" />
+										<Icon name="image" size={20} class="w-5 h-5" />
 									</div>
 									<div>
 										<p class="text-xs font-medium text-white">
@@ -289,7 +289,7 @@ try {
 									title="Manage Companies"
 									class="p-2.5 rounded-xl border border-[#2B2930] hover:bg-[#2B2930] hover:border-primary/50 text-primary transition-all cursor-pointer flex items-center justify-center shrink-0"
 								>
-									<Settings class="w-5 h-5" />
+									<Icon name="settings" size={20} class="w-5 h-5" />
 								</button>
 							</div>
 						</div>
@@ -335,7 +335,7 @@ try {
 								id="btn-save"
 								class="flex-1 py-3 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md"
 							>
-								<Save class="w-4 h-4" />
+								<Icon name="save" size={16} class="w-4 h-4" />
 								<span id="save-btn-text">Save</span>
 							</button>
 						</div>
@@ -391,7 +391,7 @@ try {
 						id="btn-save-companies"
 						class="flex-grow py-2.5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-2"
 					>
-						<Save class="w-3.5 h-3.5" />
+							<Icon name="save" size={14} class="w-3.5 h-3.5" />
 						Save Changes
 					</button>
 				</div>

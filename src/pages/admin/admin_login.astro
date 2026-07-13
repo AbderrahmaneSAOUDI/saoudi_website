@@ -1,7 +1,7 @@
 ---
 import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
 import '../../styles/global.css';
-import { UserLock } from '@lucide/astro';
+import Icon from '../../components/Icon.astro';
 import { OAuth2Client } from 'google-auth-library';
 import { createSessionToken } from '../../lib/server/session';
 
@@ -121,7 +121,7 @@ const gsiHtml = `
     <section class="max-w-md w-full px-4" aria-labelledby="login-heading">
       <div class="p-6 rounded-3xl shadow-lg border border-[var(--color-surface-container)]" style="background:var(--color-surface-container); color:var(--color-google-white);">
         <header class="mb-6 text-center flex flex-col items-center">
-          <UserLock class="w-12 h-12 mb-3" style="color:var(--color-primary);" />
+          <Icon name="lock" size={48} class="w-12 h-12 mb-3" style="color:var(--color-primary);" />
           <h1 id="login-heading" class="text-2xl font-bold tracking-tight text-[#FFFFFF]">saoudi.online</h1>
         </header>
 

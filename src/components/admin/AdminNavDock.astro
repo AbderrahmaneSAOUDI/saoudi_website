@@ -1,5 +1,5 @@
 ---
-import { LayoutDashboard, Briefcase, FolderOpen, Palette, Award, Heart, FileText, Clock } from '@lucide/astro';
+import Icon from '../Icon.astro';
 
 interface Props {
 	currentPath?: string;
@@ -8,14 +8,14 @@ interface Props {
 const { currentPath = '/admin' } = Astro.props;
 
 const navItems = [
-	{ label: 'Overview', path: '/admin', icon: LayoutDashboard },
-	{ label: 'Experience', path: '/admin/admin_experience', icon: Briefcase, disabled: true },
-	{ label: 'Projects', path: '/admin/admin_projects', icon: FolderOpen, disabled: true },
-	{ label: 'Designs', path: '/admin/admin_designs', icon: Palette },
-	{ label: 'Certifications', path: '/admin/admin_certificates', icon: Award },
-	{ label: 'Volunteering', path: '/admin/admin_volunteering', icon: Heart, disabled: true },
-	{ label: 'Resume', path: '/admin/admin_resume', icon: FileText },
-	{ label: 'Timeline', path: '/admin/admin_timeline', icon: Clock, disabled: true },
+	{ label: 'Overview', path: '/admin', iconName: 'home' },
+	{ label: 'Experience', path: '/admin/admin_experience', iconName: 'experience', disabled: true },
+	{ label: 'Projects', path: '/admin/admin_projects', iconName: 'projects', disabled: true },
+	{ label: 'Designs', path: '/admin/admin_designs', iconName: 'design' },
+	{ label: 'Certifications', path: '/admin/admin_certifications', iconName: 'certifications' },
+	{ label: 'Volunteering', path: '/admin/admin_volunteering', iconName: 'business', disabled: true },
+	{ label: 'Resume', path: '/admin/admin_resume', iconName: 'document' },
+	{ label: 'Timeline', path: '/admin/admin_timeline', iconName: 'calendar', disabled: true },
 ];
 ---
 
@@ -49,7 +49,7 @@ const navItems = [
 							aria-label={item.label}
 						>
 							<span class="admin-nav-icon">
-								<item.icon class="w-4 h-4" />
+								<Icon name={item.iconName} size={16} class="w-4 h-4" />
 							</span>
 							<span class="admin-nav-label">{item.label}</span>
 						</a>

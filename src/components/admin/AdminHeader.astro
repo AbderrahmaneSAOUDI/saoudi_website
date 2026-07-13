@@ -1,5 +1,5 @@
 ---
-import { LogOut } from '@lucide/astro';
+import Icon from '../Icon.astro';
 
 interface Props {
 	title?: string;
@@ -32,7 +32,7 @@ const { title = 'Dashboard', subtitle } = Astro.props;
 			class="flex items-center gap-2 px-3 md:px-5 py-2 md:py-2.5 rounded-full text-sm font-semibold transition-all duration-300 border border-[#DB4437]/40 hover:bg-[#DB4437] hover:text-white hover:border-transparent hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#DB4437]/50"
 			aria-label="Sign Out"
 		>
-			<LogOut class="w-4 h-4 md:hidden" />
+			<Icon name="logout" size={16} class="w-4 h-4 md:hidden" />
 			<span class="hidden md:inline">Sign Out</span>
 		</a>
 	</div>

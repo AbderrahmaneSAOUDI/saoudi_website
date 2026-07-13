@@ -5,8 +5,8 @@
  * Unified card component that handles rendering both design mockups and professional certifications.
  * Supports both public views and interactive admin workspace grids.
  */
-import { Calendar, Tag, Award, ExternalLink } from '@lucide/astro';
 import type { Design, Certificate } from '../types';
+import Icon from './Icon.astro';
 
 interface Props {
 	item: Design | Certificate;
@@ -103,7 +103,7 @@ const typeColors = {
 				<div class="flex flex-wrap gap-1.5 mt-2">
 					{design.tags.map((tag: string) => (
 						<span class="text-[10px] text-primary/80 font-bold flex items-center gap-0.5 bg-[#2D2D2D] border border-white/5 px-2 py-0.5 rounded-md">
-							<Tag class="w-2.5 h-2.5 text-primary/60" />
+							<Icon name="tag" size={10} />
 							{tag}
 						</span>
 					))}
@@ -113,7 +113,7 @@ const typeColors = {
 
 		<div class="design-card-footer mt-4 pt-3 flex justify-between items-center text-xs border-t border-white/5">
 			<span class="text-white/40 flex items-center gap-1 font-medium">
-				<Calendar class="w-3.5 h-3.5" />
+				<Icon name="calendar" size={14} />
 				{formattedDate}
 			</span>
 			{design.company && (
@@ -155,12 +155,12 @@ const typeColors = {
 					{certType && (
 						<span class={`absolute top-2.5 right-2.5 z-20 px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase border backdrop-blur-md shadow-sm pointer-events-none select-none ${typeColors[certType as keyof typeof typeColors] || ''}`}>
 							{certType}
-					</span>
+						</span>
 					)}
 				</div>
 			) : (
 				<div class="p-3 w-fit rounded-2xl bg-secondary/10 text-secondary border border-secondary/20 group-hover:scale-110 transition-transform duration-300">
-					<Award class="w-6 h-6" />
+					<Icon name="certifications" size={24} />
 				</div>
 			)}
 
@@ -174,7 +174,7 @@ const typeColors = {
 		<div class="mt-4 pt-3 flex justify-between items-center text-xs border-t border-white/5 text-white/40 font-medium">
 			<div class="flex items-center gap-2">
 				<span class="flex items-center gap-1">
-					<Calendar class="w-3.5 h-3.5" />
+					<Icon name="calendar" size={14} />
 					{formattedDate}
 				</span>
 				{!certificate.imageUrl && certType && (
@@ -192,7 +192,7 @@ const typeColors = {
 						}`}
 						title="Verify Credential"
 					>
-						<ExternalLink class="w-3.5 h-3.5" />
+						<Icon name="open_in_new" size={14} />
 					</a>
 				)}
 			</div>

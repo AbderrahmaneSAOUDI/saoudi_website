@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Card from '../components/Card.astro';
 import DesignLightbox from '../components/DesignLightbox.astro';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
-import { Palette } from '@lucide/astro';
+import Icon from '../components/Icon.astro';
 
 let designs: any[] = [];
 let companies: string[] = ['Google', 'GDG', 'Freelance', 'Personal'];
@@ -87,7 +87,7 @@ const activeGroups = Object.keys(designsByCompany)
 									{groupDesigns.length}
 								</span>
 							</div>
-							<span class="text-[10px] text-white/30 uppercase tracking-widest font-semibold hidden sm:inline">
+							<span class="text-[10px] text-white/30 uppercase tracking-widest font-bold hidden sm:inline">
 								{companyName === personalKey ? 'Independent Creations' : 'Company Collaborations'}
 							</span>
 						</div>
@@ -107,7 +107,7 @@ const activeGroups = Object.keys(designsByCompany)
 			{designs.length === 0 && !errorMsg && (
 				<div class="py-24 text-center text-white/40 bg-surface-container rounded-3xl border border-white/10 flex flex-col items-center justify-center animate-fade-in">
 					<div class="p-4 rounded-full bg-primary/10 text-primary mb-4">
-						<Palette class="w-12 h-12" />
+						<Icon name="design" size={48} />
 					</div>
 					<p class="font-bold text-white text-lg">No designs uploaded yet</p>
 					<p class="text-xs mt-1 text-white/60 max-w-sm">Please check back later or visit the admin panel to add mockups.</p>

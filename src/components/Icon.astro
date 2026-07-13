@@ -1,0 +1,157 @@
+---
+interface Props {
+    name: string;
+    size?: number;
+    filled?: boolean;
+    class?: string;
+    color?: string;
+    style?: string;
+}
+
+const { name, size = 24, filled = false, class: className = '', color, style } = Astro.props;
+const iconName = filled ? `${name}_filled` : name;
+
+// Import all icons as raw strings
+import alert from '../icons/alert.svg?raw';
+import automation from '../icons/automation.svg?raw';
+import automationFilled from '../icons/automation_filled.svg?raw';
+import brush from '../icons/brush.svg?raw';
+import business from '../icons/business.svg?raw';
+import businessFilled from '../icons/business_filled.svg?raw';
+import calendar from '../icons/calendar.svg?raw';
+import calendarFilled from '../icons/calendar_filled.svg?raw';
+import certifications from '../icons/certifications.svg?raw';
+import certificationsFilled from '../icons/certifications_filled.svg?raw';
+import check from '../icons/check.svg?raw';
+import checkSelected from '../icons/check_selected.svg?raw';
+import circleUnselected from '../icons/circle_unselected.svg?raw';
+import close from '../icons/close.svg?raw';
+import design from '../icons/design.svg?raw';
+import designFilled from '../icons/design_filled.svg?raw';
+import document from '../icons/document.svg?raw';
+import download from '../icons/download.svg?raw';
+import experience from '../icons/experience.svg?raw';
+import experienceFilled from '../icons/experience_filled.svg?raw';
+import facebook from '../icons/facebook.svg?raw';
+import facebookFilled from '../icons/facebook_filled.svg?raw';
+import filter from '../icons/filter.svg?raw';
+import github from '../icons/github.svg?raw';
+import githubFilled from '../icons/github_filled.svg?raw';
+import google from '../icons/google.svg?raw';
+import googleFilled from '../icons/google_filled.svg?raw';
+import graph from '../icons/graph.svg?raw';
+import graphFilled from '../icons/graph_filled.svg?raw';
+import home from '../icons/home.svg?raw';
+import homeFilled from '../icons/home_filled.svg?raw';
+import image from '../icons/image.svg?raw';
+import linkedin from '../icons/linkedin.svg?raw';
+import linkedinFilled from '../icons/linkedin_filled.svg?raw';
+import lock from '../icons/lock.svg?raw';
+import logout from '../icons/logout.svg?raw';
+import mail from '../icons/mail.svg?raw';
+import mailFilled from '../icons/mail_filled.svg?raw';
+import openInNew from '../icons/open_in_new.svg?raw';
+import phone from '../icons/phone.svg?raw';
+import phoneFilled from '../icons/phone_filled.svg?raw';
+import plus from '../icons/plus.svg?raw';
+import projects from '../icons/projects.svg?raw';
+import projectsFilled from '../icons/projects_filled.svg?raw';
+import save from '../icons/save.svg?raw';
+import search from '../icons/search.svg?raw';
+import settings from '../icons/settings.svg?raw';
+import settingsFilled from '../icons/settings_filled.svg?raw';
+import tag from '../icons/tag.svg?raw';
+import telegram from '../icons/telegram.svg?raw';
+import telegramFilled from '../icons/telegram_filled.svg?raw';
+import trash from '../icons/trash.svg?raw';
+import upload from '../icons/upload.svg?raw';
+import windows from '../icons/windows.svg?raw';
+import windowsFilled from '../icons/windows_filled.svg?raw';
+
+const icons = {
+    alert,
+    automation,
+    automation_filled: automationFilled,
+    brush,
+    business,
+    business_filled: businessFilled,
+    calendar,
+    calendar_filled: calendarFilled,
+    certifications,
+    certifications_filled: certificationsFilled,
+    check,
+    check_selected: checkSelected,
+    circle_unselected: circleUnselected,
+    close,
+    design,
+    design_filled: designFilled,
+    document,
+    download,
+    experience,
+    experience_filled: experienceFilled,
+    facebook,
+    facebook_filled: facebookFilled,
+    filter,
+    github,
+    github_filled: githubFilled,
+    google,
+    google_filled: googleFilled,
+    graph,
+    graph_filled: graphFilled,
+    home,
+    home_filled: homeFilled,
+    image,
+    linkedin,
+    linkedin_filled: linkedinFilled,
+    lock,
+    logout,
+    mail,
+    mail_filled: mailFilled,
+    open_in_new: openInNew,
+    phone,
+    phone_filled: phoneFilled,
+    plus,
+    projects,
+    projects_filled: projectsFilled,
+    save,
+    search,
+    settings,
+    settings_filled: settingsFilled,
+    tag,
+    telegram,
+    telegram_filled: telegramFilled,
+    trash,
+    upload,
+    windows,
+    windows_filled: windowsFilled,
+};
+
+const svgContent = icons[iconName as keyof typeof icons];
+
+// Process SVG content to set color and ensure proper sizing
+let processedSvg = svgContent || '';
+if (processedSvg) {
+    // Replace any existing fill attributes with our color or currentColor
+    const fillColor = color || 'currentColor';
+    // Remove any existing fill="..." attributes and add ours to the svg tag
+    processedSvg = processedSvg
+        .replace(/fill="[^"]*"/g, '') // Remove all fill attributes
+        .replace(/<svg([^>]*)>/, `<svg$1 fill="${fillColor}">`); // Add fill to svg tag
+}
+---
+
+{processedSvg ? (
+    <span 
+        class={className} 
+        style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: `${size}px`,
+            height: `${size}px`,
+            color: color || 'inherit',
+            ...(style ? { cssText: style } : {})
+        }} 
+        set:html={processedSvg} 
+    />
+) : null}

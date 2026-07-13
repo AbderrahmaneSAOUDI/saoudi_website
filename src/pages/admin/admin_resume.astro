@@ -5,7 +5,7 @@ import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
 import AdminLayout from "../../components/admin/AdminLayout.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
 import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
-import { FileText, Upload, Image, Download } from '@lucide/astro';
+import Icon from "../../components/Icon.astro";
 
 // Extra safety: double-check that the middleware successfully set Astro.locals.adminEmail
 const adminEmail = Astro.locals.adminEmail;
@@ -45,7 +45,7 @@ try {
 				<div class="p-6 rounded-3xl border border-[#2B2930]" style="background: #1D1B20">
 					<div class="flex items-center gap-3 mb-5">
 						<div class="p-2.5 rounded-xl bg-[#0F9D58]/10 text-[#0F9D58]">
-							<Upload class="w-5 h-5" />
+							<Icon name="upload" size={20} class="w-5 h-5" />
 						</div>
 						<div>
 							<h3 class="text-base font-bold text-white">Upload New PDF</h3>
@@ -66,7 +66,7 @@ try {
 						/>
 						<div class="flex flex-col items-center gap-3">
 							<div class="p-3 rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
-								<FileText class="w-6 h-6" />
+								<Icon name="document" size={24} class="w-6 h-6" />
 							</div>
 							<div>
 								<p class="text-sm font-medium text-white">
@@ -84,7 +84,7 @@ try {
 				<div id="settings-card" class="hidden p-6 rounded-3xl border border-[#2B2930]" style="background: #1D1B20">
 					<div class="flex items-center gap-3 mb-5">
 						<div class="p-2.5 rounded-xl bg-[#F9AB00]/10 text-[#F9AB00]">
-							<Image class="w-5 h-5" />
+							<Icon name="image" size={20} class="w-5 h-5" />
 						</div>
 						<div>
 							<h3 class="text-base font-bold text-white">Image Options</h3>
@@ -128,7 +128,7 @@ try {
 					disabled
 					class="w-full py-3.5 px-6 rounded-xl font-semibold text-white transition-all duration-300 bg-primary hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-primary flex items-center justify-center gap-2"
 				>
-					<Upload class="w-4 h-4" />
+					<Icon name="upload" size={16} class="w-4 h-4" />
 					<span id="upload-btn-text">Save</span>
 				</button>
 
@@ -145,7 +145,7 @@ try {
 					<div class="flex items-center justify-between mb-5 shrink-0">
 						<div class="flex items-center gap-3">
 							<div class="p-2.5 rounded-xl bg-primary/10 text-primary">
-								<FileText class="w-5 h-5" />
+								<Icon name="document" size={20} class="w-5 h-5" />
 							</div>
 							<div>
 								<div class="flex items-center gap-2">
@@ -160,7 +160,7 @@ try {
 							download
 							class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border border-primary/40 text-primary hover:bg-primary hover:text-white"
 						>
-							<Download class="w-4 h-4" />
+							<Icon name="download" size={16} class="w-4 h-4" />
 							<span class="hidden sm:inline">Download PDF</span>
 						</a>
 					</div>

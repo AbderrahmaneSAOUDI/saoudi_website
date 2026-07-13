@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Card from '../components/Card.astro';
 import CertificateLightbox from '../components/CertificateLightbox.astro';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
-import { Award } from '@lucide/astro';
+import Icon from '../components/Icon.astro';
 
 let certificates: any[] = [];
 let errorMsg = '';
@@ -83,7 +83,7 @@ const activeYears = Object.keys(certificatesByYear).sort((a, b) => b.localeCompa
 			{certificates.length === 0 && !errorMsg && (
 				<div class="py-24 text-center text-white/40 bg-surface-container rounded-3xl border border-white/10 flex flex-col items-center justify-center animate-fade-in">
 					<div class="p-4 rounded-full bg-primary/10 text-primary mb-4">
-						<Award class="w-12 h-12" />
+						<Icon name="certifications" size={48} />
 					</div>
 					<p class="font-bold text-white text-lg">No certifications found</p>
 					<p class="text-xs mt-1 text-white/60 max-w-sm">Please check back later or visit the admin panel to add credentials.</p>
