@@ -53,18 +53,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
  * These headers mitigate clickjacking, MIME-sniffing, and unauthorized feature access.
  */
 function addSecurityHeaders(response: Response): Response {
-  const newResponse = new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: response.headers
-  });
-  // Prevent embedding in iframes (clickjacking protection)
-  newResponse.headers.set('X-Frame-Options', 'DENY');
-  // Prevent MIME type sniffing
-  newResponse.headers.set('X-Content-Type-Options', 'nosniff');
-  // Control referrer information leaked to external sites
-  newResponse.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  // Restrict browser feature access
-  newResponse.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  return newResponse;
+  try {
+    // Attempt to mutate headers directly. This works for standard dynamic responses.
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  } catch (error) {
+    // Fallback if headers are read-only (e.g. on static files or redirects in some environments)
+    // to prevent server crashes (500 errors).
+    console.warn('Could not set security headers on read-only response:', error);
+  }
+  return response;
 }
