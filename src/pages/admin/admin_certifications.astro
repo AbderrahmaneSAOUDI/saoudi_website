@@ -427,6 +427,26 @@ try {
 		renderCertificates();
 		initFromUrl();
 
+		function showEmptyState(title: string, subtitle: string) {
+			const existingEmptyState = certificatesGrid.querySelector('.empty-state');
+			if (existingEmptyState) {
+				existingEmptyState.remove();
+			}
+
+			const emptyState = document.createElement('div');
+			emptyState.className = 'empty-state col-span-full py-16 text-center text-[#E6E1E5]/50 bg-[#1D1B20] rounded-3xl border border-[#2B2930]';
+			emptyState.innerHTML = `
+				<img src="/no_data.webp" alt="No data" class="w-28 h-28 mx-auto mb-4 object-contain opacity-90" />
+				<p class="font-semibold text-white">${title}</p>
+				<p class="text-xs mt-1">${subtitle}</p>
+			`;
+			certificatesGrid.appendChild(emptyState);
+		}
+
+		function hideEmptyState() {
+			certificatesGrid.querySelector('.empty-state')?.remove();
+		}
+
 		function renderCertificates() {
 			const newCards = allCertificates.slice(displayedCount, displayedCount + ITEMS_PER_PAGE);
 			
@@ -441,6 +461,12 @@ try {
 				loadMoreContainer.classList.add('hidden');
 			} else {
 				loadMoreContainer.classList.remove('hidden');
+			}
+
+			if (displayedCount === 0 && allCertificates.length === 0) {
+				showEmptyState('No certificates found', 'Create a new credential to get started.');
+			} else {
+				hideEmptyState();
 			}
 			
 			// Re-attach event listeners to new cards
@@ -486,15 +512,15 @@ try {
 								<div 
 									class="relative aspect-[16/10] rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center cursor-pointer block bg-[#1D1B20]"
 								>
-									<div class="absolute inset-0 skeleton" id="skeleton-${cert.id}"></div>
+									<div class="absolute inset-0 skeleton"></div>
 									<img
 										src="${cert.imageUrl}"
 										alt="${cert.title}"
-										class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10"
+										class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10 opacity-0 transition-opacity duration-300"
 										loading="lazy"
 										decoding="async"
-										onload="document.getElementById('skeleton-${cert.id}').style.display = 'none'"
-										onerror="document.getElementById('skeleton-${cert.id}').style.display = 'none'"
+										onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
+										onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
 									/>
 								</div>
 								${cert.type ? `
@@ -505,7 +531,7 @@ try {
 							</div>
 						` : `
 							<div class="p-3 w-fit rounded-2xl bg-secondary/10 text-secondary border border-secondary/20 group-hover:scale-110 transition-transform duration-300">
-								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+								<Icon name="image" size={24} class="w-6 h-6" />
 							</div>
 						`}
 
@@ -519,7 +545,7 @@ try {
 					<div class="mt-4 pt-3 flex justify-between items-center text-xs border-t border-white/5 text-white/40 font-medium">
 						<div class="flex items-center gap-2">
 							<span class="flex items-center gap-1">
-								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+								<Icon name="calendar" size={14} class="w-3.5 h-3.5" />
 								${formattedDate}
 							</span>
 							${!cert.imageUrl && cert.type ? `
@@ -535,7 +561,7 @@ try {
 									class="transition-all duration-300 cursor-pointer text-white/40 hover:text-primary stop-propagation"
 									title="Verify Credential"
 								>
-									<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+									<Icon name="open_in_new" size={14} class="w-3.5 h-3.5" />
 								</a>
 							` : ''}
 						</div>
@@ -822,6 +848,13 @@ try {
 					card.classList.add('hidden');
 				}
 			});
+
+			const visibleCards = Array.from(certificateCards).filter(card => !card.classList.contains('hidden'));
+			if (visibleCards.length === 0) {
+				showEmptyState('No certificates match your filters', 'Try clearing the filters or searching for something else.');
+			} else {
+				hideEmptyState();
+			}
 		}
 
 		// Filter Toggle Panel
