@@ -31,6 +31,9 @@
   --color-surface: #121212;
   --color-surface-container: #1E1E1E;
   --color-surface-container-high: #2D2D2D;
+
+  /* Typography */
+  --font-sans: 'Outfit', sans-serif;
 }
 
 @import "./background_animation.css";
@@ -99,6 +102,12 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Contact Obfuscation */
+  .obfuscated {
+    unicode-bidi: bidi-override;
+    direction: rtl;
   }
 }
 

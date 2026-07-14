@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
 import { deleteFile } from '../../lib/server/storage';
+import { clearCache } from '../../lib/server/cache';
 
 export const POST: APIRoute = async ({ locals, request }) => {
 	// Auth check: verify session token
@@ -48,6 +49,9 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			// 2. Delete Firestore document
 			await docRef.delete();
 
+			// Invalidate cache
+			clearCache('designs_list');
+
 			return new Response(JSON.stringify({ success: true }), {
 				status: 200,
 				headers: { 'Content-Type': 'application/json' },
@@ -66,8 +70,33 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				});
 			}
 
-			const companiesList = JSON.parse(companiesListJson) as string[];
-			const renames = renamesJson ? JSON.parse(renamesJson) as Record<string, string> : {};
+			let companiesList: string[];
+			let renames: Record<string, string> = {};
+
+			// SECURITY: Validate parsed JSON is actually the expected type.
+			// Without this, a malicious admin could inject non-string values.
+			try {
+				const parsed = JSON.parse(companiesListJson);
+				if (!Array.isArray(parsed) || !parsed.every((v: unknown) => typeof v === 'string')) {
+					return new Response(JSON.stringify({ error: 'Companies must be an array of strings.' }), {
+						status: 400,
+						headers: { 'Content-Type': 'application/json' },
+					});
+				}
+				companiesList = parsed;
+
+				if (renamesJson) {
+					const parsedRenames = JSON.parse(renamesJson);
+					if (typeof parsedRenames === 'object' && parsedRenames !== null) {
+						renames = parsedRenames;
+					}
+				}
+			} catch {
+				return new Response(JSON.stringify({ error: 'Invalid JSON in companies or renames.' }), {
+					status: 400,
+					headers: { 'Content-Type': 'application/json' },
+				});
+			}
 
 			// 1. Update the configuration document
 			const configRef = db.collection('configuration').doc('designs_companies');
@@ -77,23 +106,30 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const renameKeys = Object.keys(renames);
 			if (renameKeys.length > 0) {
 				const batch = db.batch();
-				let hasUpdates = false;
+				let updateCount = 0;
 
 				for (const oldComp of renameKeys) {
 					const newComp = renames[oldComp];
+					if (typeof newComp !== 'string') continue;
 					if (oldComp.trim() !== newComp.trim()) {
 						const snapshot = await db.collection('designs').where('company', '==', oldComp.trim()).get();
-						snapshot.docs.forEach(doc => {
+						for (const doc of snapshot.docs) {
+							// SAFETY: Firestore batches have a 500-operation limit.
+							if (updateCount >= 499) break;
 							batch.update(doc.ref, { company: newComp.trim() });
-							hasUpdates = true;
-						});
+							updateCount++;
+						}
 					}
 				}
 
-				if (hasUpdates) {
+				if (updateCount > 0) {
 					await batch.commit();
 				}
 			}
+
+			// Invalidate cache
+			clearCache('designs_companies');
+			clearCache('designs_list');
 
 			return new Response(JSON.stringify({ success: true }), {
 				status: 200,
@@ -172,6 +208,9 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			// Save/Merge in Firestore
 			await docRef.set(designPayload, { merge: true });
+
+			// Invalidate cache
+			clearCache('designs_list');
 
 			return new Response(JSON.stringify({ success: true, design: designPayload }), {
 				status: 200,

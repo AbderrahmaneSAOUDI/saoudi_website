@@ -1,32 +1,57 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Card from '../components/Card.astro';
-import DesignLightbox from '../components/DesignLightbox.astro';
+import GlobalLightbox from '../components/GlobalLightbox.astro';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
+import { getCached, setCached } from '../lib/server/cache';
 import Icon from '../components/Icon.astro';
+
+// Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
+Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=600');
 
 let designs: any[] = [];
 let companies: string[] = ['Google', 'GDG', 'Freelance', 'Personal'];
 let errorMsg = '';
 
-try {
-	const db = getFirebaseAdminDb();
+const cacheKeyDesigns = 'designs_list';
+const cacheKeyCompanies = 'designs_companies';
 
-	// Fetch companies from the database configuration
-	const companiesDoc = await db.collection("configuration").doc("designs_companies").get();
-	if (companiesDoc.exists) {
-		companies = companiesDoc.data()?.companies || companies;
+const cachedDesigns = getCached<any[]>(cacheKeyDesigns);
+const cachedCompanies = getCached<string[]>(cacheKeyCompanies);
+
+if (cachedDesigns && cachedCompanies) {
+	designs = cachedDesigns;
+	companies = cachedCompanies;
+} else {
+	try {
+		const db = getFirebaseAdminDb();
+
+		// PERF: Run both queries in parallel instead of sequentially.
+		// Also use select() to fetch only the fields needed for rendering,
+		// reducing Firestore read payload and improving TTFB.
+		const [companiesDoc, snapshot] = await Promise.all([
+			db.collection("configuration").doc("designs_companies").get(),
+			db.collection("designs")
+				.select('title', 'imageUrl', 'company', 'date', 'tags')
+				.orderBy("date", "desc")
+				.get(),
+		]);
+
+		if (companiesDoc.exists) {
+			companies = companiesDoc.data()?.companies || companies;
+		}
+
+		designs = snapshot.docs.map(doc => ({
+			id: doc.id,
+			...doc.data()
+		}));
+
+		setCached(cacheKeyDesigns, designs);
+		setCached(cacheKeyCompanies, companies);
+	} catch (error: any) {
+		console.warn("Failed to fetch designs from Firestore for public page:", error);
+		errorMsg = "Degraded mode: Designs are currently offline or unavailable.";
 	}
-
-	// Fetch all designs sorted by date descending
-	const snapshot = await db.collection("designs").orderBy("date", "desc").get();
-	designs = snapshot.docs.map(doc => ({
-		id: doc.id,
-		...doc.data()
-	}));
-} catch (error: any) {
-	console.warn("Failed to fetch designs from Firestore for public page:", error);
-	errorMsg = "Degraded mode: Designs are currently offline or unavailable.";
 }
 
 // Group designs by company
@@ -77,7 +102,7 @@ const activeGroups = Object.keys(designsByCompany)
 			{activeGroups.map((companyName, groupIndex) => {
 				const groupDesigns = designsByCompany[companyName];
 				return (
-					<section class="space-y-6 animate-slide-up" style={`animation-delay: ${100 + groupIndex * 100}ms`}>
+					<section class="space-y-6 animate-slide-up" style={`animation-delay: ${100 + groupIndex * 100}ms; content-visibility: auto; contain-intrinsic-size: auto 500px;`}>
 						<!-- Section Title -->
 						<div class="flex items-center justify-between border-b border-white/5 pb-3">
 							<div class="flex items-center gap-3">
@@ -116,10 +141,8 @@ const activeGroups = Object.keys(designsByCompany)
 		</div>
 	</div>
 
-	<!-- Render Lightboxes outside transform scopes -->
-	{designs.map(design => (
-		<DesignLightbox design={design} />
-	))}
+	<!-- Render Lightbox outside transform scopes -->
+	<GlobalLightbox />
 </BaseLayout>
 
 <style>

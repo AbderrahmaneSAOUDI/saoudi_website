@@ -16,9 +16,14 @@
   body::after {
     content: '';
     position: fixed;
-    inset: 0;
+    inset: -50px;
     pointer-events: none;
     z-index: -1;
+    /* PERF: Promote pseudo-elements to their own compositor layer.
+     * Without this, every animation frame forces a full-page repaint
+     * because mix-blend-mode invalidates the layer's compositing context.
+     * will-change: transform creates a new stacking context on the GPU. */
+    will-change: transform;
   }
 
   body::before {
@@ -32,15 +37,14 @@
     background-repeat: repeat, repeat, repeat, repeat;
     animation: bgPoints 48s linear infinite;
     opacity: 0.3;
-    mix-blend-mode: screen;
   }
 
   body::after {
     background-image:
-      radial-gradient(circle, rgba(219, 68, 55, 0.22) 1px, transparent 1px),
-      radial-gradient(circle, rgba(66, 133, 244, 0.18) 1px, transparent 1px),
-      radial-gradient(circle, rgba(255, 255, 255, 0.25) 0.75px, transparent 0.75px),
-      radial-gradient(circle, rgba(255, 255, 255, 0.18) 0.65px, transparent 0.65px);
+      radial-gradient(circle, rgba(219, 68, 55, 0.22) 1px, transparent 2px),
+      radial-gradient(circle, rgba(66, 133, 244, 0.18) 1px, transparent 2px),
+      radial-gradient(circle, rgba(255, 255, 255, 0.25) 0.75px, transparent 1.2px),
+      radial-gradient(circle, rgba(255, 255, 255, 0.18) 0.65px, transparent 1px);
     background-repeat: repeat, repeat, repeat, repeat;
     background-size: 120px 120px, 100px 100px, 24px 24px, 24px 24px;
     background-position: 8% 90%, 85% 60%, 0 0, 14px 14px;
@@ -48,27 +52,36 @@
     opacity: 1;
   }
 
+  /* PERF: Pause background animations on devices that prefer reduced motion.
+   * This eliminates continuous GPU compositing on low-power devices. */
+  @media (prefers-reduced-motion: reduce) {
+    body::before,
+    body::after {
+      animation: none;
+    }
+  }
+
   @keyframes bgPoints {
     0% {
-      background-position: 0 0, 35% 15%, 20% 70%, 80% 85%;
+      transform: translate3d(0, 0, 0);
     }
     50% {
-      background-position: -60px 50px, 45% 25%, 25% 80%, 70% 90%;
+      transform: translate3d(-60px, 50px, 0);
     }
     100% {
-      background-position: 0 0, 35% 15%, 20% 70%, 80% 85%;
+      transform: translate3d(0, 0, 0);
     }
   }
 
   @keyframes bgStars {
     0% {
-      background-position: 0 0, 0 0, 0 0, 14px 14px;
+      transform: translate3d(0, 0, 0);
     }
     50% {
-      background-position: -60px 60px, 60px -60px, 90px 90px, 14px 14px;
+      transform: translate3d(100px, -100px, 0);
     }
     100% {
-      background-position: 0 0, 0 0, 0 0, 14px 14px;
+      transform: translate3d(0, 0, 0);
     }
   }
 }

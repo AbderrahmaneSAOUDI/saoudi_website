@@ -1,20 +1,35 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
+import { getCached, setCached } from '../lib/server/cache';
+
+// Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
+Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=600');
 
 let resumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
-let resumePreviewUrl = '/resume.jpg';
+let resumePreviewUrl = '/resume.webp';
 
-try {
-	const db = getFirebaseAdminDb();
-	const configDoc = await db.collection('configuration').doc('static_data').get();
-	if (configDoc.exists) {
-		const data = configDoc.data();
-		if (data?.resumeUrl) resumeUrl = data.resumeUrl;
-		if (data?.previewUrl) resumePreviewUrl = data.previewUrl;
+const cacheKeyResume = 'resume_config';
+const cachedResume = getCached<{ resumeUrl: string; resumePreviewUrl: string }>(cacheKeyResume);
+
+if (cachedResume) {
+	resumeUrl = cachedResume.resumeUrl;
+	resumePreviewUrl = cachedResume.resumePreviewUrl;
+} else {
+	try {
+		const db = getFirebaseAdminDb();
+		const configDoc = await db.collection('configuration').doc('static_data').get();
+		if (configDoc.exists) {
+			const data = configDoc.data();
+			if (data?.resumeUrl) resumeUrl = data.resumeUrl;
+			if (data?.previewUrl) resumePreviewUrl = data.previewUrl;
+			
+			// Cache for 10 minutes
+			setCached(cacheKeyResume, { resumeUrl, resumePreviewUrl }, 600000);
+		}
+	} catch (error) {
+		console.warn('Failed to fetch resume config in public page:', error);
 	}
-} catch (error) {
-	console.warn('Failed to fetch resume config in public page:', error);
 }
 ---
 
@@ -23,7 +38,14 @@ try {
 
 		<div class="mt-8 space-y-6">
 			<div class="border border-white/10 rounded-3xl overflow-hidden p-2 bg-surface-container">
-				<img src={resumePreviewUrl} alt="Resume preview" class="w-full rounded-2xl object-cover" />
+				<img
+					src={resumePreviewUrl}
+					alt="Resume preview"
+					width="1530"
+					height="1980"
+					fetchpriority="high"
+					class="w-full rounded-2xl object-cover"
+				/>
 			</div>
 
 			<div class="flex justify-center">
