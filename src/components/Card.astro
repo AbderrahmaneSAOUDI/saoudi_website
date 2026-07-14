@@ -79,7 +79,11 @@ const typeColors = {
 	>
 		<div>
 			<a
-				href={`#lightbox-${design.id}`}
+				href={isAdmin ? undefined : design.imageUrl}
+				target={isAdmin ? undefined : "_blank"}
+				data-lightbox-src={isAdmin ? undefined : design.imageUrl}
+				data-lightbox-title={isAdmin ? undefined : design.title}
+				data-lightbox-subtitle={isAdmin ? undefined : design.company}
 				class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-4 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block"
 			>
 				<div class="absolute inset-0 skeleton"></div>
@@ -137,7 +141,11 @@ const typeColors = {
 			{certificate.imageUrl ? (
 				<div class="relative">
 					<a
-						href={isAdmin ? undefined : `#lightbox-${certificate.id}`}
+						href={isAdmin ? undefined : certificate.imageUrl}
+						target={isAdmin ? undefined : "_blank"}
+						data-lightbox-src={isAdmin ? undefined : certificate.imageUrl}
+						data-lightbox-title={isAdmin ? undefined : certificate.title}
+						data-lightbox-subtitle={isAdmin ? undefined : certificate.issuer}
 						class={`relative aspect-[16/10] rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center cursor-pointer ${!isAdmin ? 'image-zoom-trigger' : ''} block bg-[#1D1B20]`}
 					>
 						<div class="absolute inset-0 skeleton"></div>
@@ -207,7 +215,7 @@ const typeColors = {
 <script>
 	// Cleanup any skeletons for images that loaded instantly from cache
 	const removeSkeletons = () => {
-		document.querySelectorAll('img[loading="lazy"]').forEach((img) => {
+		document.querySelectorAll('.skeleton + img').forEach((img) => {
 			if (img instanceof HTMLImageElement && img.complete) {
 				img.classList.remove('opacity-0');
 				const skeleton = img.previousElementSibling;

@@ -6,6 +6,9 @@
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
+
+// Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
+Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=600');
 ---
 
 <BaseLayout title="Home">
@@ -15,7 +18,7 @@ import Icon from '../components/Icon.astro';
 			<div class="relative w-full">
 				<div class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-secondary/5 blur-3xl"></div>
 				
-				<div class="relative bg-surface/30 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-12 lg:p-16 shadow-2xl">
+				<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 lg:p-16 shadow-2xl">
 					<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
 						<div class="flex justify-center lg:justify-start">
 							<div class="relative">
@@ -28,6 +31,9 @@ import Icon from '../components/Icon.astro';
 									<img 
 										src="/profile.webp" 
 										alt="Abderrahmane SAOUDI Profile Picture"
+										width="288"
+										height="288"
+										fetchpriority="high"
 										class="w-full h-full object-cover border-4 border-primary rounded-full"
 									/>
 								</div>
@@ -82,7 +88,7 @@ import Icon from '../components/Icon.astro';
 				<div class="relative h-full">
 					<div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 blur-3xl"></div>
 					<div class="relative bg-surface-container border border-white/10 rounded-3xl overflow-hidden shadow-2xl hover:shadow-primary/10 transition-all duration-300 h-full flex flex-col">
-						<img src="/cover.webp" alt="Profile" class="w-full h-48 object-cover" />
+						<img src="/cover.webp" alt="Profile" class="w-full h-48 object-cover" fetchpriority="high" width="1280" height="192" />
 						<div class="p-8 flex-1">
 							<h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
 								About Me
@@ -332,8 +338,16 @@ import Icon from '../components/Icon.astro';
 							</div>
 							<div>
 								<h3 class="text-white font-semibold">Phone</h3>
-								<p class="text-white/70">+213 561 37 77 61</p>
-								<p class="text-white/70">+213 676 89 56 13</p>
+								<p class="text-white/70">
+									<a href="#" onclick="this.href='tel:'+atob('KzIxMzU2MTM3Nzc2MQ==')" class="hover:underline">
+										<span class="obfuscated">16 77 73 165 312+</span>
+									</a>
+								</p>
+								<p class="text-white/70">
+									<a href="#" onclick="this.href='tel:'+atob('KzIxMzY3Njg5NTYxMw==')" class="hover:underline">
+										<span class="obfuscated">31 65 98 676 312+</span>
+									</a>
+								</p>
 							</div>
 						</div>
 						<div class="bg-surface-container-high border border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-secondary/30 transition-all duration-300 hover:-translate-y-1">
@@ -342,7 +356,11 @@ import Icon from '../components/Icon.astro';
 							</div>
 							<div>
 								<h3 class="text-white font-semibold">Email</h3>
-								<p class="text-white/70">abderrahmane.saoudi.26@gmail.com</p>
+								<p class="text-white/70">
+									<a href="#" onclick="this.href='mailto:'+atob('YWJkZXJyYWhtYW5lLnNhb3VkaS4yNkBnbWFpbC5jb20=')" class="hover:underline">
+										<span class="obfuscated">moc.liamg@62.iduoas.enamharredba</span>
+									</a>
+								</p>
 							</div>
 						</div>
 					</div>
@@ -356,16 +374,17 @@ import Icon from '../components/Icon.astro';
 	@keyframes fade-in {
 		from {
 			opacity: 0;
-			transform: translateY(20px);
+			transform: translate3d(0, 20px, 0);
 		}
 		to {
 			opacity: 1;
-			transform: translateY(0);
+			transform: translate3d(0, 0, 0);
 		}
 	}
 
 	.animate-fade-in {
 		animation: fade-in 0.8s ease-out forwards;
+		will-change: transform, opacity;
 	}
 
 	@keyframes timeline-progress {
@@ -383,20 +402,21 @@ import Icon from '../components/Icon.astro';
 
 	@keyframes dot-pulse {
 		0%, 100% {
-			transform: scale(1);
+			transform: scale3d(1, 1, 1);
 		}
 		50% {
-			transform: scale(1.15);
+			transform: scale3d(1.15, 1.15, 1);
 		}
 	}
 
 	.animate-dot-pulse {
 		animation: dot-pulse 2s infinite ease-in-out;
+		will-change: transform;
 	}
 
 	@keyframes electric-flow {
 		0% {
-			transform: translate(-50%, -14%);
+			transform: translate3d(-50%, -14%, 0);
 			opacity: 0;
 		}
 		12% {
@@ -406,7 +426,7 @@ import Icon from '../components/Icon.astro';
 			opacity: 1;
 		}
 		100% {
-			transform: translate(-50%, 112%);
+			transform: translate3d(-50%, 112%, 0);
 			opacity: 0;
 		}
 	}
@@ -423,7 +443,7 @@ import Icon from '../components/Icon.astro';
 
 	.electric-dot {
 		top: 0;
-		transform: translate(-50%, -14%);
+		transform: translate3d(-50%, -14%, 0);
 		animation: electric-flow 2.2s linear infinite, electric-flicker 0.9s ease-in-out infinite;
 		will-change: transform, opacity, filter;
 	}
@@ -431,30 +451,37 @@ import Icon from '../components/Icon.astro';
 	@keyframes glow-pulse {
 		0%, 100% {
 			opacity: 0.4;
-			transform: translateX(-50%) scaleX(0.9);
+			transform: translate3d(-50%, 0, 0) scale3d(0.9, 1, 1);
 		}
 		50% {
 			opacity: 0.8;
-			transform: translateX(-50%) scaleX(1.1);
+			transform: translate3d(-50%, 0, 0) scale3d(1.1, 1, 1);
 		}
 	}
 
 	.animate-glow-pulse {
 		animation: glow-pulse 3s ease-in-out infinite;
+		will-change: transform, opacity;
 	}
 
 	@keyframes orb-pulse {
 		0%, 100% {
 			opacity: 0.3;
-			transform: scale(1);
+			transform: scale3d(1, 1, 1);
 		}
 		50% {
 			opacity: 0.6;
-			transform: scale(1.05);
+			transform: scale3d(1.05, 1.05, 1);
 		}
 	}
 
 	.animate-orb-pulse {
 		animation: orb-pulse 2.5s ease-in-out infinite;
+		will-change: transform, opacity;
+	}
+
+	.blur-3xl {
+		will-change: transform;
+		transform: translate3d(0, 0, 0);
 	}
 </style>

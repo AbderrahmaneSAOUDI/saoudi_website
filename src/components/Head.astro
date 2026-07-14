@@ -3,10 +3,17 @@ import '../styles/global.css';
 
 interface Props {
 	title?: string;
+	description?: string;
 }
 
-const { title = 'saoudi.online' } = Astro.props;
+const { title = 'saoudi.online', description = 'Abderrahmane SAOUDI — Software Engineer, Community Leader, and Graphic Designer from Ghardaia, Algeria.' } = Astro.props;
 const pageTitle = title === 'saoudi.online' ? title : `${title} | saoudi.online`;
+
+/**
+ * Canonical URL for SEO (prevents duplicate content issues).
+ * Uses Astro.url which is already the full resolved URL.
+ */
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
 ---
 
 <head>
@@ -15,5 +22,30 @@ const pageTitle = title === 'saoudi.online' ? title : `${title} | saoudi.online`
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
+
+    {/* SEO: Meta description for search engine results */}
+    <meta name="description" content={description} />
+
+    {/* SEO: Canonical URL prevents duplicate content */}
+    <link rel="canonical" href={canonicalUrl} />
+
+    {/* OpenGraph tags for social sharing */}
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content="/profile.webp" />
+
+    {/* SECURITY: X-Content-Type-Options prevents MIME sniffing */}
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
+    {/* PERFORMANCE: Preconnect to Google Fonts */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    {/* PERFORMANCE: Preconnect to Firebase Storage for faster image loads */}
+    <link rel="preconnect" href="https://storage.googleapis.com" crossorigin />
+
     <title>{pageTitle}</title>
 </head>

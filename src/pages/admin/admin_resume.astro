@@ -1,6 +1,4 @@
 ---
-import '../../styles/global.css';
-
 import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
 import AdminLayout from "../../components/admin/AdminLayout.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
@@ -13,7 +11,7 @@ if (!adminEmail) return Astro.redirect("/admin/admin_login");
 
 // Fetch current resume data from Firestore configuration
 let currentResumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
-let currentPreviewUrl = '/resume.jpg';
+let currentPreviewUrl = '/resume.webp';
 
 try {
 	const db = getFirebaseAdminDb();

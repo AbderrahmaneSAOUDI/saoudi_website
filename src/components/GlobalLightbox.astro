@@ -1,0 +1,113 @@
+---
+/**
+ * GlobalLightbox Component
+ * 
+ * Renders a single, global full-screen image overlay modal.
+ * Uses a hybrid approach:
+ * 1. A tiny inline JS snippet to populate the image and text when a thumbnail is clicked.
+ * 2. Pure CSS-only `:target` pseudo-selector to toggle visibility, maintaining zero bundler JS.
+ * 3. Graceful degradation: falls back to opening the image file in a new tab if JS is disabled.
+ */
+interface Props {}
+---
+
+<div id="global-lightbox" class="lightbox-overlay fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
+	<!-- Clicking the overlay background clears the hash to close the lightbox -->
+	<a href="#" class="absolute inset-0 cursor-zoom-out" aria-label="Close Lightbox"></a>
+	
+	<div class="relative max-w-5xl max-h-[85vh] z-10 flex flex-col items-center">
+		<img
+			id="lightbox-img"
+			src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
+			alt=""
+			class="max-w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl border border-white/10"
+			loading="lazy"
+			decoding="async"
+		/>
+		<div class="mt-4 text-center">
+			<p id="lightbox-title" class="text-white font-bold text-lg"></p>
+			<p id="lightbox-subtitle" class="text-primary text-xs font-semibold uppercase tracking-wider mt-1"></p>
+		</div>
+	</div>
+</div>
+
+<script is:inline>
+	(function() {
+		const setupLightbox = () => {
+			document.addEventListener('click', (e) => {
+				const trigger = e.target.closest('[data-lightbox-src]');
+				if (!trigger) return;
+				
+				e.preventDefault();
+				
+				const src = trigger.getAttribute('data-lightbox-src');
+				const title = trigger.getAttribute('data-lightbox-title') || '';
+				const subtitle = trigger.getAttribute('data-lightbox-subtitle') || '';
+				
+				const lightbox = document.getElementById('global-lightbox');
+				if (lightbox) {
+					const img = lightbox.querySelector('#lightbox-img');
+					const titleEl = lightbox.querySelector('#lightbox-title');
+					const subtitleEl = lightbox.querySelector('#lightbox-subtitle');
+					
+					if (img) {
+						img.src = src;
+						img.alt = title;
+					}
+					if (titleEl) titleEl.textContent = title;
+					if (subtitleEl) subtitleEl.textContent = subtitle;
+					
+					window.location.hash = 'global-lightbox';
+				}
+			});
+
+			// Escape key to close lightbox
+			document.addEventListener('keydown', (e) => {
+				if (e.key === 'Escape' && window.location.hash === '#global-lightbox') {
+					e.preventDefault();
+					window.location.hash = '#';
+				}
+			});
+
+			// Free image/graphics memory when closed
+			window.addEventListener('hashchange', () => {
+				if (window.location.hash !== '#global-lightbox') {
+					const lightbox = document.getElementById('global-lightbox');
+					if (lightbox) {
+						const img = lightbox.querySelector('#lightbox-img');
+						const titleEl = lightbox.querySelector('#lightbox-title');
+						const subtitleEl = lightbox.querySelector('#lightbox-subtitle');
+						
+						if (img) {
+							img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
+							img.alt = "";
+						}
+						if (titleEl) titleEl.textContent = '';
+						if (subtitleEl) subtitleEl.textContent = '';
+					}
+				}
+			});
+		};
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', setupLightbox);
+		} else {
+			setupLightbox();
+		}
+	})();
+</script>
+
+<style is:global>
+	.lightbox-overlay {
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+		transition: opacity 0.3s cubic-bezier(0.2, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.2, 0, 0.2, 1);
+		will-change: opacity;
+	}
+	.lightbox-overlay:target {
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
+	}
+</style>

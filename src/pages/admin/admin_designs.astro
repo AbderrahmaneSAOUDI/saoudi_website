@@ -1,12 +1,10 @@
 ---
-import '../../styles/global.css';
-
 import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
 import AdminLayout from "../../components/admin/AdminLayout.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
 import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
 import Icon from "../../components/Icon.astro";
-import DesignLightbox from "../../components/DesignLightbox.astro";
+import GlobalLightbox from "../../components/GlobalLightbox.astro";
 import AdminControlsStrip from "../../components/admin/AdminControlsStrip.astro";
 
 // Extra safety: double-check authentication
@@ -21,8 +19,12 @@ let errorMsg = '';
 try {
 	const db = getFirebaseAdminDb();
 	
-	// Fetch companies from the database configuration
-	const companiesDoc = await db.collection("configuration").doc("designs_companies").get();
+	// Fetch companies and designs in parallel to improve page load speed
+	const [companiesDoc, snapshot] = await Promise.all([
+		db.collection("configuration").doc("designs_companies").get(),
+		db.collection("designs").orderBy("date", "desc").get()
+	]);
+
 	if (companiesDoc.exists) {
 		companies = companiesDoc.data()?.companies || companies;
 	} else {
@@ -30,8 +32,6 @@ try {
 		await db.collection("configuration").doc("designs_companies").set({ companies });
 	}
 
-	// Sort by Design date descending
-	const snapshot = await db.collection("designs").orderBy("date", "desc").get();
 	designs = snapshot.docs.map(doc => ({
 		id: doc.id,
 		...doc.data()
@@ -401,10 +401,8 @@ try {
 	</AdminLayout>
 	<AdminNavDock currentPath={Astro.url.pathname} />
 
-	<!-- Render Lightboxes outside transform scopes -->
-	{designs.map(design => (
-		<DesignLightbox design={design} />
-	))}
+	<!-- Render Lightbox outside transform scopes -->
+	<GlobalLightbox />
 </BackgroundBaseLayout>
 
 <script define:vars={{ designs, initialCompanies: companies }} is:inline>
@@ -585,7 +583,11 @@ try {
 				>
 					<div>
 						<a 
-							href="#lightbox-${design.id}" 
+							href="${design.imageUrl}"
+							target="_blank"
+							data-lightbox-src="${design.imageUrl}"
+							data-lightbox-title="${design.title}"
+							data-lightbox-subtitle="${design.company || ''}"
 							class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-4 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block"
 						>
 							<div class="absolute inset-0 skeleton"></div>

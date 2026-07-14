@@ -1,25 +1,43 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Card from '../components/Card.astro';
-import CertificateLightbox from '../components/CertificateLightbox.astro';
+import GlobalLightbox from '../components/GlobalLightbox.astro';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
+import { getCached, setCached } from '../lib/server/cache';
 import Icon from '../components/Icon.astro';
+
+// Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
+Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=600');
 
 let certificates: any[] = [];
 let errorMsg = '';
 
-try {
-	const db = getFirebaseAdminDb();
+const cacheKeyCertificates = 'certificates_list';
 
-	// Fetch all certificates sorted by date descending
-	const snapshot = await db.collection("certificates").orderBy("date", "desc").get();
-	certificates = snapshot.docs.map(doc => ({
-		id: doc.id,
-		...doc.data()
-	}));
-} catch (error: any) {
-	console.warn("Failed to fetch certificates from Firestore for public page:", error);
-	errorMsg = "Degraded mode: Certifications are currently offline or unavailable.";
+const cachedCertificates = getCached<any[]>(cacheKeyCertificates);
+
+if (cachedCertificates) {
+	certificates = cachedCertificates;
+} else {
+	try {
+		const db = getFirebaseAdminDb();
+
+		// PERF: Use select() to only fetch fields needed for public rendering.
+		// Avoids transferring unused admin-only fields, reducing payload.
+		const snapshot = await db.collection("certificates")
+			.select('title', 'imageUrl', 'issuer', 'date', 'type', 'credentialUrl')
+			.orderBy("date", "desc")
+			.get();
+		certificates = snapshot.docs.map(doc => ({
+			id: doc.id,
+			...doc.data()
+		}));
+
+		setCached(cacheKeyCertificates, certificates);
+	} catch (error: any) {
+		console.warn("Failed to fetch certificates from Firestore for public page:", error);
+		errorMsg = "Degraded mode: Certifications are currently offline or unavailable.";
+	}
 }
 
 // Group certifications by year
@@ -56,7 +74,7 @@ const activeYears = Object.keys(certificatesByYear).sort((a, b) => b.localeCompa
 			{activeYears.map((year, groupIndex) => {
 				const groupCerts = certificatesByYear[year];
 				return (
-					<section class="space-y-6 animate-slide-up" style={`animation-delay: ${100 + groupIndex * 100}ms`}>
+					<section class="space-y-6 animate-slide-up" style={`animation-delay: ${100 + groupIndex * 100}ms; content-visibility: auto; contain-intrinsic-size: auto 500px;`}>
 						<!-- Section Title -->
 						<div class="flex items-center justify-between border-b border-white/5 pb-3">
 							<div class="flex items-center gap-3">
@@ -92,10 +110,8 @@ const activeYears = Object.keys(certificatesByYear).sort((a, b) => b.localeCompa
 		</div>
 	</div>
 
-	{/* Render Lightboxes outside transform scopes */}
-	{certificates.filter(cert => cert.imageUrl).map(cert => (
-		<CertificateLightbox certificate={cert} />
-	))}
+	{/* Render Lightbox outside transform scopes */}
+	<GlobalLightbox />
 </BaseLayout>
 
 <style>

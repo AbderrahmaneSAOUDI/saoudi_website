@@ -1,5 +1,13 @@
+import { z } from 'zod';
+
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
+
+/** Zod schema for session payload to prevent malformed token injection */
+const sessionPayloadSchema = z.object({
+	email: z.string().email(),
+	exp: z.number().int().positive(),
+});
 
 const getRuntimeEnv = () => globalThis.process?.env as Record<string, string | undefined> | undefined;
 
@@ -35,17 +43,35 @@ const decodeBase64Url = (value: string): Uint8Array => {
   return bytes;
 };
 
-const signHmac = async (payloadB64: string, secret: string): Promise<string> => {
-  const key = await crypto.subtle.importKey(
+/**
+ * Imports the HMAC key for both signing and verification.
+ * Uses 'sign' + 'verify' extractable=false for security.
+ */
+const getHmacKey = async (secret: string, usages: KeyUsage[]): Promise<CryptoKey> => {
+  return crypto.subtle.importKey(
     'raw',
     textEncoder.encode(secret),
     { name: 'HMAC', hash: 'SHA-256' },
     false,
-    ['sign']
+    usages
   );
+};
+
+const signHmac = async (payloadB64: string, secret: string): Promise<string> => {
+  const key = await getHmacKey(secret, ['sign']);
   const signature = await crypto.subtle.sign('HMAC', key, textEncoder.encode(payloadB64));
 
   return encodeBase64Url(new Uint8Array(signature));
+};
+
+/**
+ * SECURITY: Constant-time HMAC verification using crypto.subtle.verify().
+ * Prevents timing side-channel attacks that string comparison (===) is vulnerable to.
+ */
+const verifyHmac = async (payloadB64: string, signatureB64: string, secret: string): Promise<boolean> => {
+  const key = await getHmacKey(secret, ['verify']);
+  const signatureBytes = decodeBase64Url(signatureB64);
+  return crypto.subtle.verify('HMAC', key, signatureBytes, textEncoder.encode(payloadB64));
 };
 
 export interface SessionPayload {
@@ -74,26 +100,41 @@ export async function createSessionToken(email: string): Promise<string> {
  */
 export async function verifySessionToken(token: string): Promise<SessionPayload | null> {
   try {
+    // Reject obviously malformed tokens early (must be "payload.signature")
+    if (typeof token !== 'string' || token.length > 4096) return null;
+
     const parts = token.split('.');
     if (parts.length !== 2) return null;
     
     const [payloadB64, signature] = parts;
-    const secret = getSessionSecret();
-    const expectedSignature = await signHmac(payloadB64, secret);
+    if (!payloadB64 || !signature) return null;
 
-    if (signature !== expectedSignature) {
+    const secret = getSessionSecret();
+
+    // SECURITY: Use constant-time verification instead of string comparison.
+    // String === comparison leaks information about how many bytes match,
+    // allowing an attacker to reconstruct the signature byte-by-byte.
+    const isValid = await verifyHmac(payloadB64, signature, secret);
+    if (!isValid) {
       return null;
     }
     
     const payloadStr = textDecoder.decode(decodeBase64Url(payloadB64));
-    const payload: SessionPayload = JSON.parse(payloadStr);
+    const rawPayload = JSON.parse(payloadStr);
+
+    // SECURITY: Validate payload structure with Zod to prevent injection
+    // of unexpected fields or malformed data through crafted tokens.
+    const parsed = sessionPayloadSchema.safeParse(rawPayload);
+    if (!parsed.success) return null;
+
+    const payload: SessionPayload = parsed.data;
     
     if (Date.now() > payload.exp) {
       return null; // Expired
     }
     
     return payload;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
