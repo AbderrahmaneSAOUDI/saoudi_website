@@ -42,7 +42,6 @@ const formatDate = (dateStr: string) => {
 
 const formattedDate = formatDate(item.date);
 const certType = certificate?.type;
-const hideSkeleton = (id: string) => `document.getElementById('skeleton-${id}')?.style.display = 'none'`;
 
 const typeColors = {
 	'Online': 'bg-primary/50 border-primary/20 text-white',
@@ -83,15 +82,15 @@ const typeColors = {
 				href={`#lightbox-${design.id}`}
 				class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-4 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block"
 			>
-				<div class="absolute inset-0 skeleton" id={`skeleton-${design.id}`}></div>
+				<div class="absolute inset-0 skeleton"></div>
 				<img
 					src={design.imageUrl}
 					alt={design.title}
-					class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10"
+					class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10 opacity-0 transition-opacity duration-300"
 					loading="lazy"
 					decoding="async"
-					onload={hideSkeleton(design.id)}
-					onerror={hideSkeleton(design.id)}
+					onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
+					onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
 				/>
 			</a>
 
@@ -141,15 +140,15 @@ const typeColors = {
 						href={isAdmin ? undefined : `#lightbox-${certificate.id}`}
 						class={`relative aspect-[16/10] rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center cursor-pointer ${!isAdmin ? 'image-zoom-trigger' : ''} block bg-[#1D1B20]`}
 					>
-						<div class="absolute inset-0 skeleton" id={`skeleton-${certificate.id}`}></div>
+						<div class="absolute inset-0 skeleton"></div>
 						<img
 							src={certificate.imageUrl}
 							alt={certificate.title}
-							class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10"
+							class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10 opacity-0 transition-opacity duration-300"
 							loading="lazy"
 							decoding="async"
-							onload={hideSkeleton(certificate.id)}
-							onerror={hideSkeleton(certificate.id)}
+							onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
+							onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
 						/>
 					</a>
 					{certType && (
@@ -204,3 +203,26 @@ const typeColors = {
 		</div>
 	</article>
 ) : null}
+
+<script>
+	// Cleanup any skeletons for images that loaded instantly from cache
+	const removeSkeletons = () => {
+		document.querySelectorAll('img[loading="lazy"]').forEach((img) => {
+			if (img instanceof HTMLImageElement && img.complete) {
+				img.classList.remove('opacity-0');
+				const skeleton = img.previousElementSibling;
+				if (skeleton && skeleton.classList.contains('skeleton')) {
+					skeleton.remove();
+				}
+			}
+		});
+	};
+
+	// Run on DOM content loaded and full load
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', removeSkeletons);
+	} else {
+		removeSkeletons();
+	}
+	window.addEventListener('load', removeSkeletons);
+</script>
