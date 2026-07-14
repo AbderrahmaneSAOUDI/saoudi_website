@@ -6,13 +6,55 @@
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
+import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
+import { getCached, setCached } from '../lib/server/cache';
 
 // Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
 Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=600');
+
+const cacheKeyCounts = 'public_dashboard_counts';
+let counts = getCached<{
+	projects: number;
+	experience: number;
+	designs: number;
+	certificates: number;
+	volunteering: number;
+}>(cacheKeyCounts);
+
+if (!counts) {
+	try {
+		const db = getFirebaseAdminDb();
+		const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, volunteeringSnap] = await Promise.all([
+			db.collection("projects").count().get(),
+			db.collection("experience").count().get(),
+			db.collection("designs").count().get(),
+			db.collection("certificates").count().get(),
+			db.collection("volunteering").count().get(),
+		]);
+
+		counts = {
+			projects: projectsSnap.data().count,
+			experience: experienceSnap.data().count,
+			designs: designsSnap.data().count,
+			certificates: certificatesSnap.data().count,
+			volunteering: volunteeringSnap.data().count,
+		};
+		setCached(cacheKeyCounts, counts);
+	} catch (error) {
+		console.warn("Failed to fetch aggregate counts from Firestore for public home page:", error);
+		counts = {
+			projects: 0,
+			experience: 0,
+			designs: 0,
+			certificates: 0,
+			volunteering: 0,
+		};
+	}
+}
 ---
 
 <BaseLayout title="Home">
-	<div class="mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-7xl">
+	<div class="mx-auto px-4 sm:px-6 lg:px-8 pt-4 max-w-7xl">
 		<!-- Hero Section -->
 		<section class="animate-fade-in min-h-[80dvh] flex items-center">
 			<div class="relative w-full">
@@ -82,7 +124,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 		</section>
 
 		<!-- About Me & Education Row -->
-		<div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-6">
+		<div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
 			<!-- Professional Summary -->
 			<section class="animate-fade-in" style="animation-delay: 0.2s;">
 				<div class="relative h-full">
@@ -131,8 +173,8 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 									<div class="absolute -left-[33px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary border-4 border-surface z-20 shadow-lg shadow-primary/30 animate-dot-pulse"></div>
 									<div class="bg-surface-container-high border border-white/10 rounded-2xl p-5 hover:border-primary/30 transition-all duration-300">
 										<h3 class="text-lg font-bold text-white">University of Ghardaia</h3>
-										<p class="text-primary font-semibold">Master of Science in Intelligent Systems for Knowledge Extraction</p>
-										<p class="text-white/60 mt-1">Ongoing (1st Year)</p>
+										<p class="text-primary font-semibold">Master of Science in Intelligent Systems for Knowledge Extraction (SIEC)</p>
+										<p class="text-white/60 mt-1">Ongoing (2nd Year)</p>
 									</div>
 								</div>
 								<!-- Item 2 -->
@@ -160,8 +202,78 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 			</section>
 		</div>
 
+		<!-- Statistics Grid -->
+		<section class="mt-6 animate-fade-in" style="animation-delay: 0.4s;">
+			<div class="relative">
+				<!-- Ambient Glow -->
+				<div class="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5 blur-3xl rounded-3xl"></div>
+				
+				<div class="relative grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+					<!-- Projects Card -->
+					<div class="p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-primary/40 border border-white/10 bg-surface-container group">
+						<div class="flex justify-between items-start mb-4">
+							<div class="relative p-2.5 rounded-2xl bg-primary/10 text-primary">
+								<Icon name="projects" size={24} class="w-6 h-6 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90" />
+								<Icon name="projects" filled size={24} class="absolute top-2.5 left-2.5 w-6 h-6 opacity-0 transition-all duration-200 scale-90 group-hover:opacity-100 group-hover:scale-100" />
+							</div>
+							<span class="text-2xl font-black text-white">{counts.projects}</span>
+						</div>
+						<h3 class="font-bold text-[#E6E1E5]">Projects</h3>
+					</div>
+
+					<!-- Experience Card -->
+					<div class="p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-secondary/40 border border-white/10 bg-surface-container group">
+						<div class="flex justify-between items-start mb-4">
+							<div class="relative p-2.5 rounded-2xl bg-secondary/10 text-secondary">
+								<Icon name="experience" size={24} class="w-6 h-6 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90" />
+								<Icon name="experience" filled size={24} class="absolute top-2.5 left-2.5 w-6 h-6 opacity-0 transition-all duration-200 scale-90 group-hover:opacity-100 group-hover:scale-100" />
+							</div>
+							<span class="text-2xl font-black text-white">{counts.experience}</span>
+						</div>
+						<h3 class="font-bold text-[#E6E1E5]">Experience</h3>
+					</div>
+
+					<!-- Designs Card -->
+					<div class="p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-tertiary/40 border border-white/10 bg-surface-container group">
+						<div class="flex justify-between items-start mb-4">
+							<div class="relative p-2.5 rounded-2xl bg-tertiary/10 text-tertiary">
+								<Icon name="design" size={24} class="w-6 h-6 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90" />
+								<Icon name="design" filled size={24} class="absolute top-2.5 left-2.5 w-6 h-6 opacity-0 transition-all duration-200 scale-90 group-hover:opacity-100 group-hover:scale-100" />
+							</div>
+							<span class="text-2xl font-black text-white">{counts.designs}</span>
+						</div>
+						<h3 class="font-bold text-[#E6E1E5]">Designs</h3>
+					</div>
+
+					<!-- Certifications Card -->
+					<div class="p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-primary/40 border border-white/10 bg-surface-container group">
+						<div class="flex justify-between items-start mb-4">
+							<div class="relative p-2.5 rounded-2xl bg-primary/10 text-primary">
+								<Icon name="certifications" size={24} class="w-6 h-6 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90" />
+								<Icon name="certifications" filled size={24} class="absolute top-2.5 left-2.5 w-6 h-6 opacity-0 transition-all duration-200 scale-90 group-hover:opacity-100 group-hover:scale-100" />
+							</div>
+							<span class="text-2xl font-black text-white">{counts.certificates}</span>
+						</div>
+						<h3 class="font-bold text-[#E6E1E5]">Certificates</h3>
+					</div>
+
+					<!-- Volunteering Card -->
+					<div class="p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-secondary/40 border border-white/10 bg-surface-container group">
+						<div class="flex justify-between items-start mb-4">
+							<div class="relative p-2.5 rounded-2xl bg-secondary/10 text-secondary">
+								<Icon name="business" size={24} class="w-6 h-6 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90" />
+								<Icon name="business" filled size={24} class="absolute top-2.5 left-2.5 w-6 h-6 opacity-0 transition-all duration-200 scale-90 group-hover:opacity-100 group-hover:scale-100" />
+							</div>
+							<span class="text-2xl font-black text-white">{counts.volunteering}</span>
+						</div>
+						<h3 class="font-bold text-[#E6E1E5]">Volunteering</h3>
+					</div>
+				</div>
+			</div>
+		</section>
+
 		<!-- Technical Skills -->
-		<section class="mt-12 animate-fade-in" style="animation-delay: 0.5s;">
+		<section class="mt-6 animate-fade-in" style="animation-delay: 0.5s;">
 			<div class="relative">
 				<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"></div>
 				<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:shadow-secondary/10 transition-all duration-300 overflow-hidden">
@@ -179,7 +291,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 							<div class="xl:col-span-5 bg-surface-container-high border border-secondary/20 rounded-2xl p-6 hover:border-secondary/40 transition-all duration-300 hover:-translate-y-1 group">
 								<div class="flex items-center justify-between mb-4">
 									<h3 class="text-secondary font-bold text-xl">Development</h3>
-									<Icon name="settings" size={28} />
+									<Icon name="projects" size={28} />
 								</div>
 								<div class="flex flex-wrap gap-2.5">
 									<span class="px-3 py-1.5 bg-secondary/10 text-secondary border border-secondary/25 rounded-lg text-sm font-medium">Mobile development</span>
@@ -192,7 +304,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 								<div class="bg-surface-container-high border border-primary/20 rounded-2xl p-5 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1">
 									<div class="flex items-center justify-between mb-3">
 										<h3 class="text-primary font-bold text-lg">Automation</h3>
-										<Icon name="settings" size={24} />
+										<Icon name="automation" size={24} />
 									</div>
 									<div class="flex flex-wrap gap-2">
 										<span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs">n8n workflow design</span>
@@ -230,7 +342,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 								<div class="bg-surface-container-high border border-primary/20 rounded-2xl p-5 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1">
 									<div class="flex items-center justify-between mb-3">
 										<h3 class="text-primary font-bold text-lg">Tools</h3>
-										<Icon name="settings" size={24} />
+										<Icon name="windows" size={24} />
 									</div>
 									<div class="flex flex-wrap gap-2">
 										<span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs">Microsoft Office Suite</span>
@@ -246,11 +358,11 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 		</section>
 
 		<!-- Soft Skills & Languages -->
-		<section class="mt-12 animate-fade-in" style="animation-delay: 0.6s;">
+		<section class="mt-6 animate-fade-in" style="animation-delay: 0.6s;">
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-				<div class="relative">
+				<div class="relative h-full">
 					<div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 blur-3xl"></div>
-					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:shadow-primary/10 transition-all duration-300">
+					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:shadow-primary/10 transition-all duration-300 h-full">
 						<h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
 							Soft Skills
 						</h2>
@@ -283,9 +395,9 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 					</div>
 				</div>
 				
-				<div class="relative">
+				<div class="relative h-full">
 					<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"></div>
-					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:shadow-secondary/10 transition-all duration-300">
+					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:shadow-secondary/10 transition-all duration-300 h-full">
 						<h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
 							Languages
 						</h2>
@@ -305,7 +417,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 									<span class="text-white/70">Intermediate (B1)</span>
 								</div>
 								<div class="h-2 bg-white/10 rounded-full overflow-hidden">
-									<div class="h-full bg-secondary rounded-full w-2/3"></div>
+									<div class="h-full bg-secondary rounded-full w-1/2"></div>
 								</div>
 							</div>
 							<div>
@@ -314,7 +426,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 									<span class="text-white/70">Basic</span>
 								</div>
 								<div class="h-2 bg-white/10 rounded-full overflow-hidden">
-									<div class="h-full bg-tertiary rounded-full w-1/3"></div>
+									<div class="h-full bg-tertiary rounded-full w-1/6"></div>
 								</div>
 							</div>
 						</div>
@@ -324,7 +436,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 		</section>
 
 		<!-- Contact Information -->
-		<section class="mt-12 animate-fade-in" style="animation-delay: 0.4s;">
+		<section class="my-6 animate-fade-in" style="animation-delay: 0.7s;">
 			<div class="relative">
 				<div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-tertiary/5 blur-3xl"></div>
 				<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:shadow-primary/10 transition-all duration-300">
@@ -358,7 +470,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 								<h3 class="text-white font-semibold">Email</h3>
 								<p class="text-white/70">
 									<a href="#" onclick="this.href='mailto:'+atob('YWJkZXJyYWhtYW5lLnNhb3VkaS4yNkBnbWFpbC5jb20=')" class="hover:underline">
-										<span class="obfuscated">moc.liamg@62.iduoas.enamharredba</span>
+										<span class="obfuscated">moc.kcud@62iduoas</span>
 									</a>
 								</p>
 							</div>

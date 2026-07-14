@@ -15,10 +15,10 @@ const { href, ariaLabel, extraClass = '' } = Astro.props;
 	rel="noopener noreferrer"
 	class={`group relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-surface/40 text-white/70 backdrop-blur-lg transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-105 hover:border-primary/50 hover:bg-primary/15 hover:text-primary ${extraClass}`.trim()}
 >
-	<span class="absolute inset-0 flex items-center justify-center transition-all duration-300 ease-out group-hover:translate-y-[-4px] group-hover:scale-110 group-hover:opacity-0">
+	<span class="absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300 ease-out group-hover:translate-y-[-4px] group-hover:scale-110 group-hover:opacity-0">
 		<slot />
 	</span>
-	<span class="absolute inset-0 flex items-center justify-center opacity-0 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100">
+	<span class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100">
 		<slot name="hover-icon" />
 	</span>
 </a>
