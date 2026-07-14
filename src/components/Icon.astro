@@ -24,7 +24,9 @@ import certifications from '../icons/certifications.svg?raw';
 import certificationsFilled from '../icons/certifications_filled.svg?raw';
 import check from '../icons/check.svg?raw';
 import chevronDown from '../icons/chevron_down.svg?raw';
+import chevronDownFilled from '../icons/chevron_down_filled.svg?raw';
 import chevronUp from '../icons/chevron_up.svg?raw';
+import chevronUpFilled from '../icons/chevron_up_filled.svg?raw';
 import checkSelected from '../icons/check_selected.svg?raw';
 import circleUnselected from '../icons/circle_unselected.svg?raw';
 import close from '../icons/close.svg?raw';
@@ -64,6 +66,14 @@ import search from '../icons/search.svg?raw';
 import security from '../icons/security.svg?raw';
 import settings from '../icons/settings.svg?raw';
 import settingsFilled from '../icons/settings_filled.svg?raw';
+import shieldEmpty from '../icons/shield_empty.svg?raw';
+import shieldEmptyFilled from '../icons/shield_empty_filled.svg?raw';
+import shieldError from '../icons/shield_error.svg?raw';
+import shieldErrorFilled from '../icons/shield_error_filled.svg?raw';
+import shieldProtected from '../icons/shield_protected.svg?raw';
+import shieldProtectedFilled from '../icons/shield_protected_filled.svg?raw';
+import shieldWarning from '../icons/shield_warning.svg?raw';
+import shieldWarningFilled from '../icons/shield_warning_filled.svg?raw';
 import tag from '../icons/tag.svg?raw';
 import telegram from '../icons/telegram.svg?raw';
 import telegramFilled from '../icons/telegram_filled.svg?raw';
@@ -86,7 +96,9 @@ const icons = {
     check,
     check_selected: checkSelected,
     chevron_down: chevronDown,
+    chevron_down_filled: chevronDownFilled,
     chevron_up: chevronUp,
+    chevron_up_filled: chevronUpFilled,
     circle_unselected: circleUnselected,
     close,
     design,
@@ -125,6 +137,14 @@ const icons = {
     security,
     settings,
     settings_filled: settingsFilled,
+    shield_empty: shieldEmpty,
+    shield_empty_filled: shieldEmptyFilled,
+    shield_error: shieldError,
+    shield_error_filled: shieldErrorFilled,
+    shield_protected: shieldProtected,
+    shield_protected_filled: shieldProtectedFilled,
+    shield_warning: shieldWarning,
+    shield_warning_filled: shieldWarningFilled,
     tag,
     telegram,
     telegram_filled: telegramFilled,
@@ -134,7 +154,7 @@ const icons = {
     windows_filled: windowsFilled,
 };
 
-const svgContent = icons[iconName as keyof typeof icons];
+const svgContent = icons[iconName as keyof typeof icons] || icons[name as keyof typeof icons];
 
 // Process SVG content to set color and ensure proper sizing
 let processedSvg = svgContent || '';
@@ -163,3 +183,11 @@ if (processedSvg) {
         set:html={processedSvg} 
     />
 ) : null}
+
+<style>
+    span :global(svg) {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+</style>
