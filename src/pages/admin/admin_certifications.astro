@@ -1092,16 +1092,19 @@ try {
 
 		// --- Helper Utilities ---
 		function showStatus(type: 'success' | 'error', message: string) {
-			formStatus.classList.remove('hidden', 'bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border-[#0F9D58]/30', 'bg-[#DB4437]/10', 'text-[#DB4437]', 'border-[#DB4437]/30');
-			
-			if (type === 'success') {
-				formStatus.classList.add('bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border', 'border-[#0F9D58]/30');
-			} else {
-				formStatus.classList.add('bg-[#DB4437]/10', 'text-[#DB4437]', 'border', 'border-[#DB4437]/30');
+			if ((window as any).showToast) {
+				(window as any).showToast(message, type);
 			}
-			
-			formStatus.textContent = message;
-			formStatus.classList.remove('hidden');
+			if (formStatus) {
+				formStatus.classList.remove('hidden', 'bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border-[#0F9D58]/30', 'bg-[#DB4437]/10', 'text-[#DB4437]', 'border-[#DB4437]/30');
+				if (type === 'success') {
+					formStatus.classList.add('bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border', 'border-[#0F9D58]/30');
+				} else {
+					formStatus.classList.add('bg-[#DB4437]/10', 'text-[#DB4437]', 'border', 'border-[#DB4437]/30');
+				}
+				formStatus.textContent = message;
+				formStatus.classList.remove('hidden');
+			}
 		}
 
 		function clearStatus() {

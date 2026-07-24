@@ -2,6 +2,7 @@
 import { getRandomColor } from '../lib/colors';
 
 import Head from '../components/Head.astro';
+import Toast from '../components/Toast.astro';
 
 interface Props {
 	title: string;
@@ -16,5 +17,6 @@ const primaryColor = getRandomColor();
 	<Head title={title} />
     <body class="relative flex flex-col min-h-screen">
         <slot />
+        <Toast />
     </body>
 </html>

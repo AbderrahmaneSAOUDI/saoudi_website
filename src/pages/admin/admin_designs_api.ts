@@ -141,14 +141,14 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		if (action === 'save') {
 			const title = formData.get('title') as string;
 			const company = formData.get('company') as string;
-			const date = formData.get('date') as string;
+			const date = (formData.get('date') as string) || '';
 			const tagsStr = formData.get('tags') as string;
 			const imageFile = formData.get('image') as File | null;
 
-			// Server validation: title, company, and date are required
-			if (!title || !company || !date) {
+			// Server validation: title and company are required (date is optional)
+			if (!title || !company) {
 				return new Response(
-					JSON.stringify({ error: 'Title, company, and date are required.' }),
+					JSON.stringify({ error: 'Title and company are required.' }),
 					{ status: 400, headers: { 'Content-Type': 'application/json' } }
 				);
 			}

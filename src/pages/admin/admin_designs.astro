@@ -294,16 +294,77 @@ try {
 							</div>
 						</div>
 
-						<!-- Date -->
+						<!-- Date (Optional) -->
 						<div>
-							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Design Date *</label>
-							<input
-								type="date"
-								id="form-date"
-								name="date"
-								required
-								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
-							/>
+							<div class="flex justify-between items-center mb-1.5">
+								<label class="block text-xs font-semibold text-[#E6E1E5]/70">Design Date (Optional)</label>
+								<button
+									type="button"
+									id="btn-clear-date"
+									class="text-[11px] text-[#E6E1E5]/40 hover:text-primary transition-colors cursor-pointer hidden"
+								>
+									Clear Date
+								</button>
+							</div>
+
+							<div class="space-y-2">
+								<!-- Quick Full Date Picker -->
+								<div class="relative">
+									<input
+										type="date"
+										id="form-date-picker"
+										class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+									/>
+								</div>
+
+								<!-- Optional Granular Inputs: Day, Month, Year -->
+								<div class="grid grid-cols-3 gap-2">
+									<div>
+										<label class="block text-[10px] text-[#E6E1E5]/50 mb-1 font-medium">Day</label>
+										<select
+											id="form-date-day"
+											class="w-full px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors cursor-pointer"
+										>
+											<option value="">-- Day --</option>
+										</select>
+									</div>
+									<div>
+										<label class="block text-[10px] text-[#E6E1E5]/50 mb-1 font-medium">Month</label>
+										<select
+											id="form-date-month"
+											class="w-full px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors cursor-pointer"
+										>
+											<option value="">-- Month --</option>
+											<option value="01">01 - Jan</option>
+											<option value="02">02 - Feb</option>
+											<option value="03">03 - Mar</option>
+											<option value="04">04 - Apr</option>
+											<option value="05">05 - May</option>
+											<option value="06">06 - Jun</option>
+											<option value="07">07 - Jul</option>
+											<option value="08">08 - Aug</option>
+											<option value="09">09 - Sep</option>
+											<option value="10">10 - Oct</option>
+											<option value="11">11 - Nov</option>
+											<option value="12">12 - Dec</option>
+										</select>
+									</div>
+									<div>
+										<label class="block text-[10px] text-[#E6E1E5]/50 mb-1 font-medium">Year</label>
+										<input
+											type="number"
+											id="form-date-year"
+											placeholder="YYYY"
+											min="1900"
+											max="2100"
+											class="w-full px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors"
+										/>
+									</div>
+								</div>
+
+								<!-- Hidden field for form submission -->
+								<input type="hidden" id="form-date" name="date" />
+							</div>
 						</div>
 
 						<!-- Tags Field -->
@@ -448,6 +509,11 @@ try {
 		const formId = document.getElementById('form-id') as HTMLInputElement;
 		const formTitle = document.getElementById('form-title') as HTMLInputElement;
 		const formCompany = document.getElementById('form-company') as HTMLSelectElement;
+		const btnClearDate = document.getElementById('btn-clear-date') as HTMLButtonElement;
+		const formDatePicker = document.getElementById('form-date-picker') as HTMLInputElement;
+		const formDateDay = document.getElementById('form-date-day') as HTMLSelectElement;
+		const formDateMonth = document.getElementById('form-date-month') as HTMLSelectElement;
+		const formDateYear = document.getElementById('form-date-year') as HTMLInputElement;
 		const formDate = document.getElementById('form-date') as HTMLInputElement;
 		const formTags = document.getElementById('form-tags') as HTMLInputElement;
 
@@ -485,8 +551,177 @@ try {
 
 		// --- Core Setup & Initialization ---
 		populateCompanyDropdown();
+		populateDayDropdown();
+		initDateInputListeners();
 		renderDesigns();
 		initFromUrl();
+
+		function populateDayDropdown() {
+			if (!formDateDay) return;
+			formDateDay.innerHTML = '<option value="">-- Day --</option>';
+			for (let i = 1; i <= 31; i++) {
+				const val = String(i).padStart(2, '0');
+				const opt = document.createElement('option');
+				opt.value = val;
+				opt.textContent = String(i);
+				formDateDay.appendChild(opt);
+			}
+		}
+
+		function updateCombinedDate(fromSource?: 'picker' | 'inputs') {
+			let combinedDate = '';
+			const yearVal = formDateYear.value.trim();
+			const monthVal = formDateMonth.value;
+			const dayVal = formDateDay.value;
+			const pickerVal = formDatePicker.value;
+
+			if (fromSource === 'picker') {
+				if (pickerVal) {
+					const parts = pickerVal.split('-');
+					if (parts.length === 3) {
+						formDateYear.value = parts[0];
+						formDateMonth.value = parts[1];
+						formDateDay.value = parts[2];
+						combinedDate = pickerVal;
+					}
+				} else {
+					formDateYear.value = '';
+					formDateMonth.value = '';
+					formDateDay.value = '';
+					combinedDate = '';
+				}
+			} else if (fromSource === 'inputs') {
+				if (yearVal) {
+					if (monthVal) {
+						if (dayVal) {
+							combinedDate = `${yearVal}-${monthVal}-${dayVal}`;
+							formDatePicker.value = combinedDate;
+						} else {
+							combinedDate = `${yearVal}-${monthVal}`;
+							formDatePicker.value = '';
+						}
+					} else {
+						combinedDate = yearVal;
+						formDatePicker.value = '';
+					}
+				} else {
+					combinedDate = '';
+					formDatePicker.value = '';
+				}
+			} else {
+				if (yearVal) {
+					if (monthVal) {
+						if (dayVal) {
+							combinedDate = `${yearVal}-${monthVal}-${dayVal}`;
+							formDatePicker.value = combinedDate;
+						} else {
+							combinedDate = `${yearVal}-${monthVal}`;
+						}
+					} else {
+						combinedDate = yearVal;
+					}
+				} else if (pickerVal) {
+					combinedDate = pickerVal;
+				}
+			}
+
+			formDate.value = combinedDate;
+
+			if (combinedDate) {
+				if (btnClearDate) btnClearDate.classList.remove('hidden');
+			} else {
+				if (btnClearDate) btnClearDate.classList.add('hidden');
+			}
+		}
+
+		function setDateFields(dateStr?: string) {
+			if (!dateStr || !dateStr.trim()) {
+				if (formDatePicker) formDatePicker.value = '';
+				if (formDateYear) formDateYear.value = '';
+				if (formDateMonth) formDateMonth.value = '';
+				if (formDateDay) formDateDay.value = '';
+				if (formDate) formDate.value = '';
+				if (btnClearDate) btnClearDate.classList.add('hidden');
+				return;
+			}
+
+			const trimmed = dateStr.trim();
+			const parts = trimmed.split('-');
+			if (parts.length === 3) {
+				if (formDateYear) formDateYear.value = parts[0];
+				if (formDateMonth) formDateMonth.value = parts[1];
+				if (formDateDay) formDateDay.value = parts[2];
+				if (formDatePicker) formDatePicker.value = trimmed;
+			} else if (parts.length === 2) {
+				if (formDateYear) formDateYear.value = parts[0];
+				if (formDateMonth) formDateMonth.value = parts[1];
+				if (formDateDay) formDateDay.value = '';
+				if (formDatePicker) formDatePicker.value = '';
+			} else if (parts.length === 1 && parts[0].length === 4) {
+				if (formDateYear) formDateYear.value = parts[0];
+				if (formDateMonth) formDateMonth.value = '';
+				if (formDateDay) formDateDay.value = '';
+				if (formDatePicker) formDatePicker.value = '';
+			} else {
+				if (formDatePicker) formDatePicker.value = trimmed;
+				if (formDateYear) formDateYear.value = '';
+				if (formDateMonth) formDateMonth.value = '';
+				if (formDateDay) formDateDay.value = '';
+			}
+			if (formDate) formDate.value = trimmed;
+			if (btnClearDate) btnClearDate.classList.remove('hidden');
+		}
+
+		let monthKeyBuffer = '';
+		let monthBufferTimer: any = null;
+
+		function handleMonthKeydown(e: KeyboardEvent) {
+			const key = e.key;
+
+			// Shortcut 'o' or 'O' -> October ('10')
+			if (key === 'o' || key === 'O') {
+				e.preventDefault();
+				if (formDateMonth) {
+					formDateMonth.value = '10';
+					updateCombinedDate('inputs');
+				}
+				return;
+			}
+
+			// Numeric shortcuts (e.g. typing '10' or '1'..'12')
+			if (/^[0-9]$/.test(key)) {
+				e.preventDefault();
+				monthKeyBuffer += key;
+
+				if (monthBufferTimer) clearTimeout(monthBufferTimer);
+				monthBufferTimer = setTimeout(() => {
+					monthKeyBuffer = '';
+				}, 1000);
+
+				let num = parseInt(monthKeyBuffer, 10);
+				if (num > 12) {
+					num = parseInt(key, 10);
+					monthKeyBuffer = key;
+				}
+
+				if (num >= 1 && num <= 12 && formDateMonth) {
+					const formattedVal = String(num).padStart(2, '0');
+					formDateMonth.value = formattedVal;
+					updateCombinedDate('inputs');
+				}
+			}
+		}
+
+		function initDateInputListeners() {
+			if (formDatePicker) formDatePicker.addEventListener('change', () => updateCombinedDate('picker'));
+			if (formDateDay) formDateDay.addEventListener('change', () => updateCombinedDate('inputs'));
+			if (formDateMonth) {
+				formDateMonth.addEventListener('change', () => updateCombinedDate('inputs'));
+				formDateMonth.addEventListener('keydown', handleMonthKeydown);
+			}
+			if (formDateYear) formDateYear.addEventListener('input', () => updateCombinedDate('inputs'));
+			if (btnClearDate) btnClearDate.addEventListener('click', () => setDateFields(''));
+		}
 
 		function showEmptyState(title: string, subtitle: string) {
 			const existingEmptyState = designsGrid.querySelector('.empty-state');
@@ -545,16 +780,26 @@ try {
 
 		function createDesignCard(design: any) {
 			const formattedDate = (() => {
-				if (!design.date) return '';
+				if (!design.date || !design.date.trim()) return '';
 				try {
-					const parts = design.date.split('-');
-					if (parts.length >= 2) {
+					const parts = design.date.trim().split('-');
+					if (parts.length === 3) {
+						const year = parseInt(parts[0], 10);
+						const month = parseInt(parts[1], 10) - 1;
+						const day = parseInt(parts[2], 10);
+						const d = new Date(year, month, day);
+						if (!isNaN(d.getTime())) {
+							return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+						}
+					} else if (parts.length === 2) {
 						const year = parseInt(parts[0], 10);
 						const month = parseInt(parts[1], 10) - 1;
 						const d = new Date(year, month, 1);
 						if (!isNaN(d.getTime())) {
 							return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 						}
+					} else if (parts.length === 1 && parts[0].length === 4) {
+						return parts[0];
 					}
 					const d = new Date(design.date);
 					if (!isNaN(d.getTime())) {
@@ -610,10 +855,12 @@ try {
 					</div>
 
 					<div class="design-card-footer mt-4 pt-3 flex justify-between items-center text-xs border-t border-white/5">
-						<span class="text-white/40 flex items-center gap-1 font-medium">
-							<Icon name="calendar" size={14} class="w-3.5 h-3.5" />
-							${formattedDate}
-						</span>
+						${formattedDate ? `
+							<span class="text-white/40 flex items-center gap-1 font-medium whitespace-nowrap shrink-0">
+								<Icon name="calendar" size={14} class="w-3.5 h-3.5" />
+								${formattedDate}
+							</span>
+						` : '<span></span>'}
 						${design.company ? `
 							<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary">
 								${design.company}
@@ -744,9 +991,8 @@ try {
 			const comps = (window as any).companies || [];
 			formCompany.value = comps.length > 0 ? comps[0] : '';
 			
-			// Set today's date formatted as YYYY-MM-DD
-			const today = new Date().toISOString().split('T')[0];
-			formDate.value = today;
+			// Date is optional and empty by default for new designs
+			setDateFields('');
 			formTags.value = '';
 
 			// Reset image preview state
@@ -772,7 +1018,7 @@ try {
 			formId.value = design.id;
 			formTitle.value = design.title || '';
 			formCompany.value = design.company || '';
-			formDate.value = design.date ? design.date.split('T')[0] : '';
+			setDateFields(design.date || '');
 			formTags.value = Array.isArray(design.tags) ? design.tags.join(', ') : '';
 
 			// Setup preview image
@@ -981,7 +1227,9 @@ try {
 			if (!newName) return;
 			
 			if (modalCompanies.some(c => c.currentName.toLowerCase() === newName.toLowerCase())) {
-				alert('Company already exists!');
+				if ((window as any).showToast) {
+					(window as any).showToast('Company already exists!', 'warning');
+				}
 				return;
 			}
 
@@ -1056,12 +1304,18 @@ try {
 
 					populateCompanyDropdown();
 					companiesModal.classList.add('hidden');
-					alert('Companies updated successfully!');
+					if ((window as any).showToast) {
+						(window as any).showToast('Companies updated successfully!', 'success');
+					}
 				} else {
-					alert(data.error || 'Failed to save companies.');
+					if ((window as any).showToast) {
+						(window as any).showToast(data.error || 'Failed to save companies.', 'error');
+					}
 				}
 			} catch (err: any) {
-				alert('Error saving companies: ' + (err?.message || err));
+				if ((window as any).showToast) {
+					(window as any).showToast('Error saving companies: ' + (err?.message || err), 'error');
+				}
 			} finally {
 				btnSaveCompanies.disabled = false;
 				btnSaveCompanies.textContent = 'Save Changes';
@@ -1391,16 +1645,19 @@ try {
 
 		// --- Helper Utilities ---
 		function showStatus(type: 'success' | 'error', message: string) {
-			formStatus.classList.remove('hidden', 'bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border-[#0F9D58]/30', 'bg-[#DB4437]/10', 'text-[#DB4437]', 'border-[#DB4437]/30');
-			
-			if (type === 'success') {
-				formStatus.classList.add('bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border', 'border-[#0F9D58]/30');
-			} else {
-				formStatus.classList.add('bg-[#DB4437]/10', 'text-[#DB4437]', 'border', 'border-[#DB4437]/30');
+			if ((window as any).showToast) {
+				(window as any).showToast(message, type);
 			}
-			
-			formStatus.textContent = message;
-			formStatus.classList.remove('hidden');
+			if (formStatus) {
+				formStatus.classList.remove('hidden', 'bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border-[#0F9D58]/30', 'bg-[#DB4437]/10', 'text-[#DB4437]', 'border-[#DB4437]/30');
+				if (type === 'success') {
+					formStatus.classList.add('bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border', 'border-[#0F9D58]/30');
+				} else {
+					formStatus.classList.add('bg-[#DB4437]/10', 'text-[#DB4437]', 'border', 'border-[#DB4437]/30');
+				}
+				formStatus.textContent = message;
+				formStatus.classList.remove('hidden');
+			}
 		}
 
 		function clearStatus() {
