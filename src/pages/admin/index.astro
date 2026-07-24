@@ -13,6 +13,7 @@ import AdminLayout from "../../components/admin/AdminLayout.astro";
 import AdminDashboard from "../../components/AdminDashboard.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
 import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
+import { getCached, setCached } from "../../lib/server/cache";
 
 // Extra safety: double-check that the middleware successfully set Astro.locals.adminEmail
 const adminEmail = Astro.locals.adminEmail;
@@ -25,33 +26,59 @@ let certificatesCount = 0;
 let volunteeringCount = 0;
 let systemStatus = "Connected";
 
-try {
-  const db = getFirebaseAdminDb();
-  
-  // Parallel asynchronous fetching of the collections' count metrics
-  const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, volunteeringSnap] = await Promise.all([
-    db.collection("projects").count().get(),
-    db.collection("experience").count().get(),
-    db.collection("designs").count().get(),
-    db.collection("certificates").count().get(),
-    db.collection("volunteering").count().get(),
-  ]);
+// Use a shorter TTL (60s) for admin — reflects changes quickly while still reducing Firestore reads
+const cacheKeyAdminCounts = 'admin_dashboard_counts';
+const cachedCounts = getCached<{
+  projects: number;
+  experience: number;
+  designs: number;
+  certificates: number;
+  volunteering: number;
+}>(cacheKeyAdminCounts);
 
-  projectsCount = projectsSnap.data().count;
-  experienceCount = experienceSnap.data().count;
-  designsCount = designsSnap.data().count;
-  certificatesCount = certificatesSnap.data().count;
-  volunteeringCount = volunteeringSnap.data().count;
-} catch (error) {
-  console.warn("Firestore access degraded or unconfigured. Falling back to mock dashboard metrics.", error);
-  systemStatus = "Degraded (Mock Stats)";
-  
-  // Clean mock statistics matching user's collections structure
-  projectsCount = -1;
-  experienceCount = -1;
-  designsCount = -1;
-  certificatesCount = -1;
-  volunteeringCount = -1;
+if (cachedCounts) {
+  projectsCount = cachedCounts.projects;
+  experienceCount = cachedCounts.experience;
+  designsCount = cachedCounts.designs;
+  certificatesCount = cachedCounts.certificates;
+  volunteeringCount = cachedCounts.volunteering;
+} else {
+  try {
+    const db = getFirebaseAdminDb();
+    
+    // Parallel asynchronous fetching of the collections' count metrics
+    const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, volunteeringSnap] = await Promise.all([
+      db.collection("projects").count().get(),
+      db.collection("experience").count().get(),
+      db.collection("designs").count().get(),
+      db.collection("certificates").count().get(),
+      db.collection("volunteering").count().get(),
+    ]);
+
+    projectsCount = projectsSnap.data().count;
+    experienceCount = experienceSnap.data().count;
+    designsCount = designsSnap.data().count;
+    certificatesCount = certificatesSnap.data().count;
+    volunteeringCount = volunteeringSnap.data().count;
+
+    setCached(cacheKeyAdminCounts, {
+      projects: projectsCount,
+      experience: experienceCount,
+      designs: designsCount,
+      certificates: certificatesCount,
+      volunteering: volunteeringCount,
+    }, 60000); // 60 second TTL
+  } catch (error) {
+    console.warn("Firestore access degraded or unconfigured. Falling back to mock dashboard metrics.", error);
+    systemStatus = "Degraded (Mock Stats)";
+    
+    // Clean mock statistics matching user's collections structure
+    projectsCount = -1;
+    experienceCount = -1;
+    designsCount = -1;
+    certificatesCount = -1;
+    volunteeringCount = -1;
+  }
 }
 
 const metrics = {

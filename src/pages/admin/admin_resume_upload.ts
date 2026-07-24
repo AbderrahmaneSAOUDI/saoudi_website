@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
+import { clearCache } from '../../lib/server/cache';
 
 
 /**
@@ -91,6 +92,9 @@ export const POST: APIRoute = async ({ locals, request }) => {
 					updateData,
 					{ merge: true }
 				);
+
+				// Invalidate cache so public resume page serves fresh data immediately
+				clearCache('resume_config');
 			} catch (dbErr) {
 				console.warn('Could not update Firestore configuration:', dbErr);
 			}
