@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
+import { clearCache } from '../../lib/server/cache';
 
 export const POST: APIRoute = async ({ locals, request }) => {
 	// Auth check: verify session token
@@ -38,6 +39,11 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			// Delete Firestore document (image is stored as Base64 inside the doc)
 			await docRef.delete();
+
+			// Invalidate caches so public pages reflect the deletion immediately
+			clearCache('certificates_list');
+			clearCache('public_dashboard_counts');
+			clearCache('admin_dashboard_counts');
 
 			return new Response(JSON.stringify({ success: true }), {
 				status: 200,
@@ -127,6 +133,11 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			// Save/Merge in Firestore
 			await docRef.set(certificatePayload, { merge: true });
+
+			// Invalidate caches so public pages reflect the update immediately
+			clearCache('certificates_list');
+			clearCache('public_dashboard_counts');
+			clearCache('admin_dashboard_counts');
 
 			return new Response(JSON.stringify({ success: true, certificate: certificatePayload }), {
 				status: 200,

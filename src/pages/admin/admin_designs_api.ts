@@ -51,6 +51,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			// Invalidate cache
 			clearCache('designs_list');
+			clearCache('public_dashboard_counts');
+			clearCache('admin_dashboard_counts');
 
 			return new Response(JSON.stringify({ success: true }), {
 				status: 200,
@@ -205,6 +207,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			// Invalidate cache
 			clearCache('designs_list');
+			clearCache('public_dashboard_counts');
+			clearCache('admin_dashboard_counts');
 
 			return new Response(JSON.stringify({ success: true, design: designPayload }), {
 				status: 200,
