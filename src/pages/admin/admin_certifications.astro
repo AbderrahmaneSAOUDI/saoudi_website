@@ -1040,16 +1040,54 @@ try {
 				});
 				const result = await response.json();
 
-				if (response.ok && result.success) {
-					showStatus('success', 'Certificate saved successfully! Refreshing...');
-					setTimeout(() => {
-						window.location.href = window.location.pathname;
-					}, 1000);
+				if (response.ok && result.success && result.certificate) {
+					const savedCert = result.certificate;
+					const existingIndex = allCertificates.findIndex((c: any) => c && c.id === savedCert.id);
+
+					if (existingIndex !== -1) {
+						// Update existing certificate in state array
+						allCertificates[existingIndex] = savedCert;
+
+						// Update existing card in DOM
+						const existingCard = certificatesGrid.querySelector(`.certificate-card[data-id="${savedCert.id}"]`);
+						const updatedCard = createCertificateCard(savedCert);
+						updatedCard.addEventListener('click', () => {
+							selectCertificate(savedCert);
+							openDrawer();
+						});
+
+						if (existingCard) {
+							existingCard.replaceWith(updatedCard);
+						}
+						showStatus('success', 'Certificate saved successfully!');
+					} else {
+						// Add new certificate to state array
+						allCertificates.unshift(savedCert);
+
+						// Remove empty state if present
+						const emptyState = certificatesGrid.querySelector('.empty-state');
+						if (emptyState) emptyState.remove();
+
+						// Insert new card at top of grid
+						const newCard = createCertificateCard(savedCert);
+						newCard.addEventListener('click', () => {
+							selectCertificate(savedCert);
+							openDrawer();
+						});
+						certificatesGrid.prepend(newCard);
+
+						showStatus('success', 'Certificate created successfully!');
+					}
+
+					setFormLoading(false);
+					closeDrawer();
+					setNewCertificateState();
 				} else {
 					showStatus('error', result.error || 'Failed to save certificate.');
 					setFormLoading(false);
 				}
-			} catch (err) {
+			} catch (err: any) {
+				console.error('Error saving certificate:', err);
 				showStatus('error', 'A network error occurred. Please try again.');
 				setFormLoading(false);
 			}
@@ -1076,15 +1114,28 @@ try {
 				const result = await response.json();
 
 				if (response.ok && result.success) {
-					showStatus('success', 'Certificate deleted successfully! Syncing...');
-					setTimeout(() => {
-						window.location.href = window.location.pathname;
-					}, 1000);
+					// Remove from state array
+					allCertificates = allCertificates.filter((c: any) => c && c.id !== currentSelectedId);
+
+					// Remove card from DOM
+					const cardToRemove = certificatesGrid.querySelector(`.certificate-card[data-id="${currentSelectedId}"]`);
+					if (cardToRemove) cardToRemove.remove();
+
+					// If grid is empty, show empty state
+					if (allCertificates.length === 0) {
+						showEmptyState('No certificates found', 'Create a new certification entry to get started.');
+					}
+
+					showStatus('success', 'Certificate deleted successfully!');
+					setFormLoading(false);
+					closeDrawer();
+					setNewCertificateState();
 				} else {
 					showStatus('error', result.error || 'Failed to delete certificate.');
 					setFormLoading(false);
 				}
-			} catch (err) {
+			} catch (err: any) {
+				console.error('Error deleting certificate:', err);
 				showStatus('error', 'A network error occurred. Please try again.');
 				setFormLoading(false);
 			}

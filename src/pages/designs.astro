@@ -32,7 +32,7 @@ if (cachedDesigns && cachedCompanies) {
 		const [companiesDoc, snapshot] = await Promise.all([
 			db.collection("configuration").doc("designs_companies").get(),
 			db.collection("designs")
-				.select('title', 'imageUrl', 'company', 'date', 'tags')
+				.select('title', 'imageUrl', 'company', 'date')
 				.orderBy("date", "desc")
 				.get(),
 		]);
