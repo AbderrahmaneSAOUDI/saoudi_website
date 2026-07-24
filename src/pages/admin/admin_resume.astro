@@ -420,15 +420,20 @@ try {
 		});
 
 		function showStatus(type: 'success' | 'error', message: string) {
-			uploadStatus.classList.remove('hidden', 'bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border-[#0F9D58]/30', 'bg-[#DB4437]/10', 'text-[#DB4437]', 'border-[#DB4437]/30');
-
-			if (type === 'success') {
-				uploadStatus.classList.add('bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border', 'border-[#0F9D58]/30');
-			} else {
-				uploadStatus.classList.add('bg-[#DB4437]/10', 'text-[#DB4437]', 'border', 'border-[#DB4437]/30');
+			if ((window as any).showToast) {
+				(window as any).showToast(message, type);
 			}
+			if (uploadStatus) {
+				uploadStatus.classList.remove('hidden', 'bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border-[#0F9D58]/30', 'bg-[#DB4437]/10', 'text-[#DB4437]', 'border-[#DB4437]/30');
 
-			uploadStatus.textContent = message;
+				if (type === 'success') {
+					uploadStatus.classList.add('bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border', 'border-[#0F9D58]/30');
+				} else {
+					uploadStatus.classList.add('bg-[#DB4437]/10', 'text-[#DB4437]', 'border', 'border-[#DB4437]/30');
+				}
+
+				uploadStatus.textContent = message;
+			}
 		}
 	});
 </script>

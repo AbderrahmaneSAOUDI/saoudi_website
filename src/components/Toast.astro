@@ -1,0 +1,112 @@
+---
+/**
+ * Toast Component
+ * Provides a fixed bottom-right toast notification system that replaces native popup alerts.
+ * Features slide-left entrance, slide-right exit animations, auto-dismiss, and close button.
+ */
+interface Props {}
+---
+
+<!-- Fixed Toast Container (bottom-right corner) -->
+<div 
+	id="toast-container" 
+	class="fixed bottom-5 right-5 z-[200] flex flex-col gap-3 max-w-sm w-[calc(100vw-2.5rem)] sm:w-80 pointer-events-none"
+	aria-live="polite"
+	aria-atomic="true"
+></div>
+
+<script is:inline>
+	(function() {
+		/**
+		 * Display a screen down-right toast notification that slides in from the right,
+		 * stays for a duration, and slides back right to hide.
+		 * @param {string} message - Text message to display
+		 * @param {'success' | 'error' | 'info' | 'warning'} [type='info'] - Type of notification
+		 * @param {number} [duration=4000] - Duration in ms before auto-dismissing
+		 */
+		function createToast(message, type = 'info', duration = 4000) {
+			const container = document.getElementById('toast-container');
+			if (!container) return;
+
+			const toast = document.createElement('div');
+			toast.className = 'toast-item transform translate-x-[120%] opacity-0 transition-all duration-300 ease-out flex items-start gap-3 p-3.5 rounded-2xl border shadow-xl backdrop-blur-md pointer-events-auto bg-[#1E1E1E]/95 text-xs font-medium text-white select-none';
+
+			// Tone colors matching M3 Google Brand constraints
+			let borderColor = 'border-[#4285F4]/40';
+			let iconBg = 'bg-[#4285F4]/20 text-[#4285F4]';
+			let iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+
+			if (type === 'success') {
+				borderColor = 'border-[#34A853]/40';
+				iconBg = 'bg-[#34A853]/20 text-[#34A853]';
+				iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+			} else if (type === 'error') {
+				borderColor = 'border-[#EA4335]/40';
+				iconBg = 'bg-[#EA4335]/20 text-[#EA4335]';
+				iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+			} else if (type === 'warning') {
+				borderColor = 'border-[#F9AB00]/40';
+				iconBg = 'bg-[#F9AB00]/20 text-[#F9AB00]';
+				iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 shrink-0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+			}
+
+			toast.classList.add(...borderColor.split(' '));
+
+			toast.innerHTML = `
+				<div class="p-1 rounded-lg ${iconBg} shrink-0 mt-0.5">
+					${iconSvg}
+				</div>
+				<div class="flex-grow pt-0.5 leading-snug break-words">
+					${message}
+				</div>
+				<button 
+					type="button" 
+					class="toast-close-btn text-white/40 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10 shrink-0 cursor-pointer ml-1" 
+					aria-label="Close notification"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+				</button>
+			`;
+
+			container.appendChild(toast);
+
+			// Trigger slide-left entrance animation
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					toast.classList.remove('translate-x-[120%]', 'opacity-0');
+					toast.classList.add('translate-x-0', 'opacity-100');
+				});
+			});
+
+			let timer = null;
+
+			function dismiss() {
+				if (timer) clearTimeout(timer);
+				toast.classList.remove('translate-x-0', 'opacity-100');
+				toast.classList.add('translate-x-[120%]', 'opacity-0');
+				setTimeout(() => {
+					if (toast.parentNode) {
+						toast.parentNode.removeChild(toast);
+					}
+				}, 300);
+			}
+
+			const closeBtn = toast.querySelector('.toast-close-btn');
+			if (closeBtn) {
+				closeBtn.addEventListener('click', dismiss);
+			}
+
+			if (duration > 0) {
+				timer = setTimeout(dismiss, duration);
+			}
+		}
+
+		// Expose globally on window
+		window.showToast = createToast;
+
+		// Override browser native alert to use non-blocking down-right sliding toasts
+		window.alert = function(msg) {
+			createToast(String(msg), 'info', 4000);
+		};
+	})();
+</script>
