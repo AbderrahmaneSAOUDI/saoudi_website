@@ -139,15 +139,15 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 		// ─── ACTION: SAVE (CREATE OR UPDATE) ─────────────────────────────────
 		if (action === 'save') {
-			const title = formData.get('title') as string;
+			const title = (formData.get('title') as string) || '';
 			const company = formData.get('company') as string;
 			const date = (formData.get('date') as string) || '';
 			const imageFile = formData.get('image') as File | null;
 
-			// Server validation: title and company are required (date is optional)
-			if (!title || !company) {
+			// Server validation: company is required (title and date are optional)
+			if (!company) {
 				return new Response(
-					JSON.stringify({ error: 'Title and company are required.' }),
+					JSON.stringify({ error: 'Company is required.' }),
 					{ status: 400, headers: { 'Content-Type': 'application/json' } }
 				);
 			}
@@ -194,7 +194,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			// Prepare document fields
 			const designPayload: Record<string, any> = {
 				id: designId,
-				title,
+				title: title.trim(),
 				imageUrl,
 				company: company.trim(),
 				date,

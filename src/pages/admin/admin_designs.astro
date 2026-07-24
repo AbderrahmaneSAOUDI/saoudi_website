@@ -258,13 +258,12 @@ try {
 
 						<!-- Title -->
 						<div>
-							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Title *</label>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Title (Optional)</label>
 							<input
 								type="text"
 								id="form-title"
 								name="title"
-								required
-								placeholder="e.g., E-Commerce App Dashboard"
+								placeholder="e.g., E-Commerce App Dashboard (Optional)"
 								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
 							/>
 						</div>
@@ -312,12 +311,15 @@ try {
 								<div class="grid grid-cols-3 gap-2">
 									<div>
 										<label class="block text-[10px] text-[#E6E1E5]/50 mb-1 font-medium">Day</label>
-										<select
+										<input
+											type="text"
 											id="form-date-day"
-											class="w-full px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors cursor-pointer"
-										>
-											<option value="">-- Day --</option>
-										</select>
+											inputmode="numeric"
+											pattern="[0-9]*"
+											maxlength="2"
+											placeholder="DD"
+											class="w-full px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors text-center font-medium"
+										/>
 									</div>
 									<div>
 										<label class="block text-[10px] text-[#E6E1E5]/50 mb-1 font-medium">Month</label>
@@ -343,12 +345,13 @@ try {
 									<div>
 										<label class="block text-[10px] text-[#E6E1E5]/50 mb-1 font-medium">Year</label>
 										<input
-											type="number"
+											type="text"
 											id="form-date-year"
-											placeholder="YYYY"
-											min="1900"
-											max="2100"
-											class="w-full px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors"
+											inputmode="numeric"
+											pattern="[0-9]*"
+											maxlength="4"
+											placeholder="2026"
+											class="w-full px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors text-center font-medium"
 										/>
 									</div>
 								</div>
@@ -489,7 +492,7 @@ try {
 		const formTitle = document.getElementById('form-title') as HTMLInputElement;
 		const formCompany = document.getElementById('form-company') as HTMLSelectElement;
 		const btnClearDate = document.getElementById('btn-clear-date') as HTMLButtonElement;
-		const formDateDay = document.getElementById('form-date-day') as HTMLSelectElement;
+		const formDateDay = document.getElementById('form-date-day') as HTMLInputElement;
 		const formDateMonth = document.getElementById('form-date-month') as HTMLSelectElement;
 		const formDateYear = document.getElementById('form-date-year') as HTMLInputElement;
 		const formDate = document.getElementById('form-date') as HTMLInputElement;
@@ -528,30 +531,21 @@ try {
 
 		// --- Core Setup & Initialization ---
 		populateCompanyDropdown();
-		populateDayDropdown();
 		initDateInputListeners();
 		renderDesigns();
 		initFromUrl();
-
-		function populateDayDropdown() {
-			if (!formDateDay) return;
-			formDateDay.innerHTML = '<option value="">-- Day --</option>';
-			for (let i = 1; i <= 31; i++) {
-				const val = String(i).padStart(2, '0');
-				const opt = document.createElement('option');
-				opt.value = val;
-				opt.textContent = String(i);
-				formDateDay.appendChild(opt);
-			}
-		}
 
 		function updateCombinedDate() {
 			let combinedDate = '';
 			const yearVal = formDateYear ? formDateYear.value.trim() : '';
 			const monthVal = formDateMonth ? formDateMonth.value : '';
-			const dayVal = formDateDay ? formDateDay.value : '';
+			let dayVal = formDateDay ? formDateDay.value.trim() : '';
 
-			if (yearVal) {
+			if (dayVal && dayVal.length === 1) {
+				dayVal = dayVal.padStart(2, '0');
+			}
+
+			if (yearVal && yearVal.length === 4) {
 				if (monthVal) {
 					if (dayVal) {
 						combinedDate = `${yearVal}-${monthVal}-${dayVal}`;
@@ -646,12 +640,41 @@ try {
 		}
 
 		function initDateInputListeners() {
-			if (formDateDay) formDateDay.addEventListener('change', () => updateCombinedDate());
+			if (formCompany) {
+				formCompany.addEventListener('change', () => {
+					if (formCompany.value) {
+						localStorage.setItem('admin_last_selected_company', formCompany.value);
+					}
+				});
+			}
+
+			if (formDateDay) {
+				formDateDay.addEventListener('input', () => {
+					let val = formDateDay.value.replace(/\D/g, '').slice(0, 2);
+					formDateDay.value = val;
+					updateCombinedDate();
+				});
+			}
+
 			if (formDateMonth) {
 				formDateMonth.addEventListener('change', () => updateCombinedDate());
 				formDateMonth.addEventListener('keydown', handleMonthKeydown);
 			}
-			if (formDateYear) formDateYear.addEventListener('input', () => updateCombinedDate());
+
+			if (formDateYear) {
+				formDateYear.addEventListener('focus', () => {
+					if (!formDateYear.value) {
+						formDateYear.value = '20';
+						updateCombinedDate();
+					}
+				});
+				formDateYear.addEventListener('input', () => {
+					let val = formDateYear.value.replace(/\D/g, '').slice(0, 4);
+					formDateYear.value = val;
+					updateCombinedDate();
+				});
+			}
+
 			if (btnClearDate) btnClearDate.addEventListener('click', () => setDateFields(''));
 		}
 
@@ -752,14 +775,14 @@ try {
 							href="${design.imageUrl}"
 							target="_blank"
 							data-lightbox-src="${design.imageUrl}"
-							data-lightbox-title="${design.title}"
-							data-lightbox-subtitle="${design.company || ''}"
-							class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-4 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block"
+							data-lightbox-title="${design.title || design.company}"
+							data-lightbox-subtitle="${design.title ? (design.company || '') : ''}"
+							class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-0 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block"
 						>
 							<div class="absolute inset-0 skeleton"></div>
 							<img
 								src="${design.imageUrl}"
-								alt="${design.title}"
+								alt="${design.title || design.company}"
 								class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10 opacity-0 transition-opacity duration-300"
 								loading="lazy"
 								decoding="async"
@@ -767,13 +790,9 @@ try {
 								onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
 							/>
 						</a>
-
-						<h3 class="font-bold text-white text-lg group-hover:text-primary transition-colors line-clamp-1">
-							${design.title}
-						</h3>
 					</div>
 
-					<div class="design-card-footer mt-4 pt-3 flex justify-between items-center text-xs border-t border-white/5">
+					<div class="design-card-footer mt-3.5 flex justify-between items-center text-xs">
 						${formattedDate ? `
 							<span class="text-white/40 flex items-center gap-1 font-medium whitespace-nowrap shrink-0">
 								<Icon name="calendar" size={14} class="w-3.5 h-3.5" />
@@ -906,9 +925,16 @@ try {
 			formId.value = `design_${shortId}`;
 			formTitle.value = '';
 
-			// Default company selection
+			// Default company selection (cached for next additions)
 			const comps = (window as any).companies || [];
-			formCompany.value = comps.length > 0 ? comps[0] : '';
+			const cachedCompany = localStorage.getItem('admin_last_selected_company');
+			if (cachedCompany && comps.includes(cachedCompany)) {
+				formCompany.value = cachedCompany;
+			} else if (comps.length > 0) {
+				formCompany.value = comps[0];
+			} else {
+				formCompany.value = '';
+			}
 			
 			// Date is optional and empty by default for new designs
 			setDateFields('');
@@ -975,7 +1001,8 @@ try {
 		// --- Populating selects dropdowns ---
 		
 		function populateCompanyDropdown(selectedValue = '') {
-			const activeValue = selectedValue || formCompany.value;
+			const cachedCompany = localStorage.getItem('admin_last_selected_company');
+			const activeValue = selectedValue || formCompany.value || cachedCompany || '';
 			formCompany.innerHTML = '';
 
 			const filterActiveValue = filterCompany ? filterCompany.value : '';
@@ -1002,6 +1029,8 @@ try {
 
 			if (companies.includes(activeValue)) {
 				formCompany.value = activeValue;
+			} else if (cachedCompany && companies.includes(cachedCompany)) {
+				formCompany.value = cachedCompany;
 			} else if (companies.length > 0) {
 				formCompany.value = companies[0];
 			}
@@ -1452,7 +1481,18 @@ try {
 					return;
 				}
 				selectedImageFile = processedFile;
-				clearStatus();
+
+				const formatBytes = (bytes: number) => {
+					if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+					return `${(bytes / 1024).toFixed(0)} KB`;
+				};
+
+				const oldSize = formatBytes(file.size);
+				const newSize = formatBytes(processedFile.size);
+				const diffPercent = Math.round(((processedFile.size - file.size) / file.size) * 100);
+				const diffStr = diffPercent > 0 ? `+${diffPercent}%` : `${diffPercent}%`;
+
+				showStatus('success', `Image converted: ${oldSize} → ${newSize} (${diffStr})`);
 
 				// Generate locally readable preview URL
 				const reader = new FileReader();
@@ -1462,10 +1502,7 @@ try {
 						imagePreview.classList.remove('hidden');
 						dropZonePrompt.classList.add('hidden');
 						fileDetails.classList.remove('hidden');
-						
-						const originalSize = (file.size / 1024 / 1024).toFixed(2);
-						const processedSize = (processedFile.size / 1024 / 1024).toFixed(2);
-						fileDetails.textContent = `✓ ${processedFile.name} (${processedSize} MB, was ${originalSize} MB)`;
+						fileDetails.textContent = `✓ ${processedFile.name} (${oldSize} → ${newSize}, ${diffStr})`;
 					}
 				};
 				reader.readAsDataURL(processedFile);
@@ -1495,6 +1532,10 @@ try {
 			formData.append('title', formTitle.value);
 			formData.append('company', formCompany.value);
 			formData.append('date', formDate.value);
+
+			if (formCompany.value) {
+				localStorage.setItem('admin_last_selected_company', formCompany.value);
+			}
 
 			if (selectedImageFile) {
 				formData.append('image', selectedImageFile);
