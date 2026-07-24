@@ -982,7 +982,18 @@ try {
 					return;
 				}
 				selectedImageFile = processedFile;
-				clearStatus();
+
+				const formatBytes = (bytes: number) => {
+					if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+					return `${(bytes / 1024).toFixed(0)} KB`;
+				};
+
+				const oldSize = formatBytes(file.size);
+				const newSize = formatBytes(processedFile.size);
+				const diffPercent = Math.round(((processedFile.size - file.size) / file.size) * 100);
+				const diffStr = diffPercent > 0 ? `+${diffPercent}%` : `${diffPercent}%`;
+
+				showStatus('success', `Image converted: ${oldSize} → ${newSize} (${diffStr})`);
 
 				// Generate locally readable preview URL
 				const reader = new FileReader();
@@ -992,10 +1003,7 @@ try {
 						imagePreview.classList.remove('hidden');
 						dropZonePrompt.classList.add('hidden');
 						fileDetails.classList.remove('hidden');
-						
-						const originalSize = (file.size / 1024 / 1024).toFixed(2);
-						const processedSize = (processedFile.size / 1024 / 1024).toFixed(2);
-						fileDetails.textContent = `✓ ${processedFile.name} (${processedSize} MB, was ${originalSize} MB)`;
+						fileDetails.textContent = `✓ ${processedFile.name} (${oldSize} → ${newSize}, ${diffStr})`;
 					}
 				};
 				reader.readAsDataURL(processedFile);

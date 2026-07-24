@@ -124,7 +124,7 @@ export const projectSchema = z.object({
 
 export interface Design {
 	id: string;
-	title: string;
+	title?: string;
 	description?: string;
 	imageUrl: string;
 	date?: string; // ISO 8601 or YYYY / YYYY-MM / YYYY-MM-DD (optional)
@@ -134,7 +134,7 @@ export interface Design {
 
 export const designSchema = z.object({
 	id: z.string().min(1),
-	title: z.string().min(1),
+	title: z.string().optional(),
 	description: z.string().optional(),
 	imageUrl: z.string().min(1),
 	date: z.string().optional(),
