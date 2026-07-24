@@ -142,7 +142,6 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const title = formData.get('title') as string;
 			const company = formData.get('company') as string;
 			const date = (formData.get('date') as string) || '';
-			const tagsStr = formData.get('tags') as string;
 			const imageFile = formData.get('image') as File | null;
 
 			// Server validation: title and company are required (date is optional)
@@ -152,10 +151,6 @@ export const POST: APIRoute = async ({ locals, request }) => {
 					{ status: 400, headers: { 'Content-Type': 'application/json' } }
 				);
 			}
-
-			const tags = tagsStr
-				? tagsStr.split(',').map((t) => t.trim()).filter((t) => t.length > 0)
-				: [];
 
 			// Fetch existing doc if updating
 			const docRef = db.collection('designs').doc(designId);
@@ -202,7 +197,6 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				title,
 				imageUrl,
 				company: company.trim(),
-				tags,
 				date,
 			};
 

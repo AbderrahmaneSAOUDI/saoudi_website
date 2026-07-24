@@ -129,7 +129,7 @@ export interface Design {
 	imageUrl: string;
 	date?: string; // ISO 8601 or YYYY / YYYY-MM / YYYY-MM-DD (optional)
 	company: string;
-	tags: string[];
+	tags?: string[];
 }
 
 export const designSchema = z.object({
@@ -139,7 +139,7 @@ export const designSchema = z.object({
 	imageUrl: z.string().min(1),
 	date: z.string().optional(),
 	company: z.string().min(1),
-	tags: z.array(z.string().min(1)),
+	tags: z.array(z.string().min(1)).optional(),
 });
 
 // ─── Collection: certificates ─────────────────────────────────────────────
