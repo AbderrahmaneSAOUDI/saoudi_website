@@ -70,29 +70,41 @@ const activeYears = Object.keys(certificatesByYear).sort((a, b) => b.localeCompa
 		)}
 
 		<!-- Grouped Lists: Year, Grid -->
-		<div class="space-y-16">
+		<div class="space-y-12">
 			{activeYears.map((year, groupIndex) => {
 				const groupCerts = certificatesByYear[year];
+				const toggleId = `toggle-year-${year}`;
 				return (
-					<section class="space-y-6 animate-page-slide-up" style={`animation-delay: ${100 + groupIndex * 100}ms; content-visibility: auto; contain-intrinsic-size: auto 500px;`}>
+					<section class="space-y-4 animate-page-slide-up" style={`animation-delay: ${100 + groupIndex * 100}ms;`}>
+						<input type="checkbox" id={toggleId} class="peer hidden" checked />
+
 						<!-- Section Title -->
-						<div class="flex items-center justify-between border-b border-white/5 pb-3">
+						<label for={toggleId} class="flex items-center justify-between border-b border-white/5 pb-3 cursor-pointer select-none group peer-checked:[&_.chevron-icon]:rotate-180">
 							<div class="flex items-center gap-3">
-								<div class="w-1.5 h-6 bg-primary rounded-full"></div>
-								<h2 class="font-bold text-white text-xl tracking-tight">{year}</h2>
+								<div class="w-1.5 h-6 bg-primary rounded-full transition-transform group-hover:scale-y-125"></div>
+								<h2 class="font-bold text-white text-xl tracking-tight group-hover:text-primary transition-colors">{year}</h2>
 								<span class="text-xs text-white/40 font-semibold bg-white/5 px-2.5 py-0.5 rounded-full border border-white/5">
 									{groupCerts.length}
 								</span>
 							</div>
-						</div>
+							<div class="chevron-icon text-white/40 group-hover:text-primary transition-transform duration-300">
+								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+								</svg>
+							</div>
+						</label>
 
 						<!-- Grid of Certificates -->
-						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-							{groupCerts.map((cert, index) => (
-								<div class="animate-page-card-fade" style={`animation-delay: ${index * 50}ms`}>
-									<Card item={cert} type="certificate" />
+						<div class="grid grid-rows-[0fr] opacity-0 -translate-y-3 pointer-events-none transition-all duration-300 ease-in-out peer-checked:grid-rows-[1fr] peer-checked:opacity-100 peer-checked:translate-y-0 peer-checked:pointer-events-auto">
+							<div class="overflow-hidden">
+								<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 pb-1">
+									{groupCerts.map((cert, index) => (
+										<div class="animate-page-card-fade" style={`animation-delay: ${index * 50}ms`}>
+											<Card item={cert} type="certificate" />
+										</div>
+									))}
 								</div>
-							))}
+							</div>
 						</div>
 					</section>
 				);
