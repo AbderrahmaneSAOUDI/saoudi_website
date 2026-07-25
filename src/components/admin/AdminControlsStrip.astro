@@ -32,11 +32,12 @@ const {
 			<button
 				id={filterToggleId}
 				type="button"
-				class="px-4 py-2.5 bg-[#211F26] border border-[#2B2930] text-[#E6E1E5] font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-all cursor-pointer hover:bg-[#2B2930] shrink-0"
+				class="px-4 py-2.5 bg-[#211F26] border border-[#2B2930] text-[#E6E1E5] font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-all cursor-pointer hover:bg-[#2B2930] shrink-0 group"
 			>
 				<Icon name="filter" size={16} class="w-4 h-4 text-primary" />
 				<span>Filter</span>
 				<span id={filterBadgeId} class="hidden px-2 py-0.5 rounded-full bg-primary text-white text-[10px]">0</span>
+				<kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-white/10 text-white/50 rounded border border-white/10 group-hover:border-white/20 transition-colors">F</kbd>
 			</button>
 		)}
 		
@@ -49,8 +50,11 @@ const {
 					type="text"
 					id={searchId}
 					placeholder={searchPlaceholder}
-					class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
+					class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
 				/>
+				<span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+					<kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-white/10 text-white/40 rounded border border-white/10">/</kbd>
+				</span>
 			</div>
 		)}
 	</div>
@@ -59,10 +63,11 @@ const {
 		<div class="flex items-center gap-2 shrink-0">
 			<button
 				id={newBtnId}
-				class="w-full sm:w-auto px-5 py-2.5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
+				class="w-full sm:w-auto px-5 py-2.5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md group"
 			>
 				<Icon name="plus" size={16} class="w-4 h-4" />
-				{newBtnLabel}
+				<span>{newBtnLabel}</span>
+				<kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-white/20 text-white/90 rounded border border-white/20 group-hover:border-white/40 transition-colors">N</kbd>
 			</button>
 		</div>
 	)}
