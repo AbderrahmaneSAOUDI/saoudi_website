@@ -6,8 +6,8 @@ import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
 import { getCached, setCached } from '../lib/server/cache';
 import Icon from '../components/Icon.astro';
 
-// Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
-Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=600');
+// Cache response with must-revalidate so CDN edge revalidates on request and displays admin CRUD updates immediately
+Astro.response.headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
 
 let designs: any[] = [];
 let companies: string[] = ['Google', 'GDG', 'Freelance', 'Personal'];
@@ -26,15 +26,9 @@ if (cachedDesigns && cachedCompanies) {
 	try {
 		const db = getFirebaseAdminDb();
 
-		// PERF: Run both queries in parallel instead of sequentially.
-		// Also use select() to fetch only the fields needed for rendering,
-		// reducing Firestore read payload and improving TTFB.
 		const [companiesDoc, snapshot] = await Promise.all([
 			db.collection("configuration").doc("designs_companies").get(),
-			db.collection("designs")
-				.select('title', 'imageUrl', 'company', 'date')
-				.orderBy("date", "desc")
-				.get(),
+			db.collection("designs").get(),
 		]);
 
 		if (companiesDoc.exists) {
@@ -45,6 +39,13 @@ if (cachedDesigns && cachedCompanies) {
 			id: doc.id,
 			...doc.data()
 		}));
+
+		// Sort designs by date descending safely in JavaScript
+		designs.sort((a, b) => {
+			const dateA = a.date || '';
+			const dateB = b.date || '';
+			return dateB.localeCompare(dateA);
+		});
 
 		setCached(cacheKeyDesigns, designs);
 		setCached(cacheKeyCompanies, companies);
