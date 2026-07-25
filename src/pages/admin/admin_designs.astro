@@ -195,10 +195,11 @@ try {
 						<button
 							type="button"
 							id="btn-delete"
-							class="hidden p-2.5 rounded-xl text-[#DB4437] hover:bg-[#DB4437]/10 border border-transparent hover:border-[#DB4437]/20 transition-all cursor-pointer shrink-0"
-							title="Delete Design"
+							class="hidden p-2.5 rounded-xl text-[#DB4437] hover:bg-[#DB4437]/10 border border-transparent hover:border-[#DB4437]/20 transition-all cursor-pointer shrink-0 flex items-center gap-1.5"
+							title="Delete Design (Delete)"
 						>
 							<Icon name="trash" size={20} class="w-5 h-5" />
+							<kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-[#DB4437]/20 text-[#DB4437] rounded border border-[#DB4437]/30">Del</kbd>
 						</button>
 					</div>
 
@@ -231,8 +232,9 @@ try {
 										<Icon name="image" size={20} class="w-5 h-5" />
 									</div>
 									<div>
-										<p class="text-xs font-medium text-white">
+										<p class="text-xs font-medium text-white flex items-center gap-1.5">
 											Drop cover or <span class="text-primary font-semibold">browse</span>
+											<kbd class="px-1.5 py-0.5 text-[10px] font-mono bg-white/10 text-white/50 rounded border border-white/10">Tab</kbd>
 										</p>
 										<p class="text-[10px] text-[#E6E1E5]/40 mt-0.5">JPEG, PNG, WebP (Max 10MB)</p>
 									</div>
@@ -369,9 +371,10 @@ try {
 							<button
 								type="button"
 								id="btn-cancel"
-								class="flex-1 py-3 px-4 rounded-xl border border-[#2B2930] hover:bg-[#2B2930] text-[#E6E1E5] font-semibold text-sm transition-all duration-300 cursor-pointer text-center"
+								class="flex-1 py-3 px-4 rounded-xl border border-[#2B2930] hover:bg-[#2B2930] text-[#E6E1E5] font-semibold text-sm transition-all duration-300 cursor-pointer text-center flex items-center justify-center gap-1.5"
 							>
-								Cancel
+								<span>Cancel</span>
+								<kbd class="px-1.5 py-0.5 text-[10px] font-mono bg-white/10 text-white/50 rounded border border-white/10">Esc</kbd>
 							</button>
 							<button
 								type="submit"
@@ -1686,5 +1689,163 @@ try {
 				btnSave.classList.remove('opacity-75', 'cursor-not-allowed');
 			}
 		}
+
+		// --- Keyboard Shortcuts ---
+		let highlightedCardIndex = -1;
+
+		function updateCardHighlighting(cards: HTMLElement[]) {
+			cards.forEach((c, idx) => {
+				if (idx === highlightedCardIndex) {
+					c.classList.add('ring-2', 'ring-primary', 'border-primary/50');
+					c.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+				} else {
+					c.classList.remove('ring-2', 'ring-primary', 'border-primary/50');
+				}
+			});
+		}
+
+		document.addEventListener('keydown', (e: KeyboardEvent) => {
+			const activeEl = document.activeElement as HTMLElement | null;
+			const isEditingText = activeEl && (
+				['INPUT', 'TEXTAREA', 'SELECT'].includes(activeEl.tagName) ||
+				activeEl.isContentEditable
+			);
+
+			// 0. [/] key: Focus Search Bar (when not editing text)
+			if (e.key === '/' && !isEditingText) {
+				e.preventDefault();
+				if (searchInput) {
+					searchInput.focus();
+					searchInput.select();
+				}
+				return;
+			}
+
+			// 1. [Esc] key: Close lightbox, active modals, drawers, or blur active inputs
+			if (e.key === 'Escape') {
+				if (window.location.hash === '#global-lightbox') {
+					window.location.hash = '#';
+					return;
+				}
+				if (companiesModal && !companiesModal.classList.contains('hidden')) {
+					closeCompaniesModal.click();
+					return;
+				}
+				if (filterPanel && filterPanel.classList.contains('translate-x-0')) {
+					closeFilterDrawer();
+					return;
+				}
+				if (editorPanel && editorPanel.classList.contains('translate-x-0')) {
+					closeDrawer();
+					return;
+				}
+				if (isEditingText) {
+					activeEl?.blur();
+					return;
+				}
+			}
+
+			// 2. [Tab] key: When editor panel drawer is open, trigger image chooser
+			if (e.key === 'Tab' && editorPanel && editorPanel.classList.contains('translate-x-0')) {
+				const isTextInput = activeEl && (
+					activeEl.tagName === 'TEXTAREA' ||
+					(activeEl.tagName === 'INPUT' && (activeEl as HTMLInputElement).type === 'text')
+				);
+				if (!isTextInput) {
+					e.preventDefault();
+					if (imageFileInput) imageFileInput.click();
+					return;
+				}
+			}
+
+			// Do not trigger letter/action shortcuts while typing in an input field
+			if (isEditingText) return;
+
+			// 3. [L] key: Toggle / Open Image Lightbox
+			if (e.key === 'l' || e.key === 'L') {
+				e.preventDefault();
+				if (window.location.hash === '#global-lightbox') {
+					window.location.hash = '#';
+					return;
+				}
+				if (editorPanel && editorPanel.classList.contains('translate-x-0') && currentSelectedId) {
+					const card = designsGrid.querySelector(`.design-card[data-id="${currentSelectedId}"]`);
+					const trigger = card?.querySelector('[data-lightbox-src]') as HTMLElement;
+					if (trigger) trigger.click();
+					return;
+				}
+				const visibleCards = Array.from(designsGrid.querySelectorAll('.design-card:not(.hidden)')) as HTMLElement[];
+				if (visibleCards.length > 0) {
+					const targetCard = highlightedCardIndex >= 0 ? visibleCards[highlightedCardIndex] : visibleCards[0];
+					const trigger = targetCard?.querySelector('[data-lightbox-src]') as HTMLElement;
+					if (trigger) trigger.click();
+				}
+				return;
+			}
+
+			// 4. [Arrow Keys & Enter]: Card grid navigation
+			if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)) {
+				const isDrawerOpen = (editorPanel && editorPanel.classList.contains('translate-x-0')) ||
+				                     (filterPanel && filterPanel.classList.contains('translate-x-0'));
+				if (!isDrawerOpen) {
+					const visibleCards = Array.from(designsGrid.querySelectorAll('.design-card:not(.hidden)')) as HTMLElement[];
+					if (visibleCards.length > 0) {
+						if (e.key === 'Enter' && highlightedCardIndex >= 0 && highlightedCardIndex < visibleCards.length) {
+							e.preventDefault();
+							visibleCards[highlightedCardIndex].click();
+							return;
+						}
+
+						if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+							e.preventDefault();
+							const cols = window.innerWidth >= 768 ? 5 : window.innerWidth >= 640 ? 2 : 1;
+
+							if (highlightedCardIndex < 0) {
+								highlightedCardIndex = 0;
+							} else if (e.key === 'ArrowRight') {
+								highlightedCardIndex = (highlightedCardIndex + 1) % visibleCards.length;
+							} else if (e.key === 'ArrowLeft') {
+								highlightedCardIndex = (highlightedCardIndex - 1 + visibleCards.length) % visibleCards.length;
+							} else if (e.key === 'ArrowDown') {
+								highlightedCardIndex = Math.min(visibleCards.length - 1, highlightedCardIndex + cols);
+							} else if (e.key === 'ArrowUp') {
+								highlightedCardIndex = Math.max(0, highlightedCardIndex - cols);
+							}
+
+							updateCardHighlighting(visibleCards);
+							return;
+						}
+					}
+				}
+			}
+
+			// 5. [N] key: Open New Design panel
+			if (e.key === 'n' || e.key === 'N') {
+				e.preventDefault();
+				setNewDesignState();
+				openDrawer();
+				return;
+			}
+
+			// 6. [F] key: Open / close Filter drawer panel
+			if (e.key === 'f' || e.key === 'F') {
+				e.preventDefault();
+				if (filterPanel && filterPanel.classList.contains('translate-x-0')) {
+					closeFilterDrawer();
+				} else {
+					openFilterDrawer();
+				}
+				return;
+			}
+
+			// 7. [Delete] key: Delete card item if editor panel is open with an active item
+			if (e.key === 'Delete') {
+				if (editorPanel && editorPanel.classList.contains('translate-x-0') && currentSelectedId && !btnDelete.classList.contains('hidden')) {
+					e.preventDefault();
+					btnDelete.click();
+					return;
+				}
+			}
+		});
 	});
 </script>
