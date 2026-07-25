@@ -234,7 +234,7 @@ try {
 									<div>
 										<p class="text-xs font-medium text-white flex items-center gap-1.5">
 											Drop cover or <span class="text-primary font-semibold">browse</span>
-											<kbd class="px-1.5 py-0.5 text-[10px] font-mono bg-white/10 text-white/50 rounded border border-white/10">Tab</kbd>
+											<kbd class="px-1.5 py-0.5 text-[10px] font-mono bg-white/10 text-white/50 rounded border border-white/10">CapsLock</kbd>
 										</p>
 										<p class="text-[10px] text-[#E6E1E5]/40 mt-0.5">JPEG, PNG, WebP (Max 10MB)</p>
 									</div>
@@ -1745,17 +1745,42 @@ try {
 				}
 			}
 
-			// 2. [Tab] key: When editor panel drawer is open, trigger image chooser
-			if (e.key === 'Tab' && editorPanel && editorPanel.classList.contains('translate-x-0')) {
-				const isTextInput = activeEl && (
-					activeEl.tagName === 'TEXTAREA' ||
-					(activeEl.tagName === 'INPUT' && (activeEl as HTMLInputElement).type === 'text')
-				);
-				if (!isTextInput) {
+			// Numeric Date fields ArrowUp/ArrowDown adjustment
+			if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && activeEl && activeEl.tagName === 'INPUT') {
+				const inputEl = activeEl as HTMLInputElement;
+				const isNumericInput = inputEl.inputMode === 'numeric' || inputEl.type === 'number' || inputEl.id === 'form-date-day' || inputEl.id === 'form-date-year';
+				if (isNumericInput) {
 					e.preventDefault();
-					if (imageFileInput) imageFileInput.click();
+					let val = parseInt(inputEl.value, 10);
+					const delta = e.key === 'ArrowUp' ? 1 : -1;
+
+					if (inputEl.id === 'form-date-day') {
+						if (isNaN(val)) val = delta > 0 ? 1 : 31;
+						else val = val + delta;
+						if (val > 31) val = 1;
+						if (val < 1) val = 31;
+						inputEl.value = String(val).padStart(2, '0');
+					} else if (inputEl.id === 'form-date-year') {
+						const currentYear = new Date().getFullYear();
+						if (isNaN(val)) val = currentYear;
+						else val = val + delta;
+						inputEl.value = String(val);
+					} else {
+						if (isNaN(val)) val = 0;
+						else val = val + delta;
+						inputEl.value = String(val);
+					}
+					inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+					inputEl.dispatchEvent(new Event('change', { bubbles: true }));
 					return;
 				}
+			}
+
+			// 2. [CapsLock] key: When editor panel drawer is open, trigger image chooser
+			if (e.key === 'CapsLock' && editorPanel && editorPanel.classList.contains('translate-x-0')) {
+				e.preventDefault();
+				if (imageFileInput) imageFileInput.click();
+				return;
 			}
 
 			// Do not trigger letter/action shortcuts while typing in an input field
