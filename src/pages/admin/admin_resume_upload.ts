@@ -2,7 +2,6 @@ import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
 import { clearCache } from '../../lib/server/cache';
 
-
 /**
  * POST /admin/admin_resume_upload
  *

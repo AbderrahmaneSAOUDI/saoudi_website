@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
 import { deleteFile } from '../../lib/server/storage';
-import { clearCache } from '../../lib/server/cache';
+import { clearCache, clearCacheByPrefix } from '../../lib/server/cache';
 
 export const POST: APIRoute = async ({ locals, request }) => {
 	// Auth check: verify session token
@@ -49,9 +49,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			// 2. Delete Firestore document
 			await docRef.delete();
 
-			// Invalidate cache
-			clearCache('designs_list');
-			clearCache('designs_companies');
+			// Invalidate designs cache (all keys prefixed with 'designs_') + dashboard counts
+			clearCacheByPrefix('designs_');
 			clearCache('public_dashboard_counts');
 			clearCache('admin_dashboard_counts');
 
@@ -130,9 +129,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				}
 			}
 
-			// Invalidate cache
-			clearCache('designs_companies');
-			clearCache('designs_list');
+			// Invalidate designs cache (all keys prefixed with 'designs_') + dashboard counts
+			clearCacheByPrefix('designs_');
 			clearCache('public_dashboard_counts');
 			clearCache('admin_dashboard_counts');
 
@@ -208,9 +206,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			// Save/Merge in Firestore
 			await docRef.set(designPayload, { merge: true });
 
-			// Invalidate cache
-			clearCache('designs_list');
-			clearCache('designs_companies');
+			// Invalidate designs cache (all keys prefixed with 'designs_') + dashboard counts
+			clearCacheByPrefix('designs_');
 			clearCache('public_dashboard_counts');
 			clearCache('admin_dashboard_counts');
 

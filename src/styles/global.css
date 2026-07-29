@@ -54,6 +54,8 @@
   background-size: 200% 100%;
   animation: skeleton-loading 1.5s ease-in-out infinite;
   border-radius: 0.5rem;
+  /* PERF: Isolate shimmer repaint to this element's subtree */
+  contain: layout style;
 }
 
 /* ── Shared Page Entrance Animations (M3 easing) ──────────────────────── */
@@ -82,16 +84,19 @@
 
 .animate-page-fade-in {
 	animation: page-fade-in 0.8s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+	will-change: transform, opacity;
 }
 
 .animate-page-slide-up {
 	opacity: 0;
 	animation: page-slide-up 0.6s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+	will-change: transform, opacity;
 }
 
 .animate-page-card-fade {
 	opacity: 0;
 	animation: page-slide-up 0.5s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+	will-change: transform, opacity;
 }
 
 /* Override header responsive behavior at 1000px */
@@ -198,5 +203,3 @@ select option:checked {
   color: var(--color-primary) !important;
   font-weight: 700;
 }
-
-

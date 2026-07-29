@@ -1,157 +1,24 @@
 ---
+/**
+ * Designs Page
+ * Content loaded via server:defer island for instant page shell rendering.
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Card from '../components/Card.astro';
 import GlobalLightbox from '../components/GlobalLightbox.astro';
-import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
-import { getCached, setCached } from '../lib/server/cache';
-import Icon from '../components/Icon.astro';
+import DesignsIsland from '../components/DesignsIsland.astro';
+import SkeletonCardGrid from '../components/SkeletonCardGrid.astro';
 
-// Cache response with must-revalidate so CDN edge revalidates on request and displays admin CRUD updates immediately
-Astro.response.headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
-
-let designs: any[] = [];
-let companies: string[] = ['Google', 'GDG', 'Freelance', 'Personal'];
-let errorMsg = '';
-
-const cacheKeyDesigns = 'designs_list';
-const cacheKeyCompanies = 'designs_companies';
-
-const cachedDesigns = getCached<any[]>(cacheKeyDesigns);
-const cachedCompanies = getCached<string[]>(cacheKeyCompanies);
-
-if (cachedDesigns && cachedCompanies) {
-	designs = cachedDesigns;
-	companies = cachedCompanies;
-} else {
-	try {
-		const db = getFirebaseAdminDb();
-
-		const [companiesDoc, snapshot] = await Promise.all([
-			db.collection("configuration").doc("designs_companies").get(),
-			db.collection("designs").get(),
-		]);
-
-		if (companiesDoc.exists) {
-			companies = companiesDoc.data()?.companies || companies;
-		}
-
-		designs = snapshot.docs.map(doc => ({
-			id: doc.id,
-			...doc.data()
-		}));
-
-		// Sort designs by date descending safely in JavaScript
-		designs.sort((a, b) => {
-			const dateA = a.date || '';
-			const dateB = b.date || '';
-			return dateB.localeCompare(dateA);
-		});
-
-		setCached(cacheKeyDesigns, designs);
-		setCached(cacheKeyCompanies, companies);
-	} catch (error: any) {
-		console.warn("Failed to fetch designs from Firestore for public page:", error);
-		errorMsg = "Degraded mode: Designs are currently offline or unavailable.";
-	}
-}
-
-// Group designs by company
-const designsByCompany: Record<string, any[]> = {};
-const personalKey = 'Personal / Freelance';
-
-// Initialize all groups
-companies.forEach(co => {
-	designsByCompany[co] = [];
-});
-designsByCompany[personalKey] = [];
-
-// Distribute designs
-designs.forEach(design => {
-	const co = design.company ? design.company : personalKey;
-	if (!designsByCompany[co]) {
-		designsByCompany[co] = [];
-	}
-	designsByCompany[co].push(design);
-});
-
-// Filter and sort active company groups
-const activeGroups = Object.keys(designsByCompany)
-	.filter(co => designsByCompany[co].length > 0)
-	.sort((a, b) => {
-		if (a === personalKey) return 1;
-		if (b === personalKey) return -1;
-		
-		const indexA = companies.indexOf(a);
-		const indexB = companies.indexOf(b);
-		if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-		return a.localeCompare(b);
-	});
+// Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
+Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=600');
 ---
 
 <BaseLayout title="Designs">
 	<div class="mx-auto px-4 sm:px-6 lg:px-8 pt-8 max-w-7xl">
-
-
-		{errorMsg && (
-			<div class="mb-10 p-4 rounded-2xl bg-[#EA4335]/10 border border-[#EA4335]/30 text-[#EA4335] text-sm text-center">
-				{errorMsg}
-			</div>
-		)}
-
-		<!-- Grouped Lists: Title, Grid, Title, Grid -->
-		<div class="space-y-12">
-			{activeGroups.map((companyName, groupIndex) => {
-				const groupDesigns = designsByCompany[companyName];
-				const toggleId = `toggle-company-${groupIndex}`;
-				return (
-					<section class="space-y-4 animate-page-slide-up" style={`animation-delay: ${100 + groupIndex * 100}ms;`}>
-						<input type="checkbox" id={toggleId} class="peer hidden" checked />
-
-						<!-- Section Title -->
-						<label for={toggleId} class="flex items-center justify-between border-b border-white/5 pb-3 cursor-pointer select-none group peer-checked:[&_.chevron-icon]:rotate-180">
-							<div class="flex items-center gap-3">
-								<div class="w-1.5 h-6 bg-primary rounded-full transition-transform group-hover:scale-y-125"></div>
-								<h2 class="font-bold text-white text-xl tracking-tight group-hover:text-primary transition-colors">{companyName}</h2>
-								<span class="text-xs text-white/40 font-semibold bg-white/5 px-2.5 py-0.5 rounded-full border border-white/5">
-									{groupDesigns.length}
-								</span>
-							</div>
-							<div class="chevron-icon text-white/40 group-hover:text-primary transition-transform duration-300">
-								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-								</svg>
-							</div>
-						</label>
-
-						<!-- Grid of Designs -->
-						<div class="grid grid-rows-[0fr] opacity-0 -translate-y-3 pointer-events-none transition-all duration-300 ease-in-out peer-checked:grid-rows-[1fr] peer-checked:opacity-100 peer-checked:translate-y-0 peer-checked:pointer-events-auto">
-							<div class="overflow-hidden">
-								<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 pb-1">
-									{groupDesigns.map((design, index) => (
-										<div class="animate-page-card-fade" style={`animation-delay: ${index * 50}ms`}>
-											<Card item={design} type="design" />
-										</div>
-									))}
-								</div>
-							</div>
-						</div>
-					</section>
-				);
-			})}
-
-			{designs.length === 0 && !errorMsg && (
-				<div class="py-24 text-center text-white/40 bg-surface-container rounded-3xl border border-white/10 flex flex-col items-center justify-center animate-page-fade-in">
-					<div class="p-4 rounded-full bg-primary/10 text-primary mb-4">
-						<Icon name="design" size={48} />
-					</div>
-					<p class="font-bold text-white text-lg">No designs uploaded yet</p>
-					<p class="text-xs mt-1 text-white/60 max-w-sm">Please check back later or visit the admin panel to add mockups.</p>
-				</div>
-			)}
-		</div>
+		<DesignsIsland server:defer>
+			<SkeletonCardGrid slot="fallback" variant="design" count={8} groups={2} />
+		</DesignsIsland>
 	</div>
 
 	<!-- Render Lightbox outside transform scopes -->
 	<GlobalLightbox />
 </BaseLayout>
-
