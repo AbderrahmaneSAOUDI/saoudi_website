@@ -1,0 +1,68 @@
+---
+/**
+ * HomeCountsIsland — Server Island for Dashboard Counts
+ * 
+ * Deferred component fetched asynchronously via server:defer.
+ * Renders the statistics grid with live Firestore counts.
+ * The parent page shows skeleton cards while this loads.
+ */
+import Icon from './Icon.astro';
+import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
+import { getCached, setCached } from '../lib/server/cache';
+
+interface Props {}
+
+type CountsData = { projects: number; experience: number; designs: number; certificates: number; volunteering: number; };
+
+const defaultCounts: CountsData = { projects: 0, experience: 0, designs: 0, certificates: 0, volunteering: 0 };
+const cacheKeyCounts = 'public_dashboard_counts';
+let counts: CountsData = getCached<CountsData>(cacheKeyCounts) ?? defaultCounts;
+
+if (counts === defaultCounts) {
+	try {
+		const db = getFirebaseAdminDb();
+		const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, volunteeringSnap] = await Promise.all([
+			db.collection("projects").count().get(),
+			db.collection("experience").count().get(),
+			db.collection("designs").count().get(),
+			db.collection("certificates").count().get(),
+			db.collection("volunteering").count().get(),
+		]);
+
+		counts = {
+			projects: projectsSnap.data().count,
+			experience: experienceSnap.data().count,
+			designs: designsSnap.data().count,
+			certificates: certificatesSnap.data().count,
+			volunteering: volunteeringSnap.data().count,
+		};
+		setCached(cacheKeyCounts, counts);
+	} catch (error) {
+		console.warn("Failed to fetch aggregate counts from Firestore for public home page:", error);
+		// counts already holds defaultCounts (all zeros) — no further action needed
+	}
+}
+
+const statCards = [
+	{ label: 'Projects', value: counts.projects, icon: 'projects', color: 'primary' },
+	{ label: 'Experience', value: counts.experience, icon: 'experience', color: 'secondary' },
+	{ label: 'Designs', value: counts.designs, icon: 'design', color: 'tertiary' },
+	{ label: 'Certificates', value: counts.certificates, icon: 'certifications', color: 'primary' },
+	{ label: 'Volunteering', value: counts.volunteering, icon: 'business', color: 'secondary' },
+];
+---
+
+<div class="relative grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+	{statCards.map(({ label, value, icon, color }) => (
+		<div class={`p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-${color}/40 border border-white/10 bg-surface-container group`}>
+			<div class="flex justify-between items-start mb-4">
+				<div class={`relative p-2.5 rounded-2xl bg-${color}/10 text-${color}`}>
+					<Icon name={icon} size={24} class="w-6 h-6 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90" />
+					<Icon name={icon} filled size={24} class="absolute top-2.5 left-2.5 w-6 h-6 opacity-0 transition-all duration-200 scale-90 group-hover:opacity-100 group-hover:scale-100" />
+				</div>
+				<span class="text-2xl font-black text-white">{value}</span>
+			</div>
+			<h3 class="font-bold text-[#E6E1E5]">{label}</h3>
+		</div>
+	))}
+</div>

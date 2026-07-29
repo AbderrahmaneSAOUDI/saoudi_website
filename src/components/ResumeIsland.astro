@@ -1,0 +1,66 @@
+---
+/**
+ * ResumeIsland — Server Island for Resume Content
+ * 
+ * Deferred component fetched asynchronously via server:defer.
+ * Fetches the resume configuration (preview image URL + PDF download URL) from Firestore.
+ * The parent page shows a skeleton placeholder while this loads.
+ */
+import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
+import { getCached, setCached } from '../lib/server/cache';
+
+interface Props {}
+
+let resumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
+let resumePreviewUrl = '/resume.webp';
+
+const cacheKeyResume = 'resume_config';
+const cachedResume = getCached<{ resumeUrl: string; resumePreviewUrl: string }>(cacheKeyResume);
+
+if (cachedResume) {
+	resumeUrl = cachedResume.resumeUrl;
+	resumePreviewUrl = cachedResume.resumePreviewUrl;
+} else {
+	try {
+		const db = getFirebaseAdminDb();
+		const configDoc = await db.collection('configuration').doc('static_data').get();
+		if (configDoc.exists) {
+			const data = configDoc.data();
+			if (data?.resumeUrl) resumeUrl = data.resumeUrl;
+			if (data?.previewUrl) resumePreviewUrl = data.previewUrl;
+			
+			// Cache for 10 minutes
+			setCached(cacheKeyResume, { resumeUrl, resumePreviewUrl }, 600000);
+		}
+	} catch (error) {
+		console.warn('Failed to fetch resume config in public page:', error);
+	}
+}
+---
+
+<div class="mt-8 space-y-6">
+	<div class="border border-white/10 rounded-3xl overflow-hidden p-2 bg-surface-container">
+		<img
+			src={resumePreviewUrl}
+			alt="Resume preview"
+			width="1530"
+			height="1980"
+			fetchpriority="high"
+			class="w-full rounded-2xl object-cover"
+		/>
+	</div>
+
+	<div class="flex justify-center">
+		<a
+			href={resumeUrl}
+			download
+			class="inline-flex items-center justify-center gap-2 rounded-full bg-primary/80 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary/90">
+			<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+				<polyline points="7 10 12 15 17 10" />
+				<line x1="12" y1="15" x2="12" y2="3" />
+			</svg>
+			Download PDF
+		</a>
+	</div>
+</div>

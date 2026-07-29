@@ -36,7 +36,7 @@ function loadEnvFile(): Map<string, string> {
 			if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
 				v = v.slice(1, -1);
 			}
-			envCache.set(k, v.replace(/\\n/g, '\n'));
+			envCache.set(k, v);
 		}
 	} catch {
 		/* .env file not found or not readable — expected in production */

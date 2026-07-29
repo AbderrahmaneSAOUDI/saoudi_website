@@ -1,0 +1,124 @@
+---
+/**
+ * CertificationsIsland — Server Island for Certifications Content
+ * 
+ * Deferred component fetched asynchronously via server:defer.
+ * Renders the year-grouped certification galleries with live Firestore data.
+ * The parent page shows skeleton cards while this loads.
+ */
+import Card from './Card.astro';
+import Icon from './Icon.astro';
+import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
+import { getCached, setCached } from '../lib/server/cache';
+
+interface Props {}
+
+let certificates: any[] = [];
+let errorMsg = '';
+
+const cacheKeyCertificates = 'certificates_list';
+
+const cachedCertificates = getCached<any[]>(cacheKeyCertificates);
+
+if (cachedCertificates) {
+	certificates = cachedCertificates;
+} else {
+	try {
+		const db = getFirebaseAdminDb();
+
+		// PERF: Use select() to only fetch fields needed for public rendering.
+		// Avoids transferring unused admin-only fields, reducing payload.
+		const snapshot = await db.collection("certificates")
+			.select('title', 'imageUrl', 'issuer', 'date', 'type', 'credentialUrl')
+			.orderBy("date", "desc")
+			.get();
+		certificates = snapshot.docs.map(doc => ({
+			id: doc.id,
+			...doc.data()
+		}));
+
+		setCached(cacheKeyCertificates, certificates);
+	} catch (error: any) {
+		console.warn("Failed to fetch certificates from Firestore for public page:", error);
+		errorMsg = "Degraded mode: Certifications are currently offline or unavailable.";
+	}
+}
+
+// Group certifications by year
+const certificatesByYear: Record<string, any[]> = {};
+
+certificates.forEach(cert => {
+	let year = 'Other';
+	if (cert.date && typeof cert.date === 'string') {
+		const parts = cert.date.split('-');
+		if (parts[0] && parts[0].length === 4) {
+			year = parts[0];
+		}
+	}
+	if (!certificatesByYear[year]) {
+		certificatesByYear[year] = [];
+	}
+	certificatesByYear[year].push(cert);
+});
+
+// Sort years descending
+const activeYears = Object.keys(certificatesByYear).sort((a, b) => b.localeCompare(a));
+---
+
+{errorMsg && (
+	<div class="mb-10 p-4 rounded-2xl bg-[#EA4335]/10 border border-[#EA4335]/30 text-[#EA4335] text-sm text-center">
+		{errorMsg}
+	</div>
+)}
+
+<!-- Grouped Lists: Year, Grid -->
+<div class="space-y-12">
+	{activeYears.map((year, groupIndex) => {
+		const groupCerts = certificatesByYear[year];
+		const toggleId = `toggle-year-${year}`;
+		return (
+			<section class="space-y-4 animate-page-slide-up" style={`animation-delay: ${100 + groupIndex * 100}ms;`}>
+				<input type="checkbox" id={toggleId} class="peer hidden" checked />
+
+				<!-- Section Title -->
+				<label for={toggleId} class="flex items-center justify-between border-b border-white/5 pb-3 cursor-pointer select-none group peer-checked:[&_.chevron-icon]:rotate-180">
+					<div class="flex items-center gap-3">
+						<div class="w-1.5 h-6 bg-primary rounded-full transition-transform group-hover:scale-y-125"></div>
+						<h2 class="font-bold text-white text-xl tracking-tight group-hover:text-primary transition-colors">{year}</h2>
+						<span class="text-xs text-white/40 font-semibold bg-white/5 px-2.5 py-0.5 rounded-full border border-white/5">
+							{groupCerts.length}
+						</span>
+					</div>
+					<div class="chevron-icon text-white/40 group-hover:text-primary transition-transform duration-300">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</div>
+				</label>
+
+				<!-- Grid of Certificates -->
+				<div class="grid grid-rows-[0fr] opacity-0 -translate-y-3 pointer-events-none transition-all duration-300 ease-in-out peer-checked:grid-rows-[1fr] peer-checked:opacity-100 peer-checked:translate-y-0 peer-checked:pointer-events-auto">
+					<div class="overflow-hidden">
+						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 pb-1">
+							{groupCerts.map((cert, index) => (
+								<div class="animate-page-card-fade" style={`animation-delay: ${index * 50}ms`}>
+									<Card item={cert} type="certificate" />
+								</div>
+							))}
+						</div>
+					</div>
+				</div>
+			</section>
+		);
+	})}
+
+	{certificates.length === 0 && !errorMsg && (
+		<div class="py-24 text-center text-white/40 bg-surface-container rounded-3xl border border-white/10 flex flex-col items-center justify-center animate-page-fade-in">
+			<div class="p-4 rounded-full bg-primary/10 text-primary mb-4">
+				<Icon name="certifications" size={48} />
+			</div>
+			<p class="font-bold text-white text-lg">No certifications found</p>
+			<p class="text-xs mt-1 text-white/60 max-w-sm">Please check back later or visit the admin panel to add credentials.</p>
+		</div>
+	)}
+</div>

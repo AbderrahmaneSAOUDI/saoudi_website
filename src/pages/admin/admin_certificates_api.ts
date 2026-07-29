@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
 import { clearCache } from '../../lib/server/cache';
+import { FieldValue } from 'firebase-admin/firestore';
 
 export const POST: APIRoute = async ({ locals, request }) => {
 	// Auth check: verify session token
@@ -116,14 +117,15 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				certificatePayload.credentialUrl = null;
 			}
 
-			// Explicitly set credentialId to null to clean up existing Firestore entries if they exist
-			certificatePayload.credentialId = null;
-
-			// Also handle period removal for existing docs
-			certificatePayload.period = null;
-
-			// Explicitly set order to null to clean up existing Firestore entries
-			certificatePayload.order = null;
+			// CLEANUP: Remove deprecated fields that existed in older schema versions.
+			// FieldValue.delete() removes the key entirely rather than storing a null value.
+			// Only apply to existing documents to avoid writing unnecessary Firestore ops on new docs.
+			if (docSnap.exists) {
+				const existingData = docSnap.data() || {};
+				if ('credentialId' in existingData) certificatePayload.credentialId = FieldValue.delete();
+				if ('period' in existingData) certificatePayload.period = FieldValue.delete();
+				if ('order' in existingData) certificatePayload.order = FieldValue.delete();
+			}
 
 			if (imageUrl) {
 				certificatePayload.imageUrl = imageUrl;

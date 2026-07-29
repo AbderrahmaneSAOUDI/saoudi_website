@@ -100,7 +100,7 @@ const typeColors = {
 				<img
 					src={design.imageUrl}
 					alt={design.title || design.company}
-					class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10 opacity-0 transition-opacity duration-300"
+					class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10 opacity-0"
 					loading="lazy"
 					decoding="async"
 					onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
@@ -149,7 +149,7 @@ const typeColors = {
 						<img
 							src={certificate.imageUrl}
 							alt={certificate.title}
-							class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10 opacity-0 transition-opacity duration-300"
+							class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10 opacity-0"
 							loading="lazy"
 							decoding="async"
 							onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
@@ -223,11 +223,13 @@ const typeColors = {
 		});
 	};
 
-	// Run on DOM content loaded and full load
+	// Run once when the DOM is ready, and once more when all resources have loaded
+	// (handles images that finish loading after DOMContentLoaded but before window.load).
 	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', removeSkeletons);
+		document.addEventListener('DOMContentLoaded', removeSkeletons, { once: true });
 	} else {
 		removeSkeletons();
 	}
-	window.addEventListener('load', removeSkeletons);
+	// Always attach window.load to catch images loaded after DOMContentLoaded
+	window.addEventListener('load', removeSkeletons, { once: true });
 </script>

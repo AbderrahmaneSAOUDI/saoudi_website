@@ -1,0 +1,84 @@
+---
+/**
+ * SkeletonCardGrid — Fallback placeholder for server:defer islands
+ * 
+ * Renders animated skeleton cards that match the visual layout of design/certification grids.
+ * Displayed instantly while the actual content loads from Firestore via server islands.
+ * Pure CSS animation — zero client-side JavaScript.
+ */
+
+interface Props {
+	/** Number of skeleton cards to show */
+	count?: number;
+	/** Number of skeleton group headers to show */
+	groups?: number;
+	/** Visual variant — determines skeleton card inner structure */
+	variant?: 'design' | 'certificate' | 'stat' | 'resume';
+}
+
+const { count = 8, groups = 2, variant = 'design' } = Astro.props;
+
+// Distribute cards evenly across groups
+const cardsPerGroup = Math.ceil(count / groups);
+---
+
+{variant === 'stat' && (
+	<div class="relative grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+		{Array.from({ length: 5 }).map((_, i) => (
+			<div class="p-5 rounded-3xl border border-white/10 bg-surface-container" style={`animation-delay: ${i * 80}ms`}>
+				<div class="flex justify-between items-start mb-4">
+					<div class="skeleton w-11 h-11 rounded-2xl"></div>
+					<div class="skeleton h-7 w-8 rounded-lg"></div>
+				</div>
+				<div class="skeleton h-5 w-20 rounded-lg"></div>
+			</div>
+		))}
+	</div>
+)}
+
+{variant === 'resume' && (
+	<div class="mt-8 space-y-6">
+		<div class="border border-white/10 rounded-3xl overflow-hidden p-2 bg-surface-container">
+			<div class="skeleton w-full rounded-2xl" style="aspect-ratio: 1530/1980;"></div>
+		</div>
+		<div class="flex justify-center">
+			<div class="skeleton h-12 w-44 rounded-full"></div>
+		</div>
+	</div>
+)}
+
+{(variant === 'design' || variant === 'certificate') && (
+	<div class="space-y-12">
+		{Array.from({ length: groups }).map((_, groupIdx) => (
+			<section class="space-y-4" style={`animation-delay: ${groupIdx * 120}ms`}>
+				{/* Skeleton section header */}
+				<div class="flex items-center justify-between border-b border-white/5 pb-3">
+					<div class="flex items-center gap-3">
+						<div class="w-1.5 h-6 bg-primary/20 rounded-full"></div>
+						<div class="skeleton h-6 w-28 rounded-lg"></div>
+						<div class="skeleton h-5 w-8 rounded-full"></div>
+					</div>
+					<div class="skeleton w-5 h-5 rounded"></div>
+				</div>
+
+				{/* Skeleton card grid */}
+				<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 pb-1">
+					{Array.from({ length: cardsPerGroup }).map((_, cardIdx) => (
+						<article class="border border-white/10 rounded-3xl p-4 bg-surface-container flex flex-col justify-between h-full" style={`animation-delay: ${(groupIdx * cardsPerGroup + cardIdx) * 60}ms`}>
+							<div>
+								<div class="aspect-[16/10] rounded-2xl mb-4 skeleton"></div>
+								{variant === 'certificate' && (
+									<div class="skeleton h-5 w-3/4 mb-2 rounded-lg"></div>
+								)}
+							</div>
+							<div class="mt-3 pt-3 border-t border-white/5 flex justify-between items-center">
+								<div class="skeleton h-4 w-20 rounded-lg"></div>
+								<div class="skeleton h-4 w-16 rounded-lg"></div>
+							</div>
+						</article>
+					))}
+				</div>
+			</section>
+		))}
+	</div>
+)}
