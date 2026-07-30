@@ -3,16 +3,15 @@ import AdminHeader from './AdminHeader.astro';
 
 interface Props {
 	title?: string;
-	subtitle?: string;
 }
 
-const { title, subtitle } = Astro.props;
+const { title } = Astro.props;
 ---
 
 <div
 	class="min-h-screen text-[#E6E1E5] p-4 md:p-8 pb-28 md:pb-24"
 >
-	<AdminHeader title={title} subtitle={subtitle} />
+	<AdminHeader title={title} />
 
 	<!-- Page Content -->
 	<slot />

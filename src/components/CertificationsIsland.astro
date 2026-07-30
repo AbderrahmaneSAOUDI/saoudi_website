@@ -8,44 +8,40 @@
  */
 import Card from './Card.astro';
 import Icon from './Icon.astro';
+import type { Certificate } from '../types';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
-import { getCached, setCached } from '../lib/server/cache';
+import { CACHE_TTL_MS, getOrSetCached } from '../lib/server/cache';
 
 interface Props {}
 
-let certificates: any[] = [];
+let certificates: Certificate[] = [];
 let errorMsg = '';
 
 const cacheKeyCertificates = 'certificates_list';
 
-const cachedCertificates = getCached<any[]>(cacheKeyCertificates);
-
-if (cachedCertificates) {
-	certificates = cachedCertificates;
-} else {
-	try {
+try {
+	certificates = await getOrSetCached(
+		cacheKeyCertificates,
+		async () => {
 		const db = getFirebaseAdminDb();
-
-		// PERF: Use select() to only fetch fields needed for public rendering.
-		// Avoids transferring unused admin-only fields, reducing payload.
 		const snapshot = await db.collection("certificates")
 			.select('title', 'imageUrl', 'issuer', 'date', 'type', 'credentialUrl')
 			.orderBy("date", "desc")
 			.get();
-		certificates = snapshot.docs.map(doc => ({
+		return snapshot.docs.map(doc => ({
 			id: doc.id,
 			...doc.data()
-		}));
-
-		setCached(cacheKeyCertificates, certificates);
-	} catch (error: any) {
-		console.warn("Failed to fetch certificates from Firestore for public page:", error);
-		errorMsg = "Degraded mode: Certifications are currently offline or unavailable.";
-	}
+		})) as Certificate[];
+		},
+		CACHE_TTL_MS.PUBLIC_DATA,
+	);
+} catch (error) {
+	console.warn("Failed to fetch certificates from Firestore for public page:", error);
+	errorMsg = "Degraded mode: Certifications are currently offline or unavailable.";
 }
 
 // Group certifications by year
-const certificatesByYear: Record<string, any[]> = {};
+const certificatesByYear: Record<string, Certificate[]> = {};
 
 certificates.forEach(cert => {
 	let year = 'Other';

@@ -52,31 +52,34 @@ interface Props {}
 
 			toast.classList.add(...borderColor.split(' '));
 
-			toast.innerHTML = `
-				<div class="p-1 rounded-lg ${iconBg} shrink-0 mt-0.5">
-					${iconSvg}
-				</div>
-				<div class="flex-grow pt-0.5 leading-snug break-words">
-					${message}
-				</div>
-				<button 
-					type="button" 
-					class="toast-close-btn text-white/40 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10 shrink-0 cursor-pointer ml-1" 
+				toast.innerHTML = `
+					<div class="p-1 rounded-lg ${iconBg} shrink-0 mt-0.5">
+						${iconSvg}
+					</div>
+					<div class="toast-message flex-grow pt-0.5 leading-snug break-words"></div>
+					<button
+						type="button"
+						class="toast-close-btn text-white/40 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10 shrink-0 cursor-pointer ml-1"
 					aria-label="Close notification"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-				</button>
-			`;
+						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+					</button>
+				`;
 
-			container.appendChild(toast);
+				// Messages can include API error text, so insert them as text rather
+				// than interpolating untrusted content into the HTML template.
+				const messageElement = toast.querySelector('.toast-message');
+				if (messageElement) messageElement.textContent = String(message);
 
-			// Trigger slide-left entrance animation
-			requestAnimationFrame(() => {
+				container.appendChild(toast);
+
+				// Trigger slide-left entrance animation
 				requestAnimationFrame(() => {
-					toast.classList.remove('translate-x-[120%]', 'opacity-0');
-					toast.classList.add('translate-x-0', 'opacity-100');
+					requestAnimationFrame(() => {
+						toast.classList.remove('translate-x-[120%]', 'opacity-0');
+						toast.classList.add('translate-x-0', 'opacity-100');
+					});
 				});
-			});
 
 			let timer = null;
 

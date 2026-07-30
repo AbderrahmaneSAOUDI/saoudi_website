@@ -1,25 +1,21 @@
 import { z } from 'zod';
+import { getEnv } from './env';
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 
 /** Zod schema for session payload to prevent malformed token injection */
 const sessionPayloadSchema = z.object({
-	email: z.string().email(),
+	email: z.email(),
 	exp: z.number().int().positive(),
 });
 
-const getRuntimeEnv = () => globalThis.process?.env as Record<string, string | undefined> | undefined;
-
 const getSessionSecret = () => {
-  const runtimeEnv = getRuntimeEnv();
-  return (
-    runtimeEnv?.FIREBASE_PRIVATE_KEY ||
-    import.meta.env.FIREBASE_PRIVATE_KEY ||
-    runtimeEnv?.SESSION_SECRET ||
-    import.meta.env.SESSION_SECRET ||
-    'saoudi-online-dev-secret-key-change-in-production'
-  );
+  const secret = getEnv('SESSION_SECRET') || getEnv('FIREBASE_PRIVATE_KEY');
+  if (secret) return secret;
+  if (import.meta.env.DEV) return 'saoudi-online-local-development-only';
+
+  throw new Error('SESSION_SECRET is not configured.');
 };
 
 const encodeBase64Url = (value: Uint8Array): string => {
@@ -47,18 +43,25 @@ const decodeBase64Url = (value: string): Uint8Array => {
  * Imports the HMAC key for both signing and verification.
  * Uses 'sign' + 'verify' extractable=false for security.
  */
-const getHmacKey = async (secret: string, usages: KeyUsage[]): Promise<CryptoKey> => {
-  return crypto.subtle.importKey(
+let cachedSecret: string | undefined;
+let cachedHmacKey: Promise<CryptoKey> | undefined;
+
+const getHmacKey = (secret: string): Promise<CryptoKey> => {
+  if (cachedSecret === secret && cachedHmacKey) return cachedHmacKey;
+
+  cachedSecret = secret;
+  cachedHmacKey = crypto.subtle.importKey(
     'raw',
     textEncoder.encode(secret),
     { name: 'HMAC', hash: 'SHA-256' },
     false,
-    usages
+    ['sign', 'verify']
   );
+  return cachedHmacKey;
 };
 
 const signHmac = async (payloadB64: string, secret: string): Promise<string> => {
-  const key = await getHmacKey(secret, ['sign']);
+  const key = await getHmacKey(secret);
   const signature = await crypto.subtle.sign('HMAC', key, textEncoder.encode(payloadB64));
 
   return encodeBase64Url(new Uint8Array(signature));
@@ -69,9 +72,13 @@ const signHmac = async (payloadB64: string, secret: string): Promise<string> => 
  * Prevents timing side-channel attacks that string comparison (===) is vulnerable to.
  */
 const verifyHmac = async (payloadB64: string, signatureB64: string, secret: string): Promise<boolean> => {
-  const key = await getHmacKey(secret, ['verify']);
+  const key = await getHmacKey(secret);
   const signatureBytes = decodeBase64Url(signatureB64);
-  return crypto.subtle.verify('HMAC', key, signatureBytes, textEncoder.encode(payloadB64));
+  const signature = signatureBytes.buffer.slice(
+    signatureBytes.byteOffset,
+    signatureBytes.byteOffset + signatureBytes.byteLength,
+  ) as ArrayBuffer;
+  return crypto.subtle.verify('HMAC', key, signature, textEncoder.encode(payloadB64));
 };
 
 export interface SessionPayload {

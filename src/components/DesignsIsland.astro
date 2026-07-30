@@ -8,63 +8,56 @@
  */
 import Card from './Card.astro';
 import Icon from './Icon.astro';
+import type { Design } from '../types';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
-import { getCached, setCached } from '../lib/server/cache';
+import { CACHE_TTL_MS, getOrSetCached } from '../lib/server/cache';
 
 interface Props {}
 
-let designs: any[] = [];
+let designs: Design[] = [];
 let companies: string[] = ['Google', 'GDG', 'Freelance', 'Personal'];
 let errorMsg = '';
 
-const cacheKeyDesigns = 'designs_list';
-const cacheKeyCompanies = 'designs_companies';
-
-const cachedDesigns = getCached<any[]>(cacheKeyDesigns);
-const cachedCompanies = getCached<string[]>(cacheKeyCompanies);
-
-if (cachedDesigns && cachedCompanies) {
-	designs = cachedDesigns;
-	companies = cachedCompanies;
-} else {
-	try {
+try {
+	const data = await getOrSetCached(
+		'designs_public_data',
+		async () => {
 		const db = getFirebaseAdminDb();
-
 		const [companiesDoc, snapshot] = await Promise.all([
 			db.collection("configuration").doc("designs_companies").get(),
-			// PERF: Use select() to only fetch fields needed for public rendering.
-			// Avoids transferring imageUrl (base64 blobs) and unused admin-only fields.
 			db.collection("designs")
 				.select('title', 'imageUrl', 'company', 'date', 'tags')
 				.get(),
 		]);
 
-		if (companiesDoc.exists) {
-			companies = companiesDoc.data()?.companies || companies;
-		}
-
-		designs = snapshot.docs.map(doc => ({
+		const loadedDesigns = snapshot.docs.map(doc => ({
 			id: doc.id,
 			...doc.data()
-		}));
+		})) as Design[];
 
-		// Sort designs by date descending safely in JavaScript
-		designs.sort((a, b) => {
+		loadedDesigns.sort((a, b) => {
 			const dateA = a.date || '';
 			const dateB = b.date || '';
 			return dateB.localeCompare(dateA);
 		});
 
-		setCached(cacheKeyDesigns, designs);
-		setCached(cacheKeyCompanies, companies);
-	} catch (error: any) {
-		console.warn("Failed to fetch designs from Firestore for public page:", error);
-		errorMsg = "Degraded mode: Designs are currently offline or unavailable.";
-	}
+		const configuredCompanies = companiesDoc.data()?.companies;
+		return {
+			designs: loadedDesigns,
+			companies: Array.isArray(configuredCompanies) ? configuredCompanies : companies,
+		};
+		},
+		CACHE_TTL_MS.PUBLIC_DATA,
+	);
+	designs = data.designs;
+	companies = data.companies;
+} catch (error) {
+	console.warn("Failed to fetch designs from Firestore for public page:", error);
+	errorMsg = "Degraded mode: Designs are currently offline or unavailable.";
 }
 
 // Group designs by company
-const designsByCompany: Record<string, any[]> = {};
+const designsByCompany: Record<string, Design[]> = {};
 const personalKey = 'Personal / Freelance';
 
 // Distribute designs — each goes to its company bucket, or to personalKey if no company

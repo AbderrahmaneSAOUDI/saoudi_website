@@ -6,3 +6,4 @@ allowBuilds:
 
 overrides:
   jose: 4.15.9
+  path-to-regexp: 6.3.0

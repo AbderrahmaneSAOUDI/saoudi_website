@@ -4,27 +4,24 @@
   "version": "1.57.3",
   "engines": {
     "node": ">=22.12.0"
-  },  
+  },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "check": "astro check",
+    "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.9",
-    "@astrojs/react": "^5.0.7",
+    "@astrojs/check": "^0.9.10",
     "@astrojs/vercel": "^10.0.8",
-    "@tailwindcss/vite": "^4.3.0",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "astro": "^6.4.3",
-    "firebase-admin": "^14.0.0",
-    "google-auth-library": "^10.7.0",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "tailwindcss": "^4.3.0",
-    "typescript": "^7.0.2",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^6.4.8",
+    "firebase-admin": "^14.2.0",
+    "google-auth-library": "^10.9.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3",
+    "vite": "^7.3.6",
     "zod": "^4.4.3"
   }
 }

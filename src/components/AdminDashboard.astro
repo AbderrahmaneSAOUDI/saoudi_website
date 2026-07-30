@@ -13,9 +13,7 @@ interface DashboardMetrics {
     certificates: number;
     volunteering: number;
   };
-  adminEmail: string;
   systemStatus: string;
-  lastUpdated: string;
 }
 
 interface Props {
@@ -23,7 +21,7 @@ interface Props {
 }
 
 const { metrics } = Astro.props;
-const { counts, adminEmail, systemStatus, lastUpdated } = metrics;
+const { counts, systemStatus } = metrics;
 ---
 
 <div class="text-[#E6E1E5] flex flex-col justify-between">
