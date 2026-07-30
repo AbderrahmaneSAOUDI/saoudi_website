@@ -100,19 +100,6 @@ const { initialTodos = [] } = Astro.props;
 		</div>
 	</form>
 
-	<!-- Search Bar -->
-	<div class="relative shrink-0 mt-3">
-		<input
-			type="text"
-			id="search-todos-input"
-			placeholder="Filter tasks by name or category..."
-			class="w-full pl-9 pr-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors placeholder-[#E6E1E5]/40"
-		/>
-		<div class="absolute left-3 top-2.5 text-[#E6E1E5]/40 pointer-events-none">
-			<Icon name="search" size={14} class="w-3.5 h-3.5" />
-		</div>
-	</div>
-
 	<!-- Scrollable Body for Todo Items -->
 	<div class="flex-1 min-h-0 pt-3 overflow-hidden flex flex-col">
 		<!-- Todo Items Container -->
@@ -149,7 +136,6 @@ const { initialTodos = [] } = Astro.props;
 		const categorySelect = document.getElementById('todo-category-select') as HTMLSelectElement;
 		const prioritySelect = document.getElementById('todo-priority-select') as HTMLSelectElement;
 
-		const searchInput = document.getElementById('search-todos-input') as HTMLInputElement;
 		const statusMessage = document.getElementById('todo-status-message') as HTMLDivElement;
 		const tabButtons = document.querySelectorAll('.todo-tab-btn') as NodeListOf<HTMLButtonElement>;
 
@@ -199,13 +185,8 @@ const { initialTodos = [] } = Astro.props;
 			countCompleted.textContent = String(completedTasks.length);
 			countArchived.textContent = String(archivedTasks.length);
 
-			// Filter by tab & search query
-			const query = searchInput.value.toLowerCase().trim();
-			const tabFiltered = todos.filter(t => t.status === currentTab);
-			const finalFiltered = tabFiltered.filter(t => 
-				t.title.toLowerCase().includes(query) || 
-				(t.category && t.category.toLowerCase().includes(query))
-			);
+			// Filter by tab
+			const finalFiltered = todos.filter(t => t.status === currentTab);
 
 			listContainer.innerHTML = '';
 
@@ -470,8 +451,6 @@ const { initialTodos = [] } = Astro.props;
 				render();
 			});
 		});
-
-		searchInput.addEventListener('input', render);
 
 		// Submit new todo
 		addTodoForm.addEventListener('submit', async (e) => {

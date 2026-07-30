@@ -56,8 +56,13 @@ const { counts, systemStatus } = metrics;
     <!-- Grid Statistics -->
     <section class="mb-8">
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        <!-- Projects Card -->
-        <div class="p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-primary/40 border border-[#2B2930] group" style="background: #1D1B20">
+        <!-- Projects Card (Disabled) -->
+        <button
+          type="button"
+          class="btn-disabled-admin-card text-left p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-primary/40 border border-[#2B2930] group cursor-pointer"
+          style="background: #1D1B20"
+          data-title="Projects"
+        >
           <div class="flex justify-between items-start mb-4">
             <div class="relative p-2.5 rounded-2xl bg-primary/10 text-primary">
               <IconComponent name="projects" size={24} class="w-6 h-6 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90" />
@@ -66,10 +71,15 @@ const { counts, systemStatus } = metrics;
             <span class="text-2xl font-black text-white">{counts.projects}</span>
           </div>
           <h3 class="font-bold text-[#E6E1E5]">Projects</h3>
-        </div>
+        </button>
 
-        <!-- Experience Card -->
-        <div class="p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-[#0F9D58]/40 border border-[#2B2930] group" style="background: #1D1B20">
+        <!-- Experience Card (Disabled) -->
+        <button
+          type="button"
+          class="btn-disabled-admin-card text-left p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-[#0F9D58]/40 border border-[#2B2930] group cursor-pointer"
+          style="background: #1D1B20"
+          data-title="Experience"
+        >
           <div class="flex justify-between items-start mb-4">
             <div class="relative p-2.5 rounded-2xl bg-[#0F9D58]/10 text-[#0F9D58]">
               <IconComponent name="experience" size={24} class="w-6 h-6 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90" />
@@ -78,10 +88,14 @@ const { counts, systemStatus } = metrics;
             <span class="text-2xl font-black text-white">{counts.experience}</span>
           </div>
           <h3 class="font-bold text-[#E6E1E5]">Experience</h3>
-        </div>
+        </button>
 
-        <!-- Designs Card -->
-        <div class="p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-[#F4B400]/40 border border-[#2B2930] group" style="background: #1D1B20">
+        <!-- Designs Card (Active) -->
+        <a
+          href="/admin/admin_designs"
+          class="block p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-[#F4B400]/40 border border-[#2B2930] group cursor-pointer"
+          style="background: #1D1B20"
+        >
           <div class="flex justify-between items-start mb-4">
             <div class="relative p-2.5 rounded-2xl bg-[#F4B400]/10 text-[#F4B400]">
               <IconComponent name="design" size={24} class="w-6 h-6 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90" />
@@ -90,10 +104,14 @@ const { counts, systemStatus } = metrics;
             <span class="text-2xl font-black text-white">{counts.designs}</span>
           </div>
           <h3 class="font-bold text-[#E6E1E5]">Designs</h3>
-        </div>
+        </a>
 
-        <!-- Certifications Card -->
-        <div class="p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-primary/40 border border-[#2B2930] group" style="background: #1D1B20">
+        <!-- Certifications Card (Active) -->
+        <a
+          href="/admin/admin_certifications"
+          class="block p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-primary/40 border border-[#2B2930] group cursor-pointer"
+          style="background: #1D1B20"
+        >
           <div class="flex justify-between items-start mb-4">
             <div class="relative p-2.5 rounded-2xl bg-primary/10 text-primary">
               <IconComponent name="certifications" size={24} class="w-6 h-6 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90" />
@@ -102,10 +120,15 @@ const { counts, systemStatus } = metrics;
             <span class="text-2xl font-black text-white">{counts.certificates}</span>
           </div>
           <h3 class="font-bold text-[#E6E1E5]">Certifications</h3>
-        </div>
+        </a>
 
-        <!-- Volunteering Card -->
-        <div class="p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-[#0F9D58]/40 border border-[#2B2930] group" style="background: #1D1B20">
+        <!-- Volunteering Card (Disabled) -->
+        <button
+          type="button"
+          class="btn-disabled-admin-card text-left p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-[#0F9D58]/40 border border-[#2B2930] group cursor-pointer"
+          style="background: #1D1B20"
+          data-title="Volunteering"
+        >
           <div class="flex justify-between items-start mb-4">
             <div class="relative p-2.5 rounded-2xl bg-[#0F9D58]/10 text-[#0F9D58]">
               <IconComponent name="business" size={24} class="w-6 h-6 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90" />
@@ -114,9 +137,22 @@ const { counts, systemStatus } = metrics;
             <span class="text-2xl font-black text-white">{counts.volunteering}</span>
           </div>
           <h3 class="font-bold text-[#E6E1E5]">Volunteering</h3>
-        </div>
+        </button>
       </div>
     </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.btn-disabled-admin-card').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const title = btn.getAttribute('data-title') || 'This section';
+        if (typeof (window as any).showToast === 'function') {
+          (window as any).showToast(`${title} admin management coming soon!`, 'error');
+        }
+      });
+    });
+  });
+</script>
 
     <!-- Admin Tools & Overview Cards -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
