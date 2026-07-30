@@ -65,5 +65,16 @@ const ogImageUrl = new URL('/profile.webp', Astro.site ?? Astro.url.origin).href
     <link rel="preconnect" href="https://storage.googleapis.com" crossorigin />
     <link rel="dns-prefetch" href="https://storage.googleapis.com" />
 
+    {/* ADMIN PREFERENCE: Restore shortcuts visibility state prior to render */}
+    <script is:inline>
+        (function() {
+            try {
+                if (localStorage.getItem('admin_shortcuts_hidden') === 'true') {
+                    document.documentElement.setAttribute('data-hide-shortcuts', 'true');
+                }
+            } catch (e) {}
+        })();
+    </script>
+
     <title>{pageTitle}</title>
 </head>

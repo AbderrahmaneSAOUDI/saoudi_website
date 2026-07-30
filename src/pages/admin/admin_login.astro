@@ -34,10 +34,26 @@ if (Astro.request.method === 'POST') {
       return Response.json({ error: 'Invalid token payload.' }, { status: 400 });
     }
 
-    // Strictly check if the email matches the hardcoded ADMIN_EMAIL
-    if (payload.email !== ADMIN_EMAIL) {
+    // Check if the email matches primary ADMIN_EMAIL or is listed in Firestore accepted_admin_emails
+    const userEmail = payload.email.toLowerCase().trim();
+    let isAuthorized = userEmail === (ADMIN_EMAIL || '').toLowerCase().trim();
+    
+    if (!isAuthorized) {
+      try {
+        const { getFirebaseAdminDb } = await import('../../lib/server/firebase-admin');
+        const db = getFirebaseAdminDb();
+        const docSnap = await db.collection('accepted_admin_emails').doc(userEmail).get();
+        if (docSnap.exists) {
+          isAuthorized = true;
+        }
+      } catch (err) {
+        console.warn('Error checking accepted_admin_emails collection:', err);
+      }
+    }
+
+    if (!isAuthorized) {
       console.warn(`Unauthorized admin login attempt from: ${payload.email}`);
-      return Response.json({ error: 'Unauthorized access.' }, { status: 403 });
+      return Response.json({ error: 'Unauthorized access. Email not accepted.' }, { status: 403 });
     }
 
     // Issue a secure HTTP-Only, Secure, SameSite cookie configured with a 7-day expiration
