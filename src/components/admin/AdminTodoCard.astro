@@ -1,0 +1,510 @@
+---
+import Icon from '../Icon.astro';
+import type { AdminTodo } from '../../types';
+
+interface Props {
+	initialTodos?: AdminTodo[];
+}
+
+const { initialTodos = [] } = Astro.props;
+---
+
+<div class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-[480px] lg:h-[calc(100vh-280px)] shadow-lg relative overflow-hidden">
+	<!-- Card Header & Navigation Tabs -->
+	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#2B2930]/80 pb-4 shrink-0">
+		<div class="flex items-center gap-3">
+			<div class="p-2.5 rounded-2xl bg-[#F4B400]/10 text-[#F4B400] border border-[#F4B400]/20">
+				<Icon name="design" size={24} class="w-6 h-6" />
+			</div>
+			<div>
+				<div class="flex items-center gap-2">
+					<h2 class="text-lg font-bold text-white tracking-tight">Admin Brainstorm & To-Do</h2>
+					<span id="todo-total-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#F4B400]/15 text-[#F4B400] border border-[#F4B400]/30">
+						{initialTodos.filter(t => t.status === 'active').length} Active
+					</span>
+				</div>
+				<p class="text-xs text-[#E6E1E5]/50">Plan features, track tasks & archive completed ideas</p>
+			</div>
+		</div>
+
+		<!-- Status Tabs -->
+		<div class="flex items-center bg-[#211F26] p-1 rounded-2xl border border-[#2B2930] text-xs font-medium self-start sm:self-auto shrink-0">
+			<button
+				type="button"
+				data-tab="active"
+				class="todo-tab-btn px-3 py-1.5 rounded-xl bg-primary text-white font-bold transition-all cursor-pointer flex items-center gap-1.5"
+			>
+				<span>Active</span>
+				<span id="tab-count-active" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white">0</span>
+			</button>
+			<button
+				type="button"
+				data-tab="completed"
+				class="todo-tab-btn px-3 py-1.5 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
+			>
+				<span>Done</span>
+				<span id="tab-count-completed" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/10 text-white/70">0</span>
+			</button>
+			<button
+				type="button"
+				data-tab="archived"
+				class="todo-tab-btn px-3 py-1.5 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
+			>
+				<span>Archive</span>
+				<span id="tab-count-archived" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/10 text-white/70">0</span>
+			</button>
+		</div>
+	</div>
+
+	<!-- Add Task Input Form -->
+	<form id="add-todo-form" class="mt-4 space-y-3 p-4 rounded-2xl bg-[#211F26] border border-[#2B2930] shrink-0">
+		<div class="flex flex-col sm:flex-row gap-2">
+			<input
+				type="text"
+				id="todo-title-input"
+				required
+				placeholder="Brainstorm a task or idea... (e.g. Refactor Firestore cache, Add dark theme setting)"
+				class="flex-1 px-3.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-xs focus:outline-none focus:border-primary transition-colors placeholder-[#E6E1E5]/40"
+			/>
+
+			<div class="flex items-center gap-2">
+				<select
+					id="todo-category-select"
+					class="px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-xs focus:outline-none focus:border-primary cursor-pointer"
+				>
+					<option value="Feature">Feature</option>
+					<option value="Bug">Bug</option>
+					<option value="Refactor">Refactor</option>
+					<option value="Idea">Idea</option>
+					<option value="Content">Content</option>
+					<option value="General" selected>General</option>
+				</select>
+
+				<select
+					id="todo-priority-select"
+					class="px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-xs focus:outline-none focus:border-primary cursor-pointer"
+				>
+					<option value="High">⚡ High</option>
+					<option value="Medium" selected>📌 Medium</option>
+					<option value="Low">💤 Low</option>
+				</select>
+
+				<button
+					type="submit"
+					class="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shadow shrink-0"
+				>
+					<Icon name="plus" size={16} class="w-4 h-4" />
+					<span class="hidden sm:inline">Add Task</span>
+				</button>
+			</div>
+		</div>
+	</form>
+
+	<!-- Search Bar -->
+	<div class="relative shrink-0 mt-3">
+		<input
+			type="text"
+			id="search-todos-input"
+			placeholder="Filter tasks by name or category..."
+			class="w-full pl-9 pr-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors placeholder-[#E6E1E5]/40"
+		/>
+		<div class="absolute left-3 top-2.5 text-[#E6E1E5]/40 pointer-events-none">
+			<Icon name="search" size={14} class="w-3.5 h-3.5" />
+		</div>
+	</div>
+
+	<!-- Scrollable Body for Todo Items -->
+	<div class="flex-1 min-h-0 pt-3 overflow-hidden flex flex-col">
+		<!-- Todo Items Container -->
+		<div id="todos-list-container" class="space-y-2.5 overflow-y-auto flex-1 scrollbar-hide pr-1">
+			<!-- Rendered via JS -->
+		</div>
+
+		<!-- Empty State -->
+		<div id="todos-empty-state" class="hidden my-auto py-8 text-center text-[#E6E1E5]/40 bg-[#211F26]/50 rounded-2xl border border-dashed border-[#2B2930]">
+			<p id="empty-state-title" class="text-xs font-semibold text-white">No tasks found</p>
+			<p id="empty-state-subtitle" class="text-[11px] mt-0.5">Use the input above to add a new task to your brainstorming list.</p>
+		</div>
+	</div>
+</div>
+
+<script is:inline define:vars={{ initialTodosData: initialTodos }}>
+	Object.assign(window, { initialAdminTodos: initialTodosData || [] });
+</script>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const listContainer = document.getElementById('todos-list-container') as HTMLDivElement;
+		const emptyState = document.getElementById('todos-empty-state') as HTMLDivElement;
+		const emptyStateTitle = document.getElementById('empty-state-title') as HTMLParagraphElement;
+		const emptyStateSubtitle = document.getElementById('empty-state-subtitle') as HTMLParagraphElement;
+
+		const totalBadge = document.getElementById('todo-total-badge') as HTMLSpanElement;
+		const countActive = document.getElementById('tab-count-active') as HTMLSpanElement;
+		const countCompleted = document.getElementById('tab-count-completed') as HTMLSpanElement;
+		const countArchived = document.getElementById('tab-count-archived') as HTMLSpanElement;
+
+		const addTodoForm = document.getElementById('add-todo-form') as HTMLFormElement;
+		const titleInput = document.getElementById('todo-title-input') as HTMLInputElement;
+		const categorySelect = document.getElementById('todo-category-select') as HTMLSelectElement;
+		const prioritySelect = document.getElementById('todo-priority-select') as HTMLSelectElement;
+
+		const searchInput = document.getElementById('search-todos-input') as HTMLInputElement;
+		const statusMessage = document.getElementById('todo-status-message') as HTMLDivElement;
+		const tabButtons = document.querySelectorAll('.todo-tab-btn') as NodeListOf<HTMLButtonElement>;
+
+		let currentTab: 'active' | 'completed' | 'archived' = 'active';
+		let todos: any[] = (window as any).initialAdminTodos || [];
+
+		// Fetch fresh data from API
+		fetchTodos();
+
+		async function fetchTodos() {
+			try {
+				const res = await fetch('/admin/admin_todos_api');
+				if (res.ok) {
+					const data = await res.json();
+					if (data.success && Array.isArray(data.todos)) {
+						todos = data.todos;
+						render();
+					}
+				}
+			} catch (err) {
+				console.warn('Could not fetch latest todos:', err);
+				render();
+			}
+		}
+
+		function showStatus(msg: string, type: 'success' | 'error') {
+			statusMessage.textContent = msg;
+			statusMessage.className = `p-3 rounded-xl border text-xs font-medium text-center transition-all duration-300 ${
+				type === 'success'
+					? 'bg-[#0F9D58]/10 text-[#0F9D58] border-[#0F9D58]/30'
+					: 'bg-[#DB4437]/10 text-[#DB4437] border-[#DB4437]/30'
+			}`;
+			statusMessage.classList.remove('hidden');
+			setTimeout(() => {
+				statusMessage.classList.add('hidden');
+			}, 3500);
+		}
+
+		function render() {
+			// Update counts
+			const activeTasks = todos.filter(t => t.status === 'active');
+			const completedTasks = todos.filter(t => t.status === 'completed');
+			const archivedTasks = todos.filter(t => t.status === 'archived');
+
+			totalBadge.textContent = `${activeTasks.length} Active`;
+			countActive.textContent = String(activeTasks.length);
+			countCompleted.textContent = String(completedTasks.length);
+			countArchived.textContent = String(archivedTasks.length);
+
+			// Filter by tab & search query
+			const query = searchInput.value.toLowerCase().trim();
+			const tabFiltered = todos.filter(t => t.status === currentTab);
+			const finalFiltered = tabFiltered.filter(t => 
+				t.title.toLowerCase().includes(query) || 
+				(t.category && t.category.toLowerCase().includes(query))
+			);
+
+			listContainer.innerHTML = '';
+
+			if (finalFiltered.length === 0) {
+				emptyState.classList.remove('hidden');
+				listContainer.classList.add('hidden');
+
+				if (currentTab === 'active') {
+					emptyStateTitle.textContent = 'No active tasks';
+					emptyStateSubtitle.textContent = 'Awesome! Add a new task above to brainstorm your next goal.';
+				} else if (currentTab === 'completed') {
+					emptyStateTitle.textContent = 'No completed tasks';
+					emptyStateSubtitle.textContent = 'Mark active tasks as done to see them listed here.';
+				} else {
+					emptyStateTitle.textContent = 'No archived tasks';
+					emptyStateSubtitle.textContent = 'Archived tasks will appear here. You can restore them anytime.';
+				}
+				return;
+			}
+
+			emptyState.classList.add('hidden');
+			listContainer.classList.remove('hidden');
+
+			finalFiltered.forEach(todo => {
+				const isDone = todo.status === 'completed';
+				const isArchived = todo.status === 'archived';
+
+				const categoryColor = {
+					'Feature': 'bg-primary/10 text-primary border-primary/20',
+					'Bug': 'bg-[#DB4437]/10 text-[#DB4437] border-[#DB4437]/20',
+					'Refactor': 'bg-[#F4B400]/10 text-[#F4B400] border-[#F4B400]/20',
+					'Idea': 'bg-[#0F9D58]/10 text-[#0F9D58] border-[#0F9D58]/20',
+					'Content': 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+					'General': 'bg-white/10 text-white/70 border-white/10',
+				}[todo.category as string] || 'bg-white/10 text-white/70 border-white/10';
+
+				const priorityBadge = {
+					'High': 'text-[#DB4437] border-[#DB4437]/40 bg-[#DB4437]/10',
+					'Medium': 'text-[#F4B400] border-[#F4B400]/40 bg-[#F4B400]/10',
+					'Low': 'text-primary border-primary/40 bg-primary/10',
+				}[todo.priority as string] || 'text-white/50 border-white/20 bg-white/5';
+
+				const card = document.createElement('div');
+				card.className = `p-3.5 rounded-2xl border transition-all duration-300 flex items-center justify-between gap-3 ${
+					isDone
+						? 'bg-[#18161D] border-[#2B2930]/60 opacity-75'
+						: isArchived
+						? 'bg-[#141218] border-[#2B2930]/40 opacity-60'
+						: 'bg-[#211F26] border-[#2B2930] hover:border-white/20'
+				}`;
+
+				card.innerHTML = `
+					<div class="flex items-center gap-3 min-w-0 flex-1">
+						<!-- Toggle completion checkbox -->
+						<button
+							type="button"
+							class="btn-toggle-todo w-5 h-5 rounded-lg border transition-all duration-200 flex items-center justify-center cursor-pointer shrink-0 ${
+								isDone
+									? 'bg-[#0F9D58] border-[#0F9D58] text-white'
+									: 'border-white/30 hover:border-primary text-transparent'
+							}"
+							data-id="${todo.id}"
+							title="${isDone ? 'Mark as active' : 'Mark as completed'}"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+						</button>
+
+						<div class="min-w-0 flex-1">
+							<p class="text-xs font-semibold ${isDone ? 'line-through text-white/50' : 'text-white'} truncate" title="${todo.title}">
+								${todo.title}
+							</p>
+							<div class="flex items-center gap-2 mt-1">
+								<span class="px-2 py-0.2 rounded-md text-[10px] font-bold border uppercase tracking-wider ${categoryColor}">
+									${todo.category || 'General'}
+								</span>
+								<span class="px-1.5 py-0.2 rounded-md text-[10px] font-semibold border ${priorityBadge}">
+									${todo.priority || 'Medium'}
+								</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- Action Buttons -->
+					<div class="flex items-center gap-1 shrink-0">
+						${isArchived ? `
+							<button
+								type="button"
+								class="btn-restore-todo px-2.5 py-1 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
+								data-id="${todo.id}"
+								title="Restore task to active"
+							>
+								<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+								<span>Restore</span>
+							</button>
+						` : `
+							<button
+								type="button"
+								class="btn-archive-todo p-1.5 rounded-lg text-[#E6E1E5]/50 hover:text-[#F4B400] hover:bg-[#F4B400]/10 transition-colors cursor-pointer"
+								data-id="${todo.id}"
+								title="Archive task"
+							>
+								<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+							</button>
+						`}
+						<button
+							type="button"
+							class="btn-delete-todo p-1.5 rounded-lg text-[#DB4437]/60 hover:text-[#DB4437] hover:bg-[#DB4437]/10 transition-colors cursor-pointer"
+							data-id="${todo.id}"
+							title="Delete task permanently"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+						</button>
+					</div>
+				`;
+
+				listContainer.appendChild(card);
+			});
+
+			attachItemActions();
+		}
+
+		function attachItemActions() {
+			// Toggle completion
+			listContainer.querySelectorAll('.btn-toggle-todo').forEach(btn => {
+				btn.addEventListener('click', async () => {
+					const id = btn.getAttribute('data-id');
+					if (!id) return;
+
+					try {
+						const formData = new FormData();
+						formData.append('action', 'toggle_complete');
+						formData.append('id', id);
+
+						const res = await fetch('/admin/admin_todos_api', {
+							method: 'POST',
+							body: formData,
+						});
+						const data = await res.json();
+						if (res.ok && data.success) {
+							const todoItem = todos.find(t => t.id === id);
+							if (todoItem) {
+								todoItem.status = data.status;
+							}
+							render();
+							showStatus(data.status === 'completed' ? 'Task completed! 🎉' : 'Task restored to active.', 'success');
+						} else {
+							showStatus(data.error || 'Failed to update task.', 'error');
+						}
+					} catch (err) {
+						showStatus('Error updating task.', 'error');
+					}
+				});
+			});
+
+			// Archive task
+			listContainer.querySelectorAll('.btn-archive-todo').forEach(btn => {
+				btn.addEventListener('click', async () => {
+					const id = btn.getAttribute('data-id');
+					if (!id) return;
+
+					try {
+						const formData = new FormData();
+						formData.append('action', 'archive');
+						formData.append('id', id);
+
+						const res = await fetch('/admin/admin_todos_api', {
+							method: 'POST',
+							body: formData,
+						});
+						const data = await res.json();
+						if (res.ok && data.success) {
+							const todoItem = todos.find(t => t.id === id);
+							if (todoItem) {
+								todoItem.status = 'archived';
+							}
+							render();
+							showStatus('Task moved to archive.', 'success');
+						} else {
+							showStatus(data.error || 'Failed to archive task.', 'error');
+						}
+					} catch (err) {
+						showStatus('Error archiving task.', 'error');
+					}
+				});
+			});
+
+			// Restore task
+			listContainer.querySelectorAll('.btn-restore-todo').forEach(btn => {
+				btn.addEventListener('click', async () => {
+					const id = btn.getAttribute('data-id');
+					if (!id) return;
+
+					try {
+						const formData = new FormData();
+						formData.append('action', 'restore');
+						formData.append('id', id);
+
+						const res = await fetch('/admin/admin_todos_api', {
+							method: 'POST',
+							body: formData,
+						});
+						const data = await res.json();
+						if (res.ok && data.success) {
+							const todoItem = todos.find(t => t.id === id);
+							if (todoItem) {
+								todoItem.status = 'active';
+							}
+							render();
+							showStatus('Task restored to active list.', 'success');
+						} else {
+							showStatus(data.error || 'Failed to restore task.', 'error');
+						}
+					} catch (err) {
+						showStatus('Error restoring task.', 'error');
+					}
+				});
+			});
+
+			// Delete task permanently
+			listContainer.querySelectorAll('.btn-delete-todo').forEach(btn => {
+				btn.addEventListener('click', async () => {
+					const id = btn.getAttribute('data-id');
+					if (!id) return;
+
+					if (confirm('Permanently delete this task?')) {
+						try {
+							const formData = new FormData();
+							formData.append('action', 'delete');
+							formData.append('id', id);
+
+							const res = await fetch('/admin/admin_todos_api', {
+								method: 'POST',
+								body: formData,
+							});
+							const data = await res.json();
+							if (res.ok && data.success) {
+								todos = todos.filter(t => t.id !== id);
+								render();
+								showStatus('Task permanently deleted.', 'success');
+							} else {
+								showStatus(data.error || 'Failed to delete task.', 'error');
+							}
+						} catch (err) {
+							showStatus('Error deleting task.', 'error');
+						}
+					}
+				});
+			});
+		}
+
+		// Tab switching
+		tabButtons.forEach(btn => {
+			btn.addEventListener('click', () => {
+				tabButtons.forEach(b => {
+					b.classList.remove('bg-primary', 'text-white', 'font-bold');
+					b.classList.add('text-[#E6E1E5]/60');
+				});
+				btn.classList.add('bg-primary', 'text-white', 'font-bold');
+				btn.classList.remove('text-[#E6E1E5]/60');
+
+				currentTab = btn.getAttribute('data-tab') as any;
+				render();
+			});
+		});
+
+		searchInput.addEventListener('input', render);
+
+		// Submit new todo
+		addTodoForm.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const title = titleInput.value.trim();
+			const category = categorySelect.value;
+			const priority = prioritySelect.value;
+
+			if (!title) return;
+
+			try {
+				const formData = new FormData();
+				formData.append('action', 'create');
+				formData.append('title', title);
+				formData.append('category', category);
+				formData.append('priority', priority);
+
+				const res = await fetch('/admin/admin_todos_api', {
+					method: 'POST',
+					body: formData,
+				});
+
+				const data = await res.json();
+				if (res.ok && data.success) {
+					titleInput.value = '';
+					showStatus('New task added to brainstorm list! 🚀', 'success');
+					await fetchTodos();
+				} else {
+					showStatus(data.error || 'Failed to add task.', 'error');
+				}
+			} catch (err) {
+				showStatus('Error submitting task.', 'error');
+			}
+		});
+	});
+</script>

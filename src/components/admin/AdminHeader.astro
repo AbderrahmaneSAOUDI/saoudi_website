@@ -1,11 +1,11 @@
 ---
-import Icon from '../Icon.astro';
+import Icon from "../Icon.astro";
 
 interface Props {
 	title?: string;
 }
 
-const { title = 'Dashboard' } = Astro.props;
+const { title = "Dashboard" } = Astro.props;
 ---
 
 <header
@@ -13,19 +13,45 @@ const { title = 'Dashboard' } = Astro.props;
 >
 	<div class="min-w-0">
 		<div class="flex items-center gap-2 mb-1">
-			<span class="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-[#0F9D58] animate-pulse shrink-0"></span>
+			<span
+				class="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-[#0F9D58] animate-pulse shrink-0"
+			></span>
 			<span
 				class="text-[10px] md:text-xs uppercase tracking-widest text-primary font-semibold truncate"
 			>
 				Admin Control Panel
 			</span>
 		</div>
-		<h1 class="text-xl md:text-3xl font-extrabold text-white tracking-tight pl-4 truncate">
+		<h1
+			class="text-xl md:text-3xl font-extrabold text-white tracking-tight pl-4 truncate"
+		>
 			{title}
 		</h1>
 	</div>
 
 	<div class="flex items-center gap-3 shrink-0">
+		<button
+			id="toggle-shortcuts-btn"
+			type="button"
+			class="flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-full text-sm font-semibold transition-all duration-300 border border-white/10 bg-[#211F26] text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
+			aria-label="Hide Shortcuts"
+			title="Hide Shortcuts"
+		>
+			<span
+				id="shortcuts-icon-hide"
+				class="flex items-center justify-center"
+			>
+				<Icon name="hide" size={16} class="w-4 h-4" />
+			</span>
+			<span
+				id="shortcuts-icon-show"
+				class="hidden items-center justify-center"
+			>
+				<Icon name="show" size={16} class="w-4 h-4" />
+			</span>
+			<span class="hidden md:inline">Shortcuts</span>
+		</button>
+
 		<a
 			href="/admin/admin_logout"
 			class="flex items-center gap-2 px-3 md:px-5 py-2 md:py-2.5 rounded-full text-sm font-semibold transition-all duration-300 border border-[#DB4437]/40 hover:bg-[#DB4437] hover:text-white hover:border-transparent hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#DB4437]/50"
@@ -36,3 +62,46 @@ const { title = 'Dashboard' } = Astro.props;
 		</a>
 	</div>
 </header>
+
+<script>
+	const STORAGE_KEY = "admin_shortcuts_hidden";
+	const btn = document.getElementById("toggle-shortcuts-btn");
+	const iconHide = document.getElementById("shortcuts-icon-hide");
+	const iconShow = document.getElementById("shortcuts-icon-show");
+
+	function updateShortcutState(isHidden: boolean) {
+		if (isHidden) {
+			document.documentElement.setAttribute(
+				"data-hide-shortcuts",
+				"true",
+			);
+			localStorage.setItem(STORAGE_KEY, "true");
+			iconHide?.classList.add("hidden");
+			iconHide?.classList.remove("flex");
+			iconShow?.classList.remove("hidden");
+			iconShow?.classList.add("flex");
+			btn?.setAttribute("aria-label", "Show Shortcuts");
+			btn?.setAttribute("title", "Show Shortcuts");
+		} else {
+			document.documentElement.removeAttribute("data-hide-shortcuts");
+			localStorage.setItem(STORAGE_KEY, "false");
+			iconHide?.classList.remove("hidden");
+			iconHide?.classList.add("flex");
+			iconShow?.classList.add("hidden");
+			iconShow?.classList.remove("flex");
+			btn?.setAttribute("aria-label", "Hide Shortcuts");
+			btn?.setAttribute("title", "Hide Shortcuts");
+		}
+	}
+
+	// Initialize state on load
+	const initialHidden = localStorage.getItem(STORAGE_KEY) === "true";
+	updateShortcutState(initialHidden);
+
+	btn?.addEventListener("click", () => {
+		const currentlyHidden =
+			document.documentElement.getAttribute("data-hide-shortcuts") ===
+			"true";
+		updateShortcutState(!currentlyHidden);
+	});
+</script>

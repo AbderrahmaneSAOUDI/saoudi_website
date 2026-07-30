@@ -1,9 +1,12 @@
 ---
 import IconComponent from './Icon.astro';
+import AcceptedAdminEmailsCard from './admin/AcceptedAdminEmailsCard.astro';
+import AdminTodoCard from './admin/AdminTodoCard.astro';
+import type { AcceptedAdminEmail, AdminTodo } from '../types';
 
 /**
  * AdminDashboard Component
- * Displays a summary of system status and collection counts for the admin workspace.
+ * Displays a summary of system status, collection counts, accepted emails, and todo brainstorming tasks for the admin workspace.
  */
 interface DashboardMetrics {
   counts: {
@@ -18,13 +21,15 @@ interface DashboardMetrics {
 
 interface Props {
   metrics: DashboardMetrics;
+  initialAcceptedEmails?: AcceptedAdminEmail[];
+  initialTodos?: AdminTodo[];
 }
 
-const { metrics } = Astro.props;
+const { metrics, initialAcceptedEmails = [], initialTodos = [] } = Astro.props;
 const { counts, systemStatus } = metrics;
 ---
 
-<div class="text-[#E6E1E5] flex flex-col justify-between">
+<div class="text-[#E6E1E5] flex flex-col justify-between space-y-8">
   <div>
 
     <!-- System Status Banner -->
@@ -49,7 +54,7 @@ const { counts, systemStatus } = metrics;
     </div>
 
     <!-- Grid Statistics -->
-    <section class="mb-10">
+    <section class="mb-8">
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <!-- Projects Card -->
         <div class="p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-2 hover:ring-primary/40 border border-[#2B2930] group" style="background: #1D1B20">
@@ -111,6 +116,12 @@ const { counts, systemStatus } = metrics;
           <h3 class="font-bold text-[#E6E1E5]">Volunteering</h3>
         </div>
       </div>
+    </section>
+
+    <!-- Admin Tools & Overview Cards -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <AcceptedAdminEmailsCard initialEmails={initialAcceptedEmails} />
+      <AdminTodoCard initialTodos={initialTodos} />
     </section>
   </div>
 </div>

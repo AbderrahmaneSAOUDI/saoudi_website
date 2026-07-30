@@ -188,6 +188,56 @@ export const volunteeringSchema = z.object({
 	impactMetric: z.string().min(1).optional(),
 });
 
+// ─── Collection: accepted_admin_emails ────────────────────────────────────
+
+export interface AcceptedAdminEmail {
+	id: string;
+	email: string;
+	addedAt: string; // ISO 8601
+	addedBy: string;
+	isPrimary?: boolean;
+	notes?: string;
+}
+
+export const acceptedAdminEmailSchema = z.object({
+	id: z.string().min(1),
+	email: z.string().email(),
+	addedAt: z.string().min(1),
+	addedBy: z.string().min(1),
+	isPrimary: z.boolean().optional(),
+	notes: z.string().optional(),
+});
+
+// ─── Collection: admin_todos ──────────────────────────────────────────────
+
+export type TodoCategory = 'Feature' | 'Bug' | 'Refactor' | 'Idea' | 'Content' | 'General';
+export type TodoPriority = 'High' | 'Medium' | 'Low';
+export type TodoStatus = 'active' | 'completed' | 'archived';
+
+export interface AdminTodo {
+	id: string;
+	title: string;
+	description?: string;
+	category: TodoCategory;
+	priority: TodoPriority;
+	status: TodoStatus;
+	createdAt: string; // ISO 8601
+	completedAt?: string | null;
+	archivedAt?: string | null;
+}
+
+export const adminTodoSchema = z.object({
+	id: z.string().min(1),
+	title: z.string().min(1),
+	description: z.string().optional(),
+	category: z.enum(['Feature', 'Bug', 'Refactor', 'Idea', 'Content', 'General']),
+	priority: z.enum(['High', 'Medium', 'Low']),
+	status: z.enum(['active', 'completed', 'archived']),
+	createdAt: z.string().min(1),
+	completedAt: z.string().nullable().optional(),
+	archivedAt: z.string().nullable().optional(),
+});
+
 // ─── Parse & Validation Helpers ───────────────────────────────────────────
 
 export const parseStaticData = (data: unknown): StaticData => {
@@ -216,4 +266,12 @@ export const parseCertificate = (data: unknown): Certificate => {
 
 export const parseVolunteering = (data: unknown): Volunteering => {
 	return volunteeringSchema.parse(data);
+};
+
+export const parseAcceptedAdminEmail = (data: unknown): AcceptedAdminEmail => {
+	return acceptedAdminEmailSchema.parse(data);
+};
+
+export const parseAdminTodo = (data: unknown): AdminTodo => {
+	return adminTodoSchema.parse(data);
 };

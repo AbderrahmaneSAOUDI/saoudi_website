@@ -78,6 +78,35 @@ try {
     volunteeringCount = -1;
 }
 
+let initialAcceptedEmails: any[] = [];
+let initialTodos: any[] = [];
+
+try {
+  const db = getFirebaseAdminDb();
+  const [emailsSnap, todosSnap] = await Promise.all([
+    db.collection('accepted_admin_emails').orderBy('addedAt', 'asc').get(),
+    db.collection('admin_todos').orderBy('createdAt', 'desc').get(),
+  ]);
+
+  initialAcceptedEmails = emailsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  initialTodos = todosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+} catch (err) {
+  console.warn('Could not pre-fetch admin emails/todos in frontmatter:', err);
+}
+
+// Always ensure primary env admin email is present in initialAcceptedEmails if array is empty
+const primaryEmail = import.meta.env.ADMIN_EMAIL || process.env.ADMIN_EMAIL;
+if (primaryEmail && !initialAcceptedEmails.some(e => e.email?.toLowerCase() === primaryEmail.toLowerCase())) {
+  initialAcceptedEmails.unshift({
+    id: 'primary_env_email',
+    email: primaryEmail,
+    addedAt: new Date().toISOString(),
+    addedBy: 'system',
+    isPrimary: true,
+    notes: 'Primary System Administrator',
+  });
+}
+
 const metrics = {
   counts: {
     projects: projectsCount,
@@ -92,7 +121,7 @@ const metrics = {
 
 <BackgroundBaseLayout title="Admin Workspace Dashboard">
   <AdminLayout>
-    <AdminDashboard metrics={metrics} />
+    <AdminDashboard metrics={metrics} initialAcceptedEmails={initialAcceptedEmails} initialTodos={initialTodos} />
   </AdminLayout>
   <AdminNavDock currentPath={Astro.url.pathname} />
 </BackgroundBaseLayout>

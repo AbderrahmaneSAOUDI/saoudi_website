@@ -46,6 +46,7 @@ import google from '../icons/google.svg?raw';
 import googleFilled from '../icons/google_filled.svg?raw';
 import graph from '../icons/graph.svg?raw';
 import graphFilled from '../icons/graph_filled.svg?raw';
+import hide from '../icons/hide.svg?raw';
 import home from '../icons/home.svg?raw';
 import homeFilled from '../icons/home_filled.svg?raw';
 import image from '../icons/image.svg?raw';
@@ -74,6 +75,7 @@ import shieldProtected from '../icons/shield_protected.svg?raw';
 import shieldProtectedFilled from '../icons/shield_protected_filled.svg?raw';
 import shieldWarning from '../icons/shield_warning.svg?raw';
 import shieldWarningFilled from '../icons/shield_warning_filled.svg?raw';
+import show from '../icons/show.svg?raw';
 import tag from '../icons/tag.svg?raw';
 import telegram from '../icons/telegram.svg?raw';
 import telegramFilled from '../icons/telegram_filled.svg?raw';
@@ -117,6 +119,7 @@ const icons = {
     google_filled: googleFilled,
     graph,
     graph_filled: graphFilled,
+    hide,
     home,
     home_filled: homeFilled,
     image,
@@ -145,6 +148,7 @@ const icons = {
     shield_protected_filled: shieldProtectedFilled,
     shield_warning: shieldWarning,
     shield_warning_filled: shieldWarningFilled,
+    show,
     tag,
     telegram,
     telegram_filled: telegramFilled,
@@ -159,12 +163,16 @@ const svgContent = icons[iconName as keyof typeof icons] || icons[name as keyof 
 // Process SVG content to set color and ensure proper sizing
 let processedSvg = svgContent || '';
 if (processedSvg) {
-    // Replace any existing fill attributes with our color or currentColor
     const fillColor = color || 'currentColor';
-    // Remove any existing fill="..." attributes and add ours to the svg tag
-    processedSvg = processedSvg
-        .replace(/fill="[^"]*"/g, '') // Remove all fill attributes
-        .replace(/<svg([^>]*)>/, `<svg$1 fill="${fillColor}">`); // Add fill to svg tag
+    if (name === 'hide' || name === 'show') {
+        processedSvg = processedSvg
+            .replace(/stroke="[^"]*"/g, `stroke="${fillColor}"`)
+            .replace(/<svg([^>]*)>/, `<svg$1 fill="none">`);
+    } else {
+        processedSvg = processedSvg
+            .replace(/fill="[^"]*"/g, '')
+            .replace(/<svg([^>]*)>/, `<svg$1 fill="${fillColor}">`);
+    }
 }
 ---
 

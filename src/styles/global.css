@@ -58,6 +58,11 @@
   contain: layout style;
 }
 
+/* Hide shortcut badges in admin panel when toggled off */
+html[data-hide-shortcuts="true"] kbd {
+	display: none !important;
+}
+
 /* ── Shared Page Entrance Animations (M3 easing) ──────────────────────── */
 /* Used by certifications, designs, and any future collection pages.      */
 @keyframes page-fade-in {
