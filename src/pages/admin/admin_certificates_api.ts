@@ -1,164 +1,142 @@
 import type { APIRoute } from 'astro';
+import { FieldValue } from 'firebase-admin/firestore';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
 import { clearCache } from '../../lib/server/cache';
-import { FieldValue } from 'firebase-admin/firestore';
+import {
+	getErrorMessage,
+	getFormFile,
+	getFormString,
+	isFormRequest,
+	jsonResponse,
+} from '../../lib/server/http';
+import { deleteFile, saveFile } from '../../lib/server/storage';
+
+const CERTIFICATES_DIRECTORY = 'uploads/certificates';
+const MAX_IMAGE_BYTES = 800 * 1024;
+const VALID_TYPES = new Set(['Online', 'In-Person', 'Hybrid']);
+
+function invalidateCertificateCaches(countChanged: boolean): void {
+	clearCache('certificates_list');
+	if (countChanged) {
+		clearCache('public_dashboard_counts');
+		clearCache('admin_dashboard_counts');
+	}
+}
 
 export const POST: APIRoute = async ({ locals, request }) => {
-	// Auth check: verify session token
-	if (!locals.adminEmail) {
-		return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-			status: 401,
-			headers: { 'Content-Type': 'application/json' },
-		});
+	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
+	if (!isFormRequest(request)) {
+		return jsonResponse({ error: 'Expected a form-encoded request.' }, 415);
 	}
 
 	try {
 		const formData = await request.formData();
-		const action = formData.get('action') as string; // 'save' or 'delete'
-		const certificateId = formData.get('id') as string;
-
-		if (!certificateId) {
-			return new Response(JSON.stringify({ error: 'Missing Certificate ID' }), {
-				status: 400,
-				headers: { 'Content-Type': 'application/json' },
-			});
-		}
+		const action = getFormString(formData, 'action');
+		const certificateId = getFormString(formData, 'id').trim();
+		if (!certificateId) return jsonResponse({ error: 'Missing Certificate ID' }, 400);
 
 		const db = getFirebaseAdminDb();
+		const docRef = db.collection('certificates').doc(certificateId);
 
-		// ─── ACTION: DELETE ───────────────────────────────────────────────────
 		if (action === 'delete') {
-			const docRef = db.collection('certificates').doc(certificateId);
 			const docSnap = await docRef.get();
+			if (!docSnap.exists) return jsonResponse({ error: 'Certificate not found' }, 404);
 
-			if (!docSnap.exists) {
-				return new Response(JSON.stringify({ error: 'Certificate not found' }), {
-					status: 404,
-					headers: { 'Content-Type': 'application/json' },
-				});
+			const imageUrl = docSnap.data()?.imageUrl;
+			await docRef.delete();
+			if (typeof imageUrl === 'string' && !imageUrl.startsWith('data:')) {
+				await deleteFile(imageUrl, CERTIFICATES_DIRECTORY);
 			}
 
-			// Delete Firestore document (image is stored as Base64 inside the doc)
-			await docRef.delete();
-
-			// Invalidate caches so public pages reflect the deletion immediately
-			clearCache('certificates_list');
-			clearCache('public_dashboard_counts');
-			clearCache('admin_dashboard_counts');
-
-			return new Response(JSON.stringify({ success: true }), {
-				status: 200,
-				headers: { 'Content-Type': 'application/json' },
-			});
+			invalidateCertificateCaches(true);
+			return jsonResponse({ success: true });
 		}
 
-		// ─── ACTION: SAVE (CREATE OR UPDATE) ─────────────────────────────────
 		if (action === 'save') {
-			const title = formData.get('title') as string;
-			const issuer = formData.get('issuer') as string;
-			const date = formData.get('date') as string;
-			const type = formData.get('type') as string;
-			const credentialUrl = formData.get('credentialUrl') as string;
-			const imageFile = formData.get('image') as File | null;
+			const title = getFormString(formData, 'title').trim();
+			const issuer = getFormString(formData, 'issuer').trim();
+			const date = getFormString(formData, 'date').trim();
+			const type = getFormString(formData, 'type').trim();
+			const credentialUrl = getFormString(formData, 'credentialUrl').trim();
+			const imageFile = getFormFile(formData, 'image');
 
-			// Server validation: title, issuer, date, and type are required
 			if (!title || !issuer || !date || !type) {
-				return new Response(
-					JSON.stringify({ error: 'Title, issuer, date, and certificate type are required.' }),
-					{ status: 400, headers: { 'Content-Type': 'application/json' } }
+				return jsonResponse(
+					{ error: 'Title, issuer, date, and certificate type are required.' },
+					400,
 				);
 			}
-
-			const validTypes = ['Online', 'In-Person', 'Hybrid'];
-			if (!validTypes.includes(type)) {
-				return new Response(
-					JSON.stringify({ error: 'Invalid certificate type.' }),
-					{ status: 400, headers: { 'Content-Type': 'application/json' } }
-				);
+			if (!VALID_TYPES.has(type)) {
+				return jsonResponse({ error: 'Invalid certificate type.' }, 400);
 			}
 
-			const docRef = db.collection('certificates').doc(certificateId);
 			const docSnap = await docRef.get();
-			let imageUrl = docSnap.exists ? docSnap.data()?.imageUrl : '';
+			const existingData = docSnap.data() ?? {};
+			const previousImageUrl = existingData.imageUrl;
+			let imageUrl = typeof previousImageUrl === 'string' ? previousImageUrl : null;
+			let uploadedImageUrl: string | undefined;
 
-			// Handle image upload / replacement
-			if (imageFile && imageFile.size > 0) {
-				const allowedTypes = ['image/webp'];
-				if (!allowedTypes.includes(imageFile.type)) {
-					return new Response(
-						JSON.stringify({ error: 'Image must be a WebP file.' }),
-						{ status: 400, headers: { 'Content-Type': 'application/json' } }
-					);
+			if (imageFile) {
+				if (imageFile.type !== 'image/webp') {
+					return jsonResponse({ error: 'Image must be a WebP file.' }, 400);
 				}
-				if (imageFile.size > 800 * 1024) {
-					return new Response(
-						JSON.stringify({ error: 'Image file size must be under 800KB.' }),
-						{ status: 400, headers: { 'Content-Type': 'application/json' } }
-					);
+				if (imageFile.size > MAX_IMAGE_BYTES) {
+					return jsonResponse({ error: 'Image file size must be under 800KB.' }, 400);
 				}
-				// Convert the file buffer to Base64 data URL
-				const arrayBuffer = await imageFile.arrayBuffer();
-				const buffer = Buffer.from(arrayBuffer);
-				imageUrl = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
+
+				uploadedImageUrl = await saveFile({
+					file: imageFile,
+					destinationDir: CERTIFICATES_DIRECTORY,
+					localFallbackPath: CERTIFICATES_DIRECTORY,
+					filename: `certificate_${crypto.randomUUID()}.webp`,
+					contentType: imageFile.type,
+				});
+				imageUrl = uploadedImageUrl;
 			}
 
-			// Prepare document fields
-			const certificatePayload: Record<string, any> = {
+			const certificate = {
 				id: certificateId,
-				title: title.trim(),
-				issuer: issuer.trim(),
-				date: date.trim(),
-				type: type,
+				title,
+				issuer,
+				date,
+				type,
+				credentialUrl: credentialUrl || null,
+				imageUrl,
 			};
+			const certificatePayload: Record<string, unknown> = { ...certificate };
 
-			if (credentialUrl && credentialUrl.trim() !== '') {
-				certificatePayload.credentialUrl = credentialUrl.trim();
-			} else {
-				certificatePayload.credentialUrl = null;
-			}
-
-			// CLEANUP: Remove deprecated fields that existed in older schema versions.
-			// FieldValue.delete() removes the key entirely rather than storing a null value.
-			// Only apply to existing documents to avoid writing unnecessary Firestore ops on new docs.
 			if (docSnap.exists) {
-				const existingData = docSnap.data() || {};
 				if ('credentialId' in existingData) certificatePayload.credentialId = FieldValue.delete();
 				if ('period' in existingData) certificatePayload.period = FieldValue.delete();
 				if ('order' in existingData) certificatePayload.order = FieldValue.delete();
 			}
 
-			if (imageUrl) {
-				certificatePayload.imageUrl = imageUrl;
-			} else {
-				certificatePayload.imageUrl = null;
+			try {
+				await docRef.set(certificatePayload, { merge: true });
+			} catch (error) {
+				if (uploadedImageUrl) await deleteFile(uploadedImageUrl, CERTIFICATES_DIRECTORY);
+				throw error;
 			}
 
-			// Save/Merge in Firestore
-			await docRef.set(certificatePayload, { merge: true });
+			if (
+				uploadedImageUrl &&
+				typeof previousImageUrl === 'string' &&
+				previousImageUrl &&
+				!previousImageUrl.startsWith('data:')
+			) {
+				await deleteFile(previousImageUrl, CERTIFICATES_DIRECTORY);
+			}
 
-			// Invalidate caches so public pages reflect the update immediately
-			clearCache('certificates_list');
-			clearCache('public_dashboard_counts');
-			clearCache('admin_dashboard_counts');
-
-			return new Response(JSON.stringify({ success: true, certificate: certificatePayload }), {
-				status: 200,
-				headers: { 'Content-Type': 'application/json' },
-			});
+			invalidateCertificateCaches(!docSnap.exists);
+			return jsonResponse({ success: true, certificate });
 		}
 
-		return new Response(JSON.stringify({ error: 'Invalid action specified.' }), {
-			status: 400,
-			headers: { 'Content-Type': 'application/json' },
-		});
-	} catch (error: any) {
+		return jsonResponse({ error: 'Invalid action specified.' }, 400);
+	} catch (error) {
 		console.error('Admin certificates API error:', error);
-		return new Response(
-			JSON.stringify({ error: error.message || 'Server error occurred during request.' }),
-			{
-				status: 500,
-				headers: { 'Content-Type': 'application/json' },
-			}
+		return jsonResponse(
+			{ error: getErrorMessage(error, 'Server error occurred during request.') },
+			500,
 		);
 	}
 };

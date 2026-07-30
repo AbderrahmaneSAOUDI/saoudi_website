@@ -7,7 +7,7 @@
  * The parent page shows a skeleton placeholder while this loads.
  */
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
-import { getCached, setCached } from '../lib/server/cache';
+import { CACHE_TTL_MS, getOrSetCached } from '../lib/server/cache';
 
 interface Props {}
 
@@ -15,26 +15,26 @@ let resumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
 let resumePreviewUrl = '/resume.webp';
 
 const cacheKeyResume = 'resume_config';
-const cachedResume = getCached<{ resumeUrl: string; resumePreviewUrl: string }>(cacheKeyResume);
 
-if (cachedResume) {
-	resumeUrl = cachedResume.resumeUrl;
-	resumePreviewUrl = cachedResume.resumePreviewUrl;
-} else {
-	try {
+try {
+	const config = await getOrSetCached(
+		cacheKeyResume,
+		async () => {
 		const db = getFirebaseAdminDb();
 		const configDoc = await db.collection('configuration').doc('static_data').get();
 		if (configDoc.exists) {
 			const data = configDoc.data();
 			if (data?.resumeUrl) resumeUrl = data.resumeUrl;
 			if (data?.previewUrl) resumePreviewUrl = data.previewUrl;
-			
-			// Cache for 10 minutes
-			setCached(cacheKeyResume, { resumeUrl, resumePreviewUrl }, 600000);
 		}
-	} catch (error) {
-		console.warn('Failed to fetch resume config in public page:', error);
-	}
+		return { resumeUrl, resumePreviewUrl };
+		},
+		CACHE_TTL_MS.PUBLIC_DATA,
+	);
+	resumeUrl = config.resumeUrl;
+	resumePreviewUrl = config.resumePreviewUrl;
+} catch (error) {
+	console.warn('Failed to fetch resume config in public page:', error);
 }
 ---
 

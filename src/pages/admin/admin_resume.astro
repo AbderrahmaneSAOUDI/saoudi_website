@@ -195,7 +195,6 @@ try {
 
 		const settingsCard = document.getElementById('settings-card') as HTMLDivElement;
 		const scaleSelect = document.getElementById('scale-select') as HTMLSelectElement;
-		const qualityContainer = document.getElementById('quality-container') as HTMLDivElement;
 		const qualitySlider = document.getElementById('quality-slider') as HTMLInputElement;
 		const qualityVal = document.getElementById('quality-val') as HTMLSpanElement;
 
@@ -224,7 +223,6 @@ try {
 		function setupDropZone(
 			dropZone: HTMLDivElement,
 			fileInput: HTMLInputElement,
-			fileNameEl: HTMLDivElement,
 			acceptTypes: string[],
 			onFileSelected: (file: File) => void
 		) {
@@ -338,7 +336,6 @@ try {
 		setupDropZone(
 			pdfDropZone,
 			pdfFileInput,
-			pdfFileName,
 			['application/pdf', '.pdf'],
 			(file) => {
 				selectedPdf = file;

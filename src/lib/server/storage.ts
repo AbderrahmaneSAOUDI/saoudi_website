@@ -1,10 +1,8 @@
-import { getFirebaseAdminStorage } from './firebase-admin';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import path from 'node:path';
+import { getFirebaseAdminStorage } from './firebase-admin';
+import { getErrorMessage } from './http';
 
-/**
- * Interface representing the parameters required to save a file.
- */
 export interface SaveFileParams {
 	file: File;
 	destinationDir: string;
@@ -14,22 +12,26 @@ export interface SaveFileParams {
 	localFallbackPath: string;
 }
 
-/**
- * Interface representing the parameters required to clean up old extensions.
- */
-export interface CleanExtensionsParams {
-	baseId: string;
-	destinationDir: string;
-	localFallbackPath: string;
-	extensions?: string[];
+async function pathExists(filePath: string): Promise<boolean> {
+	try {
+		await fs.access(filePath);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+async function deleteIfPresent(filePath: string): Promise<void> {
+	try {
+		await fs.unlink(filePath);
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+	}
 }
 
 /**
- * Saves a file to Firebase Storage (under the specified destination directory),
- * falling back to writing to the local public folder if Firebase Storage is not configured or fails.
- *
- * @param params SaveFileParams object containing file, destinationDir, filename, contentType, cacheControl, and localFallbackPath.
- * @returns The public URL/path of the saved file.
+ * Saves a media file in Firebase Storage. Local development falls back to
+ * public/ so the same endpoint works without a provisioned bucket.
  */
 export async function saveFile({
 	file,
@@ -42,197 +44,84 @@ export async function saveFile({
 	const buffer = Buffer.from(await file.arrayBuffer());
 
 	try {
-		// Attempt to upload to Firebase Storage
-		const storage = getFirebaseAdminStorage();
-		const bucket = storage.bucket();
-		const storagePath = `${destinationDir}/${filename}`;
-		const storageFile = bucket.file(storagePath);
-
-		// Delete the target file path in Storage first if it exists to prevent cache issues
-		try {
-			await storageFile.delete();
-		} catch {
-			/* ignore if it does not exist */
-		}
-
-		// Save the file bytes with Cache-Control headers
+		const storageFile = getFirebaseAdminStorage().bucket().file(`${destinationDir}/${filename}`);
 		await storageFile.save(buffer, {
-			metadata: {
-				contentType,
-				cacheControl,
-			},
+			metadata: { contentType, cacheControl },
 		});
-
-		// Make it publicly accessible
 		await storageFile.makePublic();
 		return storageFile.publicUrl();
 	} catch (error) {
 		if (process.env.VERCEL) {
-			console.error(
-				`Firebase Storage upload failed for ${destinationDir}/${filename} on Vercel:`,
-				error
-			);
+			console.error(`Firebase Storage upload failed for ${destinationDir}/${filename}:`, error);
 			throw new Error(
-				`Firebase Storage upload failed: ${(error as any).message || 'Unknown error'}. Please ensure Cloud Storage is enabled in the Firebase Console (Build > Storage > Get Started) for this project.`
+				`Firebase Storage upload failed: ${getErrorMessage(error, 'Unknown storage error')}`,
 			);
 		}
 
 		console.warn(
-			`Firebase Storage upload failed for ${destinationDir}/${filename}; falling back to local filesystem:`,
-			error
+			`Firebase Storage upload failed for ${destinationDir}/${filename}; using the local development fallback.`,
 		);
 
-		// Fallback to local directory writing
-		const localDir = path.join(process.cwd(), 'public', localFallbackPath);
-		if (!fs.existsSync(localDir)) {
-			fs.mkdirSync(localDir, { recursive: true });
+		const publicDir = path.join(process.cwd(), 'public', localFallbackPath);
+		await fs.mkdir(publicDir, { recursive: true });
+		await fs.writeFile(path.join(publicDir, filename), buffer);
+
+		// Keep a running preview build in sync when its client directory exists.
+		const distClientDir = path.join(process.cwd(), 'dist', 'client');
+		if (await pathExists(distClientDir)) {
+			const distDir = path.join(distClientDir, localFallbackPath);
+			await fs.mkdir(distDir, { recursive: true });
+			await fs.writeFile(path.join(distDir, filename), buffer);
 		}
 
-		// Delete target local file path if it exists
-		const localFilePath = path.join(localDir, filename);
-		try {
-			if (fs.existsSync(localFilePath)) {
-				fs.unlinkSync(localFilePath);
-			}
-		} catch {
-			/* ignore */
-		}
-
-		fs.writeFileSync(localFilePath, buffer);
-
-		// Also write to built dist/client directory if it exists (for real-time dev builds feedback)
-		const distDir = path.join(process.cwd(), 'dist', 'client', localFallbackPath);
-		if (fs.existsSync(path.join(process.cwd(), 'dist', 'client'))) {
-			if (!fs.existsSync(distDir)) {
-				fs.mkdirSync(distDir, { recursive: true });
-			}
-			const distFilePath = path.join(distDir, filename);
-			try {
-				if (fs.existsSync(distFilePath)) {
-					fs.unlinkSync(distFilePath);
-				}
-			} catch {
-				/* ignore */
-			}
-			fs.writeFileSync(distFilePath, buffer);
-		}
-
-		// Return the locally accessible path
-		return localFallbackPath
-			? `/${localFallbackPath}/${filename}`.replace(/\/+/g, '/')
-			: `/${filename}`;
+		return `/${localFallbackPath}/${filename}`.replace(/\/+/g, '/');
 	}
 }
 
-/**
- * Deletes a file either from local fallback path or from Firebase Storage depending on its URL pattern.
- *
- * @param url The public URL of the file to delete.
- * @param localFallbackPath The local fallback directory path relative to the public folder.
- */
-export async function deleteFile(url: string, localFallbackPath: string): Promise<void> {
+function getStorageObjectPath(url: string): string {
+	if (url.includes('/o/')) {
+		const match = url.match(/\/o\/([^?]+)/);
+		return match?.[1] ? decodeURIComponent(match[1]) : '';
+	}
+
 	try {
+		const parsedUrl = new URL(url);
+		if (parsedUrl.hostname === 'storage.googleapis.com') {
+			const [, ...segments] = parsedUrl.pathname.split('/').filter(Boolean);
+			return segments.join('/');
+		}
+	} catch {
+		return '';
+	}
+
+	return '';
+}
+
+/**
+ * Deletes an uploaded file without allowing a stored URL to escape its
+ * expected directory. Cleanup failures are non-fatal to completed DB writes.
+ */
+export async function deleteFile(url: string, expectedDirectory: string): Promise<void> {
+	try {
+		const normalizedDirectory = expectedDirectory.replace(/^\/+|\/+$/g, '');
 		const isLocal = url.startsWith('/') && !url.startsWith('//');
+
 		if (isLocal) {
-			// Delete locally from public/
 			const filename = path.basename(url);
-			const localPath = path.join(process.cwd(), 'public', localFallbackPath, filename);
-			if (fs.existsSync(localPath)) {
-				fs.unlinkSync(localPath);
-			}
-
-			// Also delete from dist/client if it exists
-			const distPath = path.join(process.cwd(), 'dist', 'client', localFallbackPath, filename);
-			if (fs.existsSync(distPath)) {
-				fs.unlinkSync(distPath);
-			}
-		} else {
-			// Delete from Firebase Storage bucket
-			const storage = getFirebaseAdminStorage();
-			const bucket = storage.bucket();
-
-			let storagePath = '';
-			if (url.includes('/o/')) {
-				const match = url.match(/\/o\/([^?]+)/);
-				if (match && match[1]) {
-					storagePath = decodeURIComponent(match[1]);
-				}
-			} else if (url.includes('storage.googleapis.com')) {
-				const parts = url.split('/');
-				const bucketIndex = parts.findIndex(
-					(p) => p.includes('storage.googleapis.com') || p.includes('appspot.com')
-				);
-				if (bucketIndex !== -1 && parts.length > bucketIndex + 1) {
-					storagePath = parts.slice(bucketIndex + 2).join('/');
-				} else {
-					storagePath = parts.slice(4).join('/');
-				}
-			}
-
-			if (storagePath) {
-				const file = bucket.file(storagePath);
-				await file.delete();
-			}
+			await Promise.all([
+				deleteIfPresent(path.join(process.cwd(), 'public', normalizedDirectory, filename)),
+				deleteIfPresent(path.join(process.cwd(), 'dist', 'client', normalizedDirectory, filename)),
+			]);
+			return;
 		}
+
+		const storagePath = getStorageObjectPath(url);
+		if (!storagePath.startsWith(`${normalizedDirectory}/`)) {
+			return;
+		}
+
+		await getFirebaseAdminStorage().bucket().file(storagePath).delete({ ignoreNotFound: true });
 	} catch (error) {
-		console.warn('Failed to delete file from storage/local path:', url, error);
-	}
-}
-
-/**
- * Cleans up old variations of a file with other extensions (e.g. cleans up old webp/jpg/png versions)
- * to keep both Firebase Storage and local directories clean and free of orphan files.
- *
- * @param params CleanExtensionsParams containing baseId, destinationDir, localFallbackPath, and extensions.
- */
-export async function cleanOldExtensions({
-	baseId,
-	destinationDir,
-	localFallbackPath,
-	extensions = ['jpg', 'png', 'webp'],
-}: CleanExtensionsParams): Promise<void> {
-	// 1. Clean up from Firebase Storage bucket
-	try {
-		const storage = getFirebaseAdminStorage();
-		const bucket = storage.bucket();
-		for (const ext of extensions) {
-			try {
-				await bucket.file(`${destinationDir}/${baseId}.${ext}`).delete();
-			} catch {
-				/* ignore if it does not exist */
-			}
-		}
-	} catch (error) {
-		/* Firebase storage not available or configured */
-	}
-
-	// 2. Clean up from local public directory
-	const localDir = path.join(process.cwd(), 'public', localFallbackPath);
-	if (fs.existsSync(localDir)) {
-		for (const ext of extensions) {
-			try {
-				const localFilePath = path.join(localDir, `${baseId}.${ext}`);
-				if (fs.existsSync(localFilePath)) {
-					fs.unlinkSync(localFilePath);
-				}
-			} catch {
-				/* ignore */
-			}
-		}
-	}
-
-	// 3. Clean up from local dist/client directory if exists
-	const distDir = path.join(process.cwd(), 'dist', 'client', localFallbackPath);
-	if (fs.existsSync(distDir)) {
-		for (const ext of extensions) {
-			try {
-				const distFilePath = path.join(distDir, `${baseId}.${ext}`);
-				if (fs.existsSync(distFilePath)) {
-					fs.unlinkSync(distFilePath);
-				}
-			} catch {
-				/* ignore */
-			}
-		}
+		console.warn('Failed to clean up uploaded file:', url, error);
 	}
 }

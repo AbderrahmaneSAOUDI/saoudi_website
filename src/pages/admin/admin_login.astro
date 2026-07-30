@@ -14,12 +14,12 @@ if (Astro.request.method === 'POST') {
   try {
     const { credential } = await Astro.request.json();
     if (!credential) {
-      return new Response(JSON.stringify({ error: 'Missing credential token' }), { status: 400 });
+      return Response.json({ error: 'Missing credential token' }, { status: 400 });
     }
 
-    if (!ADMIN_EMAIL) {
-      console.error('ADMIN_EMAIL environment variable is not configured.');
-      return new Response(JSON.stringify({ error: 'Server authentication misconfigured.' }), { status: 500 });
+    if (!ADMIN_EMAIL || !GOOGLE_CLIENT_ID) {
+      console.error('Admin authentication environment variables are not configured.');
+      return Response.json({ error: 'Server authentication misconfigured.' }, { status: 500 });
     }
 
     // Verify the Google GSI ID Token
@@ -31,16 +31,13 @@ if (Astro.request.method === 'POST') {
     const payload = ticket.getPayload();
 
     if (!payload || !payload.email) {
-      return new Response(JSON.stringify({ error: 'Invalid token payload.' }), { status: 400 });
+      return Response.json({ error: 'Invalid token payload.' }, { status: 400 });
     }
 
     // Strictly check if the email matches the hardcoded ADMIN_EMAIL
     if (payload.email !== ADMIN_EMAIL) {
       console.warn(`Unauthorized admin login attempt from: ${payload.email}`);
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized access. Email does not match ADMIN_EMAIL.' }),
-        { status: 403 }
-      );
+      return Response.json({ error: 'Unauthorized access.' }, { status: 403 });
     }
 
     // Issue a secure HTTP-Only, Secure, SameSite cookie configured with a 7-day expiration
@@ -54,16 +51,10 @@ if (Astro.request.method === 'POST') {
       maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
     });
 
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  } catch (error: any) {
+    return Response.json({ success: true });
+  } catch (error) {
     console.error('Google GSI verification error:', error);
-    return new Response(
-      JSON.stringify({ error: error.message || 'Token verification failed.' }),
-      { status: 400 }
-    );
+    return Response.json({ error: 'Token verification failed.' }, { status: 400 });
   }
 }
 

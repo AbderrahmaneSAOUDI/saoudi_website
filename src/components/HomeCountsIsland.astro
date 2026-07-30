@@ -8,7 +8,7 @@
  */
 import Icon from './Icon.astro';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
-import { getCached, setCached } from '../lib/server/cache';
+import { CACHE_TTL_MS, getOrSetCached } from '../lib/server/cache';
 
 interface Props {}
 
@@ -16,10 +16,12 @@ type CountsData = { projects: number; experience: number; designs: number; certi
 
 const defaultCounts: CountsData = { projects: 0, experience: 0, designs: 0, certificates: 0, volunteering: 0 };
 const cacheKeyCounts = 'public_dashboard_counts';
-let counts: CountsData = getCached<CountsData>(cacheKeyCounts) ?? defaultCounts;
+let counts: CountsData = defaultCounts;
 
-if (counts === defaultCounts) {
-	try {
+try {
+	counts = await getOrSetCached(
+		cacheKeyCounts,
+		async () => {
 		const db = getFirebaseAdminDb();
 		const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, volunteeringSnap] = await Promise.all([
 			db.collection("projects").count().get(),
@@ -29,18 +31,18 @@ if (counts === defaultCounts) {
 			db.collection("volunteering").count().get(),
 		]);
 
-		counts = {
+		return {
 			projects: projectsSnap.data().count,
 			experience: experienceSnap.data().count,
 			designs: designsSnap.data().count,
 			certificates: certificatesSnap.data().count,
 			volunteering: volunteeringSnap.data().count,
 		};
-		setCached(cacheKeyCounts, counts);
-	} catch (error) {
-		console.warn("Failed to fetch aggregate counts from Firestore for public home page:", error);
-		// counts already holds defaultCounts (all zeros) — no further action needed
-	}
+		},
+		CACHE_TTL_MS.PUBLIC_DATA,
+	);
+} catch (error) {
+	console.warn("Failed to fetch aggregate counts from Firestore for public home page:", error);
 }
 
 const statCards = [

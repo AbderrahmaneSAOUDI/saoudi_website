@@ -1,234 +1,191 @@
 import type { APIRoute } from 'astro';
+import type { DocumentReference } from 'firebase-admin/firestore';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
-import { deleteFile } from '../../lib/server/storage';
 import { clearCache, clearCacheByPrefix } from '../../lib/server/cache';
+import {
+	getErrorMessage,
+	getFormFile,
+	getFormString,
+	isFormRequest,
+	jsonResponse,
+} from '../../lib/server/http';
+import { deleteFile, saveFile } from '../../lib/server/storage';
+
+const DESIGNS_DIRECTORY = 'uploads/designs';
+const MAX_IMAGE_BYTES = 800 * 1024;
+
+function invalidateDesignCaches(countChanged: boolean): void {
+	clearCacheByPrefix('designs_');
+	if (countChanged) {
+		clearCache('public_dashboard_counts');
+		clearCache('admin_dashboard_counts');
+	}
+}
+
+async function commitCompanyUpdates(
+	updates: Array<{ ref: DocumentReference; company: string }>,
+): Promise<void> {
+	const db = getFirebaseAdminDb();
+
+	for (let offset = 0; offset < updates.length; offset += 500) {
+		const batch = db.batch();
+		for (const update of updates.slice(offset, offset + 500)) {
+			batch.update(update.ref, { company: update.company });
+		}
+		await batch.commit();
+	}
+}
 
 export const POST: APIRoute = async ({ locals, request }) => {
-	// Auth check: verify session token
-	if (!locals.adminEmail) {
-		return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-			status: 401,
-			headers: { 'Content-Type': 'application/json' },
-		});
+	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
+	if (!isFormRequest(request)) {
+		return jsonResponse({ error: 'Expected a form-encoded request.' }, 415);
 	}
 
 	try {
 		const formData = await request.formData();
-		const action = formData.get('action') as string; // 'save', 'delete', or 'update_category'
-		const designId = formData.get('id') as string;
+		const action = getFormString(formData, 'action');
+		const designId = getFormString(formData, 'id').trim();
 
 		if (action !== 'save_companies' && !designId) {
-			return new Response(JSON.stringify({ error: 'Missing Design ID' }), {
-				status: 400,
-				headers: { 'Content-Type': 'application/json' },
-			});
+			return jsonResponse({ error: 'Missing Design ID' }, 400);
 		}
 
 		const db = getFirebaseAdminDb();
 
-		// ─── ACTION: DELETE ───────────────────────────────────────────────────
 		if (action === 'delete') {
 			const docRef = db.collection('designs').doc(designId);
 			const docSnap = await docRef.get();
+			if (!docSnap.exists) return jsonResponse({ error: 'Design not found' }, 404);
 
-			if (!docSnap.exists) {
-				return new Response(JSON.stringify({ error: 'Design not found' }), {
-					status: 404,
-					headers: { 'Content-Type': 'application/json' },
-				});
-			}
-
-			const designData = docSnap.data();
-			const imageUrl = designData?.imageUrl as string | undefined;
-
-			// 1. Delete Storage / local image file first (atomic policy)
-			if (imageUrl && !imageUrl.startsWith('data:')) {
-				await deleteFile(imageUrl, 'uploads/designs');
-			}
-
-			// 2. Delete Firestore document
+			const imageUrl = docSnap.data()?.imageUrl;
 			await docRef.delete();
 
-			// Invalidate designs cache (all keys prefixed with 'designs_') + dashboard counts
-			clearCacheByPrefix('designs_');
-			clearCache('public_dashboard_counts');
-			clearCache('admin_dashboard_counts');
-
-			return new Response(JSON.stringify({ success: true }), {
-				status: 200,
-				headers: { 'Content-Type': 'application/json' },
-			});
-		}
-
-		// ─── ACTION: SAVE COMPANIES (CRUD & REORDER) ────────────────────────
-		if (action === 'save_companies') {
-			const companiesListJson = formData.get('companies') as string;
-			const renamesJson = formData.get('renames') as string;
-
-			if (!companiesListJson) {
-				return new Response(JSON.stringify({ error: 'Companies list is required.' }), {
-					status: 400,
-					headers: { 'Content-Type': 'application/json' },
-				});
+			if (typeof imageUrl === 'string' && !imageUrl.startsWith('data:')) {
+				await deleteFile(imageUrl, DESIGNS_DIRECTORY);
 			}
 
-			let companiesList: string[];
-			let renames: Record<string, string> = {};
+			invalidateDesignCaches(true);
+			return jsonResponse({ success: true });
+		}
 
-			// SECURITY: Validate parsed JSON is actually the expected type.
-			// Without this, a malicious admin could inject non-string values.
+		if (action === 'save_companies') {
+			const companiesJson = getFormString(formData, 'companies');
+			const renamesJson = getFormString(formData, 'renames');
+			if (!companiesJson) {
+				return jsonResponse({ error: 'Companies list is required.' }, 400);
+			}
+
+			let companies: string[];
+			let renames: Record<string, unknown> = {};
 			try {
-				const parsed = JSON.parse(companiesListJson);
-				if (!Array.isArray(parsed) || !parsed.every((v: unknown) => typeof v === 'string')) {
-					return new Response(JSON.stringify({ error: 'Companies must be an array of strings.' }), {
-						status: 400,
-						headers: { 'Content-Type': 'application/json' },
-					});
+				const parsedCompanies: unknown = JSON.parse(companiesJson);
+				if (!Array.isArray(parsedCompanies) || !parsedCompanies.every((value) => typeof value === 'string')) {
+					return jsonResponse({ error: 'Companies must be an array of strings.' }, 400);
 				}
-				companiesList = parsed;
+
+				companies = [...new Set(parsedCompanies.map((value) => value.trim()).filter(Boolean))];
+				if (companies.length > 100 || companies.some((value) => value.length > 100)) {
+					return jsonResponse({ error: 'Company names exceed the supported limit.' }, 400);
+				}
 
 				if (renamesJson) {
-					const parsedRenames = JSON.parse(renamesJson);
-					if (typeof parsedRenames === 'object' && parsedRenames !== null) {
-						renames = parsedRenames;
+					const parsedRenames: unknown = JSON.parse(renamesJson);
+					if (!parsedRenames || typeof parsedRenames !== 'object' || Array.isArray(parsedRenames)) {
+						return jsonResponse({ error: 'Renames must be an object.' }, 400);
 					}
+					renames = parsedRenames as Record<string, unknown>;
 				}
 			} catch {
-				return new Response(JSON.stringify({ error: 'Invalid JSON in companies or renames.' }), {
-					status: 400,
-					headers: { 'Content-Type': 'application/json' },
-				});
+				return jsonResponse({ error: 'Invalid JSON in companies or renames.' }, 400);
 			}
 
-			// 1. Update the configuration document
-			const configRef = db.collection('configuration').doc('designs_companies');
-			await configRef.set({ companies: companiesList });
+			const renameEntries = Object.entries(renames)
+				.filter((entry): entry is [string, string] => typeof entry[1] === 'string')
+				.map(([oldCompany, newCompany]) => [oldCompany.trim(), newCompany.trim()] as const)
+				.filter(([oldCompany, newCompany]) => oldCompany && newCompany && oldCompany !== newCompany);
 
-			// 2. Perform company renames in designs collection
-			const renameKeys = Object.keys(renames);
-			if (renameKeys.length > 0) {
-				const batch = db.batch();
-				let updateCount = 0;
+			// All exact-match rename queries are independent, so fetch them concurrently.
+			const snapshots = await Promise.all(
+				renameEntries.map(([oldCompany]) =>
+					db.collection('designs').where('company', '==', oldCompany).get(),
+				),
+			);
 
-				for (const oldComp of renameKeys) {
-					const newComp = renames[oldComp];
-					if (typeof newComp !== 'string') continue;
-					if (oldComp.trim() !== newComp.trim()) {
-						const snapshot = await db.collection('designs').where('company', '==', oldComp.trim()).get();
-						for (const doc of snapshot.docs) {
-							// SAFETY: Firestore batches have a 500-operation limit.
-							if (updateCount >= 499) break;
-							batch.update(doc.ref, { company: newComp.trim() });
-							updateCount++;
-						}
-					}
-				}
-
-				if (updateCount > 0) {
-					await batch.commit();
-				}
-			}
-
-			// Invalidate designs cache (all keys prefixed with 'designs_') + dashboard counts
-			clearCacheByPrefix('designs_');
-			clearCache('public_dashboard_counts');
-			clearCache('admin_dashboard_counts');
-
-			return new Response(JSON.stringify({ success: true }), {
-				status: 200,
-				headers: { 'Content-Type': 'application/json' },
+			const updates = snapshots.flatMap((snapshot, index) => {
+				const newCompany = renameEntries[index][1];
+				return snapshot.docs.map((doc) => ({ ref: doc.ref, company: newCompany }));
 			});
+
+			await commitCompanyUpdates(updates);
+			await db.collection('configuration').doc('designs_companies').set({ companies });
+
+			invalidateDesignCaches(false);
+			return jsonResponse({ success: true });
 		}
 
-		// ─── ACTION: SAVE (CREATE OR UPDATE) ─────────────────────────────────
 		if (action === 'save') {
-			const title = (formData.get('title') as string) || '';
-			const company = formData.get('company') as string;
-			const date = (formData.get('date') as string) || '';
-			const imageFile = formData.get('image') as File | null;
+			const title = getFormString(formData, 'title').trim();
+			const company = getFormString(formData, 'company').trim();
+			const date = getFormString(formData, 'date').trim();
+			const imageFile = getFormFile(formData, 'image');
+			if (!company) return jsonResponse({ error: 'Company is required.' }, 400);
 
-			// Server validation: company is required (title and date are optional)
-			if (!company) {
-				return new Response(
-					JSON.stringify({ error: 'Company is required.' }),
-					{ status: 400, headers: { 'Content-Type': 'application/json' } }
-				);
-			}
-
-			// Fetch existing doc if updating
 			const docRef = db.collection('designs').doc(designId);
 			const docSnap = await docRef.get();
-			let imageUrl = docSnap.exists ? docSnap.data()?.imageUrl : '';
+			const previousImageUrl = docSnap.exists ? docSnap.data()?.imageUrl : '';
+			let imageUrl = typeof previousImageUrl === 'string' ? previousImageUrl : '';
+			let uploadedImageUrl: string | undefined;
 
-			// Handle image upload / replacement
-			if (imageFile && imageFile.size > 0) {
-				const allowedTypes = ['image/webp'];
-				if (!allowedTypes.includes(imageFile.type)) {
-					return new Response(
-						JSON.stringify({ error: 'Image must be a WebP file.' }),
-						{ status: 400, headers: { 'Content-Type': 'application/json' } }
-					);
+			if (imageFile) {
+				if (imageFile.type !== 'image/webp') {
+					return jsonResponse({ error: 'Image must be a WebP file.' }, 400);
 				}
-				if (imageFile.size > 800 * 1024) {
-					return new Response(
-						JSON.stringify({ error: 'Image file size must be under 800KB to store in Firestore.' }),
-						{ status: 400, headers: { 'Content-Type': 'application/json' } }
-					);
+				if (imageFile.size > MAX_IMAGE_BYTES) {
+					return jsonResponse({ error: 'Image file size must be under 800KB.' }, 400);
 				}
 
-				// If updating and the old image was NOT base64, delete it from storage
-				if (imageUrl && !imageUrl.startsWith('data:')) {
-					await deleteFile(imageUrl, 'uploads/designs');
-				}
-
-				// Convert the file buffer to Base64 data URL
-				const arrayBuffer = await imageFile.arrayBuffer();
-				const buffer = Buffer.from(arrayBuffer);
-				imageUrl = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
+				uploadedImageUrl = await saveFile({
+					file: imageFile,
+					destinationDir: DESIGNS_DIRECTORY,
+					localFallbackPath: DESIGNS_DIRECTORY,
+					filename: `design_${crypto.randomUUID()}.webp`,
+					contentType: imageFile.type,
+				});
+				imageUrl = uploadedImageUrl;
 			}
 
 			if (!imageUrl) {
-				return new Response(
-					JSON.stringify({ error: 'An image is required for this design project.' }),
-					{ status: 400, headers: { 'Content-Type': 'application/json' } }
-				);
+				return jsonResponse({ error: 'An image is required for this design project.' }, 400);
 			}
 
-			// Prepare document fields
-			const designPayload: Record<string, any> = {
-				id: designId,
-				title: title.trim(),
-				imageUrl,
-				company: company.trim(),
-				date,
-			};
+			const design = { id: designId, title, imageUrl, company, date };
+			try {
+				await docRef.set(design, { merge: true });
+			} catch (error) {
+				if (uploadedImageUrl) await deleteFile(uploadedImageUrl, DESIGNS_DIRECTORY);
+				throw error;
+			}
 
-			// Save/Merge in Firestore
-			await docRef.set(designPayload, { merge: true });
+			if (
+				uploadedImageUrl &&
+				typeof previousImageUrl === 'string' &&
+				previousImageUrl &&
+				!previousImageUrl.startsWith('data:')
+			) {
+				await deleteFile(previousImageUrl, DESIGNS_DIRECTORY);
+			}
 
-			// Invalidate designs cache (all keys prefixed with 'designs_') + dashboard counts
-			clearCacheByPrefix('designs_');
-			clearCache('public_dashboard_counts');
-			clearCache('admin_dashboard_counts');
-
-			return new Response(JSON.stringify({ success: true, design: designPayload }), {
-				status: 200,
-				headers: { 'Content-Type': 'application/json' },
-			});
+			invalidateDesignCaches(!docSnap.exists);
+			return jsonResponse({ success: true, design });
 		}
 
-		return new Response(JSON.stringify({ error: 'Invalid action specified.' }), {
-			status: 400,
-			headers: { 'Content-Type': 'application/json' },
-		});
-	} catch (error: any) {
+		return jsonResponse({ error: 'Invalid action specified.' }, 400);
+	} catch (error) {
 		console.error('Admin designs API error:', error);
-		return new Response(
-			JSON.stringify({ error: error.message || 'Server error occurred during request.' }),
-			{
-				status: 500,
-				headers: { 'Content-Type': 'application/json' },
-			}
+		return jsonResponse(
+			{ error: getErrorMessage(error, 'Server error occurred during request.') },
+			500,
 		);
 	}
 };

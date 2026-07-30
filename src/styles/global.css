@@ -84,19 +84,27 @@
 
 .animate-page-fade-in {
 	animation: page-fade-in 0.8s cubic-bezier(0.2, 0, 0.2, 1) forwards;
-	will-change: transform, opacity;
 }
 
 .animate-page-slide-up {
 	opacity: 0;
 	animation: page-slide-up 0.6s cubic-bezier(0.2, 0, 0.2, 1) forwards;
-	will-change: transform, opacity;
 }
 
 .animate-page-card-fade {
 	opacity: 0;
 	animation: page-slide-up 0.5s cubic-bezier(0.2, 0, 0.2, 1) forwards;
-	will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		scroll-behavior: auto !important;
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
 }
 
 /* Override header responsive behavior at 1000px */

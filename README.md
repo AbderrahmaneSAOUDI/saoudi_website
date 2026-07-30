@@ -26,7 +26,7 @@
 - **Heavy, Pervasive CSS Animations:** All motion is implemented with CSS `@keyframes` and Tailwind utility classes (`transition-all`, `duration-300`, custom `cubic-bezier` easings).
 - **Zero JS for Visitors:** Public routes deliver absolutely zero client-side JavaScript. Obfuscation of contact links is implemented purely using CSS text-direction reversal and attribute styling.
 - **Zero-JS Responsive Navigation:** Public pages avoid hamburger menus. On smaller mobile viewports, navigation links automatically collapse into direct shortcut icons.
-- **Admin Workspace (Protected React Island):** Accessible only through server-side Astro middleware route protection. Runs client-side CRUD operations, dynamic real-time dashboard updates, and client-side image compression (`compressorjs`).
+- **Admin Workspace (Protected Astro UI):** Accessible only through server-side Astro middleware route protection. Runs scoped client-side CRUD controls and upload workflows without shipping an unused UI framework.
 - **Universal Floating Administrative Navigation Dock:** Fixed globally across the `/admin` view context to control configurations, navigation, and content initialization.
 - **Master-Detail Dashboard Visual Interface (66% / 33% UI Pattern):** A consistent split architecture governing administrative workflows across all content collections.
 
@@ -39,7 +39,7 @@
 | **Framework** | Astro (SSR mode) | Server-rendered HTML delivered from Vercel Edge. |
 | **Styling** | Tailwind CSS + global.css | M3 token mapping in Tailwind + CSS `@keyframes` for ambient motion. |
 | **Interactivity** | Pure CSS + Tailwind utilities | All public animations and layout responsive shifts via CSS only; zero JS. |
-| **Admin UI** | React component (island) | Confined inside `/admin` via `client:only="react"` for CRUD, Auth, and compression. Protected from source leak by server-side middleware redirects. |
+| **Admin UI** | Astro + scoped browser scripts | Confined inside `/admin` for CRUD and authentication. Protected by server-side middleware and route-level guards. |
 | **Database** | Firebase Firestore (Admin SDK) | Server-side reads on public routes; client SDK inside `/admin` for real-time CRUD. |
 | **Storage** | Firebase Storage | Serves project and design assets. |
 | **Image Optimization** | Astro `<Image />` | Dynamic Storage images optimized at request time. **Requires whitelisting `firebasestorage.googleapis.com` under `image.domains` inside `astro.config.mjs` and configuring long-lived Edge cache headers.** |
@@ -109,7 +109,7 @@ graph TD
 ### Key Constraints
 
 - **Astro SSR Output Mode:** Public routes are server-rendered HTML with zero client-side Firebase SDK usage.
-- **Isolated Admin Workspace:** `/admin` is the only route running client-side JS (React island) and initializing the Client Firebase SDK. Access is gated by server-rendered middleware checks.
+- **Isolated Admin Workspace:** `/admin` contains the interactive content-management scripts and is gated by server-rendered middleware checks.
 - **Decoupled Multi-Collection Schema:** Content is split across individual Firestore collections (`experience`, `projects`, `designs`, `certifications`, `volunteering`) and configuration documents.
 - **Zero-JS Obfuscation:** Public pages hide contact emails and phones using CSS reversed text order (`unicode-bidi: bidi-override; direction: rtl;`) or data attributes styled in pseudo-elements, ensuring crawlers cannot parse details without running JS.
 
@@ -121,7 +121,7 @@ Personal portfolio and admin dashboard for Abderrahmane Saoudi, built with Astro
 
 ## Overview
 
-The public site is server-rendered and styled with CSS and Tailwind utilities. The protected `/admin` area is the only place that runs React and handles authenticated content management.
+The public site is server-rendered and styled with CSS and Tailwind utilities. The protected `/admin` area uses scoped browser scripts for authenticated content management.
 
 ## Tech Stack
 
@@ -130,7 +130,7 @@ The public site is server-rendered and styled with CSS and Tailwind utilities. T
 | Framework | Astro 6 |
 | Language | TypeScript |
 | Styling | Tailwind CSS 4 + global CSS |
-| Admin UI | React island inside `/admin` |
+| Admin UI | Astro with scoped scripts inside `/admin` |
 | Backend | Firebase Admin SDK |
 | Deployment | Vercel SSR |
 

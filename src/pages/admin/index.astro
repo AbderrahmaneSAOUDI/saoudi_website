@@ -13,7 +13,7 @@ import AdminLayout from "../../components/admin/AdminLayout.astro";
 import AdminDashboard from "../../components/AdminDashboard.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
 import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
-import { getCached, setCached } from "../../lib/server/cache";
+import { CACHE_TTL_MS, getOrSetCached } from "../../lib/server/cache";
 
 // Extra safety: double-check that the middleware successfully set Astro.locals.adminEmail
 const adminEmail = Astro.locals.adminEmail;
@@ -26,24 +26,20 @@ let certificatesCount = 0;
 let volunteeringCount = 0;
 let systemStatus = "Connected";
 
-// Use a shorter TTL (60s) for admin — reflects changes quickly while still reducing Firestore reads
+// Use a short TTL for admin metrics while still reducing repeated Firestore reads.
 const cacheKeyAdminCounts = 'admin_dashboard_counts';
-const cachedCounts = getCached<{
+type DashboardCounts = {
   projects: number;
   experience: number;
   designs: number;
   certificates: number;
   volunteering: number;
-}>(cacheKeyAdminCounts);
+};
 
-if (cachedCounts) {
-  projectsCount = cachedCounts.projects;
-  experienceCount = cachedCounts.experience;
-  designsCount = cachedCounts.designs;
-  certificatesCount = cachedCounts.certificates;
-  volunteeringCount = cachedCounts.volunteering;
-} else {
-  try {
+try {
+    const counts = await getOrSetCached<DashboardCounts>(
+      cacheKeyAdminCounts,
+      async () => {
     const db = getFirebaseAdminDb();
     
     // Parallel asynchronous fetching of the collections' count metrics
@@ -55,19 +51,21 @@ if (cachedCounts) {
       db.collection("volunteering").count().get(),
     ]);
 
-    projectsCount = projectsSnap.data().count;
-    experienceCount = experienceSnap.data().count;
-    designsCount = designsSnap.data().count;
-    certificatesCount = certificatesSnap.data().count;
-    volunteeringCount = volunteeringSnap.data().count;
-
-    setCached(cacheKeyAdminCounts, {
-      projects: projectsCount,
-      experience: experienceCount,
-      designs: designsCount,
-      certificates: certificatesCount,
-      volunteering: volunteeringCount,
-    }, 60000); // 60 second TTL
+    return {
+      projects: projectsSnap.data().count,
+      experience: experienceSnap.data().count,
+      designs: designsSnap.data().count,
+      certificates: certificatesSnap.data().count,
+      volunteering: volunteeringSnap.data().count,
+    };
+      },
+      CACHE_TTL_MS.ADMIN_DATA,
+    );
+    projectsCount = counts.projects;
+    experienceCount = counts.experience;
+    designsCount = counts.designs;
+    certificatesCount = counts.certificates;
+    volunteeringCount = counts.volunteering;
   } catch (error) {
     console.warn("Firestore access degraded or unconfigured. Falling back to mock dashboard metrics.", error);
     systemStatus = "Degraded (Mock Stats)";
@@ -78,7 +76,6 @@ if (cachedCounts) {
     designsCount = -1;
     certificatesCount = -1;
     volunteeringCount = -1;
-  }
 }
 
 const metrics = {
@@ -89,14 +86,12 @@ const metrics = {
     certificates: certificatesCount,
     volunteering: volunteeringCount,
   },
-  adminEmail: adminEmail,
   systemStatus: systemStatus,
-  lastUpdated: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
 };
 ---
 
 <BackgroundBaseLayout title="Admin Workspace Dashboard">
-  <AdminLayout subtitle={`Authenticated as ${metrics.adminEmail}`}>
+  <AdminLayout>
     <AdminDashboard metrics={metrics} />
   </AdminLayout>
   <AdminNavDock currentPath={Astro.url.pathname} />
