@@ -50,9 +50,31 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			return jsonResponse({ success: true });
 		}
 
+		if (action === 'save_fields') {
+			const fieldsJson = getFormString(formData, 'fields');
+			if (!fieldsJson) {
+				return jsonResponse({ error: 'Fields list is required.' }, 400);
+			}
+
+			let fields: string[];
+			try {
+				const parsedFields: unknown = JSON.parse(fieldsJson);
+				if (!Array.isArray(parsedFields) || !parsedFields.every((value) => typeof value === 'string')) {
+					return jsonResponse({ error: 'Fields must be an array of strings.' }, 400);
+				}
+				fields = [...new Set(parsedFields.map((value) => value.trim()).filter(Boolean))];
+			} catch {
+				return jsonResponse({ error: 'Invalid JSON in fields.' }, 400);
+			}
+
+			await db.collection('configuration').doc('projects_fields').set({ fields });
+			invalidateProjectCaches(false);
+			return jsonResponse({ success: true });
+		}
+
 		if (action === 'save') {
 			const title = getFormString(formData, 'title').trim();
-			const tagline = getFormString(formData, 'tagline').trim();
+			const field = getFormString(formData, 'field').trim();
 			const description = getFormString(formData, 'description').trim();
 			const date = getFormString(formData, 'date').trim();
 			const projectUrl = getFormString(formData, 'projectUrl').trim();
@@ -114,7 +136,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const project = {
 				id: projectId,
 				title,
-				tagline: tagline || '',
+				field: field || 'Web Development',
 				description: description || '',
 				imageUrl,
 				projectUrl: projectUrl || '',
