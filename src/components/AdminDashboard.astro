@@ -1,12 +1,13 @@
 ---
 import IconComponent from './Icon.astro';
 import AcceptedAdminEmailsCard from './admin/AcceptedAdminEmailsCard.astro';
+import AdminLogsCard from './admin/AdminLogsCard.astro';
 import AdminTodoCard from './admin/AdminTodoCard.astro';
-import type { AcceptedAdminEmail, AdminTodo } from '../types';
+import type { AcceptedAdminEmail, AdminTodo, SystemLog } from '../types';
 
 /**
  * AdminDashboard Component
- * Displays a summary of system status, collection counts, accepted emails, and todo brainstorming tasks for the admin workspace.
+ * Displays a summary of system status, collection counts, accepted emails, website activity logs, and todo brainstorming tasks for the admin workspace.
  */
 interface DashboardMetrics {
   counts: {
@@ -23,9 +24,11 @@ interface Props {
   metrics: DashboardMetrics;
   initialAcceptedEmails?: AcceptedAdminEmail[];
   initialTodos?: AdminTodo[];
+  initialLogs?: SystemLog[];
+  isPrimaryAdmin?: boolean;
 }
 
-const { metrics, initialAcceptedEmails = [], initialTodos = [] } = Astro.props;
+const { metrics, initialAcceptedEmails = [], initialTodos = [], initialLogs = [], isPrimaryAdmin = true } = Astro.props;
 const { counts, systemStatus } = metrics;
 ---
 
@@ -154,9 +157,10 @@ const { counts, systemStatus } = metrics;
 </script>
 
     <!-- Admin Tools & Overview Cards -->
-    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <AcceptedAdminEmailsCard initialEmails={initialAcceptedEmails} />
-      <AdminTodoCard initialTodos={initialTodos} />
+    <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <AcceptedAdminEmailsCard initialEmails={initialAcceptedEmails} isPrimaryAdmin={isPrimaryAdmin} />
+      <AdminLogsCard initialLogs={initialLogs} isPrimaryAdmin={isPrimaryAdmin} />
+      <AdminTodoCard initialTodos={initialTodos} isPrimaryAdmin={isPrimaryAdmin} />
     </section>
   </div>
 </div>

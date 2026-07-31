@@ -70,6 +70,11 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		const action = getFormString(formData, 'action');
 		const email = getFormString(formData, 'email').toLowerCase().trim();
 		const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
+		const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
+
+		if (callerEmail !== primaryEmail) {
+			return jsonResponse({ error: 'Only the primary environment admin owner (ADMIN_EMAIL) can add or remove emails.' }, 403);
+		}
 
 		if (!email) {
 			return jsonResponse({ error: 'Email address is required.' }, 400);
@@ -89,6 +94,20 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			}
 
 			clearCache('admin_accepted_emails');
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'admin',
+					action: 'EMAIL_REVOKED',
+					title: `Revoked admin access for ${email}`,
+					details: `Admin privileges removed by ${locals.adminEmail}`,
+					userEmail: locals.adminEmail,
+				});
+			} catch (logErr) {
+				console.warn('Could not log email delete event:', logErr);
+			}
+
 			return jsonResponse({ success: true, deletedEmail: email });
 		}
 
@@ -112,6 +131,19 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			await docRef.set(newRecord, { merge: true });
 			clearCache('admin_accepted_emails');
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'admin',
+					action: 'EMAIL_ADDED',
+					title: `Granted admin access to ${email}`,
+					details: `Added to accepted admin list by ${locals.adminEmail}`,
+					userEmail: locals.adminEmail,
+				});
+			} catch (logErr) {
+				console.warn('Could not log email add event:', logErr);
+			}
 
 			return jsonResponse({ success: true, email: newRecord });
 		}

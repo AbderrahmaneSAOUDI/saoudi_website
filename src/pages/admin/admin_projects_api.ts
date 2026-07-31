@@ -40,6 +40,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const docSnap = await docRef.get();
 			if (!docSnap.exists) return jsonResponse({ error: 'Project not found' }, 404);
 
+			const deletedTitle = docSnap.data()?.title || projectId;
 			const imageUrl = docSnap.data()?.imageUrl;
 			await docRef.delete();
 			if (typeof imageUrl === 'string' && !imageUrl.startsWith('data:')) {
@@ -47,6 +48,20 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			}
 
 			invalidateProjectCaches(true);
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'content',
+					action: 'PROJECT_DELETED',
+					title: `Removed project card: "${deletedTitle}"`,
+					details: `Project card permanently deleted by ${locals.adminEmail}`,
+					userEmail: locals.adminEmail,
+				});
+			} catch (logErr) {
+				console.warn('Could not log project delete event:', logErr);
+			}
+
 			return jsonResponse({ success: true });
 		}
 
@@ -166,7 +181,22 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				await deleteFile(previousImageUrl, PROJECTS_DIRECTORY);
 			}
 
-			invalidateProjectCaches(!docSnap.exists);
+			const isNewProject = !docSnap.exists;
+			invalidateProjectCaches(isNewProject);
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'content',
+					action: isNewProject ? 'PROJECT_ADDED' : 'PROJECT_UPDATED',
+					title: `${isNewProject ? 'Added new' : 'Updated'} project card: "${title}"`,
+					details: `Field: ${field || 'Web Development'}, Techs: ${technologies.join(', ') || 'N/A'}`,
+					userEmail: locals.adminEmail,
+				});
+			} catch (logErr) {
+				console.warn('Could not log project save event:', logErr);
+			}
+
 			return jsonResponse({ success: true, project });
 		}
 

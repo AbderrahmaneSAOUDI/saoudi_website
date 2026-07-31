@@ -58,6 +58,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const docSnap = await docRef.get();
 			if (!docSnap.exists) return jsonResponse({ error: 'Design not found' }, 404);
 
+			const deletedTitle = docSnap.data()?.title || docSnap.data()?.company || designId;
 			const imageUrl = docSnap.data()?.imageUrl;
 			await docRef.delete();
 
@@ -66,6 +67,20 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			}
 
 			invalidateDesignCaches(true);
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'content',
+					action: 'DESIGN_DELETED',
+					title: `Removed design card: "${deletedTitle}"`,
+					details: `Design card deleted by ${locals.adminEmail}`,
+					userEmail: locals.adminEmail,
+				});
+			} catch (logErr) {
+				console.warn('Could not log design delete event:', logErr);
+			}
+
 			return jsonResponse({ success: true });
 		}
 
@@ -176,7 +191,22 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				await deleteFile(previousImageUrl, DESIGNS_DIRECTORY);
 			}
 
-			invalidateDesignCaches(!docSnap.exists);
+			const isNewDesign = !docSnap.exists;
+			invalidateDesignCaches(isNewDesign);
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'content',
+					action: isNewDesign ? 'DESIGN_ADDED' : 'DESIGN_UPDATED',
+					title: `${isNewDesign ? 'Added new' : 'Updated'} design card: "${title || company}"`,
+					details: `Company: ${company}`,
+					userEmail: locals.adminEmail,
+				});
+			} catch (logErr) {
+				console.warn('Could not log design save event:', logErr);
+			}
+
 			return jsonResponse({ success: true, design });
 		}
 

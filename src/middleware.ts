@@ -8,6 +8,8 @@ const ADMIN_API_PATHS = new Set([
   '/admin/admin_resume_upload',
   '/admin/admin_emails_api',
   '/admin/admin_todos_api',
+  '/admin/admin_logs_api',
+  '/admin/admin_projects_api',
 ]);
 
 /**

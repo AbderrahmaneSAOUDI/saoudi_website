@@ -242,6 +242,34 @@ export const adminTodoSchema = z.object({
 	archivedAt: z.string().nullable().optional(),
 });
 
+// ─── Collection: system_logs ───────────────────────────────────────────────
+
+export type LogType = 'auth' | 'content' | 'admin' | 'system';
+
+export interface SystemLog {
+	id: string;
+	type: LogType;
+	action: string;
+	title: string;
+	details?: string;
+	userEmail: string;
+	isPrimaryEmail?: boolean;
+	timestamp: string; // ISO 8601
+	metadata?: Record<string, any>;
+}
+
+export const systemLogSchema = z.object({
+	id: z.string().min(1),
+	type: z.enum(['auth', 'content', 'admin', 'system']),
+	action: z.string().min(1),
+	title: z.string().min(1),
+	details: z.string().optional(),
+	userEmail: z.string().min(1),
+	isPrimaryEmail: z.boolean().optional(),
+	timestamp: z.string().min(1),
+	metadata: z.record(z.string(), z.any()).optional(),
+});
+
 // ─── Parse & Validation Helpers ───────────────────────────────────────────
 
 export const parseStaticData = (data: unknown): StaticData => {
@@ -279,3 +307,8 @@ export const parseAcceptedAdminEmail = (data: unknown): AcceptedAdminEmail => {
 export const parseAdminTodo = (data: unknown): AdminTodo => {
 	return adminTodoSchema.parse(data);
 };
+
+export const parseSystemLog = (data: unknown): SystemLog => {
+	return systemLogSchema.parse(data);
+};
+
