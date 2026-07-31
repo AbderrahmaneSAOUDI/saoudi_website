@@ -1,0 +1,287 @@
+---
+/**
+ * ProjectModal Component
+ * 
+ * Renders a global modal dialog for public project details.
+ * Features a blurred background overlay and full block content rendering.
+ */
+import type { Project } from '../types';
+
+interface Props {
+	projects?: Project[];
+}
+
+const { projects = [] } = Astro.props;
+---
+
+<div id="project-details-modal" class="project-modal-overlay fixed inset-0 bg-black/75 backdrop-blur-md z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+	<!-- Backdrop Click to Close -->
+	<a href="#" class="fixed inset-0 cursor-default" aria-label="Close Modal"></a>
+
+	<div class="relative w-full max-w-3xl bg-[#1D1B20] border border-[#2B2930] rounded-3xl shadow-2xl z-10 my-auto p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto animate-page-slide-up">
+		<!-- Close Icon Button -->
+		<a href="#" class="absolute top-5 right-5 p-2 rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors text-lg font-bold flex items-center justify-center w-9 h-9" aria-label="Close">
+			&times;
+		</a>
+
+		<!-- Modal Content Body -->
+		<div id="project-modal-content" class="space-y-6">
+			<!-- Banner / Thumbnail -->
+			<div id="project-modal-image-container" class="relative aspect-[16/9] rounded-2xl overflow-hidden bg-[#141218] border border-white/10 hidden">
+				<img id="project-modal-image" src="" alt="" class="w-full h-full object-cover" />
+			</div>
+
+			<!-- Header: Title, Date, Tech, Tagline -->
+			<div class="space-y-3">
+				<div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-4">
+					<div>
+						<h2 id="project-modal-title" class="text-2xl sm:text-3xl font-bold text-white tracking-tight"></h2>
+						<p id="project-modal-tagline" class="text-sm text-white/70 mt-1"></p>
+					</div>
+					<span id="project-modal-date" class="text-xs text-white/40 font-semibold bg-white/5 px-3 py-1 rounded-full border border-white/10"></span>
+				</div>
+
+				<div id="project-modal-tech-container" class="flex flex-wrap gap-2 pt-1">
+					<!-- Tech pills inserted here -->
+				</div>
+			</div>
+
+			<!-- Blocks Section -->
+			<div id="project-modal-blocks" class="space-y-4 pt-2">
+				<!-- Blocks dynamically inserted here -->
+			</div>
+
+			<!-- External Links (Project URL & GitHub) -->
+			<div id="project-modal-links" class="flex flex-wrap gap-3 pt-4 border-t border-white/10">
+				<!-- Links inserted here -->
+			</div>
+		</div>
+	</div>
+</div>
+
+<script is:inline define:vars={{ initialProjects: projects }}>
+	(function() {
+		const projectsMap = new Map();
+		if (Array.isArray(initialProjects)) {
+			initialProjects.forEach(p => projectsMap.set(p.id, p));
+		}
+
+		document.addEventListener('click', (e) => {
+			const trigger = e.target.closest('[data-project-card-id]');
+			if (!trigger) return;
+			
+			// Don't open modal if clicking an explicit external link
+			if (e.target.closest('a[target="_blank"]')) return;
+
+			e.preventDefault();
+			const id = trigger.getAttribute('data-project-card-id');
+			const project = projectsMap.get(id);
+			if (!project) return;
+
+			populateProjectModal(project);
+			window.location.hash = 'project-details-modal';
+		});
+
+		function populateProjectModal(project) {
+			const modal = document.getElementById('project-details-modal');
+			if (!modal) return;
+
+			const imgContainer = modal.querySelector('#project-modal-image-container');
+			const img = modal.querySelector('#project-modal-image');
+			const title = modal.querySelector('#project-modal-title');
+			const tagline = modal.querySelector('#project-modal-tagline');
+			const date = modal.querySelector('#project-modal-date');
+			const techContainer = modal.querySelector('#project-modal-tech-container');
+			const blocksContainer = modal.querySelector('#project-modal-blocks');
+			const linksContainer = modal.querySelector('#project-modal-links');
+
+			if (img && imgContainer) {
+				if (project.imageUrl) {
+					img.src = project.imageUrl;
+					img.alt = project.title || '';
+					imgContainer.classList.remove('hidden');
+				} else {
+					imgContainer.classList.add('hidden');
+				}
+			}
+
+			if (title) title.textContent = project.title || '';
+			if (tagline) tagline.textContent = project.tagline || project.description || '';
+			if (date) date.textContent = project.date || '';
+
+			if (techContainer) {
+				techContainer.innerHTML = '';
+				if (Array.isArray(project.technologies)) {
+					project.technologies.forEach(tech => {
+						const pill = document.createElement('span');
+						pill.className = 'px-3 py-1 rounded-xl text-xs font-semibold bg-primary/10 text-primary border border-primary/20';
+						pill.textContent = tech;
+						techContainer.appendChild(pill);
+					});
+				}
+			}
+
+			if (linksContainer) {
+				linksContainer.innerHTML = '';
+				if (project.projectUrl) {
+					const btn = document.createElement('a');
+					btn.href = project.projectUrl;
+					btn.target = '_blank';
+					btn.rel = 'noopener noreferrer';
+					btn.className = 'px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold transition-colors flex items-center gap-1.5';
+					btn.innerHTML = '<span>Live Demo</span> ↗';
+					linksContainer.appendChild(btn);
+				}
+				if (project.githubUrl) {
+					const btn = document.createElement('a');
+					btn.href = project.githubUrl;
+					btn.target = '_blank';
+					btn.rel = 'noopener noreferrer';
+					btn.className = 'px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors flex items-center gap-1.5';
+					btn.innerHTML = '<span>Source Code</span> ↗';
+					linksContainer.appendChild(btn);
+				}
+			}
+
+			if (blocksContainer) {
+				blocksContainer.innerHTML = '';
+				if (Array.isArray(project.blocks) && project.blocks.length > 0) {
+					project.blocks.forEach(block => {
+						const el = renderBlockElement(block);
+						if (el) blocksContainer.appendChild(el);
+					});
+				}
+			}
+		}
+
+		function renderBlockElement(block) {
+			if (!block || !block.type) return null;
+
+			if (block.type === 'heading') {
+				const lvl = block.level || 2;
+				const h = document.createElement('h' + (lvl >= 1 && lvl <= 6 ? lvl : 2));
+				const sizes = {
+					1: 'text-2xl sm:text-3xl font-extrabold text-white mt-4 mb-2',
+					2: 'text-xl sm:text-2xl font-bold text-white mt-3 mb-2',
+					3: 'text-lg sm:text-xl font-bold text-white mt-2 mb-1',
+					4: 'text-base font-semibold text-white mt-2 mb-1',
+					5: 'text-sm font-semibold text-white/90 mt-1',
+					6: 'text-xs font-semibold text-white/80 mt-1'
+				};
+				h.className = sizes[lvl] || sizes[2];
+				h.textContent = block.text || '';
+				return h;
+			} else if (block.type === 'rich_text') {
+				const div = document.createElement('div');
+				div.className = 'text-sm text-white/80 leading-relaxed space-y-2 whitespace-pre-line';
+				div.textContent = block.content || '';
+				return div;
+			} else if (block.type === 'callout') {
+				const div = document.createElement('div');
+				const variants = {
+					info: 'bg-primary/10 border-primary/30 text-[#4285F4]',
+					success: 'bg-[#34A853]/10 border-[#34A853]/30 text-[#34A853]',
+					warning: 'bg-[#F9AB00]/10 border-[#F9AB00]/30 text-[#F9AB00]',
+					error: 'bg-[#EA4335]/10 border-[#EA4335]/30 text-[#EA4335]'
+				};
+				div.className = `p-4 rounded-2xl border ${variants[block.variant || 'info']} space-y-1`;
+				if (block.title) {
+					const title = document.createElement('p');
+					title.className = 'font-bold text-xs uppercase tracking-wider';
+					title.textContent = block.title;
+					div.appendChild(title);
+				}
+				if (block.text) {
+					const txt = document.createElement('p');
+					txt.className = 'text-xs text-white/90 leading-relaxed';
+					txt.textContent = block.text;
+					div.appendChild(txt);
+				}
+				return div;
+			} else if (block.type === 'single_image') {
+				if (!block.imageUrl) return null;
+				const div = document.createElement('div');
+				div.className = 'space-y-1.5 my-3';
+				div.innerHTML = `
+					<div class="rounded-2xl overflow-hidden border border-white/10 bg-black/40">
+						<img src="${block.imageUrl}" alt="${block.caption || ''}" class="w-full h-auto object-cover" loading="lazy" />
+					</div>
+					${block.caption ? `<p class="text-[11px] text-center text-white/50 italic">${block.caption}</p>` : ''}
+				`;
+				return div;
+			} else if (block.type === 'carousel') {
+				if (!Array.isArray(block.images) || block.images.length === 0) return null;
+				const div = document.createElement('div');
+				div.className = 'space-y-2 my-3';
+				const grid = document.createElement('div');
+				grid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2';
+				block.images.forEach(imgUrl => {
+					const imgWrapper = document.createElement('div');
+					imgWrapper.className = 'aspect-[16/10] rounded-xl overflow-hidden border border-white/10 bg-black/40';
+					imgWrapper.innerHTML = `<img src="${imgUrl}" alt="" class="w-full h-full object-cover" loading="lazy" />`;
+					grid.appendChild(imgWrapper);
+				});
+				div.appendChild(grid);
+				if (block.caption) {
+					const cap = document.createElement('p');
+					cap.className = 'text-[11px] text-center text-white/50 italic';
+					cap.textContent = block.caption;
+					div.appendChild(cap);
+				}
+				return div;
+			} else if (block.type === 'metrics_grid') {
+				if (!Array.isArray(block.items) || block.items.length === 0) return null;
+				const div = document.createElement('div');
+				div.className = 'grid grid-cols-2 sm:grid-cols-3 gap-2.5 my-3';
+				block.items.forEach(it => {
+					const card = document.createElement('div');
+					card.className = 'p-3 rounded-2xl bg-white/5 border border-white/10 text-center space-y-0.5';
+					card.innerHTML = `
+						<p class="text-base sm:text-lg font-extrabold text-primary">${it.value || ''}</p>
+						<p class="text-[10px] font-semibold text-white/50 uppercase tracking-wider">${it.label || ''}</p>
+					`;
+					div.appendChild(card);
+				});
+				return div;
+			} else if (block.type === 'action_buttons') {
+				if (!Array.isArray(block.buttons) || block.buttons.length === 0) return null;
+				const div = document.createElement('div');
+				div.className = 'flex flex-wrap gap-2 my-3';
+				block.buttons.forEach(b => {
+					const a = document.createElement('a');
+					a.href = b.url || '#';
+					a.target = '_blank';
+					a.rel = 'noopener noreferrer';
+					a.className = 'px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors flex items-center gap-1';
+					a.innerHTML = `<span>${b.label || 'Link'}</span> ↗`;
+					div.appendChild(a);
+				});
+				return div;
+			}
+			return null;
+		}
+
+		// Escape key to close modal
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && window.location.hash === '#project-details-modal') {
+				e.preventDefault();
+				window.location.hash = '#';
+			}
+		});
+	})();
+</script>
+
+<style is:global>
+	.project-modal-overlay {
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+		transition: opacity 0.3s cubic-bezier(0.2, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.2, 0, 0.2, 1);
+		will-change: opacity;
+	}
+	.project-modal-overlay:target {
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
+	}
+</style>
