@@ -10,6 +10,7 @@ const ADMIN_API_PATHS = new Set([
   '/admin/admin_todos_api',
   '/admin/admin_logs_api',
   '/admin/admin_projects_api',
+  '/admin/admin_stats_api',
 ]);
 
 /**
@@ -30,36 +31,32 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   // Intercept all requests targeting `/admin` and `/admin/*` (except `/admin/admin_login`)
   if (isAdminRoute && !isLoginRoute) {
-    
-    // In development mode, mock the admin session to bypass authentication
-    if (import.meta.env.DEV) {
-      context.locals.adminEmail = 'mock@example.com';
-      return addSecurityHeaders(await next(), true);
-    }
-    
-    // Extract the session cookie for production authentication
     const sessionCookie = context.cookies.get('admin_session')?.value;
+    let verifiedEmail: string | null = null;
 
-    if (!sessionCookie) {
-      const response = isAdminApi
-        ? jsonResponse({ error: 'Unauthorized' }, 401)
-        : context.redirect('/admin/admin_login');
-      return addSecurityHeaders(response, true);
+    if (sessionCookie) {
+      const session = await verifySessionToken(sessionCookie);
+      if (session) {
+        verifiedEmail = session.email;
+      } else {
+        context.cookies.delete('admin_session', { path: '/' });
+      }
     }
 
-    // Verify the JWT-like session token
-    const session = await verifySessionToken(sessionCookie);
-    if (!session) {
-      // Clear invalid cookie and redirect to login to ensure clean state
-      context.cookies.delete('admin_session', { path: '/' });
-      const response = isAdminApi
-        ? jsonResponse({ error: 'Session expired' }, 401)
-        : context.redirect('/admin/admin_login');
-      return addSecurityHeaders(response, true);
+    if (!verifiedEmail) {
+      if (import.meta.env.DEV) {
+        // In local development mode without an explicit session cookie, default to primary ADMIN_EMAIL
+        const { getEnv } = await import('./lib/server/env');
+        verifiedEmail = getEnv('ADMIN_EMAIL') || 'mock@example.com';
+      } else {
+        const response = isAdminApi
+          ? jsonResponse({ error: 'Unauthorized' }, 401)
+          : context.redirect('/admin/admin_login');
+        return addSecurityHeaders(response, true);
+      }
     }
 
-    // Set the user email in locals so protected pages/endpoints can access it
-    context.locals.adminEmail = session.email;
+    context.locals.adminEmail = verifiedEmail;
   }
 
   // Continue to the next middleware or route handler

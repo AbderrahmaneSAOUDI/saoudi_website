@@ -16,6 +16,7 @@ interface DashboardMetrics {
     designs: number;
     certificates: number;
     volunteering: number;
+    resumeDownloads?: number;
   };
   systemStatus: string;
 }
@@ -58,7 +59,7 @@ const { counts, systemStatus } = metrics;
 
     <!-- Grid Statistics -->
     <section class="mb-8">
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         <!-- Projects Card (Active) -->
         <a
           href="/admin/admin_projects"
@@ -140,8 +141,36 @@ const { counts, systemStatus } = metrics;
           </div>
           <h3 class="font-bold text-[#E6E1E5]">Volunteering</h3>
         </button>
+
+        <!-- Resume Downloads Card (Live Real-Time Count) -->
+        <div
+          class="p-5 rounded-3xl transition-all duration-300 border border-[#2B2930] group relative"
+          style="background: #1D1B20"
+        >
+          <div class="flex justify-between items-start mb-4">
+            <div class="relative p-2.5 rounded-2xl bg-[#0F9D58]/10 text-[#0F9D58]">
+              <IconComponent name="download" size={24} class="w-6 h-6 transition-all duration-200" />
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="resume-downloads-count" class="text-2xl font-black text-white">{counts.resumeDownloads ?? 0}</span>
+              <button
+                type="button"
+                id="btn-reset-downloads"
+                class={`p-1.5 rounded-xl transition-all ${isPrimaryAdmin ? 'text-[#E6E1E5]/40 hover:text-white hover:bg-white/10 cursor-pointer' : 'text-[#E6E1E5]/20 opacity-40 cursor-not-allowed'}`}
+                title={isPrimaryAdmin ? 'Reset download counter' : 'Only website owner can do this action'}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              </button>
+            </div>
+          </div>
+          <h3 class="font-bold text-[#E6E1E5]">Downloads</h3>
+        </div>
       </div>
     </section>
+
+<script is:inline define:vars={{ isPrimaryAdmin }}>
+  window.isPrimaryAdminUser = isPrimaryAdmin;
+</script>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -153,6 +182,66 @@ const { counts, systemStatus } = metrics;
         }
       });
     });
+
+    // Real-time live polling for dashboard metrics (resume downloads count)
+    const downloadCountElem = document.getElementById('resume-downloads-count');
+    const btnResetDownloads = document.getElementById('btn-reset-downloads');
+    
+    async function updateLiveStats() {
+      try {
+        const res = await fetch(`/admin/admin_stats_api?t=${Date.now()}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.counts && downloadCountElem) {
+            downloadCountElem.textContent = String(data.counts.resumeDownloads ?? 0);
+          }
+        }
+      } catch (err) {
+        // Silent catch for background polling
+      }
+    }
+
+    // Initial check and 5-second polling interval
+    updateLiveStats();
+    setInterval(updateLiveStats, 5000);
+
+    // Reset download counter button handler
+    if (btnResetDownloads) {
+      btnResetDownloads.addEventListener('click', async () => {
+        if (!(window as any).isPrimaryAdminUser) {
+          if (typeof (window as any).showToast === 'function') {
+            (window as any).showToast('Permission denied. Only the website owner can do this action.', 'error');
+          }
+          return;
+        }
+
+        if (confirm('Are you sure you want to reset the download counter to 0?')) {
+          try {
+            const formData = new FormData();
+            formData.append('action', 'reset_downloads');
+
+            const res = await fetch('/admin/admin_stats_api', {
+              method: 'POST',
+              body: formData,
+            });
+
+            const data = await res.json();
+            if (res.ok && data.success) {
+              if (downloadCountElem) downloadCountElem.textContent = '0';
+              if (typeof (window as any).showToast === 'function') {
+                (window as any).showToast('Download counter reset to 0!', 'success');
+              }
+            } else {
+              if (typeof (window as any).showToast === 'function') {
+                (window as any).showToast(data.error || 'Failed to reset count', 'error');
+              }
+            }
+          } catch (err) {
+            console.error('Error resetting downloads count:', err);
+          }
+        }
+      });
+    }
   });
 </script>
 

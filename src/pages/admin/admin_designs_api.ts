@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import type { DocumentReference } from 'firebase-admin/firestore';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
+import { getEnv } from '../../lib/server/env';
 import { clearCache, clearCacheByPrefix } from '../../lib/server/cache';
 import {
 	getErrorMessage,
@@ -54,6 +55,12 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		const db = getFirebaseAdminDb();
 
 		if (action === 'delete') {
+			const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
+			const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
+			if (callerEmail !== primaryEmail) {
+				return jsonResponse({ error: 'Permission denied. Only the website owner can do this action.' }, 403);
+			}
+
 			const docRef = db.collection('designs').doc(designId);
 			const docSnap = await docRef.get();
 			if (!docSnap.exists) return jsonResponse({ error: 'Design not found' }, 404);

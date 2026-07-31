@@ -1,4 +1,5 @@
 import { getFirebaseAdminDb } from './firebase-admin';
+import { getEnv } from './env';
 import type { SystemLog, LogType } from '../../types';
 
 export interface AddLogParams {
@@ -16,7 +17,7 @@ export interface AddLogParams {
 export async function addSystemLog(params: AddLogParams): Promise<SystemLog | null> {
 	try {
 		const db = getFirebaseAdminDb();
-		const primaryEmail = (process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL || '').toLowerCase().trim();
+		const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
 		const userEmail = (params.userEmail || primaryEmail || 'system').toLowerCase().trim();
 		const isPrimaryEmail = userEmail === primaryEmail;
 
@@ -75,7 +76,7 @@ export async function getSystemLogs(limitCount: number = 50, typeFilter?: string
  * Initial seed logs for visual demonstration if database collection is brand new.
  */
 export function getSeedSystemLogs(): SystemLog[] {
-	const primaryEmail = (process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL || 'saoudi.dev@gmail.com').toLowerCase().trim();
+	const primaryEmail = (getEnv('ADMIN_EMAIL') || 'saoudi.dev@gmail.com').toLowerCase().trim();
 	const now = new Date();
 
 	return [

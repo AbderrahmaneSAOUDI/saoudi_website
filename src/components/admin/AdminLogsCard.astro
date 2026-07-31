@@ -1,15 +1,16 @@
 ---
 import Icon from '../Icon.astro';
 import type { SystemLog } from '../../types';
+import { getEnv } from '../../lib/server/env';
 
 interface Props {
 	initialLogs?: SystemLog[];
 	isPrimaryAdmin?: boolean;
 }
 
-const primaryEmail = (import.meta.env.ADMIN_EMAIL || process.env.ADMIN_EMAIL || '').toLowerCase().trim();
+const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
 const userEmail = (Astro.locals.adminEmail || '').toLowerCase().trim();
-const { initialLogs = [], isPrimaryAdmin = (userEmail === primaryEmail) } = Astro.props;
+const { initialLogs = [], isPrimaryAdmin = (userEmail === primaryEmail && primaryEmail !== '') } = Astro.props;
 
 const filteredLogs = isPrimaryAdmin ? initialLogs : initialLogs.filter(l => l.type === 'content');
 ---

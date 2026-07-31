@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
 import { clearCache } from '../../lib/server/cache';
 import { getErrorMessage, getFormString, isFormRequest, jsonResponse } from '../../lib/server/http';
+import { getEnv } from '../../lib/server/env';
 import type { TodoCategory, TodoPriority, TodoStatus } from '../../types';
 
 const VALID_CATEGORIES = new Set<TodoCategory>(['Feature', 'Bug', 'Refactor', 'Idea', 'Content', 'General']);
@@ -127,11 +128,11 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		}
 
 		if (action === 'delete') {
-			const primaryEmail = (process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL || '').toLowerCase().trim();
+			const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
 			const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
 
 			if (callerEmail !== primaryEmail) {
-				return jsonResponse({ error: 'Only the primary environment admin owner can delete tasks.' }, 403);
+				return jsonResponse({ error: 'Permission denied. Only the website owner can do this action.' }, 403);
 			}
 
 			await docRef.delete();

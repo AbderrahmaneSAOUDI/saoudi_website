@@ -73,7 +73,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
 
 		if (callerEmail !== primaryEmail) {
-			return jsonResponse({ error: 'Only the primary environment admin owner (ADMIN_EMAIL) can add or remove emails.' }, 403);
+			return jsonResponse({ error: 'Permission denied. Only the website owner can do this action.' }, 403);
 		}
 
 		if (!email) {

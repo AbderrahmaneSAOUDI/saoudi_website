@@ -10,6 +10,7 @@ import {
 	jsonResponse,
 } from '../../lib/server/http';
 import { deleteFile, saveFile } from '../../lib/server/storage';
+import { getEnv } from '../../lib/server/env';
 
 const CERTIFICATES_DIRECTORY = 'uploads/certificates';
 const MAX_IMAGE_BYTES = 800 * 1024;
@@ -39,6 +40,12 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		const docRef = db.collection('certificates').doc(certificateId);
 
 		if (action === 'delete') {
+			const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
+			const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
+			if (callerEmail !== primaryEmail) {
+				return jsonResponse({ error: 'Permission denied. Only the website owner can do this action.' }, 403);
+			}
+
 			const docSnap = await docRef.get();
 			if (!docSnap.exists) return jsonResponse({ error: 'Certificate not found' }, 404);
 

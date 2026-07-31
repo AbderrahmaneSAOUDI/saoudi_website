@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getSystemLogs, addSystemLog } from '../../lib/server/system-logs';
+import { getEnv } from '../../lib/server/env';
 
 export const GET: APIRoute = async ({ url, locals }) => {
 	try {
@@ -11,9 +12,9 @@ export const GET: APIRoute = async ({ url, locals }) => {
 			});
 		}
 
-		const primaryEmail = (process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL || '').toLowerCase().trim();
+		const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
 		const callerEmail = (adminEmail || '').toLowerCase().trim();
-		const isPrimaryAdmin = callerEmail === primaryEmail;
+		const isPrimaryAdmin = callerEmail === primaryEmail && primaryEmail !== '';
 
 		const requestedFilter = url.searchParams.get('type') || 'all';
 		const typeFilter = isPrimaryAdmin ? requestedFilter : 'content';

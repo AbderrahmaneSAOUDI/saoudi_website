@@ -6,10 +6,13 @@ import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
 import Icon from "../../components/Icon.astro";
 import GlobalLightbox from "../../components/GlobalLightbox.astro";
 import AdminControlsStrip from "../../components/admin/AdminControlsStrip.astro";
+import { getEnv } from "../../lib/server/env";
 
 // Extra safety: double-check authentication
 const adminEmail = Astro.locals.adminEmail;
-if (!adminEmail) return Astro.redirect("/admin/admin_login");
+const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
+const currentAdminEmail = (adminEmail || '').toLowerCase().trim();
+const isPrimaryAdmin = currentAdminEmail === primaryEmail && primaryEmail !== '';
 
 let designs: any[] = [];
 let companies: string[] = ['Google', 'GDG', 'Freelance', 'Personal'];
@@ -452,10 +455,11 @@ try {
 	<GlobalLightbox />
 </BackgroundBaseLayout>
 
-<script define:vars={{ designs, initialCompanies: companies }} is:inline>
+<script define:vars={{ designs, initialCompanies: companies, isPrimaryAdmin }} is:inline>
 	// Make server-fetched items available to client script
 	window.designs = designs || [];
 	window.companies = initialCompanies || [];
+	window.isPrimaryAdminUser = isPrimaryAdmin;
 </script>
 
 <script>
@@ -996,6 +1000,10 @@ try {
 			editorHeading.textContent = 'Edit Design';
 			editorSubheading.textContent = 'Modify your mockup credentials';
 			btnDelete.classList.remove('hidden');
+			if (!(window as any).isPrimaryAdminUser) {
+				btnDelete.classList.add('opacity-40', 'cursor-not-allowed');
+				btnDelete.title = 'Only website owner can do this action';
+			}
 
 			clearStatus();
 		}
@@ -1610,6 +1618,11 @@ try {
 		// DELETE
 		btnDelete.addEventListener('click', async () => {
 			if (!currentSelectedId) return;
+
+			if (!(window as any).isPrimaryAdminUser) {
+				showStatus('error', 'Permission denied. Only the website owner can do this action.');
+				return;
+			}
 
 			const confirmed = confirm('Are you sure you want to delete this design project? This action will permanently remove the record and its cover image.');
 			if (!confirmed) return;
