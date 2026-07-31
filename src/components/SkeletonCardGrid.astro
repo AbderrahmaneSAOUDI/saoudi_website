@@ -13,7 +13,7 @@ interface Props {
 	/** Number of skeleton group headers to show */
 	groups?: number;
 	/** Visual variant — determines skeleton card inner structure */
-	variant?: 'design' | 'certificate' | 'stat' | 'resume';
+	variant?: 'design' | 'certificate' | 'project' | 'stat' | 'resume';
 }
 
 const { count = 8, groups = 2, variant = 'design' } = Astro.props;
@@ -47,7 +47,7 @@ const cardsPerGroup = Math.ceil(count / groups);
 	</div>
 )}
 
-{(variant === 'design' || variant === 'certificate') && (
+{(variant === 'design' || variant === 'certificate' || variant === 'project') && (
 	<div class="space-y-12">
 		{Array.from({ length: groups }).map((_, groupIdx) => (
 			<section class="space-y-4" style={`animation-delay: ${groupIdx * 120}ms`}>

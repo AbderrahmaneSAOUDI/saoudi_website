@@ -9,13 +9,13 @@ const { currentPath = '/admin' } = Astro.props;
 
 const navItems = [
 	{ label: 'Overview', path: '/admin', iconName: 'home', shortcutKey: '1' },
-	{ label: 'Experience', path: '/admin/admin_experience', iconName: 'experience', disabled: true },
-	{ label: 'Projects', path: '/admin/admin_projects', iconName: 'projects', disabled: true },
-	{ label: 'Designs', path: '/admin/admin_designs', iconName: 'design', shortcutKey: '2' },
-	{ label: 'Certifications', path: '/admin/admin_certifications', iconName: 'certifications', shortcutKey: '3' },
-	{ label: 'Volunteering', path: '/admin/admin_volunteering', iconName: 'business', disabled: true },
-	{ label: 'Resume', path: '/admin/admin_resume', iconName: 'document', shortcutKey: '4' },
-	{ label: 'Timeline', path: '/admin/admin_timeline', iconName: 'calendar', disabled: true },
+	{ label: 'Experience', path: '/admin/admin_experience', iconName: 'experience', disabled: true, shortcutKey: '2' },
+	{ label: 'Projects', path: '/admin/admin_projects', iconName: 'projects', shortcutKey: '3' },
+	{ label: 'Designs', path: '/admin/admin_designs', iconName: 'design', shortcutKey: '4' },
+	{ label: 'Certifications', path: '/admin/admin_certifications', iconName: 'certifications', shortcutKey: '5' },
+	{ label: 'Volunteering', path: '/admin/admin_volunteering', iconName: 'business', disabled: true, shortcutKey: '6' },
+	{ label: 'Resume', path: '/admin/admin_resume', iconName: 'document', shortcutKey: '7' },
+	{ label: 'Timeline', path: '/admin/admin_timeline', iconName: 'calendar', disabled: true, shortcutKey: '8' },
 ];
 ---
 
@@ -38,8 +38,10 @@ const navItems = [
 
 					return (
 						<a
-							href={item.disabled ? undefined : item.path}
-							class={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium transition-all duration-300 shrink-0 ${
+							href={item.disabled ? '#' : item.path}
+							data-disabled={item.disabled ? 'true' : undefined}
+							data-label={item.label}
+							class={`admin-nav-item flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium transition-all duration-300 shrink-0 ${
 								item.disabled
 									? 'text-white/30 cursor-not-allowed'
 									: isActive
@@ -53,7 +55,7 @@ const navItems = [
 							</span>
 							<span class="admin-nav-label">{item.label}</span>
 							{item.shortcutKey && (
-								<kbd class={`hidden md:inline-block px-1.5 py-0.2 text-[9px] font-mono rounded border ${isActive ? 'bg-white/20 text-white border-white/30' : 'bg-white/10 text-white/40 border-white/10'}`}>
+								<kbd class={`hidden md:inline-block px-1.5 py-0.2 text-[9px] font-mono rounded border ${isActive ? 'bg-white/20 text-white border-white/30' : item.disabled ? 'bg-white/5 text-white/20 border-white/5' : 'bg-white/10 text-white/40 border-white/10'}`}>
 									{item.shortcutKey}
 								</kbd>
 							)}
@@ -66,6 +68,19 @@ const navItems = [
 </div>
 
 <script>
+	document.addEventListener('DOMContentLoaded', () => {
+		// Attach click listener for disabled nav dock items
+		document.querySelectorAll('.admin-nav-item[data-disabled="true"]').forEach((link) => {
+			link.addEventListener('click', (e) => {
+				e.preventDefault();
+				const label = link.getAttribute('data-label') || 'This section';
+				if (typeof (window as any).showToast === 'function') {
+					(window as any).showToast(`${label} page is still not ready yet.`, 'info');
+				}
+			});
+		});
+	});
+
 	document.addEventListener('keydown', (e: KeyboardEvent) => {
 		const activeEl = document.activeElement as HTMLElement | null;
 		const isEditingText = activeEl && (
@@ -75,20 +90,30 @@ const navItems = [
 
 		if (isEditingText) return;
 
-		// Number shortcuts to switch workspace
-		const workspaceRoutes: Record<string, string> = {
-			'1': '/admin',
-			'2': '/admin/admin_designs',
-			'3': '/admin/admin_certifications',
-			'4': '/admin/admin_resume',
+		// Number shortcuts to switch workspace or show notification
+		const workspaceRoutes: Record<string, { path: string; label: string; disabled?: boolean }> = {
+			'1': { path: '/admin', label: 'Overview' },
+			'2': { path: '/admin/admin_experience', label: 'Experience', disabled: true },
+			'3': { path: '/admin/admin_projects', label: 'Projects' },
+			'4': { path: '/admin/admin_designs', label: 'Designs' },
+			'5': { path: '/admin/admin_certifications', label: 'Certifications' },
+			'6': { path: '/admin/admin_volunteering', label: 'Volunteering', disabled: true },
+			'7': { path: '/admin/admin_resume', label: 'Resume' },
+			'8': { path: '/admin/admin_timeline', label: 'Timeline', disabled: true },
 		};
 
-		if (workspaceRoutes[e.key]) {
+		const route = workspaceRoutes[e.key];
+		if (route) {
 			e.preventDefault();
-			const targetPath = workspaceRoutes[e.key];
-			const currentPath = window.location.pathname;
-			if (currentPath !== targetPath && currentPath !== targetPath + '/') {
-				window.location.href = targetPath;
+			if (route.disabled) {
+				if (typeof (window as any).showToast === 'function') {
+					(window as any).showToast(`${route.label} page is still not ready yet.`, 'info');
+				}
+			} else {
+				const currentPath = window.location.pathname;
+				if (currentPath !== route.path && currentPath !== route.path + '/') {
+					window.location.href = route.path;
+				}
 			}
 		}
 	});
