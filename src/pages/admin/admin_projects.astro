@@ -12,6 +12,7 @@ const adminEmail = Astro.locals.adminEmail;
 if (!adminEmail) return Astro.redirect("/admin/admin_login");
 
 let projects: any[] = [];
+let fields: string[] = ['Web Development', 'Mobile App', 'UI/UX Design', 'Full-Stack', 'AI / ML'];
 let technologiesList: string[] = [];
 let years: string[] = [];
 let errorMsg = '';
@@ -19,8 +20,20 @@ let errorMsg = '';
 try {
 	const db = getFirebaseAdminDb();
 	
-	// Fetch all projects sorted by date descending
-	const snapshot = await db.collection("projects").orderBy("date", "desc").get();
+	const [fieldsDoc, snapshot] = await Promise.all([
+		db.collection("configuration").doc("projects_fields").get(),
+		db.collection("projects").orderBy("date", "desc").get()
+	]);
+
+	if (fieldsDoc.exists) {
+		const data = fieldsDoc.data();
+		if (Array.isArray(data?.fields) && data.fields.length > 0) {
+			fields = data.fields;
+		}
+	} else {
+		await db.collection("configuration").doc("projects_fields").set({ fields });
+	}
+
 	projects = snapshot.docs.map(doc => ({
 		id: doc.id,
 		...doc.data()
@@ -99,42 +112,39 @@ try {
 				id="filter-panel"
 				class="fixed top-0 left-0 h-full w-full sm:w-[360px] bg-[#1D1B20] border-r border-[#2B2930] shadow-2xl transition-transform duration-350 ease-[cubic-bezier(0.2,0,0.2,1)] transform -translate-x-full z-[70] p-6 pb-28 sm:pb-6 overflow-y-auto flex flex-col justify-between"
 			>
-				<div class="space-y-5">
-					<div class="border-b border-[#2B2930]/60 pb-4 flex justify-between items-center">
-						<div>
-							<h2 class="text-lg font-bold text-white">Filter Projects</h2>
-							<p class="text-xs text-[#E6E1E5]/50 mt-1">Refine project showcase list</p>
-						</div>
+				<div class="space-y-6">
+					<div class="flex items-center justify-between border-b border-[#2B2930]/60 pb-4">
+						<h2 class="text-base font-bold text-white flex items-center gap-2">
+							<Icon name="filter" size={18} class="text-primary" />
+							Filter Projects
+						</h2>
 						<button
-							type="button"
 							id="btn-close-filters"
-							class="text-[#E6E1E5]/60 hover:text-white transition-colors cursor-pointer text-xl font-bold"
+							class="p-1.5 rounded-xl hover:bg-white/10 text-[#E6E1E5]/60 hover:text-white transition-colors cursor-pointer text-sm font-semibold"
 						>
 							&times;
 						</button>
 					</div>
 
 					<div class="space-y-4">
-						<!-- Technology Tag Filter -->
 						<div>
 							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Technology</label>
 							<select
 								id="filter-technology"
-								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+								class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors cursor-pointer"
 							>
 								<option value="">All Technologies</option>
-								{technologiesList.map(tech => (
-									<option value={tech}>{tech}</option>
+								{technologiesList.map(t => (
+									<option value={t}>{t}</option>
 								))}
 							</select>
 						</div>
 
-						<!-- Year Select -->
 						<div>
 							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Year</label>
 							<select
 								id="filter-year"
-								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+								class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors cursor-pointer"
 							>
 								<option value="">All Years</option>
 								{years.map(y => (
@@ -145,46 +155,47 @@ try {
 					</div>
 				</div>
 
-				<div class="flex gap-3 mt-8 pt-4 border-t border-[#2B2930]/40">
+				<div class="pt-4 border-t border-[#2B2930]">
 					<button
-						type="button"
 						id="btn-clear-filters"
-						class="w-full py-2.5 bg-transparent border border-[#2B2930] hover:bg-[#2B2930] text-[#E6E1E5]/60 hover:text-white font-semibold rounded-xl text-xs transition-all cursor-pointer text-center"
+						disabled
+						class="w-full py-2.5 px-4 rounded-xl border border-[#2B2930] hover:bg-[#2B2930] text-[#E6E1E5] font-semibold text-xs transition-all duration-300 opacity-50 cursor-not-allowed"
 					>
-						Clear Filters
+						Reset All Filters
 					</button>
 				</div>
 			</div>
 
-			<!-- Sliding Drawer Detail Editor (Starts offscreen translated right) -->
+			<!-- Sliding Drawer Editor Panel (Right Side Panel) -->
 			<div
 				id="editor-panel"
 				class="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-[#1D1B20] border-l border-[#2B2930] shadow-2xl transition-transform duration-350 ease-[cubic-bezier(0.2,0,0.2,1)] transform translate-x-full z-[70] p-6 pb-28 sm:pb-6 overflow-y-auto flex flex-col justify-between"
 			>
-				<div class="space-y-5">
-					<div class="border-b border-[#2B2930]/60 pb-4 flex justify-between items-center">
+				<div class="space-y-6">
+					<!-- Drawer Header -->
+					<div class="flex items-center justify-between border-b border-[#2B2930]/60 pb-4">
 						<div>
-							<h2 id="editor-heading" class="text-lg font-bold text-white">Create Project</h2>
-							<p id="editor-subheading" class="text-xs text-[#E6E1E5]/50 mt-1">Add a new showcase project</p>
+							<h2 id="editor-heading" class="text-base font-bold text-white">Create Project</h2>
+							<p id="editor-subheading" class="text-xs text-[#E6E1E5]/50 mt-0.5">Add a new showcase project</p>
 						</div>
 						<button
-							type="button"
 							id="btn-delete"
-							class="hidden p-2.5 rounded-xl text-[#DB4437] hover:bg-[#DB4437]/10 border border-transparent hover:border-[#DB4437]/20 transition-all cursor-pointer shrink-0 flex items-center gap-1.5"
-							title="Delete Project (Delete)"
+							type="button"
+							class="hidden p-2 rounded-xl bg-[#DB4437]/10 hover:bg-[#DB4437]/20 border border-[#DB4437]/30 text-[#DB4437] transition-all duration-300 cursor-pointer"
+							title="Delete project"
 						>
-							<Icon name="trash" size={20} class="w-5 h-5" />
-							<kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-[#DB4437]/20 text-[#DB4437] rounded border border-[#DB4437]/30">Del</kbd>
+							<Icon name="trash" size={16} class="w-4 h-4" />
 						</button>
 					</div>
 
+					<!-- Form -->
 					<form id="project-form" class="space-y-4">
-						<!-- Cover / Thumbnail Image Dropzone -->
+						<!-- Cover Image File Upload Drop Zone -->
 						<div>
-							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Cover / Thumbnail Image</label>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Project Thumbnail Image</label>
 							<div
 								id="image-drop-zone"
-								class="border-2 border-dashed border-[#2B2930] hover:border-primary/50 rounded-2xl p-4 text-center transition-all duration-300 cursor-pointer group relative overflow-hidden min-h-[150px] flex flex-col items-center justify-center bg-[#141218]"
+								class="relative group cursor-pointer border-2 border-dashed border-[#2B2930] hover:border-primary/60 rounded-2xl p-4 text-center bg-[#141218] transition-all duration-300 overflow-hidden min-h-[120px] flex flex-col items-center justify-center"
 							>
 								<input
 									type="file"
@@ -192,8 +203,6 @@ try {
 									accept="image/jpeg,image/png,image/webp"
 									class="hidden"
 								/>
-								
-								<!-- Hover/Preview overlay -->
 								<img
 									id="image-preview"
 									src=""
@@ -243,63 +252,77 @@ try {
 							/>
 						</div>
 
-						<!-- Tagline / Brief Description -->
+						<!-- Main Field (Dropdown with Settings button) -->
 						<div>
-							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Tagline / Description</label>
-							<input
-								type="text"
-								id="form-tagline"
-								name="tagline"
-								placeholder="e.g., Full-stack portfolio with Astro, React, and Firestore"
-								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
-							/>
-						</div>
-
-						<!-- Technology Tags -->
-						<div>
-							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Technology Tags (Comma-separated)</label>
-							<input
-								type="text"
-								id="form-technologies"
-								name="technologies"
-								placeholder="e.g., Astro, React, TypeScript, Tailwind CSS, Firebase"
-								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
-							/>
+							<div class="flex items-center justify-between mb-1.5">
+								<label class="block text-xs font-semibold text-[#E6E1E5]/70">Main Field *</label>
+								<button
+									type="button"
+									id="btn-manage-fields"
+									class="text-[11px] text-primary hover:underline flex items-center gap-1 cursor-pointer font-medium"
+									title="Manage Fields"
+								>
+									<span>⚙</span> Manage Fields
+								</button>
+							</div>
+							<select
+								id="form-field"
+								name="field"
+								required
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+							>
+								<!-- Populated via JS -->
+							</select>
 						</div>
 
 						<!-- Date Selection -->
 						<div>
-							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Completion / Release Date</label>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Completion / Release Date *</label>
 							<input
 								type="month"
 								id="form-date"
 								name="date"
+								required
 								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
 							/>
 						</div>
 
-						<!-- Live Website Link (Optional) -->
-						<div>
-							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Live Website Link (Optional)</label>
-							<input
-								type="url"
-								id="form-project-url"
-								name="projectUrl"
-								placeholder="https://..."
-								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
-							/>
-						</div>
+						<!-- Project Details & Links -->
+						<div class="p-3.5 rounded-2xl bg-[#141218] border border-[#2B2930] space-y-3">
+							<p class="text-xs font-bold text-white/90">Project Details & Links</p>
+							
+							<div>
+								<label class="block text-[11px] font-semibold text-[#E6E1E5]/70 mb-1">Technology Tags (Comma-separated)</label>
+								<input
+									type="text"
+									id="form-technologies"
+									name="technologies"
+									placeholder="e.g., Astro, React, TypeScript, Tailwind CSS, Firebase"
+									class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors"
+								/>
+							</div>
 
-						<!-- Source-Code Link (Optional) -->
-						<div>
-							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Source-Code Link (Optional)</label>
-							<input
-								type="url"
-								id="form-github-url"
-								name="githubUrl"
-								placeholder="https://github.com/..."
-								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
-							/>
+							<div>
+								<label class="block text-[11px] font-semibold text-[#E6E1E5]/70 mb-1">Live Website Link (Optional)</label>
+								<input
+									type="url"
+									id="form-project-url"
+									name="projectUrl"
+									placeholder="https://..."
+									class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors"
+								/>
+							</div>
+
+							<div>
+								<label class="block text-[11px] font-semibold text-[#E6E1E5]/70 mb-1">Source-Code Link (Optional)</label>
+								<input
+									type="url"
+									id="form-github-url"
+									name="githubUrl"
+									placeholder="https://github.com/..."
+									class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors"
+								/>
+							</div>
 						</div>
 
 						<!-- Hidden input for blocks JSON payload -->
@@ -352,8 +375,8 @@ try {
 				<div class="space-y-5">
 					<div class="border-b border-[#2B2930]/60 pb-4 flex justify-between items-center">
 						<div>
-							<h2 class="text-base font-bold text-white">Project Details & Story Blocks</h2>
-							<p class="text-xs text-[#E6E1E5]/50 mt-0.5">Manage dynamic custom blocks</p>
+							<h2 class="text-base font-bold text-white">Content Blocks Editor</h2>
+							<p class="text-xs text-[#E6E1E5]/50 mt-0.5">Drag to reorder story blocks</p>
 						</div>
 						<button
 							type="button"
@@ -365,31 +388,17 @@ try {
 						</button>
 					</div>
 
-					<!-- Quick Add Toolbar -->
+					<!-- Quick Add Toolbar (Single Row Icons Only - Container Background Removed) -->
 					<div>
 						<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-2">Add New Content Block</label>
-						<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-							<button type="button" data-add-block="heading" class="p-2 rounded-xl bg-[#211F26] hover:bg-primary/20 border border-[#2B2930] text-xs text-white font-medium flex items-center gap-1.5 cursor-pointer">
-								<span class="text-primary font-bold">H</span> Heading
-							</button>
-							<button type="button" data-add-block="rich_text" class="p-2 rounded-xl bg-[#211F26] hover:bg-primary/20 border border-[#2B2930] text-xs text-white font-medium flex items-center gap-1.5 cursor-pointer">
-								<span class="text-primary font-bold">¶</span> Rich Text
-							</button>
-							<button type="button" data-add-block="callout" class="p-2 rounded-xl bg-[#211F26] hover:bg-primary/20 border border-[#2B2930] text-xs text-white font-medium flex items-center gap-1.5 cursor-pointer">
-								<span class="text-[#F9AB00] font-bold">⚡</span> Callout
-							</button>
-							<button type="button" data-add-block="carousel" class="p-2 rounded-xl bg-[#211F26] hover:bg-primary/20 border border-[#2B2930] text-xs text-white font-medium flex items-center gap-1.5 cursor-pointer">
-								<span class="text-[#34A853] font-bold">🖼</span> Carousel
-							</button>
-							<button type="button" data-add-block="single_image" class="p-2 rounded-xl bg-[#211F26] hover:bg-primary/20 border border-[#2B2930] text-xs text-white font-medium flex items-center gap-1.5 cursor-pointer">
-								<span class="text-[#34A853] font-bold">📷</span> Image
-							</button>
-							<button type="button" data-add-block="metrics_grid" class="p-2 rounded-xl bg-[#211F26] hover:bg-primary/20 border border-[#2B2930] text-xs text-white font-medium flex items-center gap-1.5 cursor-pointer">
-								<span class="text-[#4285F4] font-bold">📊</span> Metrics
-							</button>
-							<button type="button" data-add-block="action_buttons" class="p-2 rounded-xl bg-[#211F26] hover:bg-primary/20 border border-[#2B2930] text-xs text-white font-medium flex items-center gap-1.5 cursor-pointer col-span-2">
-								<span class="text-[#EA4335] font-bold">🔗</span> Buttons
-							</button>
+						<div class="flex items-center justify-between gap-1.5 py-1">
+							<button type="button" data-add-block="heading" title="Heading (H1-H6)" class="flex-1 py-2 rounded-xl bg-[#211F26] hover:bg-primary/20 hover:border-primary/40 border border-white/5 text-white font-bold text-xs flex items-center justify-center cursor-pointer transition-all">H</button>
+							<button type="button" data-add-block="rich_text" title="Rich Text Paragraph" class="flex-1 py-2 rounded-xl bg-[#211F26] hover:bg-primary/20 hover:border-primary/40 border border-white/5 text-white font-bold text-xs flex items-center justify-center cursor-pointer transition-all">¶</button>
+							<button type="button" data-add-block="callout" title="Callout Box" class="flex-1 py-2 rounded-xl bg-[#211F26] hover:bg-[#F9AB00]/20 hover:border-[#F9AB00]/40 border border-white/5 text-[#F9AB00] font-bold text-xs flex items-center justify-center cursor-pointer transition-all">⚡</button>
+							<button type="button" data-add-block="single_image" title="Single Image" class="flex-1 py-2 rounded-xl bg-[#211F26] hover:bg-[#34A853]/20 hover:border-[#34A853]/40 border border-white/5 text-[#34A853] font-bold text-xs flex items-center justify-center cursor-pointer transition-all">🖼</button>
+							<button type="button" data-add-block="carousel" title="Image Carousel" class="flex-1 py-2 rounded-xl bg-[#211F26] hover:bg-[#34A853]/20 hover:border-[#34A853]/40 border border-white/5 text-[#34A853] font-bold text-xs flex items-center justify-center cursor-pointer transition-all">🎠</button>
+							<button type="button" data-add-block="metrics_grid" title="Metrics Grid" class="flex-1 py-2 rounded-xl bg-[#211F26] hover:bg-[#4285F4]/20 hover:border-[#4285F4]/40 border border-white/5 text-[#4285F4] font-bold text-xs flex items-center justify-center cursor-pointer transition-all">📊</button>
+							<button type="button" data-add-block="action_buttons" title="Action Buttons" class="flex-1 py-2 rounded-xl bg-[#211F26] hover:bg-[#EA4335]/20 hover:border-[#EA4335]/40 border border-white/5 text-[#EA4335] font-bold text-xs flex items-center justify-center cursor-pointer transition-all">🔗</button>
 						</div>
 					</div>
 
@@ -400,7 +409,9 @@ try {
 							<button type="button" id="btn-clear-all-blocks" class="text-[11px] text-[#DB4437] hover:underline cursor-pointer">Clear All</button>
 						</div>
 
-						<div id="blocks-list-container" class="space-y-3 min-h-[120px]">
+						<div id="blocks-list-container" class="space-y-3 min-h-[120px] relative">
+							<!-- Horizontal Drop Indicator Line -->
+							<div id="drag-drop-line" class="hidden h-1 bg-primary rounded-full my-1.5 transition-all"></div>
 							<!-- Blocks rendered dynamically via JS -->
 						</div>
 					</div>
@@ -417,15 +428,59 @@ try {
 				</div>
 			</div>
 
+			<!-- Manage Fields Modal -->
+			<div id="fields-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+				<div class="bg-[#1D1B20] border border-[#2B2930] rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl animate-page-slide-up">
+					<div class="flex justify-between items-center border-b border-[#2B2930] pb-3">
+						<h3 class="text-base font-bold text-white">Manage Main Fields</h3>
+						<button id="btn-close-fields-modal" type="button" class="text-white/60 hover:text-white text-lg font-bold">&times;</button>
+					</div>
+
+					<div class="space-y-3">
+						<div class="flex gap-2">
+							<input
+								type="text"
+								id="new-field-input"
+								placeholder="Add new field name..."
+								class="flex-1 px-3.5 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary"
+							/>
+							<button
+								type="button"
+								id="btn-add-field"
+								class="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold transition-all"
+							>
+								Add
+							</button>
+						</div>
+
+						<div id="fields-list" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+							<!-- Populated via JS -->
+						</div>
+					</div>
+
+					<div class="pt-3 border-t border-[#2B2930] flex justify-end gap-2">
+						<button
+							type="button"
+							id="btn-save-fields"
+							class="w-full py-2.5 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs transition-all cursor-pointer text-center"
+						>
+							Save Fields Configuration
+						</button>
+					</div>
+				</div>
+			</div>
+
 		</div>
 	</AdminLayout>
 	<AdminNavDock currentPath={Astro.url.pathname} />
 	<GlobalLightbox />
 </BackgroundBaseLayout>
 
-<script is:inline define:vars={{ initialProjects: projects }}>
-	// Make server-fetched items available to client script
-	Object.assign(window, { projects: initialProjects || [] });
+<script is:inline define:vars={{ initialProjects: projects, initialFields: fields }}>
+	Object.assign(window, { 
+		projects: initialProjects || [],
+		projectsFields: initialFields || ['Web Development', 'Mobile App', 'UI/UX Design', 'Full-Stack', 'AI / ML']
+	});
 </script>
 
 <script>
@@ -457,7 +512,7 @@ try {
 		const projectForm = document.getElementById('project-form') as HTMLFormElement;
 		const formId = document.getElementById('form-id') as HTMLInputElement;
 		const formTitle = document.getElementById('form-title') as HTMLInputElement;
-		const formTagline = document.getElementById('form-tagline') as HTMLInputElement;
+		const formField = document.getElementById('form-field') as HTMLSelectElement;
 		const formTechnologies = document.getElementById('form-technologies') as HTMLInputElement;
 		const formDate = document.getElementById('form-date') as HTMLInputElement;
 		const formProjectUrl = document.getElementById('form-project-url') as HTMLInputElement;
@@ -474,9 +529,20 @@ try {
 		const btnApplyBlocks = document.getElementById('btn-apply-blocks') as HTMLButtonElement;
 		const btnClearAllBlocks = document.getElementById('btn-clear-all-blocks') as HTMLButtonElement;
 		const blocksListContainer = document.getElementById('blocks-list-container') as HTMLDivElement;
+		const dragDropLine = document.getElementById('drag-drop-line') as HTMLDivElement;
 		const addBlockBtns = document.querySelectorAll('[data-add-block]');
 
+		// Fields Modal Elements
+		const btnManageFields = document.getElementById('btn-manage-fields') as HTMLButtonElement;
+		const fieldsModal = document.getElementById('fields-modal') as HTMLDivElement;
+		const btnCloseFieldsModal = document.getElementById('btn-close-fields-modal') as HTMLButtonElement;
+		const newFieldInput = document.getElementById('new-field-input') as HTMLInputElement;
+		const btnAddField = document.getElementById('btn-add-field') as HTMLButtonElement;
+		const fieldsListContainer = document.getElementById('fields-list') as HTMLDivElement;
+		const btnSaveFields = document.getElementById('btn-save-fields') as HTMLButtonElement;
+
 		let currentBlocks: any[] = [];
+		let fieldsList: string[] = (window as any).projectsFields || ['Web Development', 'Mobile App', 'UI/UX Design', 'Full-Stack', 'AI / ML'];
 
 		// Image Drop Zone Elements
 		const imageDropZone = document.getElementById('image-drop-zone') as HTMLDivElement;
@@ -495,7 +561,94 @@ try {
 
 		const btnCloseBlockPanelIcon = document.getElementById('btn-close-block-panel-icon') as HTMLButtonElement;
 
-		// Block Editor Drawer Toggle Controls (Left Side Panel)
+		// --- Fields Management Modal Logic ---
+		function renderFieldsDropdown() {
+			if (!formField) return;
+			const lastChoice = localStorage.getItem('admin_last_selected_project_field');
+			formField.innerHTML = '';
+			fieldsList.forEach(f => {
+				const opt = document.createElement('option');
+				opt.value = f;
+				opt.textContent = f;
+				if (lastChoice && lastChoice === f) {
+					opt.selected = true;
+				}
+				formField.appendChild(opt);
+			});
+		}
+
+		function renderFieldsModalList() {
+			if (!fieldsListContainer) return;
+			fieldsListContainer.innerHTML = '';
+			fieldsList.forEach((f, idx) => {
+				const div = document.createElement('div');
+				div.className = 'flex items-center justify-between p-2 rounded-xl bg-[#211F26] border border-[#2B2930] text-xs text-white';
+				div.innerHTML = `
+					<span>${f}</span>
+					<button type="button" data-delete-field="${idx}" class="text-[#DB4437] hover:bg-[#DB4437]/10 p-1 rounded cursor-pointer">✕</button>
+				`;
+				div.querySelector('[data-delete-field]')?.addEventListener('click', () => {
+					fieldsList.splice(idx, 1);
+					renderFieldsModalList();
+				});
+				fieldsListContainer.appendChild(div);
+			});
+		}
+
+		if (btnManageFields) {
+			btnManageFields.addEventListener('click', () => {
+				renderFieldsModalList();
+				fieldsModal.classList.remove('hidden');
+			});
+		}
+
+		if (btnCloseFieldsModal) {
+			btnCloseFieldsModal.addEventListener('click', () => fieldsModal.classList.add('hidden'));
+		}
+
+		if (btnAddField) {
+			btnAddField.addEventListener('click', () => {
+				const val = newFieldInput.value.trim();
+				if (val && !fieldsList.includes(val)) {
+					fieldsList.push(val);
+					newFieldInput.value = '';
+					renderFieldsModalList();
+				}
+			});
+		}
+
+		if (btnSaveFields) {
+			btnSaveFields.addEventListener('click', async () => {
+				try {
+					const formData = new FormData();
+					formData.append('action', 'save_fields');
+					formData.append('fields', JSON.stringify(fieldsList));
+
+					const res = await fetch('/admin/admin_projects_api', {
+						method: 'POST',
+						body: formData
+					});
+					const data = await res.json();
+					if (res.ok && data.success) {
+						renderFieldsDropdown();
+						fieldsModal.classList.add('hidden');
+						showToast('Main fields updated successfully!', 'success');
+					} else {
+						showToast(data.error || 'Failed to update fields', 'error');
+					}
+				} catch (err: any) {
+					showToast(err.message || 'Error updating fields', 'error');
+				}
+			});
+		}
+
+		formField?.addEventListener('change', () => {
+			if (formField.value) {
+				localStorage.setItem('admin_last_selected_project_field', formField.value);
+			}
+		});
+
+		// Block Editor Drawer Controls
 		function openBlockEditorDrawer() {
 			if (!blockEditorPanel) return;
 			blockEditorPanel.classList.remove('-translate-x-full');
@@ -514,12 +667,17 @@ try {
 		if (btnCloseBlockPanelIcon) {
 			btnCloseBlockPanelIcon.addEventListener('click', closeBlockEditorDrawer);
 		}
+
+		// Save Content Blocks directly to Firebase without waiting for main save
 		if (btnApplyBlocks) {
-			btnApplyBlocks.addEventListener('click', () => {
+			btnApplyBlocks.addEventListener('click', async () => {
 				updateBlocksUI();
-				closeBlockEditorDrawer();
+				showToast('Saving content blocks to Firebase...', 'info');
+				// Dispatch form submit event directly
+				projectForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
 			});
 		}
+
 		if (btnClearAllBlocks) {
 			btnClearAllBlocks.addEventListener('click', () => {
 				if (currentBlocks.length === 0) return;
@@ -542,16 +700,16 @@ try {
 				} else if (type === 'callout') {
 					currentBlocks.push({ id, type, variant: 'info', title: '', text: '' });
 				} else if (type === 'carousel') {
-					currentBlocks.push({ id, type, images: [], caption: '' });
+					currentBlocks.push({ id, type, images: [] });
 				} else if (type === 'single_image') {
-					currentBlocks.push({ id, type, imageUrl: '', caption: '' });
+					currentBlocks.push({ id, type, imageUrl: '' });
 				} else if (type === 'metrics_grid') {
 					currentBlocks.push({ id, type, items: [{ label: '', value: '' }] });
 				} else if (type === 'action_buttons') {
-					currentBlocks.push({ id, type, buttons: [{ label: '', url: '', variant: 'primary' }] });
+					currentBlocks.push({ id, type, buttons: [{ label: '', url: '' }] });
 				}
-
-				updateBlocksUI();
+				
+				renderBlocksList();
 			});
 		});
 
@@ -562,46 +720,138 @@ try {
 			renderBlocksList();
 		}
 
+		// Client-Side WebP Compression Helper (<50KB target with notification)
+		function compressImageToWebpUnder50KB(file: File): Promise<{ webpDataUrl: string; oldKB: number; newKB: number; diffPercent: number }> {
+			return new Promise((resolve, reject) => {
+				const oldKB = Math.round(file.size / 1024);
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					const img = new Image();
+					img.onload = () => {
+						const canvas = document.createElement('canvas');
+						let width = img.width;
+						let height = img.height;
+						const MAX_DIM = 1200;
+						if (width > MAX_DIM || height > MAX_DIM) {
+							if (width > height) {
+								height = Math.round((height * MAX_DIM) / width);
+								width = MAX_DIM;
+							} else {
+								width = Math.round((width * MAX_DIM) / height);
+								height = MAX_DIM;
+							}
+						}
+						canvas.width = width;
+						canvas.height = height;
+						const ctx = canvas.getContext('2d');
+						if (!ctx) return reject(new Error('Canvas context error'));
+						ctx.drawImage(img, 0, 0, width, height);
+
+						let quality = 0.75;
+						let dataUrl = canvas.toDataURL('image/webp', quality);
+						while (dataUrl.length > 68000 && quality > 0.1) {
+							quality -= 0.1;
+							dataUrl = canvas.toDataURL('image/webp', quality);
+						}
+						
+						const approxBytes = Math.round((dataUrl.length * 3) / 4);
+						const newKB = Math.round(approxBytes / 1024);
+						const diffPercent = Math.round(((newKB - oldKB) / oldKB) * 100);
+
+						resolve({ webpDataUrl: dataUrl, oldKB, newKB, diffPercent });
+					};
+					img.onerror = () => reject(new Error('Failed to load image'));
+					img.src = e.target?.result as string;
+				};
+				reader.onerror = () => reject(new Error('Failed to read file'));
+				reader.readAsDataURL(file);
+			});
+		}
+
+		// Drag and Drop state with horizontal drop indicator line
+		let draggedBlockIndex: number | null = null;
+		let dropTargetIndex: number | null = null;
+
 		function renderBlocksList() {
 			if (!blocksListContainer) return;
-			blocksListContainer.innerHTML = '';
-
+			
 			if (currentBlocks.length === 0) {
 				blocksListContainer.innerHTML = `
 					<div class="py-8 text-center border border-dashed border-[#2B2930] rounded-2xl bg-[#141218]">
 						<p class="text-xs font-semibold text-[#E6E1E5]/60">No content blocks added yet</p>
-						<p class="text-[10px] text-[#E6E1E5]/40 mt-1">Use the buttons above to add headings, text, carousels, or callouts.</p>
+						<p class="text-[10px] text-[#E6E1E5]/40 mt-1">Use the icons above to add headings, text, or images.</p>
 					</div>
 				`;
 				return;
 			}
 
+			blocksListContainer.innerHTML = '';
+			if (dragDropLine) blocksListContainer.appendChild(dragDropLine);
+
 			currentBlocks.forEach((block, index) => {
 				const blockCard = document.createElement('div');
-				blockCard.className = 'p-3.5 rounded-2xl bg-[#141218] border border-[#2B2930] space-y-3';
-				
-				const header = document.createElement('div');
-				header.className = 'flex items-center justify-between border-b border-[#2B2930]/60 pb-2';
-				header.innerHTML = `
-					<div class="flex items-center gap-2">
-						<span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
-							${block.type.replace('_', ' ')}
-						</span>
-						<span class="text-[10px] text-[#E6E1E5]/40 font-mono">#${index + 1}</span>
-					</div>
-					<div class="flex items-center gap-1">
-						<button type="button" data-move-up="${index}" ${index === 0 ? 'disabled class="opacity-30 cursor-not-allowed text-xs px-1.5 py-0.5 text-white"' : 'class="text-xs px-1.5 py-0.5 text-white/70 hover:text-white hover:bg-white/10 rounded cursor-pointer"'}>↑</button>
-						<button type="button" data-move-down="${index}" ${index === currentBlocks.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed text-xs px-1.5 py-0.5 text-white"' : 'class="text-xs px-1.5 py-0.5 text-white/70 hover:text-white hover:bg-white/10 rounded cursor-pointer"'}>↓</button>
-						<button type="button" data-delete-block="${index}" class="text-xs text-[#DB4437] hover:bg-[#DB4437]/10 p-1 rounded cursor-pointer ml-1">✕</button>
-					</div>
-				`;
-				blockCard.appendChild(header);
+				blockCard.className = 'p-3 rounded-2xl bg-[#141218] border border-[#2B2930] relative transition-all group';
+				blockCard.setAttribute('draggable', 'true');
+				blockCard.setAttribute('data-index', String(index));
 
-				const body = document.createElement('div');
-				body.className = 'space-y-2.5';
+				// Drag events
+				blockCard.addEventListener('dragstart', (e) => {
+					draggedBlockIndex = index;
+					blockCard.classList.add('opacity-30');
+					if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
+				});
+
+				blockCard.addEventListener('dragend', () => {
+					draggedBlockIndex = null;
+					dropTargetIndex = null;
+					blockCard.classList.remove('opacity-30');
+					if (dragDropLine) dragDropLine.classList.add('hidden');
+				});
+
+				blockCard.addEventListener('dragover', (e) => {
+					e.preventDefault();
+					if (draggedBlockIndex === null) return;
+					
+					const rect = blockCard.getBoundingClientRect();
+					const midY = rect.top + rect.height / 2;
+					if (e.clientY < midY) {
+						dropTargetIndex = index;
+						blockCard.parentNode?.insertBefore(dragDropLine, blockCard);
+					} else {
+						dropTargetIndex = index + 1;
+						blockCard.parentNode?.insertBefore(dragDropLine, blockCard.nextSibling);
+					}
+					if (dragDropLine) dragDropLine.classList.remove('hidden');
+				});
+
+				blockCard.addEventListener('drop', (e) => {
+					e.preventDefault();
+					if (dragDropLine) dragDropLine.classList.add('hidden');
+					if (draggedBlockIndex !== null && dropTargetIndex !== null) {
+						let targetIdx = dropTargetIndex;
+						if (draggedBlockIndex < targetIdx) targetIdx--;
+						const moved = currentBlocks.splice(draggedBlockIndex, 1)[0];
+						currentBlocks.splice(targetIdx, 0, moved);
+						updateBlocksUI();
+					}
+				});
+
+				// Card Body Layout with 6-dot handle inside on left, remove icon top right
+				const cardBody = document.createElement('div');
+				cardBody.className = 'flex items-start gap-2.5';
+
+				// 6 dots drag handle
+				const dragHandle = document.createElement('div');
+				dragHandle.className = 'cursor-grab active:cursor-grabbing text-white/30 hover:text-white pt-1 select-none transition-colors';
+				dragHandle.title = 'Drag to reorder';
+				dragHandle.innerHTML = '<span class="font-bold text-sm tracking-tighter">⋮⋮</span>';
+
+				// Content controls wrapper
+				const contentWrapper = document.createElement('div');
+				contentWrapper.className = 'flex-1 space-y-2';
 
 				if (block.type === 'heading') {
-					body.innerHTML = `
+					contentWrapper.innerHTML = `
 						<div class="flex gap-2">
 							<select data-field="level" class="px-2 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs">
 								<option value="1" ${block.level === 1 ? 'selected' : ''}>H1</option>
@@ -615,11 +865,11 @@ try {
 						</div>
 					`;
 				} else if (block.type === 'rich_text') {
-					body.innerHTML = `
-						<textarea data-field="content" rows="3" placeholder="Write markdown/text content (**bold**, *italic*, lists)..." class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary">${block.content || ''}</textarea>
+					contentWrapper.innerHTML = `
+						<textarea data-field="content" rows="3" placeholder="Write text content..." class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary">${block.content || ''}</textarea>
 					`;
 				} else if (block.type === 'callout') {
-					body.innerHTML = `
+					contentWrapper.innerHTML = `
 						<div class="space-y-2">
 							<div class="flex gap-2">
 								<select data-field="variant" class="px-2 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs">
@@ -634,36 +884,168 @@ try {
 						</div>
 					`;
 				} else if (block.type === 'single_image') {
-					body.innerHTML = `
-						<div class="space-y-2">
-							<input type="url" data-field="imageUrl" value="${block.imageUrl || ''}" placeholder="Image URL (https://...)" class="w-full px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary" />
-							<input type="text" data-field="caption" value="${block.caption || ''}" placeholder="Image Caption (optional)..." class="w-full px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary" />
-						</div>
-					`;
+					if (block.imageUrl) {
+						contentWrapper.innerHTML = `
+							<div class="relative group/img rounded-xl overflow-hidden border border-white/10 bg-black/40 aspect-[16/9]">
+								<img src="${block.imageUrl}" class="w-full h-full object-cover" />
+								<div class="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 flex items-center justify-center gap-2 transition-opacity">
+									<button type="button" class="btn-change-single-img px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold cursor-pointer">Change Image</button>
+									<button type="button" class="btn-remove-single-img px-3 py-1.5 rounded-xl bg-[#DB4437] text-white text-xs font-bold cursor-pointer">Remove</button>
+									<input type="file" accept="image/*" class="file-input-single-block hidden" />
+								</div>
+							</div>
+						`;
+						const changeBtn = contentWrapper.querySelector('.btn-change-single-img') as HTMLButtonElement;
+						const removeBtn = contentWrapper.querySelector('.btn-remove-single-img') as HTMLButtonElement;
+						const fileInput = contentWrapper.querySelector('.file-input-single-block') as HTMLInputElement;
+
+						changeBtn?.addEventListener('click', () => fileInput.click());
+						removeBtn?.addEventListener('click', () => {
+							block.imageUrl = '';
+							updateBlocksUI();
+						});
+
+						fileInput?.addEventListener('change', async () => {
+							const file = fileInput.files?.[0];
+							if (file) {
+								try {
+									showToast('Compressing image to WebP...', 'info');
+									const res = await compressImageToWebpUnder50KB(file);
+									block.imageUrl = res.webpDataUrl;
+									updateBlocksUI();
+									showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${res.diffPercent}%) WebP`, 'success');
+								} catch (e: any) {
+									showToast('Failed to process image', 'error');
+								}
+							}
+						});
+					} else {
+						contentWrapper.innerHTML = `
+							<div class="drop-zone-single border-2 border-dashed border-[#2B2930] hover:border-primary/60 rounded-xl p-4 text-center bg-[#211F26] cursor-pointer transition-all">
+								<p class="text-xs font-semibold text-white/80">Drop image here or click to browse</p>
+								<p class="text-[10px] text-white/40 mt-0.5">WebP compressed under 50KB automatically</p>
+								<input type="file" accept="image/*" class="file-input-single-block hidden" />
+							</div>
+						`;
+						const dropZone = contentWrapper.querySelector('.drop-zone-single') as HTMLDivElement;
+						const fileInput = contentWrapper.querySelector('.file-input-single-block') as HTMLInputElement;
+						
+						dropZone?.addEventListener('click', () => fileInput.click());
+						dropZone?.addEventListener('dragover', (e) => e.preventDefault());
+						dropZone?.addEventListener('drop', async (e) => {
+							e.preventDefault();
+							const file = e.dataTransfer?.files?.[0];
+							if (file) {
+								try {
+									showToast('Compressing image to WebP...', 'info');
+									const res = await compressImageToWebpUnder50KB(file);
+									block.imageUrl = res.webpDataUrl;
+									updateBlocksUI();
+									showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${res.diffPercent}%) WebP`, 'success');
+								} catch (e) {
+									showToast('Failed to process image', 'error');
+								}
+							}
+						});
+
+						fileInput?.addEventListener('change', async () => {
+							const file = fileInput.files?.[0];
+							if (file) {
+								try {
+									showToast('Compressing image to WebP...', 'info');
+									const res = await compressImageToWebpUnder50KB(file);
+									block.imageUrl = res.webpDataUrl;
+									updateBlocksUI();
+									showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${res.diffPercent}%) WebP`, 'success');
+								} catch (e) {
+									showToast('Failed to process image', 'error');
+								}
+							}
+						});
+					}
 				} else if (block.type === 'carousel') {
-					const imgsStr = Array.isArray(block.images) ? block.images.join('\n') : '';
-					body.innerHTML = `
+					contentWrapper.innerHTML = `
 						<div class="space-y-2">
-							<label class="block text-[10px] text-[#E6E1E5]/60">Image URLs (One per line)</label>
-							<textarea data-field="images_str" rows="3" placeholder="https://image1.jpg&#10;https://image2.jpg" class="w-full px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary">${imgsStr}</textarea>
-							<input type="text" data-field="caption" value="${block.caption || ''}" placeholder="Carousel Caption..." class="w-full px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary" />
+							<div class="grid grid-cols-3 gap-2 carousel-previews-grid">
+								<!-- Rendered via JS -->
+							</div>
+							<div class="drop-zone-carousel border-2 border-dashed border-[#2B2930] hover:border-primary/60 rounded-xl p-3 text-center bg-[#211F26] cursor-pointer transition-all">
+								<p class="text-xs font-semibold text-white/80">+ Add Carousel Image</p>
+								<p class="text-[10px] text-white/40 mt-0.5">Drop or click to add WebP image</p>
+								<input type="file" accept="image/*" class="file-input-carousel-block hidden" />
+							</div>
 						</div>
 					`;
+
+					const previewsGrid = contentWrapper.querySelector('.carousel-previews-grid') as HTMLDivElement;
+					const dropZone = contentWrapper.querySelector('.drop-zone-carousel') as HTMLDivElement;
+					const fileInput = contentWrapper.querySelector('.file-input-carousel-block') as HTMLInputElement;
+
+					if (Array.isArray(block.images)) {
+						block.images.forEach((imgUrl: string, imgIdx: number) => {
+							const thumb = document.createElement('div');
+							thumb.className = 'relative group/thumb aspect-[16/10] rounded-lg overflow-hidden border border-white/10 bg-black/40';
+							thumb.innerHTML = `
+								<img src="${imgUrl}" class="w-full h-full object-cover" />
+								<button type="button" data-remove-carousel-img="${imgIdx}" class="absolute top-1 right-1 bg-black/70 hover:bg-[#DB4437] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center cursor-pointer transition-colors">✕</button>
+							`;
+							thumb.querySelector('[data-remove-carousel-img]')?.addEventListener('click', () => {
+								block.images.splice(imgIdx, 1);
+								updateBlocksUI();
+							});
+							previewsGrid.appendChild(thumb);
+						});
+					}
+
+					dropZone?.addEventListener('click', () => fileInput.click());
+					dropZone?.addEventListener('dragover', (e) => e.preventDefault());
+					dropZone?.addEventListener('drop', async (e) => {
+						e.preventDefault();
+						const file = e.dataTransfer?.files?.[0];
+						if (file) {
+							try {
+								showToast('Compressing image to WebP...', 'info');
+								const res = await compressImageToWebpUnder50KB(file);
+								if (!Array.isArray(block.images)) block.images = [];
+								block.images.push(res.webpDataUrl);
+								updateBlocksUI();
+								showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${res.diffPercent}%) WebP`, 'success');
+							} catch (e) {
+								showToast('Failed to process image', 'error');
+							}
+						}
+					});
+
+					fileInput?.addEventListener('change', async () => {
+						const file = fileInput.files?.[0];
+						if (file) {
+							try {
+								showToast('Compressing image to WebP...', 'info');
+								const res = await compressImageToWebpUnder50KB(file);
+								if (!Array.isArray(block.images)) block.images = [];
+								block.images.push(res.webpDataUrl);
+								updateBlocksUI();
+								showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${res.diffPercent}%) WebP`, 'success');
+							} catch (e) {
+								showToast('Failed to process image', 'error');
+							}
+						}
+					});
 				} else if (block.type === 'metrics_grid') {
 					const metricsStr = Array.isArray(block.items) 
 						? block.items.map((it: any) => `${it.label || ''}:${it.value || ''}`).join(', ')
 						: '';
-					body.innerHTML = `
+					contentWrapper.innerHTML = `
 						<div class="space-y-1.5">
 							<label class="block text-[10px] text-[#E6E1E5]/60">Metrics (Label:Value separated by commas)</label>
-							<input type="text" data-field="metrics_str" value="${metricsStr}" placeholder="Lighthouse:100, Speed:Fast, Bundle:0KB" class="w-full px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary" />
+							<input type="text" data-field="metrics_str" value="${metricsStr}" placeholder="Lighthouse:100, Speed:Fast" class="w-full px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary" />
 						</div>
 					`;
 				} else if (block.type === 'action_buttons') {
 					const btnsStr = Array.isArray(block.buttons)
 						? block.buttons.map((b: any) => `${b.label || ''}|${b.url || ''}`).join('\n')
 						: '';
-					body.innerHTML = `
+					contentWrapper.innerHTML = `
 						<div class="space-y-1.5">
 							<label class="block text-[10px] text-[#E6E1E5]/60">Buttons (Label|URL per line)</label>
 							<textarea data-field="buttons_str" rows="2" placeholder="Live Demo|https://example.com&#10;GitHub|https://github.com" class="w-full px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary">${btnsStr}</textarea>
@@ -671,121 +1053,87 @@ try {
 					`;
 				}
 
-				blockCard.appendChild(body);
+				// Remove block button top right of card body
+				const deleteBtn = document.createElement('button');
+				deleteBtn.type = 'button';
+				deleteBtn.className = 'text-xs text-[#DB4437] hover:bg-[#DB4437]/10 p-1 rounded cursor-pointer transition-colors';
+				deleteBtn.title = 'Delete Block';
+				deleteBtn.textContent = '✕';
+				deleteBtn.addEventListener('click', () => {
+					currentBlocks.splice(index, 1);
+					updateBlocksUI();
+				});
 
-				body.addEventListener('input', (e) => {
+				cardBody.appendChild(dragHandle);
+				cardBody.appendChild(contentWrapper);
+				cardBody.appendChild(deleteBtn);
+				blockCard.appendChild(cardBody);
+
+				contentWrapper.addEventListener('input', (e) => {
 					const target = e.target as HTMLElement;
 					const field = target.getAttribute('data-field');
 					if (!field) return;
 
-					const val = (target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement).value;
-
-					if (field === 'level') block.level = parseInt(val, 10);
-					else if (field === 'images_str') {
-						block.images = val.split('\n').map(s => s.trim()).filter(Boolean);
+					const val = (target as HTMLInputElement).value;
+					if (field === 'level') {
+						block.level = parseInt(val, 10);
 					} else if (field === 'metrics_str') {
 						block.items = val.split(',').map(pair => {
-							const [l, v] = pair.split(':').map(s => s.trim());
-							return { label: l || '', value: v || '' };
-						}).filter(m => m.label || m.value);
+							const [label, value] = pair.split(':').map(s => s.trim());
+							return { label: label || '', value: value || '' };
+						}).filter(it => it.label || it.value);
 					} else if (field === 'buttons_str') {
 						block.buttons = val.split('\n').map(line => {
-							const [lbl, u] = line.split('|').map(s => s.trim());
-							return { label: lbl || 'Button', url: u || '#', variant: 'primary' };
-						}).filter(b => b.label);
+							const [label, url] = line.split('|').map(s => s.trim());
+							return { label: label || '', url: url || '' };
+						}).filter(b => b.label || b.url);
 					} else {
 						block[field] = val;
 					}
-
 					if (formBlocks) formBlocks.value = JSON.stringify(currentBlocks);
 				});
-
-				const btnUp = header.querySelector(`[data-move-up="${index}"]`);
-				const btnDown = header.querySelector(`[data-move-down="${index}"]`);
-				const btnDel = header.querySelector(`[data-delete-block="${index}"]`);
-
-				if (btnUp) {
-					btnUp.addEventListener('click', () => {
-						if (index > 0) {
-							const temp = currentBlocks[index];
-							currentBlocks[index] = currentBlocks[index - 1];
-							currentBlocks[index - 1] = temp;
-							updateBlocksUI();
-						}
-					});
-				}
-				if (btnDown) {
-					btnDown.addEventListener('click', () => {
-						if (index < currentBlocks.length - 1) {
-							const temp = currentBlocks[index];
-							currentBlocks[index] = currentBlocks[index + 1];
-							currentBlocks[index + 1] = temp;
-							updateBlocksUI();
-						}
-					});
-				}
-				if (btnDel) {
-					btnDel.addEventListener('click', () => {
-						currentBlocks.splice(index, 1);
-						updateBlocksUI();
-					});
-				}
 
 				blocksListContainer.appendChild(blockCard);
 			});
 		}
 
-		// --- Core Setup & Initialization ---
-		renderProjects();
-		initFromUrl();
-
-		function showEmptyState(title: string, subtitle: string) {
-			const existingEmptyState = projectsGrid.querySelector('.empty-state');
-			if (existingEmptyState) {
-				existingEmptyState.remove();
+		// Projects Rendering
+		function renderProjects(resetPagination = false) {
+			if (resetPagination) {
+				displayedCount = ITEMS_PER_PAGE;
+			} else {
+				displayedCount += ITEMS_PER_PAGE;
 			}
 
-			const emptyState = document.createElement('div');
-			emptyState.className = 'empty-state col-span-full py-16 text-center text-[#E6E1E5]/50 bg-[#1D1B20] rounded-3xl border border-[#2B2930]';
-			emptyState.innerHTML = `
-				<p class="font-semibold text-white">${title}</p>
-				<p class="text-xs mt-1">${subtitle}</p>
-			`;
-			projectsGrid.appendChild(emptyState);
-		}
+			const visibleProjects = filteredProjects.slice(0, displayedCount);
+			projectsGrid.innerHTML = '';
 
-		function hideEmptyState() {
-			projectsGrid.querySelector('.empty-state')?.remove();
-		}
-
-		function renderProjects(reset = false) {
-			if (reset) {
-				projectsGrid.innerHTML = '';
-				displayedCount = 0;
+			if (visibleProjects.length === 0) {
+				projectsGrid.innerHTML = `
+					<div class="col-span-full py-12 text-center border border-dashed border-[#2B2930] rounded-3xl bg-[#141218]">
+						<div class="p-3 w-fit rounded-full bg-white/5 text-white/40 mx-auto mb-3">
+							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+						</div>
+						<h3 class="text-sm font-semibold text-white">No projects found</h3>
+						<p class="text-xs text-[#E6E1E5]/50 mt-1">Try adjusting your search query or filter parameters.</p>
+					</div>
+				`;
+				loadMoreContainer.classList.add('hidden');
+				return;
 			}
 
-			const newCards = filteredProjects.slice(displayedCount, displayedCount + ITEMS_PER_PAGE);
-			
-			newCards.forEach(project => {
-				const card = createProjectCard(project);
-				projectsGrid.appendChild(card);
+			visibleProjects.forEach(project => {
+				const cardEl = createProjectCard(project);
+				projectsGrid.appendChild(cardEl);
 			});
-			
-			displayedCount += newCards.length;
-			
+
+			attachCardEventListeners();
+
 			if (displayedCount >= filteredProjects.length) {
 				loadMoreContainer.classList.add('hidden');
 			} else {
 				loadMoreContainer.classList.remove('hidden');
 			}
-
-			if (filteredProjects.length === 0) {
-				showEmptyState('No projects found', 'Create a new project to get started.');
-			} else {
-				hideEmptyState();
-			}
-			
-			attachCardEventListeners();
 		}
 
 		function createProjectCard(project: any) {
@@ -796,7 +1144,7 @@ try {
 					if (parts.length >= 2) {
 						const year = parseInt(parts[0], 10);
 						const month = parseInt(parts[1], 10) - 1;
-						const date = new Date(year, month, 1);
+						const date = new Date(year, month);
 						if (!isNaN(date.getTime())) {
 							return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 						}
@@ -805,9 +1153,7 @@ try {
 				return project.date;
 			})();
 
-			const techPillText = Array.isArray(project.technologies) && project.technologies.length > 0
-				? project.technologies.slice(0, 2).join(', ')
-				: '';
+			const fieldText = project.field || 'Web Development';
 
 			const cardWrapper = document.createElement('div');
 			cardWrapper.innerHTML = `
@@ -821,7 +1167,7 @@ try {
 								href="#global-lightbox"
 								data-lightbox-src="${project.imageUrl}"
 								data-lightbox-title="${project.title || ''}"
-								data-lightbox-subtitle="${project.tagline || ''}"
+								data-lightbox-subtitle="${project.field || ''}"
 								class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block bg-[#1D1B20]"
 							>
 								<div class="absolute inset-0 skeleton"></div>
@@ -853,11 +1199,9 @@ try {
 								${formattedDate}
 							</span>
 						` : '<span></span>'}
-						${techPillText ? `
-							<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary line-clamp-1 max-w-[140px]">
-								${techPillText}
-							</span>
-						` : ''}
+						<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary line-clamp-1 max-w-[140px]">
+							${fieldText}
+						</span>
 					</div>
 				</article>
 			`;
@@ -904,13 +1248,14 @@ try {
 			}
 		}
 
-		// --- Drawer Controls ---
+		// --- Drawer Controls (Opens BOTH drawers on card click) ---
 		function openDrawer() {
 			editorBackdrop.classList.remove('hidden');
 			setTimeout(() => {
 				editorBackdrop.classList.add('opacity-100');
 				editorPanel.classList.remove('translate-x-full');
 				editorPanel.classList.add('translate-x-0');
+				openBlockEditorDrawer();
 			}, 10);
 		}
 
@@ -979,7 +1324,7 @@ try {
 			
 			formId.value = `proj_${shortId}`;
 			formTitle.value = '';
-			formTagline.value = '';
+			renderFieldsDropdown();
 			formTechnologies.value = '';
 			formProjectUrl.value = '';
 			formGithubUrl.value = '';
@@ -1010,7 +1355,10 @@ try {
 
 			formId.value = project.id;
 			formTitle.value = project.title || '';
-			formTagline.value = project.tagline || project.description || '';
+			renderFieldsDropdown();
+			if (project.field) {
+				formField.value = project.field;
+			}
 			formTechnologies.value = Array.isArray(project.technologies) ? project.technologies.join(', ') : '';
 			formDate.value = project.date ? project.date.substring(0, 7) : '';
 			formProjectUrl.value = project.projectUrl || '';
@@ -1076,7 +1424,7 @@ try {
 			filteredProjects = allProjects.filter(project => {
 				const matchesQuery = !query || 
 					(project.title && project.title.toLowerCase().includes(query)) ||
-					(project.tagline && project.tagline.toLowerCase().includes(query)) ||
+					(project.field && project.field.toLowerCase().includes(query)) ||
 					(Array.isArray(project.technologies) && project.technologies.some((t: string) => t.toLowerCase().includes(query)));
 
 				const matchesTech = !selectedTech || 
@@ -1224,7 +1572,7 @@ try {
 						imagePreview.classList.remove('hidden');
 						dropZonePrompt.classList.add('hidden');
 						fileDetails.classList.remove('hidden');
-						fileDetails.textContent = `✓ ${processedFile.name} (${oldSize} → ${newSize}, ${diffStr})`;
+						fileDetails.textContent = `✓ Cover Image Selected (${newSize})`;
 					}
 				};
 				reader.readAsDataURL(processedFile);
@@ -1244,7 +1592,7 @@ try {
 				formData.append('action', 'save');
 				formData.append('id', formId.value);
 				formData.append('title', formTitle.value);
-				formData.append('tagline', formTagline.value);
+				formData.append('field', formField.value);
 				formData.append('technologies', formTechnologies.value);
 				formData.append('date', formDate.value);
 				formData.append('projectUrl', formProjectUrl.value);
@@ -1356,130 +1704,9 @@ try {
 			}
 		}
 
-		// Keyboard Shortcuts
-		let highlightedCardIndex = -1;
-
-		function updateCardHighlighting(cards: HTMLElement[]) {
-			cards.forEach((c, idx) => {
-				if (idx === highlightedCardIndex) {
-					c.classList.add('ring-2', 'ring-primary', 'border-primary/50');
-					c.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-				} else {
-					c.classList.remove('ring-2', 'ring-primary', 'border-primary/50');
-				}
-			});
-		}
-
-		document.addEventListener('keydown', (e: KeyboardEvent) => {
-			const activeEl = document.activeElement as HTMLElement | null;
-			const isEditingText = activeEl && (
-				['INPUT', 'TEXTAREA', 'SELECT'].includes(activeEl.tagName) ||
-				activeEl.isContentEditable
-			);
-
-			if (e.key === '/' && !isEditingText) {
-				e.preventDefault();
-				searchInput.focus();
-				return;
-			}
-			
-			if (e.key === 'Escape') {
-				if (window.location.hash === '#global-lightbox') {
-					window.location.hash = '#';
-					return;
-				}
-				if (filterPanel && filterPanel.classList.contains('translate-x-0')) {
-					closeFilterDrawer();
-					return;
-				}
-				if (editorPanel && editorPanel.classList.contains('translate-x-0')) {
-					closeDrawer();
-					return;
-				}
-				if (isEditingText) {
-					activeEl?.blur();
-					return;
-				}
-			}
-
-			// CapsLock key triggers image file chooser when editor panel is open
-			if (e.key === 'CapsLock' && editorPanel && editorPanel.classList.contains('translate-x-0')) {
-				e.preventDefault();
-				if (imageFileInput) imageFileInput.click();
-				return;
-			}
-
-			if (isEditingText) return;
-
-			// L key: Toggle / Open Image Lightbox
-			if (e.key === 'l' || e.key === 'L') {
-				e.preventDefault();
-				if (window.location.hash === '#global-lightbox') {
-					window.location.hash = '#';
-					return;
-				}
-				if (editorPanel && editorPanel.classList.contains('translate-x-0') && currentSelectedId) {
-					const card = projectsGrid.querySelector(`.project-card[data-id="${currentSelectedId}"]`);
-					const trigger = card?.querySelector('[data-lightbox-src]') as HTMLElement;
-					if (trigger) trigger.click();
-					return;
-				}
-				const visibleCards = Array.from(projectsGrid.querySelectorAll('.project-card:not(.hidden)')) as HTMLElement[];
-				if (visibleCards.length > 0) {
-					const targetCard = highlightedCardIndex >= 0 ? visibleCards[highlightedCardIndex] : visibleCards[0];
-					const trigger = targetCard?.querySelector('[data-lightbox-src]') as HTMLElement;
-					if (trigger) trigger.click();
-				}
-				return;
-			}
-
-			// Arrow keys & Enter for card grid navigation
-			if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)) {
-				const isDrawerOpen = (editorPanel && editorPanel.classList.contains('translate-x-0')) ||
-				                     (filterPanel && filterPanel.classList.contains('translate-x-0'));
-				if (!isDrawerOpen) {
-					const visibleCards = Array.from(projectsGrid.querySelectorAll('.project-card:not(.hidden)')) as HTMLElement[];
-					if (visibleCards.length > 0) {
-						if (e.key === 'Enter' && highlightedCardIndex >= 0 && highlightedCardIndex < visibleCards.length) {
-							e.preventDefault();
-							visibleCards[highlightedCardIndex].click();
-							return;
-						}
-
-						if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
-							e.preventDefault();
-							const cols = window.innerWidth >= 768 ? 5 : window.innerWidth >= 640 ? 2 : 1;
-
-							if (highlightedCardIndex < 0) {
-								highlightedCardIndex = 0;
-							} else if (e.key === 'ArrowRight') {
-								highlightedCardIndex = (highlightedCardIndex + 1) % visibleCards.length;
-							} else if (e.key === 'ArrowLeft') {
-								highlightedCardIndex = (highlightedCardIndex - 1 + visibleCards.length) % visibleCards.length;
-							} else if (e.key === 'ArrowDown') {
-								highlightedCardIndex = Math.min(visibleCards.length - 1, highlightedCardIndex + cols);
-							} else if (e.key === 'ArrowUp') {
-								highlightedCardIndex = Math.max(0, highlightedCardIndex - cols);
-							}
-
-							updateCardHighlighting(visibleCards);
-							return;
-						}
-					}
-				}
-			}
-
-			if ((e.key === 'n' || e.key === 'N')) {
-				e.preventDefault();
-				setNewProjectState();
-				openDrawer();
-			} else if ((e.key === 'f' || e.key === 'F')) {
-				e.preventDefault();
-				openFilterDrawer();
-			} else if (e.key === 'Delete' && currentSelectedId && editorPanel.classList.contains('translate-x-0')) {
-				e.preventDefault();
-				btnDelete.click();
-			}
-		});
+		// Initial Load & Render
+		renderFieldsDropdown();
+		renderProjects(true);
+		initFromUrl();
 	});
 </script>

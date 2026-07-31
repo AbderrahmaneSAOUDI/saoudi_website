@@ -96,13 +96,15 @@ export interface Project {
 	id: string;
 	order: number;
 	title: string;
-	tagline: string;
-	description: string;
+	field?: string;
+	tagline?: string;
+	description?: string;
 	imageUrl: string;
-	projectUrl: string;
-	githubUrl: string;
+	projectUrl?: string;
+	githubUrl?: string;
 	date: string; // ISO 8601
 	technologies: string[];
+	blocks?: any[];
 	featured: boolean;
 }
 
@@ -110,13 +112,15 @@ export const projectSchema = z.object({
 	id: z.string().min(1),
 	order: z.number().int(),
 	title: z.string().min(1),
-	tagline: z.string().min(1),
-	description: z.string().min(1),
+	field: z.string().optional(),
+	tagline: z.string().optional(),
+	description: z.string().optional(),
 	imageUrl: z.string().min(1),
-	projectUrl: z.string().min(1),
-	githubUrl: z.string().min(1),
+	projectUrl: z.string().optional(),
+	githubUrl: z.string().optional(),
 	date: z.string().min(1),
 	technologies: z.array(z.string().min(1)),
+	blocks: z.array(z.any()).optional(),
 	featured: z.boolean(),
 });
 
