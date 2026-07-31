@@ -820,7 +820,7 @@ try {
 			designCards.forEach(card => {
 				card.addEventListener('click', (e) => {
 					// If clicking the image link, let the CSS lightbox handle it and stop propagation
-					if ((e.target as HTMLElement).closest('.image-zoom-trigger')) {
+					if ((e.target as HTMLElement).closest('.image-zoom-trigger, [data-lightbox-src]')) {
 						return;
 					}
 					const id = card.getAttribute('data-id');
@@ -1563,7 +1563,8 @@ try {
 						// Update existing card in DOM
 						const existingCard = designsGrid.querySelector(`.design-card[data-id="${savedDesign.id}"]`);
 						const updatedCard = createDesignCard(savedDesign);
-						updatedCard.addEventListener('click', () => {
+						updatedCard.addEventListener('click', (e) => {
+							if ((e.target as HTMLElement).closest('.image-zoom-trigger, [data-lightbox-src]')) return;
 							selectDesign(savedDesign);
 							openDrawer();
 						});
@@ -1582,7 +1583,8 @@ try {
 
 						// Insert new card at top of grid
 						const newCard = createDesignCard(savedDesign);
-						newCard.addEventListener('click', () => {
+						newCard.addEventListener('click', (e) => {
+							if ((e.target as HTMLElement).closest('.image-zoom-trigger, [data-lightbox-src]')) return;
 							selectDesign(savedDesign);
 							openDrawer();
 						});
