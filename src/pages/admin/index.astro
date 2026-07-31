@@ -14,6 +14,7 @@ import AdminDashboard from "../../components/AdminDashboard.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
 import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
 import { CACHE_TTL_MS, getOrSetCached } from "../../lib/server/cache";
+import { getEnv } from "../../lib/server/env";
 
 // Extra safety: double-check that the middleware successfully set Astro.locals.adminEmail
 const adminEmail = Astro.locals.adminEmail;
@@ -24,6 +25,7 @@ let experienceCount = 0;
 let designsCount = 0;
 let certificatesCount = 0;
 let volunteeringCount = 0;
+let resumeDownloadsCount = 0;
 let systemStatus = "Connected";
 
 // Use a short TTL for admin metrics while still reducing repeated Firestore reads.
@@ -34,6 +36,7 @@ type DashboardCounts = {
   designs: number;
   certificates: number;
   volunteering: number;
+  resumeDownloads: number;
 };
 
 try {
@@ -43,12 +46,13 @@ try {
     const db = getFirebaseAdminDb();
     
     // Parallel asynchronous fetching of the collections' count metrics
-    const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, volunteeringSnap] = await Promise.all([
+    const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, volunteeringSnap, configSnap] = await Promise.all([
       db.collection("projects").count().get(),
       db.collection("experience").count().get(),
       db.collection("designs").count().get(),
       db.collection("certificates").count().get(),
       db.collection("volunteering").count().get(),
+      db.collection("configuration").doc("static_data").get(),
     ]);
 
     return {
@@ -57,6 +61,7 @@ try {
       designs: designsSnap.data().count,
       certificates: certificatesSnap.data().count,
       volunteering: volunteeringSnap.data().count,
+      resumeDownloads: configSnap.exists ? (configSnap.data()?.resumeDownloads || 0) : 0,
     };
       },
       CACHE_TTL_MS.ADMIN_DATA,
@@ -66,6 +71,7 @@ try {
     designsCount = counts.designs;
     certificatesCount = counts.certificates;
     volunteeringCount = counts.volunteering;
+    resumeDownloadsCount = counts.resumeDownloads;
   } catch (error) {
     console.warn("Firestore access degraded or unconfigured. Falling back to mock dashboard metrics.", error);
     systemStatus = "Degraded (Mock Stats)";
@@ -99,7 +105,7 @@ try {
   console.warn('Could not pre-fetch admin emails/todos/logs in frontmatter:', err);
 }
 
-const primaryEmail = (import.meta.env.ADMIN_EMAIL || process.env.ADMIN_EMAIL || '').toLowerCase().trim();
+const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
 const currentAdminEmail = (adminEmail || '').toLowerCase().trim();
 const isPrimaryAdmin = currentAdminEmail === primaryEmail;
 
@@ -121,6 +127,7 @@ const metrics = {
     designs: designsCount,
     certificates: certificatesCount,
     volunteering: volunteeringCount,
+    resumeDownloads: resumeDownloadsCount,
   },
   systemStatus: systemStatus,
 };

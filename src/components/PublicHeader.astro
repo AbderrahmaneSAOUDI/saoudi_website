@@ -10,8 +10,8 @@ import NavItem from '../components/NavItem.astro';
 import ActionButton from '../components/ActionButton.astro';
 import Icon from './Icon.astro';
 
-// Static resume link used on public routes to keep the homepage edge-safe.
-let resumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
+// Download endpoint that increments download count and redirects to PDF
+let resumeUrl = '/api/download_resume';
 
 // Read current request pathname to determine active route highlighting
 const { pathname } = Astro.url;

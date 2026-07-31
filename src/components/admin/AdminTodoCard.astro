@@ -1,15 +1,16 @@
 ---
 import Icon from '../Icon.astro';
 import type { AdminTodo } from '../../types';
+import { getEnv } from '../../lib/server/env';
 
 interface Props {
 	initialTodos?: AdminTodo[];
 	isPrimaryAdmin?: boolean;
 }
 
-const primaryEmail = (import.meta.env.ADMIN_EMAIL || process.env.ADMIN_EMAIL || '').toLowerCase().trim();
+const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
 const userEmail = (Astro.locals.adminEmail || '').toLowerCase().trim();
-const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail) } = Astro.props;
+const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && primaryEmail !== '') } = Astro.props;
 ---
 
 <div class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-[380px] lg:h-[calc(90vh-420px)] min-h-[360px] shadow-lg relative overflow-hidden">
@@ -141,12 +142,13 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail) } = Ast
 		let currentTab: 'active' | 'completed' | 'archived' = 'active';
 		let todos: any[] = (window as any).initialAdminTodos || [];
 
-		// Fetch fresh data from API
+		// Fetch fresh data from API with cache buster
 		fetchTodos();
+		setInterval(fetchTodos, 5000);
 
 		async function fetchTodos() {
 			try {
-				const res = await fetch('/admin/admin_todos_api');
+				const res = await fetch(`/admin/admin_todos_api?t=${Date.now()}`);
 				if (res.ok) {
 					const data = await res.json();
 					if (data.success && Array.isArray(data.todos)) {
@@ -289,16 +291,15 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail) } = Ast
 								<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
 							</button>
 						`}
-						${(window as any).isPrimaryAdminUser ? `
-							<button
-								type="button"
-								class="btn-delete-todo p-1.5 rounded-lg text-[#DB4437]/60 hover:text-[#DB4437] hover:bg-[#DB4437]/10 transition-colors cursor-pointer"
-								data-id="${todo.id}"
-								title="Delete task permanently"
-							>
-								<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-							</button>
-						` : ''}
+						<button
+							type="button"
+							class="btn-delete-todo p-1.5 rounded-lg transition-colors ${(window as any).isPrimaryAdminUser ? 'text-[#DB4437]/60 hover:text-[#DB4437] hover:bg-[#DB4437]/10 cursor-pointer' : 'text-[#DB4437]/30 opacity-40 cursor-not-allowed'}"
+							data-id="${todo.id}"
+							data-disabled="${!(window as any).isPrimaryAdminUser}"
+							title="${(window as any).isPrimaryAdminUser ? 'Delete task permanently' : 'Only the website owner can do this action.'}"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+						</button>
 					</div>
 				`;
 
@@ -408,6 +409,11 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail) } = Ast
 			// Delete task permanently
 			listContainer.querySelectorAll('.btn-delete-todo').forEach(btn => {
 				btn.addEventListener('click', async () => {
+					if (btn.getAttribute('data-disabled') === 'true' || !(window as any).isPrimaryAdminUser) {
+						showStatus('Permission denied. Only the website owner can do this action.', 'error');
+						return;
+					}
+
 					const id = btn.getAttribute('data-id');
 					if (!id) return;
 
@@ -477,7 +483,22 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail) } = Ast
 				if (res.ok && data.success) {
 					titleInput.value = '';
 					showStatus('New task added to brainstorm list! 🚀', 'success');
-					await fetchTodos();
+					if (data.todo) {
+						// Remove any existing todo with same ID if present and unshift
+						todos = [data.todo, ...todos.filter(t => t.id !== data.todo.id)];
+					}
+					// Ensure we are viewing the active tab where the new task lives
+					currentTab = 'active';
+					// Reset tab UI active state
+					tabButtons.forEach(b => {
+						const isAct = b.getAttribute('data-tab') === 'active';
+						b.classList.toggle('bg-primary', isAct);
+						b.classList.toggle('text-white', isAct);
+						b.classList.toggle('font-bold', isAct);
+						b.classList.toggle('text-[#E6E1E5]/60', !isAct);
+					});
+					render();
+					fetchTodos();
 				} else {
 					showStatus(data.error || 'Failed to add task.', 'error');
 				}
