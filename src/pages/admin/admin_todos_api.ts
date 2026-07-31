@@ -127,6 +127,13 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		}
 
 		if (action === 'delete') {
+			const primaryEmail = (process.env.ADMIN_EMAIL || import.meta.env.ADMIN_EMAIL || '').toLowerCase().trim();
+			const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
+
+			if (callerEmail !== primaryEmail) {
+				return jsonResponse({ error: 'Only the primary environment admin owner can delete tasks.' }, 403);
+			}
+
 			await docRef.delete();
 			clearCache('admin_todos');
 			return jsonResponse({ success: true, id: todoId, deleted: true });

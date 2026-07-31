@@ -4,9 +4,12 @@ import type { AdminTodo } from '../../types';
 
 interface Props {
 	initialTodos?: AdminTodo[];
+	isPrimaryAdmin?: boolean;
 }
 
-const { initialTodos = [] } = Astro.props;
+const primaryEmail = (import.meta.env.ADMIN_EMAIL || process.env.ADMIN_EMAIL || '').toLowerCase().trim();
+const userEmail = (Astro.locals.adminEmail || '').toLowerCase().trim();
+const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail) } = Astro.props;
 ---
 
 <div class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-[380px] lg:h-[calc(90vh-420px)] min-h-[360px] shadow-lg relative overflow-hidden">
@@ -16,14 +19,8 @@ const { initialTodos = [] } = Astro.props;
 			<div class="p-2.5 rounded-2xl bg-[#F4B400]/10 text-[#F4B400] border border-[#F4B400]/20">
 				<Icon name="design" size={24} class="w-6 h-6" />
 			</div>
-			<div>
-				<div class="flex items-center gap-2">
-					<h2 class="text-lg font-bold text-white tracking-tight">Admin Brainstorm & To-Do</h2>
-					<span id="todo-total-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#F4B400]/15 text-[#F4B400] border border-[#F4B400]/30">
-						{initialTodos.filter(t => t.status === 'active').length} Active
-					</span>
-				</div>
-				<p class="text-xs text-[#E6E1E5]/50">Plan features, track tasks & archive completed ideas</p>
+			<div class="flex items-center gap-2">
+				<h2 class="text-lg font-bold text-white tracking-tight">To-Do</h2>
 			</div>
 		</div>
 
@@ -115,8 +112,11 @@ const { initialTodos = [] } = Astro.props;
 	</div>
 </div>
 
-<script is:inline define:vars={{ initialTodosData: initialTodos }}>
-	Object.assign(window, { initialAdminTodos: initialTodosData || [] });
+<script is:inline define:vars={{ initialTodosData: initialTodos, isPrimaryAdminUser: isPrimaryAdmin }}>
+	Object.assign(window, { 
+		initialAdminTodos: initialTodosData || [],
+		isPrimaryAdminUser: Boolean(isPrimaryAdminUser)
+	});
 </script>
 
 <script>
@@ -126,7 +126,6 @@ const { initialTodos = [] } = Astro.props;
 		const emptyStateTitle = document.getElementById('empty-state-title') as HTMLParagraphElement;
 		const emptyStateSubtitle = document.getElementById('empty-state-subtitle') as HTMLParagraphElement;
 
-		const totalBadge = document.getElementById('todo-total-badge') as HTMLSpanElement;
 		const countActive = document.getElementById('tab-count-active') as HTMLSpanElement;
 		const countCompleted = document.getElementById('tab-count-completed') as HTMLSpanElement;
 		const countArchived = document.getElementById('tab-count-archived') as HTMLSpanElement;
@@ -180,7 +179,6 @@ const { initialTodos = [] } = Astro.props;
 			const completedTasks = todos.filter(t => t.status === 'completed');
 			const archivedTasks = todos.filter(t => t.status === 'archived');
 
-			totalBadge.textContent = `${activeTasks.length} Active`;
 			countActive.textContent = String(activeTasks.length);
 			countCompleted.textContent = String(completedTasks.length);
 			countArchived.textContent = String(archivedTasks.length);
@@ -291,14 +289,16 @@ const { initialTodos = [] } = Astro.props;
 								<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
 							</button>
 						`}
-						<button
-							type="button"
-							class="btn-delete-todo p-1.5 rounded-lg text-[#DB4437]/60 hover:text-[#DB4437] hover:bg-[#DB4437]/10 transition-colors cursor-pointer"
-							data-id="${todo.id}"
-							title="Delete task permanently"
-						>
-							<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-						</button>
+						${(window as any).isPrimaryAdminUser ? `
+							<button
+								type="button"
+								class="btn-delete-todo p-1.5 rounded-lg text-[#DB4437]/60 hover:text-[#DB4437] hover:bg-[#DB4437]/10 transition-colors cursor-pointer"
+								data-id="${todo.id}"
+								title="Delete task permanently"
+							>
+								<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+							</button>
+						` : ''}
 					</div>
 				`;
 
