@@ -15,7 +15,7 @@ const { href, isActive = false } = Astro.props;
 
 <a
 	href={href}
-	class={`flex items-center gap-2 px-3 py-1.5 rounded-full font-medium text-sm transition-all hover:-translate-y-0.5 duration-300 ${
+	class={`h-9 inline-flex items-center justify-center gap-2 px-3 sm:px-4 rounded-full font-medium text-sm transition-all hover:-translate-y-0.5 duration-300 ${
 		isActive
 			? 'bg-primary text-white' // Accent highlighted active link
 			: 'text-white/70 hover:text-white hover:bg-white/10' // Subtle muted inactive link

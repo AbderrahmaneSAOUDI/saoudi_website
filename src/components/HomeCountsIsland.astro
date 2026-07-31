@@ -45,12 +45,18 @@ try {
 	console.warn("Failed to fetch aggregate counts from Firestore for public home page:", error);
 }
 
+function formatStatCount(count: number): string {
+	if (count < 10) return '0';
+	const rounded = Math.floor(count / 10) * 10;
+	return `+${rounded}`;
+}
+
 const statCards = [
-	{ label: 'Projects', value: counts.projects, icon: 'projects', color: 'primary', href: '/projects', disabled: false },
-	{ label: 'Experience', value: counts.experience, icon: 'experience', color: 'secondary', href: '/experience', disabled: false },
-	{ label: 'Designs', value: counts.designs, icon: 'design', color: 'tertiary', href: '/designs', disabled: false },
-	{ label: 'Certificates', value: counts.certificates, icon: 'certifications', color: 'primary', href: '/certifications', disabled: false },
-	{ label: 'Volunteering', value: counts.volunteering, icon: 'business', color: 'secondary', href: '#', disabled: true },
+	{ label: 'Projects', value: formatStatCount(counts.projects), icon: 'projects', color: 'primary', href: '/projects', disabled: false },
+	{ label: 'Experience', value: formatStatCount(counts.experience), icon: 'experience', color: 'secondary', href: '/experience', disabled: false },
+	{ label: 'Designs', value: formatStatCount(counts.designs), icon: 'design', color: 'tertiary', href: '/designs', disabled: false },
+	{ label: 'Certificates', value: formatStatCount(counts.certificates), icon: 'certifications', color: 'primary', href: '/certifications', disabled: false },
+	{ label: 'Volunteering', value: formatStatCount(counts.volunteering), icon: 'business', color: 'secondary', href: '#', disabled: true },
 ];
 ---
 

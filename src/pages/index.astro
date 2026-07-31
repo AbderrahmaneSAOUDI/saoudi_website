@@ -347,37 +347,45 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 						Contact
 					</h2>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-						<div class="bg-surface-container-high border border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1">
-							<div class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center text-primary flex-shrink-0 shadow-lg shadow-primary/10">
+						<a
+							href="#"
+							onclick="this.setAttribute('href', atob('aHR0cHM6Ly93YS5tZS8yMTM1NjEzNzc3NjE='))"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="bg-surface-container-high border border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 block group cursor-pointer"
+						>
+							<div class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center text-primary flex-shrink-0 shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform duration-300">
 								<Icon name="phone" size={28} />
 							</div>
 							<div>
-								<h3 class="text-white font-semibold">Phone</h3>
-								<p class="text-white/70">
-									<a href="#" onclick="this.setAttribute('href','tel:'+atob('KzIxMzU2MTM3Nzc2MQ=='))" class="hover:underline">
-										<span class="obfuscated">16 77 73 165 312+</span>
-									</a>
+								<h3 class="text-white font-semibold flex items-center gap-2">
+									Phone & WhatsApp
+								</h3>
+								<p class="text-white/70 mt-1">
+									<span class="obfuscated">16 77 73 165 312+</span>
 								</p>
 								<p class="text-white/70">
-									<a href="#" onclick="this.setAttribute('href','tel:'+atob('KzIxMzY3Njg5NTYxMw=='))" class="hover:underline">
-										<span class="obfuscated">31 65 98 676 312+</span>
-									</a>
+									<span class="obfuscated">31 65 98 676 312+</span>
 								</p>
 							</div>
-						</div>
-						<div class="bg-surface-container-high border border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-secondary/30 transition-all duration-300 hover:-translate-y-1">
-							<div class="w-12 h-12 bg-secondary/20 rounded-xl flex items-center justify-center text-secondary flex-shrink-0 shadow-lg shadow-secondary/10">
+						</a>
+						<a
+							href="#"
+							onclick="this.setAttribute('href','mailto:'+atob('YWJkZXJyYWhtYW5lLnNhb3VkaS4yNkBnbWFpbC5jb20='))"
+							class="bg-surface-container-high border border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-secondary/30 transition-all duration-300 hover:-translate-y-1 block group cursor-pointer"
+						>
+							<div class="w-12 h-12 bg-secondary/20 rounded-xl flex items-center justify-center text-secondary flex-shrink-0 shadow-lg shadow-secondary/10 group-hover:scale-105 transition-transform duration-300">
 								<Icon name="mail" size={28} />
 							</div>
 							<div>
-								<h3 class="text-white font-semibold">Email</h3>
-								<p class="text-white/70">
-									<a href="#" onclick="this.setAttribute('href','mailto:'+atob('YWJkZXJyYWhtYW5lLnNhb3VkaS4yNkBnbWFpbC5jb20='))" class="hover:underline">
-										<span class="obfuscated">moc.kcud@62iduoas</span>
-									</a>
+								<h3 class="text-white font-semibold flex items-center gap-2">
+									Email
+								</h3>
+								<p class="text-white/70 mt-1">
+									<span class="obfuscated">moc.kcud@62iduoas</span>
 								</p>
 							</div>
-						</div>
+						</a>
 					</div>
 				</div>
 			</div>

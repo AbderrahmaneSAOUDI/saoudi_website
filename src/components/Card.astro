@@ -89,11 +89,11 @@ const typeColors = {
 	>
 		<div>
 			<a
-				href={isAdmin ? undefined : design.imageUrl}
-				target={isAdmin ? undefined : "_blank"}
-				data-lightbox-src={isAdmin ? undefined : design.imageUrl}
-				data-lightbox-title={isAdmin ? undefined : (design.title || design.company)}
-				data-lightbox-subtitle={isAdmin ? undefined : (design.title ? design.company : undefined)}
+				href={design.imageUrl}
+				target="_blank"
+				data-lightbox-src={design.imageUrl}
+				data-lightbox-title={design.title || design.company}
+				data-lightbox-subtitle={design.title ? design.company : undefined}
 				class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-0 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block"
 			>
 				<div class="absolute inset-0 skeleton"></div>
@@ -138,12 +138,12 @@ const typeColors = {
 			{certificate.imageUrl ? (
 				<div class="relative">
 					<a
-						href={isAdmin ? undefined : certificate.imageUrl}
-						target={isAdmin ? undefined : "_blank"}
-						data-lightbox-src={isAdmin ? undefined : certificate.imageUrl}
-						data-lightbox-title={isAdmin ? undefined : certificate.title}
-						data-lightbox-subtitle={isAdmin ? undefined : certificate.issuer}
-						class={`relative aspect-[16/10] rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center cursor-pointer ${!isAdmin ? 'image-zoom-trigger' : ''} block bg-[#1D1B20]`}
+						href={certificate.imageUrl}
+						target="_blank"
+						data-lightbox-src={certificate.imageUrl}
+						data-lightbox-title={certificate.title}
+						data-lightbox-subtitle={certificate.issuer}
+						class="relative aspect-[16/10] rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block bg-[#1D1B20]"
 					>
 						<div class="absolute inset-0 skeleton"></div>
 						<img

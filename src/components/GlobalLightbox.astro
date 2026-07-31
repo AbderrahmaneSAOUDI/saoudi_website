@@ -38,6 +38,7 @@ interface Props {}
 				if (!trigger) return;
 				
 				e.preventDefault();
+				e.stopPropagation();
 				
 				const src = trigger.getAttribute('data-lightbox-src');
 				const title = trigger.getAttribute('data-lightbox-title') || '';
@@ -58,7 +59,7 @@ interface Props {}
 					
 					window.location.hash = 'global-lightbox';
 				}
-			});
+			}, true);
 
 			// Escape key to close lightbox
 			document.addEventListener('keydown', (e) => {
