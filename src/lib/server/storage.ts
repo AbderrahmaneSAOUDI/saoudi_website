@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { getFirebaseAdminStorage } from './firebase-admin';
+import { getEnv } from './env';
 import { getErrorMessage } from './http';
 
 export interface SaveFileParams {
@@ -30,8 +31,9 @@ async function deleteIfPresent(filePath: string): Promise<void> {
 }
 
 /**
- * Saves a media file in Firebase Storage. Local development falls back to
- * public/ so the same endpoint works without a provisioned bucket.
+ * Saves a media file. If Cloud Storage is not configured or fails,
+ * production uses Base64 Data URLs stored in Firestore (100% free, no credit card),
+ * while local development falls back to the public/ folder.
  */
 export async function saveFile({
 	file,
@@ -42,6 +44,13 @@ export async function saveFile({
 	localFallbackPath,
 }: SaveFileParams): Promise<string> {
 	const buffer = Buffer.from(await file.arrayBuffer());
+	const hasStorageBucket = Boolean(getEnv('FIREBASE_STORAGE_BUCKET'));
+
+	// If no storage bucket is configured and running on Vercel, immediately return Base64 Data URL
+	if (!hasStorageBucket && process.env.VERCEL) {
+		const base64 = buffer.toString('base64');
+		return `data:${contentType};base64,${base64}`;
+	}
 
 	try {
 		const storageFile = getFirebaseAdminStorage().bucket().file(`${destinationDir}/${filename}`);
@@ -51,16 +60,14 @@ export async function saveFile({
 		await storageFile.makePublic();
 		return storageFile.publicUrl();
 	} catch (error) {
-		if (process.env.VERCEL) {
-			console.error(`Firebase Storage upload failed for ${destinationDir}/${filename}:`, error);
-			throw new Error(
-				`Firebase Storage upload failed: ${getErrorMessage(error, 'Unknown storage error')}`,
-			);
-		}
-
 		console.warn(
-			`Firebase Storage upload failed for ${destinationDir}/${filename}; using the local development fallback.`,
+			`Firebase Storage upload failed for ${destinationDir}/${filename}: ${getErrorMessage(error, 'Unknown storage error')}. Falling back to inline data URL / local storage.`,
 		);
+
+		if (process.env.VERCEL) {
+			const base64 = buffer.toString('base64');
+			return `data:${contentType};base64,${base64}`;
+		}
 
 		const publicDir = path.join(process.cwd(), 'public', localFallbackPath);
 		await fs.mkdir(publicDir, { recursive: true });
@@ -103,6 +110,10 @@ function getStorageObjectPath(url: string): string {
  */
 export async function deleteFile(url: string, expectedDirectory: string): Promise<void> {
 	try {
+		if (!url || url.startsWith('data:')) {
+			return;
+		}
+
 		const normalizedDirectory = expectedDirectory.replace(/^\/+|\/+$/g, '');
 		const isLocal = url.startsWith('/') && !url.startsWith('//');
 

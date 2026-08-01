@@ -26,7 +26,10 @@ function readFirebaseAdminEnv(): FirebaseAdminEnv {
   const projectId = getEnv('FIREBASE_PROJECT_ID');
   const clientEmail = getEnv('FIREBASE_CLIENT_EMAIL');
   const privateKey = getEnv('FIREBASE_PRIVATE_KEY');
-  const storageBucket = getEnv('FIREBASE_STORAGE_BUCKET');
+  const rawStorageBucket = getEnv('FIREBASE_STORAGE_BUCKET');
+  const storageBucket = rawStorageBucket
+    ? rawStorageBucket.replace(/^gs:\/\//, '').replace(/\/+$/, '')
+    : undefined;
 
   if (!projectId || !clientEmail || !privateKey) {
     throw new Error(

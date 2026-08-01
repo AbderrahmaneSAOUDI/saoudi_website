@@ -75,7 +75,11 @@ function addSecurityHeaders(response: Response, preventCaching = false): Respons
     response.headers.set('X-Content-Type-Options', 'nosniff');
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
     response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-    if (preventCaching) response.headers.set('Cache-Control', 'private, no-store');
+    if (preventCaching) {
+      response.headers.set('Cache-Control', 'private, no-store');
+    } else if (context.url.pathname.startsWith('/uploads/') || context.url.pathname.endsWith('.webp')) {
+      response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+    }
     return response;
   } catch {
     // Some platform responses expose immutable headers. Clone them rather than
@@ -85,7 +89,11 @@ function addSecurityHeaders(response: Response, preventCaching = false): Respons
     headers.set('X-Content-Type-Options', 'nosniff');
     headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
     headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-    if (preventCaching) headers.set('Cache-Control', 'private, no-store');
+    if (preventCaching) {
+      headers.set('Cache-Control', 'private, no-store');
+    } else if (context.url.pathname.startsWith('/uploads/') || context.url.pathname.endsWith('.webp')) {
+      headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+    }
 
     return new Response(response.body, {
       status: response.status,
