@@ -37,6 +37,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 										width="288"
 										height="288"
 										fetchpriority="high"
+										decoding="async"
 										class="w-full h-full object-cover border-4 border-primary rounded-full"
 									/>
 								</div>
@@ -91,7 +92,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 				<div class="relative h-full">
 					<div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 blur-3xl"></div>
 					<div class="relative bg-surface-container border border-white/10 rounded-3xl overflow-hidden shadow-2xl hover:shadow-primary/10 transition-all duration-300 h-full flex flex-col">
-						<img src="/cover.webp" alt="Profile" class="w-full h-48 object-cover" fetchpriority="high" width="1280" height="192" />
+						<img src="/cover.webp" alt="Profile" class="w-full h-48 object-cover" fetchpriority="high" decoding="async" width="1280" height="192" />
 						<div class="p-8 flex-1">
 							<h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
 								About Me
