@@ -44,7 +44,7 @@ The mobile interface must replicate the premium **Material 3 Dark Theme** constr
 | **Text Muted** | Desaturated Gray| `#E6E1E5` | Body text, captions |
 
 ### Typography & Curvature Geometry
-*   **Fonts:** Use the `google_fonts` package (e.g., **Outfit** or **Inter**).
+*   **Fonts:** Use Google Sans for all UI text.
 *   **Geometry:** Strict M3 curvatures:
     *   Main cards, panel modules, dialog wrappers: `BorderRadius.circular(24.0)` (representing `rounded-3xl`).
     *   Buttons, input text fields, filter chips: `BorderRadius.circular(12.0)` (representing `rounded-xl`).
@@ -387,7 +387,7 @@ Here is the context and complete specification of what to build:
    - Tertiary Accent: #F4B400 (Google Yellow)
    - Error Color: #DB4437 (Google Red)
    - Curvatures: rounded-3xl (BorderRadius 24) for cards/dialogs, rounded-xl (BorderRadius 12) for buttons/inputs.
-   - Typography: Use Google Fonts 'Outfit' with primary text white (#FFFFFF) and body text desaturated gray (#E6E1E5).
+   - Typography: Use Google Sans with primary text white (#FFFFFF) and body text desaturated gray (#E6E1E5).
 5. Authentication Screen:
    - Provide a clean sign-in screen with a "Continue with Google" button.
    - Gated validation: Once Google Sign-In completes, verify if the authenticated user's email matches "saoudi.online@example.com" (make this configurable or read from a constants file). If it doesn't match, sign the user out immediately, show an alert dialog with "Unauthorized access", and do not enter the dashboard.

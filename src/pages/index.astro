@@ -21,63 +21,65 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 			<div class="relative w-full">
 				<div class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-secondary/5 blur-3xl"></div>
 				
-				<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 lg:p-16 shadow-2xl">
-					<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-						<div class="flex justify-center lg:justify-start">
-							<div class="relative">
-								<!-- Animated Glow Under Photo -->
-								<div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-gradient-to-r from-primary/0 via-primary/50 to-primary/0 blur-xl animate-glow-pulse"></div>
-								<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1/2 h-4 bg-gradient-to-r from-secondary/0 via-secondary/40 to-secondary/0 blur-lg animate-glow-pulse" style="animation-delay: 0.5s;"></div>
-								
-								<div class="absolute inset-0 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-full blur-2xl animate-orb-pulse"></div>
-								<div class="relative w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full border-4 border-primary/40 shadow-2xl shadow-primary/20 overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
-									<img 
-										src="/profile.webp" 
-										alt="Abderrahmane SAOUDI Profile Picture"
-										width="288"
-										height="288"
-										fetchpriority="high"
-										decoding="async"
-										class="w-full h-full object-cover border-4 border-primary rounded-full"
-									/>
-								</div>
+			<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 lg:p-16 shadow-2xl">
+					<!-- Top Row: Image + Titles side by side -->
+					<div class="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10 mb-8 md:mb-10">
+						<!-- Profile Image -->
+						<div class="relative shrink-0">
+							<!-- Animated Glow Under Photo -->
+							<div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-gradient-to-r from-primary/0 via-primary/50 to-primary/0 blur-xl animate-glow-pulse"></div>
+							<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1/2 h-4 bg-gradient-to-r from-secondary/0 via-secondary/40 to-secondary/0 blur-lg animate-glow-pulse" style="animation-delay: 0.5s;"></div>
+							
+							<div class="absolute inset-0 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-full blur-2xl animate-orb-pulse"></div>
+							<div class="relative w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 rounded-full border-4 border-primary/40 shadow-2xl shadow-primary/20 overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
+								<img 
+									src="/profile.webp" 
+									alt="Abderrahmane SAOUDI Profile Picture"
+									width="224"
+									height="224"
+									fetchpriority="high"
+									decoding="async"
+									class="w-full h-full object-cover border-4 border-primary rounded-full"
+								/>
 							</div>
 						</div>
 						
-						<div class="text-center lg:text-left lg:col-span-2">
-							<h1 class="mb-4 font-bold text-white text-4xl md:text-5xl lg:text-6xl">
+						<!-- Big Title + Small Subtitle -->
+						<div class="text-center md:text-left flex-1 flex flex-col justify-center">
+							<h1 class="mb-3 font-bold text-white text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight">
 								Hi, I'm <span class="text-primary">Abderrahmane SAOUDI</span>
 							</h1>
-							<p class="text-white/80 text-xl md:text-2xl mb-8 leading-relaxed font-light">
+							<p class="text-white/80 text-lg md:text-xl lg:text-2xl leading-relaxed font-light">
 								Passionate technologist and community leader crafting digital experiences
 							</p>
-							
-							<div class="space-y-6">
-								<div class="space-y-3 pt-4">
-									<h3 class="text-white/60 text-sm font-semibold uppercase tracking-wider">Professional Roles</h3>
-									<div class="flex flex-wrap justify-center lg:justify-start gap-2">
-										<span class="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-semibold">Graphic Designer</span>
-										<span class="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-semibold">Mobile Developer</span>
-										<span class="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-semibold">n8n Automations</span>
-									</div>
-								</div>
-								
-								<div class="space-y-3 pt-4">
-									<h3 class="text-white/60 text-sm font-semibold uppercase tracking-wider">Community & Leadership</h3>
-									<div class="flex flex-wrap justify-center lg:justify-start gap-2">
-										<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">GDG Ghardaia President (2022-Now)</span>
-										<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">University Teacher</span>
-										<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">DevFest Lead 2023-2025</span>
-										<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">Google I/O Lead 2023-2025</span>
-									</div>
-								</div>
-								
-								<div class="space-y-3 pt-4">
-									<h3 class="text-white/60 text-sm font-semibold uppercase tracking-wider">Achievements</h3>
-									<div class="flex flex-wrap justify-center lg:justify-start gap-2">
-										<span class="px-4 py-2 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-xl text-sm font-semibold">🥉 3rd Place - StartUp City Hackathon</span>
-									</div>
-								</div>
+						</div>
+					</div>
+					
+					<!-- Full-Width Sections: Roles, Community, Achievements -->
+					<div class="space-y-5">
+						<div class="space-y-3">
+							<h3 class="text-white/60 text-sm font-semibold uppercase tracking-wider">Professional Roles</h3>
+							<div class="flex flex-wrap justify-center md:justify-start gap-2">
+								<span class="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-semibold">Graphic Designer</span>
+								<span class="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-semibold">Mobile Developer</span>
+								<span class="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-semibold">n8n Automations</span>
+							</div>
+						</div>
+						
+						<div class="space-y-3">
+							<h3 class="text-white/60 text-sm font-semibold uppercase tracking-wider">Community & Leadership</h3>
+							<div class="flex flex-wrap justify-center md:justify-start gap-2">
+								<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">GDG Ghardaia President (2022-Now)</span>
+								<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">University Teacher</span>
+								<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">DevFest Lead 2023-2025</span>
+								<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">Google I/O Lead 2023-2025</span>
+							</div>
+						</div>
+						
+						<div class="space-y-3">
+							<h3 class="text-white/60 text-sm font-semibold uppercase tracking-wider">Achievements</h3>
+							<div class="flex flex-wrap justify-center md:justify-start gap-2">
+								<span class="px-4 py-2 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-xl text-sm font-semibold">🥉 3rd Place - StartUp City Hackathon</span>
 							</div>
 						</div>
 					</div>
@@ -91,7 +93,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 			<section class="animate-fade-in" style="animation-delay: 0.2s;">
 				<div class="relative h-full">
 					<div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 blur-3xl"></div>
-					<div class="relative bg-surface-container border border-white/10 rounded-3xl overflow-hidden shadow-2xl hover:shadow-primary/10 transition-all duration-300 h-full flex flex-col">
+					<div class="relative bg-surface-container border border-white/10 rounded-3xl overflow-hidden shadow-2xl hover:border-primary/50 transition-all duration-300 h-full flex flex-col">
 						<img src="/cover.webp" alt="Profile" class="w-full h-48 object-cover" fetchpriority="high" decoding="async" width="1280" height="192" />
 						<div class="p-8 flex-1">
 							<h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
@@ -114,7 +116,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 			<section class="animate-fade-in" style="animation-delay: 0.3s;">
 				<div class="relative h-full">
 					<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"></div>
-					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 shadow-2xl hover:shadow-secondary/10 transition-all duration-300 h-full">
+					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 shadow-2xl hover:border-primary/50 transition-all duration-300 h-full">
 						<h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
 							Education
 						</h2>
@@ -180,7 +182,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 		<section class="mt-6 animate-fade-in" style="animation-delay: 0.5s;">
 			<div class="relative">
 				<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"></div>
-				<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:shadow-secondary/10 transition-all duration-300 overflow-hidden">
+				<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:border-primary/50 transition-all duration-300 overflow-hidden">
 					<div class="absolute -top-20 right-0 w-56 h-56 bg-secondary/10 blur-3xl rounded-full"></div>
 					<div class="relative">
 						<div class="flex flex-wrap items-end justify-between gap-4 mb-8">
@@ -266,7 +268,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 				<div class="relative h-full">
 					<div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 blur-3xl"></div>
-					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:shadow-primary/10 transition-all duration-300 h-full">
+					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:border-primary/50 transition-all duration-300 h-full">
 						<h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
 							Soft Skills
 						</h2>
@@ -301,7 +303,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 				
 				<div class="relative h-full">
 					<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"></div>
-					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:shadow-secondary/10 transition-all duration-300 h-full">
+					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:border-primary/50 transition-all duration-300 h-full">
 						<h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
 							Languages
 						</h2>
@@ -343,7 +345,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 		<section class="my-6 animate-fade-in" style="animation-delay: 0.7s;">
 			<div class="relative">
 				<div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-tertiary/5 blur-3xl"></div>
-				<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:shadow-primary/10 transition-all duration-300">
+				<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:border-primary/50 transition-all duration-300">
 					<h2 class="text-3xl md:text-4xl font-bold text-primary mb-8 flex items-center gap-3">
 						Contact
 					</h2>

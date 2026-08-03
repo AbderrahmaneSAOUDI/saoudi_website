@@ -84,7 +84,7 @@ const typeColors = {
 		class={`group border rounded-3xl p-4 transition-all duration-300 flex flex-col justify-between h-full ${
 			isAdmin
 				? 'design-card border-[#2B2930] bg-[#1D1B20] hover:ring-2 hover:ring-primary/40 cursor-pointer'
-				: 'bg-surface-container border-white/10 hover:-translate-y-1.5 hover:shadow-lg hover:shadow-primary/10 hover:ring-2 hover:ring-primary/40'
+				: 'bg-surface-container border-white/10 hover:-translate-y-1.5 hover:border-primary/50'
 		}`}
 		data-id={isAdmin ? design.id : undefined}
 	>
@@ -105,7 +105,7 @@ const typeColors = {
 					loading="lazy"
 					decoding="async"
 					onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
-					onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
+					onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.src='/cover.webp';}"
 				/>
 			</a>
 		</div>
@@ -131,7 +131,7 @@ const typeColors = {
 		class={`group border rounded-3xl p-5 transition-all duration-300 flex flex-col justify-between h-full ${
 			isAdmin
 				? 'certificate-card border-[#2B2930] bg-[#1D1B20] hover:ring-2 hover:ring-primary/40 cursor-pointer'
-				: 'bg-surface-container border-white/10 hover:-translate-y-1.5 hover:shadow-lg hover:shadow-primary/10 hover:ring-2 hover:ring-primary/40'
+				: 'bg-surface-container border-white/10 hover:-translate-y-1.5 hover:border-primary/50'
 		}`}
 		data-id={isAdmin ? certificate.id : undefined}
 	>
@@ -154,7 +154,7 @@ const typeColors = {
 							loading="lazy"
 							decoding="async"
 							onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
-							onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
+							onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.src='/cover.webp';}"
 						/>
 					</a>
 					{certType && (
@@ -215,7 +215,7 @@ const typeColors = {
 		class={`group border rounded-3xl p-4 transition-all duration-300 flex flex-col justify-between h-full ${
 			isAdmin
 				? 'project-card border-[#2B2930] bg-[#1D1B20] hover:ring-2 hover:ring-primary/40 cursor-pointer'
-				: 'bg-surface-container border-white/10 hover:-translate-y-1.5 hover:shadow-lg hover:shadow-primary/10 hover:ring-2 hover:ring-primary/40 cursor-pointer'
+				: 'bg-surface-container border-white/10 hover:-translate-y-1.5 hover:border-primary/50 cursor-pointer'
 		}`}
 		data-id={isAdmin ? project.id : undefined}
 		data-project-card-id={!isAdmin ? project.id : undefined}
@@ -238,7 +238,7 @@ const typeColors = {
 							loading="lazy"
 							decoding="async"
 							onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
-							onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
+							onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.src='/cover.webp';}"
 						/>
 					</a>
 				) : (
@@ -251,7 +251,7 @@ const typeColors = {
 							loading="lazy"
 							decoding="async"
 							onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
-							onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
+							onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.src='/cover.webp';}"
 						/>
 					</div>
 				)

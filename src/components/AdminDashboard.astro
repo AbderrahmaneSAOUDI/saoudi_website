@@ -215,7 +215,11 @@ const { counts, systemStatus } = metrics;
           return;
         }
 
-        if (confirm('Are you sure you want to reset the download counter to 0?')) {
+        const confirmed = typeof (window as any).showConfirmDialog === 'function'
+          ? await (window as any).showConfirmDialog('Reset Download Counter', 'Are you sure you want to reset the resume download counter to 0?')
+          : confirm('Are you sure you want to reset the download counter to 0?');
+
+        if (confirmed) {
           try {
             const formData = new FormData();
             formData.append('action', 'reset_downloads');

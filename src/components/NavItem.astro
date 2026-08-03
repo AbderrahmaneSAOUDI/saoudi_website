@@ -15,9 +15,9 @@ const { href, isActive = false } = Astro.props;
 
 <a
 	href={href}
-	class={`h-9 inline-flex items-center justify-center gap-2 px-3 sm:px-4 rounded-full font-medium text-sm transition-all hover:-translate-y-0.5 duration-300 ${
+	class={`h-9 inline-flex items-center justify-center gap-2 px-3 sm:px-4 rounded-full font-medium text-sm transition-[transform,background-color,color,box-shadow] duration-200 ease-[cubic-bezier(0.2,0,0.2,1)] active:scale-95 hover:scale-[1.04] hover:-translate-y-0.5 ${
 		isActive
-			? 'bg-primary text-white' // Accent highlighted active link
+			? 'bg-primary text-white shadow-md shadow-primary/20' // Accent highlighted active link
 			: 'text-white/70 hover:text-white hover:bg-white/10' // Subtle muted inactive link
 	}`}
 >

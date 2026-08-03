@@ -228,6 +228,7 @@ export interface AdminTodo {
 	createdAt: string; // ISO 8601
 	completedAt?: string | null;
 	archivedAt?: string | null;
+	createdBy?: string;
 }
 
 export const adminTodoSchema = z.object({
@@ -240,6 +241,7 @@ export const adminTodoSchema = z.object({
 	createdAt: z.string().min(1),
 	completedAt: z.string().nullable().optional(),
 	archivedAt: z.string().nullable().optional(),
+	createdBy: z.string().optional(),
 });
 
 // ─── Collection: system_logs ───────────────────────────────────────────────

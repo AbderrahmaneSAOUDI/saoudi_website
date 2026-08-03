@@ -113,10 +113,11 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 	</div>
 </div>
 
-<script is:inline define:vars={{ initialTodosData: initialTodos, isPrimaryAdminUser: isPrimaryAdmin }}>
+<script is:inline define:vars={{ initialTodosData: initialTodos, isPrimaryAdminUser: isPrimaryAdmin, currentAdminEmail: userEmail }}>
 	Object.assign(window, { 
 		initialAdminTodos: initialTodosData || [],
-		isPrimaryAdminUser: Boolean(isPrimaryAdminUser)
+		isPrimaryAdminUser: Boolean(isPrimaryAdminUser),
+		currentAdminEmail: currentAdminEmail || ''
 	});
 </script>
 
@@ -176,17 +177,25 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 		}
 
 		function render() {
+			const isPrimary = (window as any).isPrimaryAdminUser;
+			const currentUser = ((window as any).currentAdminEmail || '').toLowerCase();
+
+			// Non-primary admin sees only their own tasks
+			const userTodos = isPrimary
+				? todos
+				: todos.filter(t => (t.createdBy || '').toLowerCase() === currentUser);
+
 			// Update counts
-			const activeTasks = todos.filter(t => t.status === 'active');
-			const completedTasks = todos.filter(t => t.status === 'completed');
-			const archivedTasks = todos.filter(t => t.status === 'archived');
+			const activeTasks = userTodos.filter(t => t.status === 'active');
+			const completedTasks = userTodos.filter(t => t.status === 'completed');
+			const archivedTasks = userTodos.filter(t => t.status === 'archived');
 
 			countActive.textContent = String(activeTasks.length);
 			countCompleted.textContent = String(completedTasks.length);
 			countArchived.textContent = String(archivedTasks.length);
 
 			// Filter by tab
-			const finalFiltered = todos.filter(t => t.status === currentTab);
+			const finalFiltered = userTodos.filter(t => t.status === currentTab);
 
 			listContainer.innerHTML = '';
 
@@ -229,6 +238,10 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 					'Low': 'text-primary border-primary/40 bg-primary/10',
 				}[todo.priority as string] || 'text-white/50 border-white/20 bg-white/5';
 
+				const creatorBadge = isPrimary && todo.createdBy
+					? `<span class="px-1.5 py-0.2 rounded-md text-[10px] font-mono border border-white/10 text-white/50 bg-white/5 truncate max-w-[120px]" title="Created by ${todo.createdBy}">by ${todo.createdBy}</span>`
+					: '';
+
 				const card = document.createElement('div');
 				card.className = `p-3.5 rounded-2xl border transition-all duration-300 flex items-center justify-between gap-3 ${
 					isDone
@@ -258,13 +271,14 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 							<p class="text-xs font-semibold ${isDone ? 'line-through text-white/50' : 'text-white'} truncate" title="${todo.title}">
 								${todo.title}
 							</p>
-							<div class="flex items-center gap-2 mt-1">
+							<div class="flex items-center gap-2 mt-1 flex-wrap">
 								<span class="px-2 py-0.2 rounded-md text-[10px] font-bold border uppercase tracking-wider ${categoryColor}">
 									${todo.category || 'General'}
 								</span>
 								<span class="px-1.5 py-0.2 rounded-md text-[10px] font-semibold border ${priorityBadge}">
 									${todo.priority || 'Medium'}
 								</span>
+								${creatorBadge}
 							</div>
 						</div>
 					</div>
@@ -417,7 +431,11 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 					const id = btn.getAttribute('data-id');
 					if (!id) return;
 
-					if (confirm('Permanently delete this task?')) {
+					const confirmed = typeof (window as any).showConfirmDialog === 'function'
+						? await (window as any).showConfirmDialog('Delete Task', 'Are you sure you want to permanently delete this task?')
+						: confirm('Permanently delete this task?');
+
+					if (confirmed) {
 						try {
 							const formData = new FormData();
 							formData.append('action', 'delete');

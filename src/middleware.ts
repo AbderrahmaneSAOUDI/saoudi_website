@@ -52,7 +52,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         const response = isAdminApi
           ? jsonResponse({ error: 'Unauthorized' }, 401)
           : context.redirect('/admin/admin_login');
-        return addSecurityHeaders(response, true);
+        return addSecurityHeaders(response, true, pathname);
       }
     }
 
@@ -61,14 +61,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   // Continue to the next middleware or route handler
   const response = await next();
-  return addSecurityHeaders(response, isAdminRoute);
+  return addSecurityHeaders(response, isAdminRoute, pathname);
 });
 
 /**
  * SECURITY: Injects critical security headers into every HTTP response.
  * These headers mitigate clickjacking, MIME-sniffing, and unauthorized feature access.
  */
-function addSecurityHeaders(response: Response, preventCaching = false): Response {
+function addSecurityHeaders(response: Response, preventCaching = false, pathname = ''): Response {
   try {
     // Attempt to mutate headers directly. This works for standard dynamic responses.
     response.headers.set('X-Frame-Options', 'DENY');
@@ -77,7 +77,7 @@ function addSecurityHeaders(response: Response, preventCaching = false): Respons
     response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
     if (preventCaching) {
       response.headers.set('Cache-Control', 'private, no-store');
-    } else if (context.url.pathname.startsWith('/uploads/') || context.url.pathname.endsWith('.webp')) {
+    } else if (pathname.startsWith('/uploads/') || pathname.endsWith('.webp')) {
       response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
     }
     return response;
@@ -91,7 +91,7 @@ function addSecurityHeaders(response: Response, preventCaching = false): Respons
     headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
     if (preventCaching) {
       headers.set('Cache-Control', 'private, no-store');
-    } else if (context.url.pathname.startsWith('/uploads/') || context.url.pathname.endsWith('.webp')) {
+    } else if (pathname.startsWith('/uploads/') || pathname.endsWith('.webp')) {
       headers.set('Cache-Control', 'public, max-age=31536000, immutable');
     }
 

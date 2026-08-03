@@ -41,12 +41,12 @@ const navItems = [
 							href={item.disabled ? '#' : item.path}
 							data-disabled={item.disabled ? 'true' : undefined}
 							data-label={item.label}
-							class={`admin-nav-item flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium transition-all duration-300 shrink-0 ${
+							class={`admin-nav-item flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ease-[cubic-bezier(0.2,0,0.2,1)] hover:-translate-y-0.5 hover:scale-[1.04] shrink-0 ${
 								item.disabled
 									? 'text-white/30 cursor-not-allowed'
 									: isActive
-									? 'bg-primary text-white'
-									: 'text-white/70 hover:text-white hover:bg-white/5'
+									? 'bg-primary text-white shadow-md shadow-primary/20'
+									: 'text-white/70 hover:text-white hover:bg-white/10 hover:border-primary/30'
 							}`}
 							aria-label={item.label}
 						>
