@@ -33,7 +33,7 @@
   --color-surface-container-high: #2D2D2D;
 
   /* Typography */
-  --font-sans: 'Outfit', sans-serif;
+  --font-sans: 'Google Sans', sans-serif;
 }
 
 @import "./background_animation.css";
@@ -58,9 +58,16 @@
   contain: layout style;
 }
 
-/* Hide shortcut badges in admin panel when toggled off */
+/* Hide shortcut badges in admin panel when toggled off — 
+   uses width/overflow instead of display:none to allow fade transitions */
 html[data-hide-shortcuts="true"] kbd {
-	display: none !important;
+	max-width: 0 !important;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+	border-width: 0 !important;
+	overflow: hidden !important;
 }
 
 /* ── Shared Page Entrance Animations (M3 easing) ──────────────────────── */
@@ -215,4 +222,79 @@ select option:checked {
   background-color: #2D2D2D !important;
   color: var(--color-primary) !important;
   font-weight: 700;
+}
+
+/* ── Custom Personalized Scrollbar ─────────────────────────────────────── */
+/* Webkit (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface-container);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-primary) 50%, transparent);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: color-mix(in srgb, var(--color-primary) 80%, transparent);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) var(--color-surface-container);
+}
+
+/* ── Smooth Group Collapse / Expand Slide ──────────────────────────────── */
+/* Shared accordion slide up/down animation for collection group toggles   */
+.group-collapse-grid {
+  will-change: grid-template-rows;
+  transition: grid-template-rows 400ms cubic-bezier(0.2, 0, 0.2, 1),
+              opacity 400ms cubic-bezier(0.2, 0, 0.2, 1),
+              transform 400ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+/* ── Shortcut Kbd Badge Animation ──────────────────────────────────────── */
+/* Smooth show/hide transition when toggling shortcuts visibility          */
+html:not([data-hide-shortcuts="true"]) kbd {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 200ms cubic-bezier(0.2, 0, 0.2, 1),
+              transform 200ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+html[data-hide-shortcuts="true"] kbd {
+  opacity: 0 !important;
+  transform: scale(0.8) !important;
+  pointer-events: none !important;
+  transition: opacity 150ms cubic-bezier(0.2, 0, 0.2, 1),
+              transform 150ms cubic-bezier(0.2, 0, 0.2, 1) !important;
+}
+
+/* ── Admin Page Entrance Animations ────────────────────────────────────── */
+@keyframes admin-section-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-admin-enter {
+  opacity: 0;
+  animation: admin-section-enter 0.5s cubic-bezier(0.2, 0, 0.2, 1) forwards;
 }

@@ -12,13 +12,25 @@ export const GET: APIRoute = async ({ locals }) => {
 	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
 
 	try {
+		const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
+		const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
+		const isPrimaryAdmin = callerEmail === primaryEmail && primaryEmail !== '';
+
 		const db = getFirebaseAdminDb();
 		const snapshot = await db.collection('admin_todos').orderBy('createdAt', 'desc').get();
 
-		const todos = snapshot.docs.map((doc) => ({
-			id: doc.id,
-			...doc.data(),
-		}));
+		let todos = snapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				id: doc.id,
+				...data,
+				createdBy: data.createdBy || primaryEmail,
+			};
+		});
+
+		if (!isPrimaryAdmin) {
+			todos = todos.filter((t) => (t.createdBy || '').toLowerCase() === callerEmail);
+		}
 
 		return jsonResponse({ success: true, todos });
 	} catch (error) {
@@ -57,6 +69,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const priority: TodoPriority = VALID_PRIORITIES.has(priorityRaw) ? priorityRaw : 'Medium';
 			const newId = todoId || `todo_${crypto.randomUUID().substring(0, 8)}`;
 			const now = new Date().toISOString();
+			const creatorEmail = (locals.adminEmail || '').toLowerCase().trim();
 
 			const todoItem = {
 				id: newId,
@@ -68,6 +81,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				createdAt: now,
 				completedAt: null,
 				archivedAt: null,
+				createdBy: creatorEmail,
 			};
 
 			await db.collection('admin_todos').doc(newId).set(todoItem);

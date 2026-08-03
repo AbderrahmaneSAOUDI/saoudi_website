@@ -115,7 +115,7 @@ const activeGroups = Object.keys(designsByCompany)
 				</label>
 
 				<!-- Grid of Designs -->
-				<div class="grid grid-rows-[0fr] opacity-0 -translate-y-3 pointer-events-none transition-all duration-300 ease-in-out peer-checked:grid-rows-[1fr] peer-checked:opacity-100 peer-checked:translate-y-0 peer-checked:pointer-events-auto">
+				<div class="grid grid-rows-[0fr] opacity-0 -translate-y-3 pointer-events-none group-collapse-grid will-change-[grid-template-rows] transition-[grid-template-rows,opacity,transform] duration-400 ease-[cubic-bezier(0.2,0,0.2,1)] peer-checked:grid-rows-[1fr] peer-checked:opacity-100 peer-checked:translate-y-0 peer-checked:pointer-events-auto">
 					<div class="overflow-hidden">
 						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 pb-1">
 							{groupDesigns.map((design, index) => (

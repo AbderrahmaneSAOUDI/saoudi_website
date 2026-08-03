@@ -84,7 +84,7 @@ try {
     volunteeringCount = -1;
 }
 
-import { getSystemLogs } from "../../lib/server/system-logs";
+import { addSystemLog, getSystemLogs } from "../../lib/server/system-logs";
 
 let initialAcceptedEmails: any[] = [];
 let initialTodos: any[] = [];
@@ -108,6 +108,19 @@ try {
 const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
 const currentAdminEmail = (adminEmail || '').toLowerCase().trim();
 const isPrimaryAdmin = currentAdminEmail === primaryEmail;
+
+// Record admin dashboard view event
+try {
+  await addSystemLog({
+    type: 'admin',
+    action: 'DASHBOARD_OPENED',
+    title: 'Admin opened Dashboard',
+    details: `Admin session accessed by ${currentAdminEmail}`,
+    userEmail: currentAdminEmail,
+  });
+} catch (logErr) {
+  console.warn('Could not log dashboard view event:', logErr);
+}
 
 if (primaryEmail && !initialAcceptedEmails.some(e => e.email?.toLowerCase() === primaryEmail)) {
   initialAcceptedEmails.unshift({

@@ -60,14 +60,14 @@ const filteredLogs = isPrimaryAdmin ? initialLogs : initialLogs.filter(l => l.ty
 						data-filter="auth"
 						class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap"
 					>
-						Logins (Auth)
+						Logins
 					</button>
 					<button
 						type="button"
 						data-filter="content"
 						class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap"
 					>
-						Card Changes
+						Content Changes
 					</button>
 					<button
 						type="button"
@@ -76,6 +76,13 @@ const filteredLogs = isPrimaryAdmin ? initialLogs : initialLogs.filter(l => l.ty
 					>
 						Admin Access
 					</button>
+					<button
+						type="button"
+						data-filter="system"
+						class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap"
+					>
+						System
+					</button>
 				</>
 			) : (
 				<button
@@ -83,7 +90,7 @@ const filteredLogs = isPrimaryAdmin ? initialLogs : initialLogs.filter(l => l.ty
 					data-filter="content"
 					class="log-filter-btn px-2.5 py-1 rounded-xl bg-primary text-white font-bold transition-all cursor-default whitespace-nowrap"
 				>
-					Card Changes
+					Content Changes
 				</button>
 			)}
 		</div>
@@ -120,6 +127,17 @@ const filteredLogs = isPrimaryAdmin ? initialLogs : initialLogs.filter(l => l.ty
 
 		let currentFilter: string = (window as any).isPrimaryAdminUser ? 'all' : 'content';
 		let logs: any[] = (window as any).initialSystemLogs || [];
+
+		function maskEmail(email: string): string {
+			if (!email || typeof email !== 'string' || !email.includes('@')) return email;
+			const parts = email.split('@');
+			const local = parts[0];
+			const domain = parts.slice(1).join('@');
+			if (local.length <= 2) {
+				return `${local[0]}***@${domain}`;
+			}
+			return `${local[0]}***${local[local.length - 1]}@${domain}`;
+		}
 
 		// Load live logs on mount
 		fetchLogs();
@@ -161,7 +179,10 @@ const filteredLogs = isPrimaryAdmin ? initialLogs : initialLogs.filter(l => l.ty
 		}
 
 		function renderLogs() {
+			const isPrimaryUser = (window as any).isPrimaryAdminUser;
 			const filtered = logs.filter(log => {
+				// Task 3.5: Remove "Resume Downloaded" log entries from display
+				if (log.action === 'RESUME_DOWNLOADED') return false;
 				return currentFilter === 'all' || log.type === currentFilter;
 			});
 
@@ -219,6 +240,10 @@ const filteredLogs = isPrimaryAdmin ? initialLogs : initialLogs.filter(l => l.ty
 					badgeStyle = 'bg-white/10 text-white/70 border-white/20';
 				}
 
+				const displayUserEmail = isPrimaryUser
+					? (log.userEmail || 'system')
+					: maskEmail(log.userEmail || 'system');
+
 				const card = document.createElement('div');
 				card.className = `p-3 rounded-2xl bg-[#211F26] border ${
 					isNonPrimaryLogin ? 'border-[#F9AB00]/40 bg-[#25211B]' : 'border-[#2B2930]'
@@ -255,7 +280,7 @@ const filteredLogs = isPrimaryAdmin ? initialLogs : initialLogs.filter(l => l.ty
 							` : ''}
 
 							<div class="flex items-center gap-2 mt-1 text-[10px] text-[#E6E1E5]/40">
-								<span class="font-mono ${isNonPrimaryLogin ? 'text-[#F9AB00] font-semibold' : ''}">${log.userEmail || 'system'}</span>
+								<span class="font-mono ${isNonPrimaryLogin ? 'text-[#F9AB00] font-semibold' : ''}">${displayUserEmail}</span>
 								<span>•</span>
 								<span>${formatTimeAgo(log.timestamp)}</span>
 							</div>
