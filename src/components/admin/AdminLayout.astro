@@ -10,12 +10,14 @@ const { title } = Astro.props;
 ---
 
 <div
-	class="min-h-screen text-[#E6E1E5] p-4 md:p-8 pb-28 md:pb-24"
+	class="min-h-screen text-[#E6E1E5] pb-28 md:pb-24"
 >
 	<AdminHeader title={title} />
 
 	<!-- Page Content -->
-	<slot />
+	<main class="p-4 md:p-8 pt-4 md:pt-6">
+		<slot />
+	</main>
 
 	<!-- Global Admin Custom Confirmation Dialog -->
 	<ConfirmDialog />
