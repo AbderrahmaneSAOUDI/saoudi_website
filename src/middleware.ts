@@ -29,20 +29,22 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const isLoginRoute = normalizedPath === '/admin/admin_login';
   const isAdminApi = ADMIN_API_PATHS.has(normalizedPath);
 
+  // Check for admin session cookie on all incoming requests
+  const sessionCookie = context.cookies.get('admin_session')?.value;
+  let verifiedEmail: string | null = null;
+
+  if (sessionCookie) {
+    const session = await verifySessionToken(sessionCookie);
+    if (session) {
+      verifiedEmail = session.email;
+    } else if (isAdminRoute && !isLoginRoute) {
+      context.cookies.delete('admin_session', { path: '/' });
+      context.cookies.delete('admin_remember', { path: '/' });
+    }
+  }
+
   // Intercept all requests targeting `/admin` and `/admin/*` (except `/admin/admin_login`)
   if (isAdminRoute && !isLoginRoute) {
-    const sessionCookie = context.cookies.get('admin_session')?.value;
-    let verifiedEmail: string | null = null;
-
-    if (sessionCookie) {
-      const session = await verifySessionToken(sessionCookie);
-      if (session) {
-        verifiedEmail = session.email;
-      } else {
-        context.cookies.delete('admin_session', { path: '/' });
-      }
-    }
-
     if (!verifiedEmail) {
       if (import.meta.env.DEV) {
         // In local development mode without an explicit session cookie, default to primary ADMIN_EMAIL
@@ -55,7 +57,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
         return addSecurityHeaders(response, true, pathname);
       }
     }
+  }
 
+  if (verifiedEmail) {
     context.locals.adminEmail = verifiedEmail;
   }
 

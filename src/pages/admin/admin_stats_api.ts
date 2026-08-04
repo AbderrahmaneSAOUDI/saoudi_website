@@ -26,6 +26,7 @@ export const GET: APIRoute = async ({ locals }) => {
 			certificates: certificatesSnap.data().count,
 			volunteering: volunteeringSnap.data().count,
 			resumeDownloads: configSnap.exists ? (configSnap.data()?.resumeDownloads || 0) : 0,
+			excludeAdminDownloads: configSnap.exists ? (configSnap.data()?.excludeAdminDownloads ?? true) : true,
 		};
 
 		return jsonResponse({ success: true, counts });
@@ -35,7 +36,7 @@ export const GET: APIRoute = async ({ locals }) => {
 	}
 };
 
-export const POST: APIRoute = async ({ locals, request }) => {
+export const POST: APIRoute = async ({ locals, request, cookies }) => {
 	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
 	if (!isFormRequest(request)) {
 		return jsonResponse({ error: 'Expected form-encoded or JSON request' }, 415);
@@ -44,6 +45,54 @@ export const POST: APIRoute = async ({ locals, request }) => {
 	try {
 		const formData = await request.formData();
 		const action = getFormString(formData, 'action');
+
+		if (action === 'toggle_exclude_downloads' || action === 'set_exclude_downloads') {
+			const db = getFirebaseAdminDb();
+			const configRef = db.collection('configuration').doc('static_data');
+
+			const configSnap = await configRef.get();
+			const currentVal = configSnap.exists ? (configSnap.data()?.excludeAdminDownloads ?? true) : true;
+
+			let newVal: boolean;
+			const reqVal = getFormString(formData, 'exclude');
+			if (reqVal === 'true') newVal = true;
+			else if (reqVal === 'false') newVal = false;
+			else newVal = !currentVal;
+
+			await configRef.set(
+				{
+					excludeAdminDownloads: newVal,
+					updatedAt: new Date().toISOString(),
+					updatedBy: locals.adminEmail,
+				},
+				{ merge: true }
+			);
+
+			const maxAge = 30 * 24 * 60 * 60;
+			cookies.set('ignore_admin_downloads', String(newVal), {
+				path: '/',
+				maxAge,
+				sameSite: 'lax',
+				secure: true,
+			});
+			cookies.set('admin_remember', String(newVal), {
+				path: '/',
+				maxAge,
+				sameSite: 'lax',
+				secure: true,
+			});
+
+			await addSystemLog({
+				type: 'content',
+				action: 'ADMIN_DOWNLOADS_EXCLUSION_TOGGLED',
+				title: `Admin Downloads Exclusion ${newVal ? 'Enabled' : 'Disabled'}`,
+				details: `Admin ${locals.adminEmail} updated admin downloads setting to: ${newVal ? 'Exclude' : 'Include'}.`,
+				userEmail: locals.adminEmail,
+			});
+
+			clearCache('admin_dashboard_counts');
+			return jsonResponse({ success: true, excludeAdminDownloads: newVal });
+		}
 
 		if (action === 'reset_downloads') {
 			const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
