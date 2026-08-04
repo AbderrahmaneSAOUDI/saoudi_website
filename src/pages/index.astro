@@ -5,81 +5,161 @@
  * Uses BaseLayout for the main site wrapper and provides animated entry sections.
  * Statistics are loaded via server:defer island for instant page shell rendering.
  */
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Icon from '../components/Icon.astro';
-import HomeCountsIsland from '../components/HomeCountsIsland.astro';
-import SkeletonCardGrid from '../components/SkeletonCardGrid.astro';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
+import HomeCountsIsland from "../components/HomeCountsIsland.astro";
+import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 
 // Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
-Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=600');
+Astro.response.headers.set(
+	"Cache-Control",
+	"public, max-age=0, s-maxage=3600, stale-while-revalidate=600",
+);
 ---
 
 <BaseLayout title="Home">
-	<div class="mx-auto px-4 sm:px-6 lg:px-8 pt-4 max-w-7xl">
+	<div class="mx-auto px-4 sm:px-6 lg:px-8 pt-2 md:pt-4 max-w-7xl">
 		<!-- Hero Section -->
-		<section class="animate-fade-in min-h-[80dvh] flex items-center">
+		<section class="animate-fade-in flex items-center pb-2">
 			<div class="relative w-full">
-				<div class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-secondary/5 blur-3xl"></div>
-				
-			<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 lg:p-16 shadow-2xl">
-					<!-- Top Row: Image + Titles side by side -->
-					<div class="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10 mb-8 md:mb-10">
-						<!-- Profile Image -->
-						<div class="relative shrink-0">
-							<!-- Animated Glow Under Photo -->
-							<div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-gradient-to-r from-primary/0 via-primary/50 to-primary/0 blur-xl animate-glow-pulse"></div>
-							<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1/2 h-4 bg-gradient-to-r from-secondary/0 via-secondary/40 to-secondary/0 blur-lg animate-glow-pulse" style="animation-delay: 0.5s;"></div>
-							
-							<div class="absolute inset-0 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-full blur-2xl animate-orb-pulse"></div>
-							<div class="relative w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 rounded-full border-4 border-primary/40 shadow-2xl shadow-primary/20 overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10">
-								<img 
-									src="/profile.webp" 
-									alt="Abderrahmane SAOUDI Profile Picture"
-									width="224"
-									height="224"
-									fetchpriority="high"
-									decoding="async"
-									class="w-full h-full object-cover border-4 border-primary rounded-full"
-								/>
+				<div
+					class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-secondary/5 blur-3xl"
+				>
+				</div>
+
+				<div
+					class="relative bg-surface-container border border-white/10 rounded-3xl p-6 md:p-8 lg:p-10 shadow-2xl"
+				>
+					<div
+						class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10 items-center"
+					>
+						<!-- Left Column: Profile Image with Entrance Animation -->
+						<div
+							class="lg:col-span-1 flex justify-center animate-hero-image"
+						>
+							<div class="relative">
+								<!-- Animated Glow Under Photo -->
+								<div
+									class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-gradient-to-r from-primary/0 via-primary/50 to-primary/0 blur-xl animate-glow-pulse"
+								>
+								</div>
+								<div
+									class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1/2 h-4 bg-gradient-to-r from-secondary/0 via-secondary/40 to-secondary/0 blur-lg animate-glow-pulse"
+									style="animation-delay: 0.5s;"
+								>
+								</div>
+
+								<div
+									class="absolute inset-0 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-full blur-2xl animate-orb-pulse"
+								>
+								</div>
+								<div
+									class="relative w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full border-4 border-primary/40 shadow-2xl shadow-primary/20 overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10"
+								>
+									<img
+										src="/profile.webp"
+										alt="Abderrahmane SAOUDI Profile Picture"
+										width="256"
+										height="256"
+										fetchpriority="high"
+										decoding="async"
+										class="w-full h-full object-cover border-4 border-primary rounded-full"
+									/>
+								</div>
 							</div>
 						</div>
-						
-						<!-- Big Title + Small Subtitle -->
-						<div class="text-center md:text-left flex-1 flex flex-col justify-center">
-							<h1 class="mb-3 font-bold text-white text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight">
-								Hi, I'm <span class="text-primary">Abderrahmane SAOUDI</span>
-							</h1>
-							<p class="text-white/80 text-lg md:text-xl lg:text-2xl leading-relaxed font-light">
-								Passionate technologist and community leader crafting digital experiences
-							</p>
-						</div>
-					</div>
-					
-					<!-- Full-Width Sections: Roles, Community, Achievements -->
-					<div class="space-y-5">
-						<div class="space-y-3">
-							<h3 class="text-white/60 text-sm font-semibold uppercase tracking-wider">Professional Roles</h3>
-							<div class="flex flex-wrap justify-center md:justify-start gap-2">
-								<span class="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-semibold">Graphic Designer</span>
-								<span class="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-semibold">Mobile Developer</span>
-								<span class="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm font-semibold">n8n Automations</span>
+
+						<!-- Right Column: Titles, Subtitles, Roles & Badges with Entrance Animation -->
+						<div
+							class="lg:col-span-2 text-center lg:text-left animate-hero-text"
+						>
+							<div>
+								<h1
+									class="mb-2 font-bold text-white text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight"
+								>
+									Hi, I'm <span
+										class="text-primary animate-hero-typing"
+										>Abderrahmane SAOUDI</span
+									>
+								</h1>
+								<p
+									class="text-white/80 text-lg md:text-xl lg:text-2xl leading-relaxed font-light animate-hero-subtitle"
+								>
+									Passionate technologist and community leader
+									crafting digital experiences
+								</p>
 							</div>
-						</div>
-						
-						<div class="space-y-3">
-							<h3 class="text-white/60 text-sm font-semibold uppercase tracking-wider">Community & Leadership</h3>
-							<div class="flex flex-wrap justify-center md:justify-start gap-2">
-								<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">GDG Ghardaia President (2022-Now)</span>
-								<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">University Teacher</span>
-								<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">DevFest Lead 2023-2025</span>
-								<span class="px-4 py-2 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-sm font-semibold">Google I/O Lead 2023-2025</span>
+
+							<div class="space-y-2 animate-hero-roles mt-4">
+								<h3
+									class="text-white/60 text-xs md:text-sm font-semibold uppercase tracking-wider"
+								>
+									Professional Roles
+								</h3>
+								<div
+									class="flex flex-wrap justify-center lg:justify-start gap-2"
+								>
+									<span
+										class="px-3.5 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs md:text-sm font-semibold hover:border-primary/40 transition-colors duration-300"
+										>Graphic Designer</span
+									>
+									<span
+										class="px-3.5 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs md:text-sm font-semibold hover:border-primary/40 transition-colors duration-300"
+										>Mobile Developer</span
+									>
+									<span
+										class="px-3.5 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs md:text-sm font-semibold hover:border-primary/40 transition-colors duration-300"
+										>n8n Automations</span
+									>
+								</div>
 							</div>
-						</div>
-						
-						<div class="space-y-3">
-							<h3 class="text-white/60 text-sm font-semibold uppercase tracking-wider">Achievements</h3>
-							<div class="flex flex-wrap justify-center md:justify-start gap-2">
-								<span class="px-4 py-2 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-xl text-sm font-semibold">🥉 3rd Place - StartUp City Hackathon</span>
+
+							<div
+								class="space-y-2 mt-4 md:mt-5 animate-hero-community"
+							>
+								<h3
+									class="text-white/60 text-xs md:text-sm font-semibold uppercase tracking-wider"
+								>
+									Community & Leadership
+								</h3>
+								<div
+									class="flex flex-wrap justify-center lg:justify-start gap-2"
+								>
+									<span
+										class="px-3.5 py-1.5 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-xs md:text-sm font-semibold hover:border-secondary/40 transition-colors duration-300"
+										>GDG Ghardaia President (2022-Now)</span
+									>
+									<span
+										class="px-3.5 py-1.5 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-xs md:text-sm font-semibold hover:border-secondary/40 transition-colors duration-300"
+										>University Teacher</span
+									>
+									<span
+										class="px-3.5 py-1.5 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-xs md:text-sm font-semibold hover:border-secondary/40 transition-colors duration-300"
+										>DevFest Lead 2023-2025</span
+									>
+									<span
+										class="px-3.5 py-1.5 bg-secondary/10 text-secondary border border-secondary/20 rounded-xl text-xs md:text-sm font-semibold hover:border-secondary/40 transition-colors duration-300"
+										>Google I/O Lead 2023-2025</span
+									>
+								</div>
+							</div>
+
+							<div
+								class="space-y-2 mt-4 md:mt-5 animate-hero-achievements"
+							>
+								<h3
+									class="text-white/60 text-xs md:text-sm font-semibold uppercase tracking-wider"
+								>
+									Achievements
+								</h3>
+								<div
+									class="flex flex-wrap justify-center lg:justify-start gap-2"
+								>
+									<span
+										class="px-3.5 py-1.5 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-xl text-xs md:text-sm font-semibold hover:border-tertiary/40 transition-colors duration-300"
+										>🥉 3rd Place - StartUp City Hackathon</span
+									>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -92,19 +172,39 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 			<!-- Professional Summary -->
 			<section class="animate-fade-in" style="animation-delay: 0.2s;">
 				<div class="relative h-full">
-					<div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 blur-3xl"></div>
-					<div class="relative bg-surface-container border border-white/10 rounded-3xl overflow-hidden shadow-2xl hover:border-primary/50 transition-all duration-300 h-full flex flex-col">
-						<img src="/cover.webp" alt="Profile" class="w-full h-48 object-cover" fetchpriority="high" decoding="async" width="1280" height="192" />
+					<div
+						class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 blur-3xl"
+					>
+					</div>
+					<div
+						class="relative bg-surface-container border border-white/10 rounded-3xl overflow-hidden shadow-2xl hover:border-primary/50 transition-all duration-300 h-full flex flex-col"
+					>
+						<img
+							src="/cover.webp"
+							alt="Profile"
+							class="w-full h-48 object-cover"
+							fetchpriority="high"
+							decoding="async"
+							width="1280"
+							height="192"
+						/>
 						<div class="p-8 flex-1">
-							<h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
+							<h2
+								class="text-3xl font-bold text-primary mb-6 flex items-center gap-3"
+							>
 								About Me
 							</h2>
 							<div class="text-white/80 text-lg leading-relaxed">
 								<p class="mb-4">
-									I am a Computer Science Master's student from Ghardaia, Algeria, driven by software engineering and tech community leadership.
+									I am a Computer Science Master's student
+									from Ghardaia, Algeria, driven by software
+									engineering and tech community leadership.
 								</p>
 								<p>
-									Beyond engineering, I serve as the volunteer President of GDG Ghardaia, managing a structured team to run events and tech sessions (online and in-person).
+									Beyond engineering, I serve as the volunteer
+									President of GDG Ghardaia, managing a
+									structured team to run events and tech
+									sessions (online and in-person).
 								</p>
 							</div>
 						</div>
@@ -115,48 +215,115 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 			<!-- Education Timeline -->
 			<section class="animate-fade-in" style="animation-delay: 0.3s;">
 				<div class="relative h-full">
-					<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"></div>
-					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 shadow-2xl hover:border-primary/50 transition-all duration-300 h-full">
-						<h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
+					<div
+						class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"
+					>
+					</div>
+					<div
+						class="relative bg-surface-container border border-white/10 rounded-3xl p-8 shadow-2xl hover:border-primary/50 transition-all duration-300 h-full"
+					>
+						<h2
+							class="text-3xl font-bold text-primary mb-6 flex items-center gap-3"
+						>
 							Education
 						</h2>
 						<div class="relative">
 							<!-- Timeline Line -->
-							<div class="absolute left-[18px] top-0 bottom-0 w-0.5 bg-primary/35 overflow-hidden">
+							<div
+								class="absolute left-[18px] top-0 bottom-0 w-0.5 bg-primary/35 overflow-hidden"
+							>
 								<!-- Animated Gradient Line -->
-								<div class="absolute inset-0 bg-primary rounded-full animate-timeline-progress"></div>
+								<div
+									class="absolute inset-0 bg-primary rounded-full animate-timeline-progress"
+								>
+								</div>
 								<!-- Electricity Dots -->
-								<div class="electric-dot w-2 h-2 bg-primary rounded-full shadow-lg shadow-primary/60 absolute left-1/2 -translate-x-1/2"></div>
-								<div class="electric-dot w-1.5 h-1.5 bg-secondary rounded-full shadow-lg shadow-secondary/60 absolute left-1/2 -translate-x-1/2" style="animation-delay: 0.6s;"></div>
-								<div class="electric-dot w-1 h-1 bg-tertiary rounded-full shadow-lg shadow-tertiary/60 absolute left-1/2 -translate-x-1/2" style="animation-delay: 1.2s;"></div>
+								<div
+									class="electric-dot w-2 h-2 bg-primary rounded-full shadow-lg shadow-primary/60 absolute left-1/2 -translate-x-1/2"
+								>
+								</div>
+								<div
+									class="electric-dot w-1.5 h-1.5 bg-secondary rounded-full shadow-lg shadow-secondary/60 absolute left-1/2 -translate-x-1/2"
+									style="animation-delay: 0.6s;"
+								>
+								</div>
+								<div
+									class="electric-dot w-1 h-1 bg-tertiary rounded-full shadow-lg shadow-tertiary/60 absolute left-1/2 -translate-x-1/2"
+									style="animation-delay: 1.2s;"
+								>
+								</div>
 							</div>
-							
+
 							<div class="space-y-5 pl-10">
 								<!-- Item 1 -->
 								<div class="relative">
-									<div class="absolute -left-[33px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary border-4 border-surface z-20 shadow-lg shadow-primary/30 animate-dot-pulse"></div>
-									<div class="bg-surface-container-high border border-white/10 rounded-2xl p-5 hover:border-primary/30 transition-all duration-300">
-										<h3 class="text-lg font-bold text-white">University of Ghardaia</h3>
-										<p class="text-primary font-semibold">Master of Science in Intelligent Systems for Knowledge Extraction (SIEC)</p>
-										<p class="text-white/60 mt-1">Ongoing (2nd Year)</p>
+									<div
+										class="absolute -left-[33px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary border-4 border-surface z-20 shadow-lg shadow-primary/30 animate-dot-pulse"
+									>
+									</div>
+									<div
+										class="bg-surface-container-high border border-white/10 rounded-2xl p-5 hover:border-primary/30 transition-all duration-300"
+									>
+										<h3
+											class="text-lg font-bold text-white"
+										>
+											University of Ghardaia
+										</h3>
+										<p class="text-primary font-semibold">
+											Master of Science in Intelligent
+											Systems for Knowledge Extraction
+											(SIEC)
+										</p>
+										<p class="text-white/60 mt-1">
+											Ongoing (2nd Year)
+										</p>
 									</div>
 								</div>
 								<!-- Item 2 -->
 								<div class="relative">
-									<div class="absolute -left-[33px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-secondary border-4 border-surface z-20 shadow-lg shadow-secondary/30 animate-dot-pulse" style="animation-delay: 0.3s;"></div>
-									<div class="bg-surface-container-high border border-white/10 rounded-2xl p-5 hover:border-secondary/30 transition-all duration-300">
-										<h3 class="text-lg font-bold text-white">University of Ghardaia</h3>
-										<p class="text-secondary font-semibold">Bachelor of Science in Information Systems (SI)</p>
-										<p class="text-white/60 mt-1">Graduated June 2022</p>
+									<div
+										class="absolute -left-[33px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-secondary border-4 border-surface z-20 shadow-lg shadow-secondary/30 animate-dot-pulse"
+										style="animation-delay: 0.3s;"
+									>
+									</div>
+									<div
+										class="bg-surface-container-high border border-white/10 rounded-2xl p-5 hover:border-secondary/30 transition-all duration-300"
+									>
+										<h3
+											class="text-lg font-bold text-white"
+										>
+											University of Ghardaia
+										</h3>
+										<p class="text-secondary font-semibold">
+											Bachelor of Science in Information
+											Systems (SI)
+										</p>
+										<p class="text-white/60 mt-1">
+											Graduated June 2022
+										</p>
 									</div>
 								</div>
 								<!-- Item 3 -->
 								<div class="relative">
-									<div class="absolute -left-[33px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-tertiary border-4 border-surface z-20 shadow-lg shadow-tertiary/30 animate-dot-pulse" style="animation-delay: 0.6s;"></div>
-									<div class="bg-surface-container-high border border-white/10 rounded-2xl p-5 hover:border-tertiary/30 transition-all duration-300">
-										<h3 class="text-lg font-bold text-white">Algerian Red Crescent</h3>
-										<p class="text-tertiary font-semibold">First Aid Trainee</p>
-										<p class="text-white/60 mt-1">Completed April 2026</p>
+									<div
+										class="absolute -left-[33px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-tertiary border-4 border-surface z-20 shadow-lg shadow-tertiary/30 animate-dot-pulse"
+										style="animation-delay: 0.6s;"
+									>
+									</div>
+									<div
+										class="bg-surface-container-high border border-white/10 rounded-2xl p-5 hover:border-tertiary/30 transition-all duration-300"
+									>
+										<h3
+											class="text-lg font-bold text-white"
+										>
+											Algerian Red Crescent
+										</h3>
+										<p class="text-tertiary font-semibold">
+											First Aid Trainee
+										</p>
+										<p class="text-white/60 mt-1">
+											Completed April 2026
+										</p>
 									</div>
 								</div>
 							</div>
@@ -170,8 +337,11 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 		<section class="mt-6 animate-fade-in" style="animation-delay: 0.4s;">
 			<div class="relative">
 				<!-- Ambient Glow -->
-				<div class="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5 blur-3xl rounded-3xl"></div>
-				
+				<div
+					class="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5 blur-3xl rounded-3xl"
+				>
+				</div>
+
 				<HomeCountsIsland server:defer>
 					<SkeletonCardGrid slot="fallback" variant="stat" />
 				</HomeCountsIsland>
@@ -181,79 +351,186 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 		<!-- Technical Skills -->
 		<section class="mt-6 animate-fade-in" style="animation-delay: 0.5s;">
 			<div class="relative">
-				<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"></div>
-				<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:border-primary/50 transition-all duration-300 overflow-hidden">
-					<div class="absolute -top-20 right-0 w-56 h-56 bg-secondary/10 blur-3xl rounded-full"></div>
+				<div
+					class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"
+				>
+				</div>
+				<div
+					class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:border-primary/50 transition-all duration-300 overflow-hidden"
+				>
+					<div
+						class="absolute -top-20 right-0 w-56 h-56 bg-secondary/10 blur-3xl rounded-full"
+					>
+					</div>
 					<div class="relative">
-						<div class="flex flex-wrap items-end justify-between gap-4 mb-8">
+						<div
+							class="flex flex-wrap items-end justify-between gap-4 mb-8"
+						>
 							<div>
-								<h2 class="text-3xl md:text-4xl font-bold text-primary flex items-center gap-3">
+								<h2
+									class="text-3xl md:text-4xl font-bold text-primary flex items-center gap-3"
+								>
 									Technical Skills
 								</h2>
 							</div>
 						</div>
 
-						<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-5">
-							<div class="xl:col-span-5 bg-surface-container-high border border-secondary/20 rounded-2xl p-6 hover:border-secondary/40 transition-all duration-300 hover:-translate-y-1 group">
-								<div class="flex items-center justify-between mb-4">
-									<h3 class="text-secondary font-bold text-xl">Development</h3>
+						<div
+							class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-5"
+						>
+							<div
+								class="xl:col-span-5 bg-surface-container-high border border-secondary/20 rounded-2xl p-6 hover:border-secondary/40 transition-all duration-300 hover:-translate-y-1 group"
+							>
+								<div
+									class="flex items-center justify-between mb-4"
+								>
+									<h3
+										class="text-secondary font-bold text-xl"
+									>
+										Development
+									</h3>
 									<Icon name="projects" size={28} />
 								</div>
 								<div class="flex flex-wrap gap-2.5">
-									<span class="px-3 py-1.5 bg-secondary/10 text-secondary border border-secondary/25 rounded-lg text-sm font-medium">Mobile development</span>
-									<span class="px-3 py-1.5 bg-secondary/10 text-secondary border border-secondary/25 rounded-lg text-sm font-medium">WordPress CMS customization</span>
-									<span class="px-3 py-1.5 bg-secondary/10 text-secondary border border-secondary/25 rounded-lg text-sm font-medium">UI/UX implementation</span>
+									<span
+										class="px-3 py-1.5 bg-secondary/10 text-secondary border border-secondary/25 rounded-lg text-sm font-medium"
+										>Mobile development</span
+									>
+									<span
+										class="px-3 py-1.5 bg-secondary/10 text-secondary border border-secondary/25 rounded-lg text-sm font-medium"
+										>WordPress CMS customization</span
+									>
+									<span
+										class="px-3 py-1.5 bg-secondary/10 text-secondary border border-secondary/25 rounded-lg text-sm font-medium"
+										>UI/UX implementation</span
+									>
 								</div>
 							</div>
 
-							<div class="xl:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-5">
-								<div class="bg-surface-container-high border border-primary/20 rounded-2xl p-5 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1">
-									<div class="flex items-center justify-between mb-3">
-										<h3 class="text-primary font-bold text-lg">Automation</h3>
+							<div
+								class="xl:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-5"
+							>
+								<div
+									class="bg-surface-container-high border border-primary/20 rounded-2xl p-5 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1"
+								>
+									<div
+										class="flex items-center justify-between mb-3"
+									>
+										<h3
+											class="text-primary font-bold text-lg"
+										>
+											Automation
+										</h3>
 										<Icon name="automation" size={24} />
 									</div>
 									<div class="flex flex-wrap gap-2">
-										<span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs">n8n workflow design</span>
-										<span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs">Notion automation</span>
-										<span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs">event management systems</span>
+										<span
+											class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs"
+											>n8n workflow design</span
+										>
+										<span
+											class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs"
+											>Notion automation</span
+										>
+										<span
+											class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs"
+											>event management systems</span
+										>
 									</div>
 								</div>
 
-								<div class="bg-surface-container-high border border-tertiary/20 rounded-2xl p-5 hover:border-tertiary/40 transition-all duration-300 hover:-translate-y-1">
-									<div class="flex items-center justify-between mb-3">
-										<h3 class="text-tertiary font-bold text-lg">Design</h3>
+								<div
+									class="bg-surface-container-high border border-tertiary/20 rounded-2xl p-5 hover:border-tertiary/40 transition-all duration-300 hover:-translate-y-1"
+								>
+									<div
+										class="flex items-center justify-between mb-3"
+									>
+										<h3
+											class="text-tertiary font-bold text-lg"
+										>
+											Design
+										</h3>
 										<Icon name="design" size={24} />
 									</div>
 									<div class="flex flex-wrap gap-2">
-										<span class="px-2.5 py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-md text-xs">Adobe Illustrator</span>
-										<span class="px-2.5 py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-md text-xs">Figma</span>
-										<span class="px-2.5 py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-md text-xs">brand identity creation</span>
-										<span class="px-2.5 py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-md text-xs">promotional design</span>
+										<span
+											class="px-2.5 py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-md text-xs"
+											>Adobe Illustrator</span
+										>
+										<span
+											class="px-2.5 py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-md text-xs"
+											>Figma</span
+										>
+										<span
+											class="px-2.5 py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-md text-xs"
+											>brand identity creation</span
+										>
+										<span
+											class="px-2.5 py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-md text-xs"
+											>promotional design</span
+										>
 									</div>
 								</div>
 
-								<div class="bg-surface-container-high border border-error/20 rounded-2xl p-5 hover:border-error/40 transition-all duration-300 hover:-translate-y-1">
-									<div class="flex items-center justify-between mb-3">
-										<h3 class="text-error font-bold text-lg">Business</h3>
+								<div
+									class="bg-surface-container-high border border-error/20 rounded-2xl p-5 hover:border-error/40 transition-all duration-300 hover:-translate-y-1"
+								>
+									<div
+										class="flex items-center justify-between mb-3"
+									>
+										<h3
+											class="text-error font-bold text-lg"
+										>
+											Business
+										</h3>
 										<Icon name="graph" size={24} />
 									</div>
 									<div class="flex flex-wrap gap-2">
-										<span class="px-2.5 py-1 bg-error/10 text-error border border-error/20 rounded-md text-xs">Design analysis</span>
-										<span class="px-2.5 py-1 bg-error/10 text-error border border-error/20 rounded-md text-xs">social media analytics</span>
-										<span class="px-2.5 py-1 bg-error/10 text-error border border-error/20 rounded-md text-xs">event operations</span>
-										<span class="px-2.5 py-1 bg-error/10 text-error border border-error/20 rounded-md text-xs">partnership management</span>
+										<span
+											class="px-2.5 py-1 bg-error/10 text-error border border-error/20 rounded-md text-xs"
+											>Design analysis</span
+										>
+										<span
+											class="px-2.5 py-1 bg-error/10 text-error border border-error/20 rounded-md text-xs"
+											>social media analytics</span
+										>
+										<span
+											class="px-2.5 py-1 bg-error/10 text-error border border-error/20 rounded-md text-xs"
+											>event operations</span
+										>
+										<span
+											class="px-2.5 py-1 bg-error/10 text-error border border-error/20 rounded-md text-xs"
+											>partnership management</span
+										>
 									</div>
 								</div>
 
-								<div class="bg-surface-container-high border border-primary/20 rounded-2xl p-5 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1">
-									<div class="flex items-center justify-between mb-3">
-										<h3 class="text-primary font-bold text-lg">Tools</h3>
+								<div
+									class="bg-surface-container-high border border-primary/20 rounded-2xl p-5 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1"
+								>
+									<div
+										class="flex items-center justify-between mb-3"
+									>
+										<h3
+											class="text-primary font-bold text-lg"
+										>
+											Tools
+										</h3>
 										<Icon name="windows" size={24} />
 									</div>
 									<div class="flex flex-wrap gap-2">
-										<span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs">Microsoft Office Suite</span>
-										<span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs">Google Workspace</span>
-										<span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs">event management platforms</span>
+										<span
+											class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs"
+											>Microsoft Office Suite</span
+										>
+										<span
+											class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs"
+											>Google Workspace</span
+										>
+										<span
+											class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/20 rounded-md text-xs"
+											>event management platforms</span
+										>
 									</div>
 								</div>
 							</div>
@@ -267,9 +544,16 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 		<section class="mt-6 animate-fade-in" style="animation-delay: 0.6s;">
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 				<div class="relative h-full">
-					<div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 blur-3xl"></div>
-					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:border-primary/50 transition-all duration-300 h-full">
-						<h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
+					<div
+						class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 blur-3xl"
+					>
+					</div>
+					<div
+						class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:border-primary/50 transition-all duration-300 h-full"
+					>
+						<h2
+							class="text-3xl font-bold text-primary mb-6 flex items-center gap-3"
+						>
 							Soft Skills
 						</h2>
 						<ul class="space-y-3">
@@ -300,39 +584,69 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 						</ul>
 					</div>
 				</div>
-				
+
 				<div class="relative h-full">
-					<div class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"></div>
-					<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:border-primary/50 transition-all duration-300 h-full">
-						<h2 class="text-3xl font-bold text-primary mb-6 flex items-center gap-3">
+					<div
+						class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"
+					>
+					</div>
+					<div
+						class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:border-primary/50 transition-all duration-300 h-full"
+					>
+						<h2
+							class="text-3xl font-bold text-primary mb-6 flex items-center gap-3"
+						>
 							Languages
 						</h2>
 						<div class="space-y-4">
 							<div>
 								<div class="flex justify-between mb-2">
-									<span class="text-white font-semibold">Arabic</span>
+									<span class="text-white font-semibold"
+										>Arabic</span
+									>
 									<span class="text-white/70">Native</span>
 								</div>
-								<div class="h-2 bg-white/10 rounded-full overflow-hidden">
-									<div class="h-full bg-primary rounded-full w-full"></div>
+								<div
+									class="h-2 bg-white/10 rounded-full overflow-hidden"
+								>
+									<div
+										class="h-full bg-primary rounded-full w-full"
+									>
+									</div>
 								</div>
 							</div>
 							<div>
 								<div class="flex justify-between mb-2">
-									<span class="text-white font-semibold">English</span>
-									<span class="text-white/70">Intermediate (B1)</span>
+									<span class="text-white font-semibold"
+										>English</span
+									>
+									<span class="text-white/70"
+										>Intermediate (B1)</span
+									>
 								</div>
-								<div class="h-2 bg-white/10 rounded-full overflow-hidden">
-									<div class="h-full bg-secondary rounded-full w-1/2"></div>
+								<div
+									class="h-2 bg-white/10 rounded-full overflow-hidden"
+								>
+									<div
+										class="h-full bg-secondary rounded-full w-1/2"
+									>
+									</div>
 								</div>
 							</div>
 							<div>
 								<div class="flex justify-between mb-2">
-									<span class="text-white font-semibold">French</span>
+									<span class="text-white font-semibold"
+										>French</span
+									>
 									<span class="text-white/70">Basic</span>
 								</div>
-								<div class="h-2 bg-white/10 rounded-full overflow-hidden">
-									<div class="h-full bg-tertiary rounded-full w-1/6"></div>
+								<div
+									class="h-2 bg-white/10 rounded-full overflow-hidden"
+								>
+									<div
+										class="h-full bg-tertiary rounded-full w-1/6"
+									>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -344,9 +658,16 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 		<!-- Contact Information -->
 		<section class="my-6 animate-fade-in" style="animation-delay: 0.7s;">
 			<div class="relative">
-				<div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-tertiary/5 blur-3xl"></div>
-				<div class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:border-primary/50 transition-all duration-300">
-					<h2 class="text-3xl md:text-4xl font-bold text-primary mb-8 flex items-center gap-3">
+				<div
+					class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-tertiary/5 blur-3xl"
+				>
+				</div>
+				<div
+					class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover:border-primary/50 transition-all duration-300"
+				>
+					<h2
+						class="text-3xl md:text-4xl font-bold text-primary mb-8 flex items-center gap-3"
+					>
 						Contact
 					</h2>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -357,18 +678,26 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 							rel="noopener noreferrer"
 							class="bg-surface-container-high border border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 block group cursor-pointer"
 						>
-							<div class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center text-primary flex-shrink-0 shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform duration-300">
+							<div
+								class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center text-primary flex-shrink-0 shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform duration-300"
+							>
 								<Icon name="phone" size={28} />
 							</div>
 							<div>
-								<h3 class="text-white font-semibold flex items-center gap-2">
+								<h3
+									class="text-white font-semibold flex items-center gap-2"
+								>
 									Phone & WhatsApp
 								</h3>
 								<p class="text-white/70 mt-1">
-									<span class="obfuscated">16 77 73 165 312+</span>
+									<span class="obfuscated"
+										>16 77 73 165 312+</span
+									>
 								</p>
 								<p class="text-white/70">
-									<span class="obfuscated">31 65 98 676 312+</span>
+									<span class="obfuscated"
+										>31 65 98 676 312+</span
+									>
 								</p>
 							</div>
 						</a>
@@ -377,15 +706,21 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 							onclick="this.setAttribute('href','mailto:'+atob('YWJkZXJyYWhtYW5lLnNhb3VkaS4yNkBnbWFpbC5jb20='))"
 							class="bg-surface-container-high border border-white/10 rounded-2xl p-6 flex items-start gap-4 hover:border-secondary/30 transition-all duration-300 hover:-translate-y-1 block group cursor-pointer"
 						>
-							<div class="w-12 h-12 bg-secondary/20 rounded-xl flex items-center justify-center text-secondary flex-shrink-0 shadow-lg shadow-secondary/10 group-hover:scale-105 transition-transform duration-300">
+							<div
+								class="w-12 h-12 bg-secondary/20 rounded-xl flex items-center justify-center text-secondary flex-shrink-0 shadow-lg shadow-secondary/10 group-hover:scale-105 transition-transform duration-300"
+							>
 								<Icon name="mail" size={28} />
 							</div>
 							<div>
-								<h3 class="text-white font-semibold flex items-center gap-2">
+								<h3
+									class="text-white font-semibold flex items-center gap-2"
+								>
 									Email
 								</h3>
 								<p class="text-white/70 mt-1">
-									<span class="obfuscated">moc.kcud@62iduoas</span>
+									<span class="obfuscated"
+										>moc.kcud@62iduoas</span
+									>
 								</p>
 							</div>
 						</a>
@@ -400,7 +735,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 	@keyframes fade-in {
 		from {
 			opacity: 0;
-			transform: translate3d(0, 20px, 0);
+			transform: translate3d(0, 24px, 0);
 		}
 		to {
 			opacity: 1;
@@ -409,7 +744,15 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 	}
 
 	.animate-fade-in {
-		animation: fade-in 0.8s ease-out forwards;
+		animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+
+	@supports (animation-timeline: view()) {
+		.animate-fade-in {
+			animation: fade-in linear both;
+			animation-timeline: view();
+			animation-range: entry 5% entry 35%;
+		}
 	}
 
 	@keyframes timeline-progress {
@@ -426,7 +769,8 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 	}
 
 	@keyframes dot-pulse {
-		0%, 100% {
+		0%,
+		100% {
 			transform: scale3d(1, 1, 1);
 		}
 		50% {
@@ -469,12 +813,15 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 	.electric-dot {
 		top: 0;
 		transform: translate3d(-50%, -14%, 0);
-		animation: electric-flow 2.2s linear infinite, electric-flicker 0.9s ease-in-out infinite;
+		animation:
+			electric-flow 2.2s linear infinite,
+			electric-flicker 0.9s ease-in-out infinite;
 		will-change: transform, opacity, filter;
 	}
 
 	@keyframes glow-pulse {
-		0%, 100% {
+		0%,
+		100% {
 			opacity: 0.4;
 			transform: translate3d(-50%, 0, 0) scale3d(0.9, 1, 1);
 		}
@@ -490,7 +837,8 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 	}
 
 	@keyframes orb-pulse {
-		0%, 100% {
+		0%,
+		100% {
 			opacity: 0.3;
 			transform: scale3d(1, 1, 1);
 		}
@@ -504,5 +852,4 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, s
 		animation: orb-pulse 2.5s ease-in-out infinite;
 		will-change: transform, opacity;
 	}
-
 </style>
