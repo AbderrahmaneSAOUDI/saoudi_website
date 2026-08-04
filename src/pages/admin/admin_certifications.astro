@@ -2,6 +2,7 @@
 import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
 import AdminLayout from "../../components/admin/AdminLayout.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
+import GlobalLightbox from "../../components/GlobalLightbox.astro";
 import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
 import Icon from "../../components/Icon.astro";
 import AdminControlsStrip from "../../components/admin/AdminControlsStrip.astro";
@@ -366,6 +367,9 @@ try {
 		</div>
 	</AdminLayout>
 	<AdminNavDock currentPath={Astro.url.pathname} />
+
+	<!-- Render Lightbox outside transform scopes -->
+	<GlobalLightbox />
 </BackgroundBaseLayout>
 
 <script is:inline define:vars={{ initialCertificates: certificates, isPrimaryAdmin }}>
@@ -514,8 +518,7 @@ try {
 						${cert.imageUrl ? `
 							<div class="relative">
 								<a
-									href="${cert.imageUrl}"
-									target="_blank"
+									href="#global-lightbox"
 									data-lightbox-src="${cert.imageUrl}"
 									data-lightbox-title="${cert.title || ''}"
 									data-lightbox-subtitle="${cert.issuer || ''}"
