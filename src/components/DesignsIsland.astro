@@ -27,6 +27,7 @@ try {
 			db.collection("configuration").doc("designs_companies").get(),
 			db.collection("designs")
 				.select('title', 'imageUrl', 'company', 'date', 'tags')
+				.orderBy('date', 'desc')
 				.get(),
 		]);
 
@@ -34,12 +35,6 @@ try {
 			id: doc.id,
 			...doc.data()
 		})) as Design[];
-
-		loadedDesigns.sort((a, b) => {
-			const dateA = a.date || '';
-			const dateB = b.date || '';
-			return dateB.localeCompare(dateA);
-		});
 
 		const configuredCompanies = companiesDoc.data()?.companies;
 		return {
