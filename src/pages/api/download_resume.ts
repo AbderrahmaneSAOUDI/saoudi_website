@@ -24,10 +24,10 @@ export const GET: APIRoute = async ({ redirect, locals, cookies }) => {
 			}
 		}
 
-		// Check if request originates from an authenticated admin or remembered admin device
+		// Check if request originates from an authenticated admin
 		const ignoreCookie = cookies.get('ignore_admin_downloads')?.value;
 		const adminEmail = locals.adminEmail;
-		const hasAdminSession = Boolean(cookies.get('admin_session')?.value || cookies.get('admin_remember')?.value);
+		const hasAdminSession = Boolean(cookies.get('admin_session')?.value);
 		const isAdmin = Boolean(adminEmail || hasAdminSession);
 		
 		// Exclude admin downloads if setting is enabled and requester is an admin (unless cookie is explicitly 'false')

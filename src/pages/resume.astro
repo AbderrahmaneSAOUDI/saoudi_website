@@ -1,20 +1,12 @@
 ---
-/**
- * Resume Page
- * Content loaded via server:defer island for instant page shell rendering.
- */
+export const prerender = true;
+
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ResumeIsland from '../components/ResumeIsland.astro';
-import SkeletonCardGrid from '../components/SkeletonCardGrid.astro';
-
-// Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
-Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=600');
 ---
 
-<BaseLayout title="Resume">
+<BaseLayout title="Resume" description="Download or view the official software engineer resume of Abderrahmane SAOUDI.">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-		<ResumeIsland server:defer>
-			<SkeletonCardGrid slot="fallback" variant="resume" />
-		</ResumeIsland>
+		<ResumeIsland />
 	</div>
 </BaseLayout>

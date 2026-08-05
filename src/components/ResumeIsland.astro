@@ -50,7 +50,7 @@ try {
 		/>
 	</div>
 
-	<!-- Download Actions & Browser Registration Toggle -->
+	<!-- Download Actions -->
 	<div class="flex flex-col items-center gap-3">
 		<button
 			id="btn-trigger-resume-download"
@@ -63,16 +63,6 @@ try {
 			</svg>
 			<span>Download PDF</span>
 		</button>
-
-		<!-- Remember Browser Checkbox -->
-		<label class="inline-flex items-center gap-2 cursor-pointer text-xs text-[#E6E1E5]/70 hover:text-white transition select-none">
-			<input
-				type="checkbox"
-				id="remember-device-toggle"
-				class="w-3.5 h-3.5 rounded border border-white/20 bg-surface-container text-primary focus:ring-primary/40 cursor-pointer accent-[#4285F4]"
-			/>
-			<span>Remember this browser (skip 3s delay)</span>
-		</label>
 	</div>
 
 	<!-- Countdown Modal Overlay -->
@@ -110,23 +100,13 @@ try {
 <script>
 	document.addEventListener('DOMContentLoaded', () => {
 		const downloadBtn = document.getElementById('btn-trigger-resume-download');
-		const rememberToggle = document.getElementById('remember-device-toggle') as HTMLInputElement | null;
 		const modal = document.getElementById('resume-download-modal');
 		const modalCard = modal?.querySelector('div');
 		const countdownDisplay = document.getElementById('countdown-timer-display');
 		const skipBtn = document.getElementById('btn-skip-countdown');
 		const cancelBtn = document.getElementById('btn-cancel-countdown');
 
-		const STORAGE_KEY = 'remember_resume_device';
 		let timerInterval: any = null;
-
-		// Sync initial toggle state from localStorage
-		if (rememberToggle) {
-			rememberToggle.checked = localStorage.getItem(STORAGE_KEY) === 'true';
-			rememberToggle.addEventListener('change', () => {
-				localStorage.setItem(STORAGE_KEY, rememberToggle.checked ? 'true' : 'false');
-			});
-		}
 
 		function triggerDirectDownload() {
 			const link = document.createElement('a');
@@ -171,12 +151,7 @@ try {
 
 		if (downloadBtn) {
 			downloadBtn.addEventListener('click', () => {
-				const isRemembered = localStorage.getItem(STORAGE_KEY) === 'true';
-				if (isRemembered) {
-					triggerDirectDownload();
-				} else {
-					startCountdown();
-				}
+				startCountdown();
 			});
 		}
 

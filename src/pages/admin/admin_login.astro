@@ -12,7 +12,7 @@ const ADMIN_EMAIL = getEnv('ADMIN_EMAIL');
 // Handle authentication POST request
 if (Astro.request.method === 'POST') {
   try {
-    const { credential, rememberMe } = await Astro.request.json();
+    const { credential } = await Astro.request.json();
     if (!credential) {
       return Response.json({ error: 'Missing credential token' }, { status: 400 });
     }
@@ -56,9 +56,8 @@ if (Astro.request.method === 'POST') {
       return Response.json({ error: 'Unauthorized access. Email not accepted.' }, { status: 403 });
     }
 
-    // Issue a secure HTTP-Only, Secure, SameSite cookie configured with expiration (30 days if rememberMe, 7 days default)
-    const isRemember = rememberMe !== false;
-    const maxAgeSeconds = isRemember ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
+    // Issue a secure HTTP-Only, Secure, SameSite cookie configured with expiration (7 days default)
+    const maxAgeSeconds = 7 * 24 * 60 * 60;
     const sessionToken = await createSessionToken(payload.email);
     
     // Log authentication event in system_logs
@@ -69,7 +68,7 @@ if (Astro.request.method === 'POST') {
         type: 'auth',
         action: isPrimary ? 'PRIMARY_ADMIN_LOGIN' : 'SECONDARY_ADMIN_LOGIN',
         title: isPrimary ? 'Owner logged into Admin Dashboard' : `Admin email entered Admin Dashboard: ${userEmail}`,
-        details: `Authenticated via Google GSI for ${userEmail} (Remember Me: ${isRemember})`,
+        details: `Authenticated via Google GSI for ${userEmail}`,
         userEmail: userEmail,
       });
     } catch (logErr) {
@@ -84,14 +83,6 @@ if (Astro.request.method === 'POST') {
       maxAge: maxAgeSeconds,
     });
 
-    Astro.cookies.set('admin_remember', isRemember ? 'true' : 'false', {
-      path: '/',
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      maxAge: 30 * 24 * 60 * 60,
-    });
-
     return Response.json({ success: true });
   } catch (error) {
     console.error('Google GSI verification error:', error);
@@ -104,17 +95,13 @@ const gsiHtml = `
 <script src="https://accounts.google.com/gsi/client" async defer><\/script>
 <script>
   function handleCredentialResponse(response) {
-    var rememberEl = document.getElementById('remember-me-checkbox');
-    var rememberMe = rememberEl ? rememberEl.checked : true;
-
     fetch('/admin/admin_login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        credential: response.credential,
-        rememberMe: rememberMe
+        credential: response.credential
       })
     })
     .then(async res => {
@@ -172,18 +159,6 @@ const gsiHtml = `
           data-callback="handleCredentialResponse">
         </div>
         <div class="w-full flex justify-center rounded-3xl" id="g_id_signin" data-type="standard" data-size="medium" data-theme="dark"></div>
-
-        <div class="mt-4 flex items-center justify-center">
-          <label class="inline-flex items-center gap-2 cursor-pointer text-xs text-[#E6E1E5]/70 hover:text-white transition select-none">
-            <input
-              type="checkbox"
-              id="remember-me-checkbox"
-              checked
-              class="w-4 h-4 rounded border border-white/20 bg-surface-container text-primary focus:ring-primary/40 cursor-pointer accent-[#4285F4]"
-            />
-            <span>Remember me (don't count admin downloads)</span>
-          </label>
-        </div>
 
         <div set:html={gsiHtml}></div>
       </div>

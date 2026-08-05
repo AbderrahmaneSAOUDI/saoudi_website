@@ -2,7 +2,6 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Icon from "../components/Icon.astro";
 import HomeCountsIsland from "../components/HomeCountsIsland.astro";
-import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 
 // Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
 Astro.response.headers.set(
@@ -336,9 +335,7 @@ Astro.response.headers.set(
 				>
 				</div>
 
-				<HomeCountsIsland server:defer>
-					<SkeletonCardGrid slot="fallback" variant="stat" />
-				</HomeCountsIsland>
+				<HomeCountsIsland />
 			</div>
 		</section>
 
@@ -370,7 +367,7 @@ Astro.response.headers.set(
 						</div>
 
 						<div
-							class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-5"
+							class="skills-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-6"
 						>
 							<div
 								class="xl:col-span-5 bg-surface-container-high border border-secondary/20 rounded-2xl p-6 hover:border-secondary/40 transition-all duration-300 hover:-translate-y-1 group"
@@ -402,10 +399,10 @@ Astro.response.headers.set(
 							</div>
 
 							<div
-								class="xl:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-5"
+								class="xl:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6"
 							>
 								<div
-									class="bg-surface-container-high border border-primary/20 rounded-2xl p-5 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1"
+									class="bg-surface-container-high border border-primary/20 rounded-2xl p-6 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1"
 								>
 									<div
 										class="flex items-center justify-between mb-3"
@@ -434,7 +431,7 @@ Astro.response.headers.set(
 								</div>
 
 								<div
-									class="bg-surface-container-high border border-tertiary/20 rounded-2xl p-5 hover:border-tertiary/40 transition-all duration-300 hover:-translate-y-1"
+									class="bg-surface-container-high border border-tertiary/20 rounded-2xl p-6 hover:border-tertiary/40 transition-all duration-300 hover:-translate-y-1"
 								>
 									<div
 										class="flex items-center justify-between mb-3"
@@ -467,7 +464,7 @@ Astro.response.headers.set(
 								</div>
 
 								<div
-									class="bg-surface-container-high border border-error/20 rounded-2xl p-5 hover:border-error/40 transition-all duration-300 hover:-translate-y-1"
+									class="bg-surface-container-high border border-error/20 rounded-2xl p-6 hover:border-error/40 transition-all duration-300 hover:-translate-y-1"
 								>
 									<div
 										class="flex items-center justify-between mb-3"
@@ -500,7 +497,7 @@ Astro.response.headers.set(
 								</div>
 
 								<div
-									class="bg-surface-container-high border border-primary/20 rounded-2xl p-5 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1"
+									class="bg-surface-container-high border border-primary/20 rounded-2xl p-6 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1"
 								>
 									<div
 										class="flex items-center justify-between mb-3"
