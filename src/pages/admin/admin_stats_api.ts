@@ -75,12 +75,6 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
 				sameSite: 'lax',
 				secure: true,
 			});
-			cookies.set('admin_remember', String(newVal), {
-				path: '/',
-				maxAge,
-				sameSite: 'lax',
-				secure: true,
-			});
 
 			await addSystemLog({
 				type: 'content',

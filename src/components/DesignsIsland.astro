@@ -76,6 +76,13 @@ const activeGroups = Object.keys(designsByCompany)
 		if (indexA !== -1 && indexB !== -1) return indexA - indexB;
 		return a.localeCompare(b);
 	});
+
+let runningCount = 0;
+const groupOffsets = activeGroups.map(co => {
+	const currentOffset = runningCount;
+	runningCount += designsByCompany[co].length;
+	return currentOffset;
+});
 ---
 
 {errorMsg && (
@@ -88,6 +95,7 @@ const activeGroups = Object.keys(designsByCompany)
 <div class="space-y-12">
 	{activeGroups.map((companyName, groupIndex) => {
 		const groupDesigns = designsByCompany[companyName];
+		const groupOffset = groupOffsets[groupIndex];
 		const toggleId = `toggle-company-${groupIndex}`;
 		return (
 			<section class="space-y-4 animate-page-slide-up" style={`animation-delay: ${100 + groupIndex * 100}ms;`}>
@@ -113,11 +121,20 @@ const activeGroups = Object.keys(designsByCompany)
 				<div class="grid grid-rows-[0fr] opacity-0 -translate-y-3 pointer-events-none group-collapse-grid will-change-[grid-template-rows] transition-[grid-template-rows,opacity,transform] duration-400 ease-[cubic-bezier(0.2,0,0.2,1)] peer-checked:grid-rows-[1fr] peer-checked:opacity-100 peer-checked:translate-y-0 peer-checked:pointer-events-auto">
 					<div class="overflow-hidden">
 						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 pb-1">
-							{groupDesigns.map((design, index) => (
-								<div class="animate-page-card-fade" style={`animation-delay: ${index * 50}ms`}>
-									<Card item={design} type="design" />
-								</div>
-							))}
+							{groupDesigns.map((design, index) => {
+								const globalIndex = groupOffset + index;
+								const isEager = globalIndex < 4;
+								return (
+									<div class="animate-page-card-fade" style={`animation-delay: ${index * 50}ms`}>
+										<Card
+											item={design}
+											type="design"
+											loading={isEager ? 'eager' : 'lazy'}
+											fetchpriority={isEager ? 'high' : 'auto'}
+										/>
+									</div>
+								);
+							})}
 						</div>
 					</div>
 				</div>

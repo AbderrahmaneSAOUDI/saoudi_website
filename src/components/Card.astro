@@ -7,15 +7,25 @@
  */
 import type { Design, Certificate, Project } from '../types';
 import Icon from './Icon.astro';
+import { getThumbnailUrl, getImageSrcSet } from '../lib/images';
 
 interface Props {
 	item: Design | Certificate | Project;
 	type: 'design' | 'certificate' | 'project';
 	isAdmin?: boolean;
 	isLoading?: boolean;
+	loading?: 'lazy' | 'eager';
+	fetchpriority?: 'high' | 'low' | 'auto';
 }
 
-const { item, type, isAdmin = false, isLoading = false } = Astro.props;
+const {
+	item,
+	type,
+	isAdmin = false,
+	isLoading = false,
+	loading = 'lazy',
+	fetchpriority = 'auto',
+} = Astro.props;
 const design = !isLoading && type === 'design' ? (item as Design) : undefined;
 const certificate = !isLoading && type === 'certificate' ? (item as Certificate) : undefined;
 const project = !isLoading && type === 'project' ? (item as Project) : undefined;
@@ -64,7 +74,7 @@ const typeColors = {
 {isLoading ? (
 	<article class="border border-white/10 rounded-3xl p-4 bg-surface-container flex flex-col justify-between h-full">
 		<div>
-			<div class="aspect-[16/10] rounded-2xl mb-4 skeleton"></div>
+			<div class="aspect-[16/10] rounded-2xl mb-4 skeleton" style="aspect-ratio: 16 / 10;"></div>
 			<div class="skeleton h-6 w-3/4 mb-2"></div>
 			<div class="flex gap-1.5 mt-2">
 				<div class="skeleton h-5 w-16"></div>
@@ -97,13 +107,20 @@ const typeColors = {
 				data-lightbox-title={design.title || design.company}
 				data-lightbox-subtitle={design.title ? design.company : undefined}
 				class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-0 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block"
+				style="aspect-ratio: 16 / 10;"
 			>
 				<div class="absolute inset-0 skeleton"></div>
 				<img
-					src={design.imageUrl}
+					src={getThumbnailUrl(design.imageUrl, 800)}
+					srcset={getImageSrcSet(design.imageUrl)}
+					sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
 					alt={design.title || design.company}
+					width="400"
+					height="250"
+					style="aspect-ratio: 16 / 10;"
 					class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10 opacity-0"
-					loading="lazy"
+					loading={loading}
+					fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 					decoding="async"
 					onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
 					onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.src='/cover.webp';}"
@@ -147,13 +164,20 @@ const typeColors = {
 						data-lightbox-title={certificate.title}
 						data-lightbox-subtitle={certificate.issuer}
 						class="relative aspect-[16/10] rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block bg-[#1D1B20]"
+						style="aspect-ratio: 16 / 10;"
 					>
 						<div class="absolute inset-0 skeleton"></div>
 						<img
-							src={certificate.imageUrl}
+							src={getThumbnailUrl(certificate.imageUrl, 800)}
+							srcset={getImageSrcSet(certificate.imageUrl)}
+							sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
 							alt={certificate.title}
+							width="400"
+							height="250"
+							style="aspect-ratio: 16 / 10;"
 							class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10 opacity-0"
-							loading="lazy"
+							loading={loading}
+							fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 							decoding="async"
 							onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
 							onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.src='/cover.webp';}"
@@ -231,26 +255,39 @@ const typeColors = {
 						data-lightbox-title={project.title}
 						data-lightbox-subtitle={project.tagline || ''}
 						class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block bg-[#1D1B20]"
+						style="aspect-ratio: 16 / 10;"
 					>
 						<div class="absolute inset-0 skeleton"></div>
 						<img
-							src={project.imageUrl}
+							src={getThumbnailUrl(project.imageUrl, 800)}
+							srcset={getImageSrcSet(project.imageUrl)}
+							sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
 							alt={project.title}
+							width="400"
+							height="250"
+							style="aspect-ratio: 16 / 10;"
 							class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10 opacity-0"
-							loading="lazy"
+							loading={loading}
+							fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 							decoding="async"
 							onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
 							onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.src='/cover.webp';}"
 						/>
 					</a>
 				) : (
-					<div class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 border border-white/10 flex items-center justify-center bg-[#1D1B20]">
+					<div class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 border border-white/10 flex items-center justify-center bg-[#1D1B20]" style="aspect-ratio: 16 / 10;">
 						<div class="absolute inset-0 skeleton"></div>
 						<img
-							src={project.imageUrl}
+							src={getThumbnailUrl(project.imageUrl, 800)}
+							srcset={getImageSrcSet(project.imageUrl)}
+							sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
 							alt={project.title}
+							width="400"
+							height="250"
+							style="aspect-ratio: 16 / 10;"
 							class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10 opacity-0"
-							loading="lazy"
+							loading={loading}
+							fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 							decoding="async"
 							onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();"
 							onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.src='/cover.webp';}"

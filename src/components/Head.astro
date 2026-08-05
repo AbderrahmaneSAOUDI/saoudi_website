@@ -4,18 +4,24 @@ import '../styles/global.css';
 interface Props {
 	title?: string;
 	description?: string;
+	canonical?: string;
+	image?: string;
 }
 
-const { title = 'saoudi.online', description = 'Abderrahmane SAOUDI — Software Engineer, Community Leader, and Graphic Designer from Ghardaia, Algeria.' } = Astro.props;
+const {
+	title = 'saoudi.online',
+	description = 'Abderrahmane SAOUDI — Software Engineer, Community Leader, and Graphic Designer from Ghardaia, Algeria.',
+	canonical,
+	image = '/profile.webp',
+} = Astro.props;
+
 const pageTitle = title === 'saoudi.online' ? title : `${title} | saoudi.online`;
 
-/**
- * Canonical URL for SEO (prevents duplicate content issues).
- * Uses Astro.url which is already the full resolved URL.
- */
-const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
-// IMPORTANT: og:image and twitter:image MUST be absolute URLs — relative paths are ignored by crawlers.
-const ogImageUrl = new URL('/profile.webp', Astro.site ?? Astro.url.origin).href;
+const siteUrl = Astro.site?.href ?? 'https://www.saoudi.online';
+const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).href;
+const ogImageUrl = image.startsWith('http://') || image.startsWith('https://')
+	? image
+	: new URL(image, siteUrl).href;
 ---
 
 <head>
@@ -52,6 +58,10 @@ const ogImageUrl = new URL('/profile.webp', Astro.site ?? Astro.url.origin).href
     {/* PERFORMANCE: Preconnect + dns-prefetch to Firebase Storage for faster image loads */}
     <link rel="preconnect" href="https://storage.googleapis.com" crossorigin />
     <link rel="dns-prefetch" href="https://storage.googleapis.com" />
+
+    {/* PERFORMANCE: Preload WOFF2 core fonts */}
+    <link rel="preload" href="/fonts/GoogleSans-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/GoogleSans-Bold.woff2" as="font" type="font/woff2" crossorigin />
 
     {/* ADMIN PREFERENCE: Restore shortcuts visibility state prior to render */}
     <script is:inline>

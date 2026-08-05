@@ -1,22 +1,14 @@
 ---
-/**
- * Projects Page
- * Content loaded via server:defer island for instant page shell rendering.
- */
+export const prerender = true;
+
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GlobalLightbox from '../components/GlobalLightbox.astro';
 import ProjectsIsland from '../components/ProjectsIsland.astro';
-import SkeletonCardGrid from '../components/SkeletonCardGrid.astro';
-
-// Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
-Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=600');
 ---
 
-<BaseLayout title="Projects">
+<BaseLayout title="Projects" description="Explore open-source software, web apps, and full-stack projects by Abderrahmane SAOUDI.">
 	<div class="mx-auto px-4 sm:px-6 lg:px-8 pt-8 max-w-7xl">
-		<ProjectsIsland server:defer>
-			<SkeletonCardGrid slot="fallback" variant="project" count={6} groups={2} />
-		</ProjectsIsland>
+		<ProjectsIsland />
 	</div>
 
 	<!-- Render Lightbox outside transform scopes -->

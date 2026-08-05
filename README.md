@@ -82,7 +82,7 @@
 
 - **Animated Background:** A persistent, ambient background animation implemented in `src/styles/global.css` using CSS `@keyframes` (e.g., slow-floating geometric shapes or radial ambient pulses). Shapes are tinted using soft desaturated Google brand accents at low opacity.
 
-- **Hover & Interaction:** Every card, button, link, and chip uses Tailwind-native transitions: `transition-all duration-300 ease-in-out`, combined with M3-like elevation changes (`hover:-translate-y-1.5`, `hover:shadow-lg`) and ring indicators (`hover:ring-2 hover:ring-primary/40`).
+- **Hover & Interaction:** Every card, button, link, and chip uses Tailwind-native transitions: `transition-all duration-300 ease-in-out`, combined with M3-like elevation changes (`hover:-translate-y-1.5`) and ring indicators (`hover:ring-2 hover:ring-primary/40`).
 
 - **Motion Easing:** Use M3-appropriate easing via Tailwind (`ease-in-out`) or custom cubic curves (`cubic-bezier(0.2, 0.0, 0.2, 1)`). Staggered entry animations use pure CSS animation-delay utility attributes.
 

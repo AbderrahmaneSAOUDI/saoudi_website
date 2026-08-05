@@ -1,10 +1,9 @@
 ---
 /**
- * HomeCountsIsland — Server Island for Dashboard Counts
+ * HomeCountsIsland — Server-side Stat Counters
  * 
- * Deferred component fetched asynchronously via server:defer.
- * Renders the statistics grid with live Firestore counts.
- * The parent page shows skeleton cards while this loads.
+ * Fetches and computes live aggregate counts from Firestore at build / SSR time.
+ * Renders zero-JS statistics cards directly in the HTML response.
  */
 import Icon from './Icon.astro';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
@@ -46,9 +45,9 @@ try {
 }
 
 function formatStatCount(count: number): string {
-	if (count < 10) return '0';
-	const rounded = Math.floor(count / 10) * 10;
-	return `+${rounded}`;
+	if (count <= 0) return '0';
+	if (count < 10) return `${count}`;
+	return `+${count}`;
 }
 
 const statCards = [

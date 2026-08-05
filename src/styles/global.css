@@ -2,7 +2,8 @@
 
 @font-face {
   font-family: 'Google Sans';
-  src: url('/fonts/GoogleSans-Regular.ttf') format('truetype');
+  src: url('/fonts/GoogleSans-Regular.woff2') format('woff2'),
+       url('/fonts/GoogleSans-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -10,7 +11,8 @@
 
 @font-face {
   font-family: 'Google Sans';
-  src: url('/fonts/GoogleSans-Italic.ttf') format('truetype');
+  src: url('/fonts/GoogleSans-Italic.woff2') format('woff2'),
+       url('/fonts/GoogleSans-Italic.ttf') format('truetype');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
@@ -18,7 +20,8 @@
 
 @font-face {
   font-family: 'Google Sans';
-  src: url('/fonts/GoogleSans-Medium.ttf') format('truetype');
+  src: url('/fonts/GoogleSans-Medium.woff2') format('woff2'),
+       url('/fonts/GoogleSans-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -26,7 +29,8 @@
 
 @font-face {
   font-family: 'Google Sans';
-  src: url('/fonts/GoogleSans-MediumItalic.ttf') format('truetype');
+  src: url('/fonts/GoogleSans-MediumItalic.woff2') format('woff2'),
+       url('/fonts/GoogleSans-MediumItalic.ttf') format('truetype');
   font-weight: 500;
   font-style: italic;
   font-display: swap;
@@ -34,7 +38,8 @@
 
 @font-face {
   font-family: 'Google Sans';
-  src: url('/fonts/GoogleSans-Bold.ttf') format('truetype');
+  src: url('/fonts/GoogleSans-Bold.woff2') format('woff2'),
+       url('/fonts/GoogleSans-Bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -42,7 +47,8 @@
 
 @font-face {
   font-family: 'Google Sans';
-  src: url('/fonts/GoogleSans-BoldItalic.ttf') format('truetype');
+  src: url('/fonts/GoogleSans-BoldItalic.woff2') format('woff2'),
+       url('/fonts/GoogleSans-BoldItalic.ttf') format('truetype');
   font-weight: 700;
   font-style: italic;
   font-display: swap;
@@ -393,7 +399,6 @@ select option:checked {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #57CAFF; /* Glowing light Google blue */
-  box-shadow: 0 0 10px rgba(87, 202, 255, 0.7);
 }
 
 ::-webkit-scrollbar-thumb:active {
@@ -464,6 +469,12 @@ html[data-hide-shortcuts="true"] kbd {
 }
 
 /* ── Accessibility & Focus Indicator (WCAG 2.2 AAA) ──────────────────── */
+:root {
+  --surface-bg: #0b0f19;
+  --text-primary: #ffffff;   /* 18.5:1 ratio */
+  --text-secondary: #e2e8f0; /* 13.2:1 ratio (Passes AAA) */
+}
+
 :focus-visible {
   outline: 3px solid #38bdf8 !important;
   outline-offset: 3px !important;
@@ -471,6 +482,6 @@ html[data-hide-shortcuts="true"] kbd {
 }
 
 .text-muted {
-  color: #E2E8F0;
+  color: var(--text-secondary, #E2E8F0);
 }
 

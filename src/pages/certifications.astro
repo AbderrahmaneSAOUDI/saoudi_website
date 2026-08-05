@@ -1,22 +1,14 @@
 ---
-/**
- * Certifications Page
- * Content loaded via server:defer island for instant page shell rendering.
- */
+export const prerender = true;
+
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GlobalLightbox from '../components/GlobalLightbox.astro';
 import CertificationsIsland from '../components/CertificationsIsland.astro';
-import SkeletonCardGrid from '../components/SkeletonCardGrid.astro';
-
-// Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
-Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=600');
 ---
 
-<BaseLayout title="Certifications">
+<BaseLayout title="Certifications" description="Professional certifications, credentials, and achievements of Abderrahmane SAOUDI.">
 	<div class="mx-auto px-4 sm:px-6 lg:px-8 pt-8 max-w-7xl">
-		<CertificationsIsland server:defer>
-			<SkeletonCardGrid slot="fallback" variant="certificate" count={8} groups={2} />
-		</CertificationsIsland>
+		<CertificationsIsland />
 	</div>
 
 	{/* Render Lightbox outside transform scopes */}
