@@ -24,6 +24,7 @@ let projectsCount = 0;
 let experienceCount = 0;
 let designsCount = 0;
 let certificatesCount = 0;
+let servicesCount = 0;
 let volunteeringCount = 0;
 let resumeDownloadsCount = 0;
 let systemStatus = "Connected";
@@ -35,6 +36,7 @@ type DashboardCounts = {
   experience: number;
   designs: number;
   certificates: number;
+  services: number;
   volunteering: number;
   resumeDownloads: number;
 };
@@ -46,11 +48,12 @@ try {
     const db = getFirebaseAdminDb();
     
     // Parallel asynchronous fetching of the collections' count metrics
-    const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, volunteeringSnap, configSnap] = await Promise.all([
+    const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, servicesSnap, volunteeringSnap, configSnap] = await Promise.all([
       db.collection("projects").count().get(),
       db.collection("experience").count().get(),
       db.collection("designs").count().get(),
       db.collection("certificates").count().get(),
+      db.collection("services").count().get(),
       db.collection("volunteering").count().get(),
       db.collection("configuration").doc("static_data").get(),
     ]);
@@ -60,6 +63,7 @@ try {
       experience: experienceSnap.data().count,
       designs: designsSnap.data().count,
       certificates: certificatesSnap.data().count,
+      services: servicesSnap.data().count,
       volunteering: volunteeringSnap.data().count,
       resumeDownloads: configSnap.exists ? (configSnap.data()?.resumeDownloads || 0) : 0,
     };
@@ -70,6 +74,7 @@ try {
     experienceCount = counts.experience;
     designsCount = counts.designs;
     certificatesCount = counts.certificates;
+    servicesCount = counts.services;
     volunteeringCount = counts.volunteering;
     resumeDownloadsCount = counts.resumeDownloads;
   } catch (error) {
@@ -81,6 +86,7 @@ try {
     experienceCount = -1;
     designsCount = -1;
     certificatesCount = -1;
+    servicesCount = -1;
     volunteeringCount = -1;
 }
 
@@ -139,6 +145,7 @@ const metrics = {
     experience: experienceCount,
     designs: designsCount,
     certificates: certificatesCount,
+    services: servicesCount,
     volunteering: volunteeringCount,
     resumeDownloads: resumeDownloadsCount,
   },

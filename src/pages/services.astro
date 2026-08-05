@@ -1,0 +1,197 @@
+---
+/**
+ * Services Public Page
+ *
+ * Displays professional services offered by Abderrahmane SAOUDI.
+ * Fetches services from Firestore server-side with zero client JS.
+ * Includes the reusable ContactCard component at the bottom.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
+import ContactCard from "../components/ContactCard.astro";
+import type { Service } from "../types";
+import { getFirebaseAdminDb } from "../lib/server/firebase-admin";
+import { CACHE_TTL_MS, getOrSetCached } from "../lib/server/cache";
+
+// Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
+Astro.response.headers.set(
+	"Cache-Control",
+	"public, max-age=0, s-maxage=3600, stale-while-revalidate=600",
+);
+
+let services: Service[] = [];
+let errorMsg = "";
+
+try {
+	services = await getOrSetCached<Service[]>(
+		"services_list",
+		async () => {
+			const db = getFirebaseAdminDb();
+			const snapshot = await db.collection("services").get();
+			const list = snapshot.docs.map((doc) => {
+				const data = doc.data();
+				return {
+					id: doc.id,
+					order: data.order ?? 0,
+					title: data.title ?? "",
+					description: data.description ?? "",
+					logoUrl: data.logoUrl ?? null,
+					features: data.features ?? [],
+					createdAt: data.createdAt ?? "",
+					updatedAt: data.updatedAt ?? "",
+				};
+			}) as Service[];
+
+			list.sort((a, b) => a.order - b.order);
+			return list;
+		},
+		CACHE_TTL_MS.PUBLIC_DATA,
+	);
+} catch (error) {
+	console.warn("Failed to fetch services for public page:", error);
+	errorMsg = "Degraded mode: Services data is currently offline.";
+}
+
+// Accent colors palette for service cards
+const colorAccents = [
+	{ color: 'primary', bg: 'bg-primary/10', border: 'border-primary/20', text: 'text-primary', hoverBorder: 'hover:border-primary/50', ring: 'hover:ring-primary/40' },
+	{ color: 'secondary', bg: 'bg-secondary/10', border: 'border-secondary/20', text: 'text-secondary', hoverBorder: 'hover:border-secondary/50', ring: 'hover:ring-secondary/40' },
+	{ color: 'tertiary', bg: 'bg-tertiary/10', border: 'border-tertiary/20', text: 'text-tertiary', hoverBorder: 'hover:border-tertiary/50', ring: 'hover:ring-tertiary/40' },
+];
+---
+
+<BaseLayout title="My Services" description="Professional services, consulting, and solutions offered by Abderrahmane SAOUDI.">
+	<div class="mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-16 max-w-7xl">
+		<!-- Page Header -->
+		<section class="mb-10 text-center animate-fade-in">
+			<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs sm:text-sm font-semibold mb-4">
+				<Icon name="business" size={16} />
+				<span>Professional Offerings</span>
+			</div>
+			<h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
+				My <span class="text-primary">Services</span>
+			</h1>
+			<p class="mt-3 text-white/70 text-base sm:text-lg max-w-2xl mx-auto font-light leading-relaxed">
+				Tailored digital solutions, from full-stack web and mobile development to automation systems, brand design, and community tech leadership.
+			</p>
+		</section>
+
+		{errorMsg && (
+			<div class="mb-10 p-4 rounded-2xl bg-error/10 border border-error/30 text-error text-sm text-center">
+				{errorMsg}
+			</div>
+		)}
+
+		<!-- Services Grid -->
+		<section class="mb-12">
+			{services.length > 0 ? (
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+					{services.map((service, index) => {
+						const accent = colorAccents[index % colorAccents.length];
+						const animationDelay = `${(index * 0.12 + 0.1).toFixed(2)}s`;
+						return (
+							<div
+								class={`bg-surface-container border border-white/10 ${accent.hoverBorder} rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 shadow-2xl relative group overflow-hidden animate-service-card`}
+								style={`animation-delay: ${animationDelay};`}
+							>
+								<!-- Top Glow -->
+								<div class={`absolute -top-16 -right-16 w-32 h-32 ${accent.bg} blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+
+								<div>
+									<!-- Card Header: Icon/Logo & Title -->
+									<div class="flex items-center gap-4 mb-5 relative z-10">
+										<div class={`w-14 h-14 rounded-2xl ${accent.bg} border ${accent.border} overflow-hidden flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300`}>
+											{service.logoUrl ? (
+												<img
+													src={service.logoUrl}
+													alt={service.title}
+													class="w-full h-full object-contain p-2.5"
+													loading={index < 3 ? 'eager' : 'lazy'}
+												/>
+											) : (
+												<Icon name="business" size={28} class={accent.text} />
+											)}
+										</div>
+										<div>
+											<h3 class="font-bold text-white text-xl sm:text-2xl tracking-tight leading-snug group-hover:text-primary transition-colors">
+												{service.title}
+											</h3>
+										</div>
+									</div>
+
+									<!-- Service Description -->
+									<p class="text-white/80 text-sm sm:text-base leading-relaxed mb-6 font-normal relative z-10">
+										{service.description}
+									</p>
+
+									<!-- Features List -->
+									{service.features && service.features.length > 0 && (
+										<div class="border-t border-white/10 pt-5 mt-auto relative z-10">
+											<h4 class="text-xs font-semibold uppercase tracking-wider text-white/50 mb-3">Key Capabilities</h4>
+											<ul class="space-y-2.5">
+												{service.features.map((feat) => (
+													<li class="flex items-start gap-2.5 text-xs sm:text-sm text-white/80 leading-snug">
+														<span class={`inline-block w-1.5 h-1.5 rounded-full ${accent.text} bg-current mt-1.5 shrink-0`}></span>
+														<span>{feat}</span>
+													</li>
+												))}
+											</ul>
+										</div>
+									)}
+								</div>
+
+								<!-- Action CTA Button -->
+								<div class="mt-8 pt-4 relative z-10">
+									<a
+										href="#contact"
+										onclick="document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth' }); return false;"
+										class={`w-full py-3 px-5 rounded-2xl ${accent.bg} border ${accent.border} ${accent.text} hover:bg-white/10 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-300 active:scale-95`}
+									>
+										<span>Inquire About Service</span>
+										<Icon name="open_in_new" size={16} />
+									</a>
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			) : (
+				!errorMsg && (
+					<div class="py-20 text-center bg-surface-container rounded-3xl border border-white/10 flex flex-col items-center">
+						<div class="p-4 rounded-2xl bg-primary/10 text-primary mb-3">
+							<Icon name="business" size={40} />
+						</div>
+						<p class="font-bold text-white text-lg sm:text-xl">No services listed currently</p>
+						<p class="text-sm text-white/60 mt-1 max-w-md">Services are being updated. Feel free to contact directly for custom project inquiries.</p>
+					</div>
+				)
+			)}
+		</section>
+
+		<!-- Reusable Contact Section -->
+		<div id="contact-section">
+			<ContactCard title="Get In Touch for Services" animationDelay="0.4s" />
+		</div>
+	</div>
+</BaseLayout>
+
+<style>
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.animate-fade-in {
+		animation: fadeIn 0.6s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+	}
+
+	.animate-service-card {
+		animation: fadeIn 0.6s cubic-bezier(0.2, 0, 0.2, 1) both;
+	}
+</style>
