@@ -41,6 +41,8 @@ import experienceFilled from '../icons/experience_filled.svg?raw';
 import facebook from '../icons/facebook.svg?raw';
 import facebookFilled from '../icons/facebook_filled.svg?raw';
 import filter from '../icons/filter.svg?raw';
+import gdg from '../icons/gdg.svg?raw';
+import gdgFilled from '../icons/gdg_filled.svg?raw';
 import github from '../icons/github.svg?raw';
 import githubFilled from '../icons/github_filled.svg?raw';
 import google from '../icons/google.svg?raw';
@@ -116,6 +118,8 @@ const icons = {
     facebook,
     facebook_filled: facebookFilled,
     filter,
+    gdg,
+    gdg_filled: gdgFilled,
     github,
     github_filled: githubFilled,
     google,
@@ -168,10 +172,13 @@ const svgContent = icons[iconName as keyof typeof icons] || icons[name as keyof 
 let processedSvg = svgContent || '';
 if (processedSvg) {
     const fillColor = color || 'currentColor';
-    if (name === 'hide' || name === 'show') {
+    if (iconName === 'telegram' || iconName === 'gdg' || name === 'hide' || name === 'show') {
         processedSvg = processedSvg
             .replace(/stroke="[^"]*"/g, `stroke="${fillColor}"`)
-            .replace(/<svg([^>]*)>/, `<svg$1 fill="none">`);
+            .replace(/fill="[^"]*"/g, '')
+            .replace(/<svg([^>]*)>/, `<svg$1 fill="none" stroke="${fillColor}">`);
+    } else if (iconName === 'gdg_filled') {
+        // Keep multi-color fills in gdg_filled intact
     } else {
         processedSvg = processedSvg
             .replace(/fill="[^"]*"/g, '')
