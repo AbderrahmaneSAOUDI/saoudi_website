@@ -9,7 +9,7 @@ const { currentPath = '/admin' } = Astro.props;
 
 const navItems = [
 	{ label: 'Overview', path: '/admin', iconName: 'home', shortcutKey: '1' },
-	{ label: 'Experience', path: '/admin/admin_experience', iconName: 'experience', disabled: true, shortcutKey: '2' },
+	{ label: 'Experience', path: '/admin/admin_experience', iconName: 'experience', shortcutKey: '2' },
 	{ label: 'Projects', path: '/admin/admin_projects', iconName: 'projects', shortcutKey: '3' },
 	{ label: 'Designs', path: '/admin/admin_designs', iconName: 'design', shortcutKey: '4' },
 	{ label: 'Certifications', path: '/admin/admin_certifications', iconName: 'certifications', shortcutKey: '5' },
@@ -93,7 +93,7 @@ const navItems = [
 		// Number shortcuts to switch workspace or show notification
 		const workspaceRoutes: Record<string, { path: string; label: string; disabled?: boolean }> = {
 			'1': { path: '/admin', label: 'Overview' },
-			'2': { path: '/admin/admin_experience', label: 'Experience', disabled: true },
+			'2': { path: '/admin/admin_experience', label: 'Experience' },
 			'3': { path: '/admin/admin_projects', label: 'Projects' },
 			'4': { path: '/admin/admin_designs', label: 'Designs' },
 			'5': { path: '/admin/admin_certifications', label: 'Certifications' },

@@ -1,10 +1,10 @@
 ---
-export const prerender = true;
-
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Construction from '../layouts/Construction.astro';
+import ExperienceIsland from '../components/ExperienceIsland.astro';
 ---
 
-<BaseLayout title="Experience">
-  <Construction></Construction>
+<BaseLayout title="Experience" description="Professional work experience, roles, and career achievements of Abderrahmane SAOUDI.">
+	<div class="mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 max-w-7xl">
+		<ExperienceIsland />
+	</div>
 </BaseLayout>

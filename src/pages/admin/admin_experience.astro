@@ -2,15 +2,1251 @@
 import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
 import AdminLayout from "../../components/admin/AdminLayout.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
+import GlobalLightbox from "../../components/GlobalLightbox.astro";
+import ConfirmDialog from "../../components/admin/ConfirmDialog.astro";
+import Toast from "../../components/Toast.astro";
+import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
+import Icon from "../../components/Icon.astro";
+import AdminControlsStrip from "../../components/admin/AdminControlsStrip.astro";
+import { getEnv } from "../../lib/server/env";
+import type { Experience } from "../../types";
+import { EMPLOYMENT_TYPES } from "../../types";
 
-// Extra safety: double-check that the middleware successfully set Astro.locals.adminEmail
 const adminEmail = Astro.locals.adminEmail;
 if (!adminEmail) return Astro.redirect("/admin/admin_login");
+
+const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
+const currentAdminEmail = (adminEmail || '').toLowerCase().trim();
+const isPrimaryAdmin = currentAdminEmail === primaryEmail && primaryEmail !== '';
+
+let experiences: Experience[] = [];
+let companies: string[] = [];
+let years: string[] = [];
+let errorMsg = '';
+
+try {
+	const db = getFirebaseAdminDb();
+	const snapshot = await db.collection("experience").get();
+	experiences = snapshot.docs.map(doc => {
+		const data = doc.data();
+		return {
+			id: doc.id,
+			order: data.order ?? 0,
+			role: data.role ?? '',
+			company: data.company ?? '',
+			logoUrl: data.logoUrl ?? null,
+			employmentType: data.employmentType ?? 'Full-time',
+			startDate: data.startDate ?? '',
+			endDate: data.endDate ?? null,
+			responsibilities: data.responsibilities ?? '',
+		};
+	}) as Experience[];
+
+	// Extract unique companies & years
+	companies = [...new Set(experiences.map(e => e.company).filter((c): c is string => Boolean(c)))].sort((a, b) => a.localeCompare(b));
+	years = [...new Set(experiences.map(e => {
+		if (typeof e.startDate === 'string' && e.startDate.includes('-')) {
+			return e.startDate.split('-')[0];
+		}
+		return null;
+	}).filter((y): y is string => Boolean(y)))].sort((a, b) => b.localeCompare(a));
+
+	// Sort by startDate desc
+	experiences.sort((a, b) => b.startDate.localeCompare(a.startDate));
+} catch (error: any) {
+	console.warn("Failed to fetch experiences from Firestore:", error);
+	errorMsg = "Degraded mode: Firestore is not configured or offline.";
+}
 ---
 
-<BackgroundBaseLayout title="Experience Workspace">
-  <AdminLayout title="Experience">
+<BackgroundBaseLayout title="Experience Management — Admin">
+	<AdminLayout title="Experience">
+		<div class="relative min-h-[calc(100vh-140px)]">
+			
+			<!-- Main Content Area -->
+			<div class="space-y-6">
+				<!-- Top Controls Strip -->
+				<AdminControlsStrip
+					searchId="search-input"
+					searchPlaceholder="Search role, company..."
+					filterToggleId="btn-filter-toggle"
+					filterBadgeId="filter-badge"
+					newBtnId="btn-new-experience"
+					newBtnLabel="New"
+				/>
 
-  </AdminLayout>
-  <AdminNavDock currentPath={Astro.url.pathname} />
+				{errorMsg && (
+					<div class="p-4 rounded-2xl bg-[#DB4437]/10 border border-[#DB4437]/30 text-[#DB4437] text-sm flex items-center gap-2.5">
+						<Icon name="alert" size={20} class="w-5 h-5 shrink-0" />
+						<span>{errorMsg}</span>
+					</div>
+				)}
+
+				<!-- Grid of Experiences -->
+				<div id="experiences-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+					{/* Cards will be dynamically rendered via JS */}
+				</div>
+
+				<!-- Load More Button -->
+				<div id="load-more-container" class="flex justify-center">
+					<button
+						id="btn-load-more"
+						class="px-6 py-2.5 rounded-xl border border-[#2B2930] hover:bg-[#2B2930] text-[#E6E1E5] font-semibold text-sm transition-all duration-300 cursor-pointer"
+					>
+						Load More
+					</button>
+				</div>
+			</div>
+
+			<!-- Drawer Backdrop -->
+			<div
+				id="editor-backdrop"
+				class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] transition-opacity duration-300 opacity-0"
+			></div>
+
+			<!-- Sliding Filter Drawer (Starts offscreen translated left) -->
+			<div
+				id="filter-panel"
+				class="fixed top-0 left-0 h-full w-full sm:w-[360px] bg-[#1D1B20] border-r border-[#2B2930] shadow-2xl transition-transform duration-350 ease-[cubic-bezier(0.2,0,0.2,1)] transform -translate-x-full z-[70] p-6 pb-28 sm:pb-6 overflow-y-auto flex flex-col justify-between"
+			>
+				<div class="space-y-5">
+					<div class="border-b border-[#2B2930]/60 pb-4 flex justify-between items-center">
+						<div>
+							<h2 class="text-lg font-bold text-white">Filter Experience</h2>
+							<p class="text-xs text-[#E6E1E5]/50 mt-1">Refine position listing</p>
+						</div>
+						<button
+							type="button"
+							id="btn-close-filters"
+							class="text-[#E6E1E5]/60 hover:text-white transition-colors cursor-pointer text-xl font-bold"
+						>
+							&times;
+						</button>
+					</div>
+
+					<div class="space-y-4">
+						<!-- Employment Type Select -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Employment Type</label>
+							<select
+								id="filter-type"
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+							>
+								<option value="">All Types</option>
+								{EMPLOYMENT_TYPES.map(t => (
+									<option value={t}>{t}</option>
+								))}
+							</select>
+						</div>
+
+						<!-- Company Select -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Company</label>
+							<select
+								id="filter-company"
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+							>
+								<option value="">All Companies</option>
+								{companies.map(comp => (
+									<option value={comp}>{comp}</option>
+								))}
+							</select>
+						</div>
+
+						<!-- Year Select -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Start Year</label>
+							<select
+								id="filter-year"
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+							>
+								<option value="">All Years</option>
+								{years.map(y => (
+									<option value={y}>{y}</option>
+								))}
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="flex gap-3 mt-8 pt-4 border-t border-[#2B2930]/40">
+					<button
+						type="button"
+						id="btn-clear-filters"
+						class="w-full py-2.5 bg-transparent border border-[#2B2930] hover:bg-[#2B2930] text-[#E6E1E5]/60 hover:text-white font-semibold rounded-xl text-xs transition-all cursor-pointer text-center"
+					>
+						Clear Filters
+					</button>
+				</div>
+			</div>
+
+			<!-- Sliding Drawer Detail Editor (Starts offscreen translated right) -->
+			<div
+				id="editor-panel"
+				class="fixed top-0 right-0 h-full w-full sm:w-[460px] bg-[#1D1B20] border-l border-[#2B2930] shadow-2xl transition-transform duration-350 ease-[cubic-bezier(0.2,0,0.2,1)] transform translate-x-full z-[70] p-6 pb-28 sm:pb-6 overflow-y-auto flex flex-col justify-between"
+			>
+				<div class="space-y-5">
+					<div class="border-b border-[#2B2930]/60 pb-4 flex justify-between items-center">
+						<div>
+							<h2 id="editor-heading" class="text-lg font-bold text-white">Create Experience</h2>
+							<p id="editor-subheading" class="text-xs text-[#E6E1E5]/50 mt-1">Add a new professional role</p>
+						</div>
+						<button
+							type="button"
+							id="btn-delete"
+							class="hidden p-2.5 rounded-xl text-[#DB4437] hover:bg-[#DB4437]/10 border border-transparent hover:border-[#DB4437]/20 transition-all cursor-pointer shrink-0 flex items-center gap-1.5"
+							title="Delete Experience (Delete)"
+						>
+							<Icon name="trash" size={20} class="w-5 h-5" />
+							<kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-[#DB4437]/20 text-[#DB4437] rounded border border-[#DB4437]/30">Del</kbd>
+						</button>
+					</div>
+
+					<form id="experience-form" class="space-y-4">
+						<!-- Company Logo File Dropzone (Moved to the Top) -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Company Logo (Optional WebP ≤50KB)</label>
+							<div
+								id="image-drop-zone"
+								class="border-2 border-dashed border-[#2B2930] hover:border-primary/50 rounded-2xl p-4 text-center transition-all duration-300 cursor-pointer group relative overflow-hidden min-h-[140px] flex flex-col items-center justify-center bg-[#141218]"
+							>
+								<input
+									type="file"
+									id="image-file-input"
+									accept="image/jpeg,image/png,image/webp"
+									class="hidden"
+								/>
+								<img
+									id="image-preview"
+									src=""
+									alt="Preview"
+									class="hidden absolute inset-0 w-full h-full object-contain p-2 opacity-80 group-hover:scale-105 transition-all duration-500 z-10"
+								/>
+								<div id="drop-zone-prompt" class="relative z-10 flex flex-col items-center gap-1.5">
+									<div class="p-2 rounded-full bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+										<Icon name="image" size={20} class="w-5 h-5" />
+									</div>
+									<div>
+										<p class="text-xs font-medium text-white flex items-center gap-1.5">
+											Drop logo or <span class="text-primary font-semibold">browse</span>
+											<kbd class="px-1.5 py-0.5 text-[10px] font-mono bg-white/10 text-white/50 rounded border border-white/10">CapsLock</kbd>
+										</p>
+										<p class="text-[10px] text-[#E6E1E5]/40 mt-0.5">JPEG, PNG, WebP (Max 50KB)</p>
+									</div>
+								</div>
+								<div id="file-details" class="hidden relative z-10 text-[10px] bg-[#0F9D58]/10 text-[#0F9D58] border border-[#0F9D58]/20 px-2 py-1 rounded-md font-semibold mt-2">
+									✓ File Selected
+								</div>
+							</div>
+						</div>
+
+						<!-- Read-only experience ID -->
+						<div class="hidden">
+							<input type="text" id="form-id" name="id" readonly />
+						</div>
+
+						<!-- Job Title / Role -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Job Title / Role *</label>
+							<input
+								type="text"
+								id="form-role"
+								name="role"
+								required
+								placeholder="e.g. Senior Software Engineer"
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
+							/>
+						</div>
+
+						<!-- Company Name -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Company Name *</label>
+							<input
+								type="text"
+								id="form-company"
+								name="company"
+								required
+								placeholder="e.g. Google"
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors"
+							/>
+						</div>
+
+						<!-- Employment Type -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Employment Type *</label>
+							<select
+								id="form-employment-type"
+								name="employmentType"
+								required
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary transition-colors cursor-pointer"
+							>
+								{EMPLOYMENT_TYPES.map(t => (
+									<option value={t}>{t}</option>
+								))}
+							</select>
+						</div>
+
+						<!-- Start Date (Design Panel Granular Logic) -->
+						<div>
+							<div class="flex justify-between items-center mb-1.5">
+								<label class="block text-xs font-semibold text-[#E6E1E5]/70">Start Date *</label>
+								<button
+									type="button"
+									id="btn-clear-start-date"
+									class="text-[11px] text-[#E6E1E5]/40 hover:text-primary transition-colors cursor-pointer hidden"
+								>
+									Clear Date
+								</button>
+							</div>
+							<div class="space-y-2">
+								<div class="grid grid-cols-3 gap-2">
+									<div>
+										<label class="block text-[10px] text-[#E6E1E5]/50 mb-1 font-medium">Day</label>
+										<input
+											type="text"
+											id="form-start-date-day"
+											inputmode="numeric"
+											pattern="[0-9]*"
+											maxlength="2"
+											placeholder="DD"
+											class="w-full px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors text-center font-medium"
+										/>
+									</div>
+									<div>
+										<label class="block text-[10px] text-[#E6E1E5]/50 mb-1 font-medium">Month</label>
+										<select
+											id="form-start-date-month"
+											class="w-full px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors cursor-pointer"
+										>
+											<option value="">-- Month --</option>
+											<option value="01">01 - Jan</option>
+											<option value="02">02 - Feb</option>
+											<option value="03">03 - Mar</option>
+											<option value="04">04 - Apr</option>
+											<option value="05">05 - May</option>
+											<option value="06">06 - Jun</option>
+											<option value="07">07 - Jul</option>
+											<option value="08">08 - Aug</option>
+											<option value="09">09 - Sep</option>
+											<option value="10">10 - Oct</option>
+											<option value="11">11 - Nov</option>
+											<option value="12">12 - Dec</option>
+										</select>
+									</div>
+									<div>
+										<label class="block text-[10px] text-[#E6E1E5]/50 mb-1 font-medium">Year</label>
+										<input
+											type="text"
+											id="form-start-date-year"
+											inputmode="numeric"
+											pattern="[0-9]*"
+											maxlength="4"
+											value="2026"
+											placeholder="2026"
+											class="w-full px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors text-center font-medium"
+										/>
+									</div>
+								</div>
+								<input type="hidden" id="form-start-date" name="startDate" />
+							</div>
+						</div>
+
+						<!-- End Date (Optional - Empty = Present) -->
+						<div>
+							<div class="flex justify-between items-center mb-1.5">
+								<div class="flex items-center gap-1.5">
+									<label class="block text-xs font-semibold text-[#E6E1E5]/70">End Date</label>
+									<span class="text-[10px] text-primary/80 font-medium">(Empty = Present)</span>
+								</div>
+								<button
+									type="button"
+									id="btn-clear-end-date"
+									class="text-[11px] text-[#E6E1E5]/40 hover:text-primary transition-colors cursor-pointer hidden"
+								>
+									Clear Date
+								</button>
+							</div>
+							<div class="space-y-2">
+								<div class="grid grid-cols-3 gap-2">
+									<div>
+										<label class="block text-[10px] text-[#E6E1E5]/50 mb-1 font-medium">Day</label>
+										<input
+											type="text"
+											id="form-end-date-day"
+											inputmode="numeric"
+											pattern="[0-9]*"
+											maxlength="2"
+											placeholder="DD"
+											class="w-full px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors text-center font-medium"
+										/>
+									</div>
+									<div>
+										<label class="block text-[10px] text-[#E6E1E5]/50 mb-1 font-medium">Month</label>
+										<select
+											id="form-end-date-month"
+											class="w-full px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors cursor-pointer"
+										>
+											<option value="">-- Month --</option>
+											<option value="01">01 - Jan</option>
+											<option value="02">02 - Feb</option>
+											<option value="03">03 - Mar</option>
+											<option value="04">04 - Apr</option>
+											<option value="05">05 - May</option>
+											<option value="06">06 - Jun</option>
+											<option value="07">07 - Jul</option>
+											<option value="08">08 - Aug</option>
+											<option value="09">09 - Sep</option>
+											<option value="10">10 - Oct</option>
+											<option value="11">11 - Nov</option>
+											<option value="12">12 - Dec</option>
+										</select>
+									</div>
+									<div>
+										<label class="block text-[10px] text-[#E6E1E5]/50 mb-1 font-medium">Year</label>
+										<input
+											type="text"
+											id="form-end-date-year"
+											inputmode="numeric"
+											pattern="[0-9]*"
+											maxlength="4"
+											placeholder="2026"
+											class="w-full px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary transition-colors text-center font-medium"
+										/>
+									</div>
+								</div>
+								<input type="hidden" id="form-end-date" name="endDate" />
+							</div>
+						</div>
+
+						<!-- Responsibilities (Optional) -->
+						<div>
+							<label class="block text-xs font-semibold text-[#E6E1E5]/70 mb-1.5">Key Responsibilities (Markdown) (Optional)</label>
+							<textarea
+								id="form-responsibilities"
+								name="responsibilities"
+								rows="4"
+								placeholder="- Led cross-functional team...&#10;- Built scalable cloud backend..."
+								class="w-full px-4 py-2.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs font-mono leading-relaxed focus:outline-none focus:border-primary transition-colors"
+							></textarea>
+						</div>
+
+						<!-- Status Panel -->
+						<div id="form-status" class="hidden p-3.5 rounded-xl border text-xs font-medium text-center"></div>
+
+						<!-- Form Buttons -->
+						<div class="flex gap-3 pt-2">
+							<button
+								type="button"
+								id="btn-cancel"
+								class="flex-1 py-3 px-4 rounded-xl border border-[#2B2930] hover:bg-[#2B2930] text-[#E6E1E5] font-semibold text-sm transition-all duration-300 cursor-pointer text-center flex items-center justify-center gap-1.5"
+							>
+								<span>Cancel</span>
+								<kbd class="px-1.5 py-0.5 text-[10px] font-mono bg-white/10 text-white/50 rounded border border-white/10">Esc</kbd>
+							</button>
+							<button
+								type="submit"
+								id="btn-save"
+								class="flex-1 py-3 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md"
+							>
+								<Icon name="save" size={16} class="w-4 h-4" />
+								<span id="save-btn-text">Save</span>
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+		</div>
+	</AdminLayout>
+	<AdminNavDock currentPath={Astro.url.pathname} />
+	<GlobalLightbox />
+	<ConfirmDialog />
+	<Toast />
 </BackgroundBaseLayout>
+
+<script is:inline define:vars={{ initialExperiences: experiences, isPrimaryAdmin }}>
+	Object.assign(window, { experiences: initialExperiences || [], isPrimaryAdminUser: isPrimaryAdmin });
+</script>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		// Element Declarations
+		const searchInput = document.getElementById('search-input') as HTMLInputElement;
+		const btnNewExperience = document.getElementById('btn-new-experience') as HTMLButtonElement;
+		const experiencesGrid = document.getElementById('experiences-grid') as HTMLDivElement;
+		const loadMoreBtn = document.getElementById('btn-load-more') as HTMLButtonElement;
+		const loadMoreContainer = document.getElementById('load-more-container') as HTMLDivElement;
+
+		// Filter Elements
+		const btnFilterToggle = document.getElementById('btn-filter-toggle') as HTMLButtonElement;
+		const filterBadge = document.getElementById('filter-badge') as HTMLSpanElement;
+		const filterPanel = document.getElementById('filter-panel') as HTMLDivElement;
+		const filterType = document.getElementById('filter-type') as HTMLSelectElement;
+		const filterCompany = document.getElementById('filter-company') as HTMLSelectElement;
+		const filterYear = document.getElementById('filter-year') as HTMLSelectElement;
+		const btnClearFilters = document.getElementById('btn-clear-filters') as HTMLButtonElement;
+		const btnCloseFilters = document.getElementById('btn-close-filters') as HTMLButtonElement;
+
+		// Drawer Elements
+		const editorPanel = document.getElementById('editor-panel') as HTMLDivElement;
+		const editorBackdrop = document.getElementById('editor-backdrop') as HTMLDivElement;
+		const btnCancel = document.getElementById('btn-cancel') as HTMLButtonElement;
+
+		const editorHeading = document.getElementById('editor-heading') as HTMLHeadingElement;
+		const editorSubheading = document.getElementById('editor-subheading') as HTMLParagraphElement;
+
+		const experienceForm = document.getElementById('experience-form') as HTMLFormElement;
+		const formId = document.getElementById('form-id') as HTMLInputElement;
+		const formRole = document.getElementById('form-role') as HTMLInputElement;
+		const formCompany = document.getElementById('form-company') as HTMLInputElement;
+		const formEmploymentType = document.getElementById('form-employment-type') as HTMLSelectElement;
+		const formResponsibilities = document.getElementById('form-responsibilities') as HTMLTextAreaElement;
+
+		const formStatus = document.getElementById('form-status') as HTMLDivElement;
+		const btnDelete = document.getElementById('btn-delete') as HTMLButtonElement;
+		const btnSave = document.getElementById('btn-save') as HTMLButtonElement;
+		const saveBtnText = document.getElementById('save-btn-text') as HTMLSpanElement;
+
+		// Image Drop Zone Elements
+		const imageDropZone = document.getElementById('image-drop-zone') as HTMLDivElement;
+		const imageFileInput = document.getElementById('image-file-input') as HTMLInputElement;
+		const imagePreview = document.getElementById('image-preview') as HTMLImageElement;
+		const dropZonePrompt = document.getElementById('drop-zone-prompt') as HTMLDivElement;
+		const fileDetails = document.getElementById('file-details') as HTMLDivElement;
+
+		// Local State
+		let currentSelectedId: string | null = null;
+		let selectedLogoFile: File | null = null;
+		let ITEMS_PER_PAGE = 6;
+		let displayedCount = 0;
+		let allExperiences: any[] = (window as any).experiences || [];
+
+		// Generic Date Binder helper for Start Date & End Date (Design panel date logic)
+		function bindDateInputs(prefix: 'start-date' | 'end-date', defaultYear = '') {
+			const dayInput = document.getElementById(`form-${prefix}-day`) as HTMLInputElement;
+			const monthInput = document.getElementById(`form-${prefix}-month`) as HTMLSelectElement;
+			const yearInput = document.getElementById(`form-${prefix}-year`) as HTMLInputElement;
+			const hiddenInput = document.getElementById(`form-${prefix}`) as HTMLInputElement;
+			const clearBtn = document.getElementById(`btn-clear-${prefix}`) as HTMLButtonElement;
+
+			function updateCombined() {
+				let yearVal = yearInput ? yearInput.value.trim() : '';
+				let monthVal = monthInput ? monthInput.value : '';
+				let dayVal = dayInput ? dayInput.value.trim() : '';
+
+				if (dayVal && dayVal.length === 1) dayVal = dayVal.padStart(2, '0');
+
+				let combined = '';
+				if (yearVal && yearVal.length === 4) {
+					if (monthVal) {
+						if (dayVal) combined = `${yearVal}-${monthVal}-${dayVal}`;
+						else combined = `${yearVal}-${monthVal}`;
+					} else combined = yearVal;
+				}
+
+				if (hiddenInput) hiddenInput.value = combined;
+				if (clearBtn) {
+					if (combined) clearBtn.classList.remove('hidden');
+					else clearBtn.classList.add('hidden');
+				}
+			}
+
+			function setFields(dateStr?: string) {
+				if (!dateStr || !dateStr.trim()) {
+					if (yearInput) yearInput.value = defaultYear;
+					if (monthInput) monthInput.value = '';
+					if (dayInput) dayInput.value = '';
+					if (hiddenInput) hiddenInput.value = '';
+					if (clearBtn) clearBtn.classList.add('hidden');
+					return;
+				}
+
+				const trimmed = dateStr.trim();
+				const parts = trimmed.split('-');
+				if (parts.length === 3) {
+					if (yearInput) yearInput.value = parts[0];
+					if (monthInput) monthInput.value = parts[1];
+					if (dayInput) dayInput.value = parts[2];
+				} else if (parts.length === 2) {
+					if (yearInput) yearInput.value = parts[0];
+					if (monthInput) monthInput.value = parts[1];
+					if (dayInput) dayInput.value = '';
+				} else if (parts.length === 1 && parts[0].length === 4) {
+					if (yearInput) yearInput.value = parts[0];
+					if (monthInput) monthInput.value = '';
+					if (dayInput) dayInput.value = '';
+				} else {
+					if (yearInput) yearInput.value = defaultYear;
+					if (monthInput) monthInput.value = '';
+					if (dayInput) dayInput.value = '';
+				}
+				if (hiddenInput) hiddenInput.value = trimmed;
+				if (clearBtn) clearBtn.classList.remove('hidden');
+			}
+
+			let monthKeyBuffer = '';
+			let monthBufferTimer: any = null;
+
+			function handleMonthKeydown(e: KeyboardEvent) {
+				const key = e.key;
+				if (key === 'o' || key === 'O') {
+					e.preventDefault();
+					if (monthInput) {
+						monthInput.value = '10';
+						updateCombined();
+					}
+					return;
+				}
+
+				if (/^[0-9]$/.test(key)) {
+					e.preventDefault();
+					monthKeyBuffer += key;
+
+					if (monthBufferTimer) clearTimeout(monthBufferTimer);
+					monthBufferTimer = setTimeout(() => {
+						monthKeyBuffer = '';
+					}, 1000);
+
+					let num = parseInt(monthKeyBuffer, 10);
+					if (num > 12) {
+						num = parseInt(key, 10);
+						monthKeyBuffer = key;
+					}
+
+					if (num >= 1 && num <= 12 && monthInput) {
+						const formattedVal = String(num).padStart(2, '0');
+						monthInput.value = formattedVal;
+						updateCombined();
+					}
+				}
+			}
+
+			if (dayInput) {
+				dayInput.addEventListener('input', () => {
+					dayInput.value = dayInput.value.replace(/\D/g, '').slice(0, 2);
+					updateCombined();
+				});
+			}
+			if (monthInput) {
+				monthInput.addEventListener('change', updateCombined);
+				monthInput.addEventListener('keydown', handleMonthKeydown);
+			}
+			if (yearInput) {
+				yearInput.addEventListener('focus', () => {
+					if (!yearInput.value && defaultYear) {
+						yearInput.value = defaultYear;
+						updateCombined();
+					}
+				});
+				yearInput.addEventListener('input', () => {
+					yearInput.value = yearInput.value.replace(/\D/g, '').slice(0, 4);
+					updateCombined();
+				});
+			}
+			if (clearBtn) {
+				clearBtn.addEventListener('click', () => setFields(''));
+			}
+
+			return { updateCombined, setFields };
+		}
+
+		const startDateBinder = bindDateInputs('start-date', '2026');
+		const endDateBinder = bindDateInputs('end-date', '');
+
+		// --- Core Setup & Initialization ---
+		renderExperiences();
+		initFromUrl();
+
+		function showEmptyState(title: string, subtitle: string) {
+			const existingEmptyState = experiencesGrid.querySelector('.empty-state');
+			if (existingEmptyState) existingEmptyState.remove();
+
+			const emptyState = document.createElement('div');
+			emptyState.className = 'empty-state col-span-full py-16 text-center text-[#E6E1E5]/50 bg-[#1D1B20] rounded-3xl border border-[#2B2930]';
+			emptyState.innerHTML = `
+				<img src="/no_data.webp" alt="No data" class="w-28 h-28 mx-auto mb-4 object-contain opacity-90" />
+				<p class="font-semibold text-white">${title}</p>
+				<p class="text-xs mt-1">${subtitle}</p>
+			`;
+			experiencesGrid.appendChild(emptyState);
+		}
+
+		function hideEmptyState() {
+			experiencesGrid.querySelector('.empty-state')?.remove();
+		}
+
+		function renderExperiences() {
+			const newCards = allExperiences.slice(displayedCount, displayedCount + ITEMS_PER_PAGE);
+
+			newCards.forEach(exp => {
+				const card = createExperienceCard(exp);
+				experiencesGrid.appendChild(card);
+			});
+
+			displayedCount += newCards.length;
+
+			if (displayedCount >= allExperiences.length) {
+				loadMoreContainer.classList.add('hidden');
+			} else {
+				loadMoreContainer.classList.remove('hidden');
+			}
+
+			if (displayedCount === 0 && allExperiences.length === 0) {
+				showEmptyState('No experience entries found', 'Click "New" to add your first position.');
+			} else {
+				hideEmptyState();
+			}
+
+			attachCardEventListeners();
+		}
+
+		function createExperienceCard(exp: any) {
+			const formatPart = (d?: string | null) => {
+				if (!d) return 'Present';
+				const parts = d.split('-');
+				if (parts.length >= 2) {
+					const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+					const mIdx = parseInt(parts[1], 10) - 1;
+					return `${months[mIdx] || parts[1]} ${parts[0]}`;
+				}
+				return d;
+			};
+			const dateRangeText = `${formatPart(exp.startDate)} — ${formatPart(exp.endDate)}`;
+
+			const cardWrapper = document.createElement('div');
+			cardWrapper.innerHTML = `
+				<article 
+					class="experience-card group border rounded-3xl p-5 transition-all duration-300 flex flex-col justify-between h-full border-[#2B2930] bg-[#1D1B20] hover:ring-2 hover:ring-primary/40 cursor-pointer"
+					data-id="${exp.id}"
+				>
+					<div class="space-y-4">
+						<div class="flex items-start justify-between gap-3">
+							<div class="flex items-center gap-3">
+								<div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
+									${exp.logoUrl ? `
+										<a
+											href="#global-lightbox"
+											data-lightbox-src="${exp.logoUrl}"
+											data-lightbox-title="${exp.role}"
+											data-lightbox-subtitle="${exp.company}"
+											class="block w-full h-full cursor-pointer image-zoom-trigger"
+										>
+											<img
+												src="${exp.logoUrl}"
+												alt="${exp.company}"
+												class="w-full h-full object-contain p-1.5"
+												loading="lazy"
+											/>
+										</a>
+									` : `
+										<Icon name="business" size={24} class="text-white/40" />
+									`}
+								</div>
+								<div>
+									<h3 class="font-bold text-white text-base leading-tight group-hover:text-primary transition-colors">${exp.role}</h3>
+									<p class="text-xs text-[#E6E1E5]/70 font-medium">${exp.company}</p>
+								</div>
+							</div>
+							<span class="px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-semibold shrink-0">
+								${exp.employmentType}
+							</span>
+						</div>
+
+						<div class="flex items-center gap-2 text-xs text-[#E6E1E5]/60 font-mono">
+							<Icon name="calendar" size={14} class="text-primary" />
+							<span>${dateRangeText}</span>
+						</div>
+
+						${exp.responsibilities ? `
+							<p class="text-xs text-[#E6E1E5]/70 line-clamp-3 leading-relaxed whitespace-pre-line border-t border-white/5 pt-3">
+								${exp.responsibilities}
+							</p>
+						` : ''}
+					</div>
+
+					<div class="pt-3 mt-4 border-t border-white/5 flex items-center justify-end text-xs text-white/40">
+						<span class="text-primary opacity-0 group-hover:opacity-100 transition-opacity font-semibold">Click to edit →</span>
+					</div>
+				</article>
+			`;
+			return cardWrapper.firstElementChild as HTMLElement;
+		}
+
+		function attachCardEventListeners() {
+			const cards = experiencesGrid.querySelectorAll('.experience-card') as NodeListOf<HTMLDivElement>;
+			cards.forEach(card => {
+				card.addEventListener('click', (e) => {
+					if ((e.target as HTMLElement).closest('.image-zoom-trigger, [data-lightbox-src]')) {
+						return;
+					}
+					const id = card.getAttribute('data-id');
+					const exp = allExperiences.find((item: any) => item.id === id);
+					if (exp) {
+						const newUrl = new URL(window.location.href);
+						newUrl.searchParams.set('id', exp.id);
+						window.history.pushState(null, '', newUrl.toString());
+
+						selectExperience(exp);
+						openDrawer();
+					}
+				});
+			});
+		}
+
+		loadMoreBtn.addEventListener('click', () => {
+			renderExperiences();
+		});
+
+		function initFromUrl() {
+			const urlParams = new URLSearchParams(window.location.search);
+			const urlId = urlParams.get('id');
+			if (urlId) {
+				const exp = allExperiences.find((item: any) => item.id === urlId);
+				if (exp) {
+					selectExperience(exp);
+					openDrawer();
+				}
+			}
+		}
+
+		// --- Drawer Controls ---
+		function openDrawer() {
+			editorBackdrop.classList.remove('hidden');
+			setTimeout(() => {
+				editorBackdrop.classList.add('opacity-100');
+				editorPanel.classList.remove('translate-x-full');
+				editorPanel.classList.add('translate-x-0');
+			}, 10);
+		}
+
+		function closeDrawer() {
+			editorBackdrop.classList.remove('opacity-100');
+			editorPanel.classList.remove('translate-x-0');
+			editorPanel.classList.add('translate-x-full');
+
+			const newUrl = new URL(window.location.href);
+			newUrl.searchParams.delete('id');
+			window.history.pushState(null, '', newUrl.toString());
+
+			const cards = experiencesGrid.querySelectorAll('.experience-card') as NodeListOf<HTMLDivElement>;
+			cards.forEach(c => c.classList.remove('ring-2', 'ring-primary/60', 'border-primary/50'));
+
+			setTimeout(() => {
+				editorBackdrop.classList.add('hidden');
+			}, 350);
+		}
+
+		function openFilterDrawer() {
+			editorBackdrop.classList.remove('hidden');
+			setTimeout(() => {
+				editorBackdrop.classList.add('opacity-100');
+				filterPanel.classList.remove('-translate-x-full');
+				filterPanel.classList.add('translate-x-0');
+			}, 10);
+		}
+
+		function closeFilterDrawer() {
+			editorBackdrop.classList.remove('opacity-100');
+			filterPanel.classList.remove('translate-x-0');
+			filterPanel.classList.add('-translate-x-full');
+
+			setTimeout(() => {
+				editorBackdrop.classList.add('hidden');
+			}, 350);
+		}
+
+		btnNewExperience.addEventListener('click', () => {
+			setNewExperienceState();
+			openDrawer();
+		});
+
+		btnFilterToggle.addEventListener('click', openFilterDrawer);
+		btnCancel.addEventListener('click', closeDrawer);
+		if (btnCloseFilters) btnCloseFilters.addEventListener('click', closeFilterDrawer);
+
+		editorBackdrop.addEventListener('click', () => {
+			closeDrawer();
+			closeFilterDrawer();
+		});
+
+		// Keyboard Shortcuts (Esc = Close, Del = Delete)
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape') {
+				closeDrawer();
+				closeFilterDrawer();
+			}
+			if (e.key === 'Delete' && currentSelectedId && !editorPanel.classList.contains('translate-x-full')) {
+				if ((window as any).isPrimaryAdminUser) {
+					triggerDeleteExperience();
+				}
+			}
+		});
+
+		// --- Form State Management ---
+		function setNewExperienceState() {
+			currentSelectedId = null;
+			const shortId = (crypto && crypto.randomUUID)
+				? crypto.randomUUID().substring(0, 8)
+				: Math.random().toString(36).substring(2, 10);
+
+			formId.value = `exp_${shortId}`;
+			formRole.value = '';
+			formCompany.value = '';
+			formEmploymentType.value = 'Full-time';
+			formResponsibilities.value = '';
+
+			startDateBinder.setFields('');
+			endDateBinder.setFields('');
+
+			selectedLogoFile = null;
+			imagePreview.src = '';
+			imagePreview.classList.add('hidden');
+			dropZonePrompt.classList.remove('hidden');
+			fileDetails.classList.add('hidden');
+			fileDetails.textContent = '';
+
+			editorHeading.textContent = 'Create Experience';
+			editorSubheading.textContent = 'Add a new professional role';
+			btnDelete.classList.add('hidden');
+
+			clearStatus();
+		}
+
+		function selectExperience(exp: any) {
+			currentSelectedId = exp.id;
+			formId.value = exp.id;
+			formRole.value = exp.role || '';
+			formCompany.value = exp.company || '';
+			formEmploymentType.value = exp.employmentType || 'Full-time';
+			formResponsibilities.value = exp.responsibilities || '';
+
+			startDateBinder.setFields(exp.startDate || '');
+			endDateBinder.setFields(exp.endDate || '');
+
+			selectedLogoFile = null;
+			if (exp.logoUrl) {
+				imagePreview.src = exp.logoUrl;
+				imagePreview.classList.remove('hidden');
+				dropZonePrompt.classList.add('hidden');
+				fileDetails.textContent = '✓ Current Logo';
+				fileDetails.classList.remove('hidden');
+			} else {
+				imagePreview.src = '';
+				imagePreview.classList.add('hidden');
+				dropZonePrompt.classList.remove('hidden');
+				fileDetails.classList.add('hidden');
+				fileDetails.textContent = '';
+			}
+
+			const cards = experiencesGrid.querySelectorAll('.experience-card') as NodeListOf<HTMLDivElement>;
+			cards.forEach(c => {
+				if (c.getAttribute('data-id') === exp.id) {
+					c.classList.add('ring-2', 'ring-primary/60', 'border-primary/50');
+				} else {
+					c.classList.remove('ring-2', 'ring-primary/60', 'border-primary/50');
+				}
+			});
+
+			editorHeading.textContent = 'Edit Experience';
+			editorSubheading.textContent = 'Modify experience details';
+			btnDelete.classList.remove('hidden');
+			if (!(window as any).isPrimaryAdminUser) {
+				btnDelete.classList.add('opacity-40', 'cursor-not-allowed');
+				btnDelete.title = 'Only website owner can do this action';
+			}
+
+			clearStatus();
+		}
+
+		// --- Filters Logic ---
+		function applyFilters() {
+			const query = searchInput.value.toLowerCase().trim();
+			const selectedType = filterType.value;
+			const selectedCompany = filterCompany.value;
+			const selectedYear = filterYear.value;
+
+			let activeFiltersCount = 0;
+			if (selectedType) activeFiltersCount++;
+			if (selectedCompany) activeFiltersCount++;
+			if (selectedYear) activeFiltersCount++;
+			if (query) activeFiltersCount++;
+
+			if (activeFiltersCount > 0) {
+				filterBadge.textContent = String(activeFiltersCount);
+				filterBadge.classList.remove('hidden');
+			} else {
+				filterBadge.classList.add('hidden');
+			}
+
+			const cards = experiencesGrid.querySelectorAll('.experience-card') as NodeListOf<HTMLDivElement>;
+			let visibleCount = 0;
+
+			cards.forEach(card => {
+				const id = card.getAttribute('data-id');
+				const exp = allExperiences.find((item: any) => item.id === id);
+				if (!exp) return;
+
+				const matchesQuery = !query ||
+					exp.role.toLowerCase().includes(query) ||
+					exp.company.toLowerCase().includes(query);
+				const matchesType = !selectedType || exp.employmentType === selectedType;
+				const matchesCompany = !selectedCompany || exp.company === selectedCompany;
+				const matchesYear = !selectedYear || (exp.startDate && exp.startDate.startsWith(selectedYear));
+
+				if (matchesQuery && matchesType && matchesCompany && matchesYear) {
+					card.classList.remove('hidden');
+					visibleCount++;
+				} else {
+					card.classList.add('hidden');
+				}
+			});
+
+			if (visibleCount === 0 && allExperiences.length > 0) {
+				showEmptyState('No matching experiences', 'Try adjusting your search query or filter options.');
+			} else {
+				hideEmptyState();
+			}
+		}
+
+		searchInput.addEventListener('input', applyFilters);
+		filterType.addEventListener('change', applyFilters);
+		filterCompany.addEventListener('change', applyFilters);
+		filterYear.addEventListener('change', applyFilters);
+
+		btnClearFilters.addEventListener('click', () => {
+			filterType.value = '';
+			filterCompany.value = '';
+			filterYear.value = '';
+			searchInput.value = '';
+			applyFilters();
+		});
+
+		// --- Logo File Selection & WebP Compression ≤ 50KB ---
+		imageDropZone.addEventListener('click', () => imageFileInput.click());
+		imageFileInput.addEventListener('change', () => {
+			const file = imageFileInput.files?.[0];
+			if (file) handleFileSelection(file);
+		});
+
+		async function handleFileSelection(file: File) {
+			if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+				showStatus('error', 'Only JPEG, PNG, or WebP files are allowed.');
+				return;
+			}
+			try {
+				const compressed = await compressImageToWebP(file, 50 * 1024);
+				selectedLogoFile = compressed;
+				showStatus('success', `Logo optimized to WebP (${(compressed.size / 1024).toFixed(1)} KB)`);
+
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					if (e.target?.result) {
+						imagePreview.src = e.target.result as string;
+						imagePreview.classList.remove('hidden');
+						dropZonePrompt.classList.add('hidden');
+						fileDetails.classList.remove('hidden');
+						fileDetails.textContent = `✓ ${compressed.name} (${(compressed.size / 1024).toFixed(1)} KB)`;
+					}
+				};
+				reader.readAsDataURL(compressed);
+			} catch (err: any) {
+				showStatus('error', err.message || 'Failed to process logo image.');
+			}
+		}
+
+		function compressImageToWebP(file: File, maxSizeBytes: number): Promise<File> {
+			return new Promise((resolve, reject) => {
+				const img = new Image();
+				img.src = URL.createObjectURL(file);
+				img.onload = () => {
+					URL.revokeObjectURL(img.src);
+					const maxDim = 400;
+					let w = img.width;
+					let h = img.height;
+					if (w > maxDim || h > maxDim) {
+						if (w > h) {
+							h = Math.round((h * maxDim) / w);
+							w = maxDim;
+						} else {
+							w = Math.round((w * maxDim) / h);
+							h = maxDim;
+						}
+					}
+					const canvas = document.createElement('canvas');
+					canvas.width = w;
+					canvas.height = h;
+					const ctx = canvas.getContext('2d');
+					if (!ctx) return resolve(file);
+					ctx.drawImage(img, 0, 0, w, h);
+
+					canvas.toBlob(
+						(blob) => {
+							if (blob) {
+								if (blob.size > maxSizeBytes) {
+									return reject(new Error(`Optimized logo (${(blob.size / 1024).toFixed(1)}KB) exceeds 50KB limit.`));
+								}
+								const webpFile = new File([blob], `logo_${Date.now()}.webp`, {
+									type: 'image/webp',
+									lastModified: Date.now(),
+								});
+								resolve(webpFile);
+							} else resolve(file);
+						},
+						'image/webp',
+						0.85
+					);
+				};
+				img.onerror = () => reject(new Error('Failed to load logo image file.'));
+			});
+		}
+
+		// --- Submit Form ---
+		experienceForm.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			startDateBinder.updateCombined();
+			endDateBinder.updateCombined();
+
+			const startDateVal = (document.getElementById('form-start-date') as HTMLInputElement).value;
+			if (!startDateVal) {
+				showStatus('error', 'Start date is required.');
+				return;
+			}
+
+			setFormLoading(true, 'Saving...');
+
+			const formData = new FormData();
+			formData.append('action', 'save');
+			formData.append('id', formId.value);
+			formData.append('role', formRole.value);
+			formData.append('company', formCompany.value);
+			formData.append('employmentType', formEmploymentType.value);
+			formData.append('startDate', startDateVal);
+
+			const endDateVal = (document.getElementById('form-end-date') as HTMLInputElement).value;
+			formData.append('endDate', endDateVal);
+
+			formData.append('responsibilities', formResponsibilities.value);
+			if (selectedLogoFile) {
+				formData.append('logo', selectedLogoFile);
+			}
+
+			try {
+				const response = await fetch('/admin/admin_experience_api', {
+					method: 'POST',
+					body: formData,
+				});
+				const result = await response.json();
+				if (response.ok && result.success && result.experience) {
+					const savedExp = result.experience;
+					const existingIndex = allExperiences.findIndex((item: any) => item && item.id === savedExp.id);
+
+					if (existingIndex !== -1) {
+						allExperiences[existingIndex] = savedExp;
+						const existingCard = experiencesGrid.querySelector(`.experience-card[data-id="${savedExp.id}"]`);
+						const updatedCard = createExperienceCard(savedExp);
+						if (existingCard) existingCard.replaceWith(updatedCard);
+						showStatus('success', 'Experience saved successfully!');
+					} else {
+						allExperiences.unshift(savedExp);
+						const newCard = createExperienceCard(savedExp);
+						experiencesGrid.prepend(newCard);
+						showStatus('success', 'Experience created successfully!');
+					}
+					attachCardEventListeners();
+
+					setTimeout(() => {
+						setFormLoading(false);
+						closeDrawer();
+						setNewExperienceState();
+					}, 400);
+				} else {
+					showStatus('error', result.error || 'Failed to save experience.');
+					setFormLoading(false);
+				}
+			} catch (err: any) {
+				showStatus('error', 'Network error occurred.');
+				setFormLoading(false);
+			}
+		});
+
+		// --- Delete Action ---
+		async function triggerDeleteExperience() {
+			if (!currentSelectedId) return;
+
+			if (!(window as any).isPrimaryAdminUser) {
+				showStatus('error', 'Permission denied. Only the website owner can do this action.');
+				return;
+			}
+
+			const confirmed = typeof (window as any).showConfirmDialog === 'function'
+				? await (window as any).showConfirmDialog('Delete Experience', 'Are you sure you want to delete this experience record? This action will permanently remove the position.')
+				: confirm('Are you sure you want to delete this experience record? This action will permanently remove the position.');
+			if (!confirmed) return;
+
+			setFormLoading(true, 'Deleting...');
+
+			const formData = new FormData();
+			formData.append('action', 'delete');
+			formData.append('id', currentSelectedId);
+
+			try {
+				const response = await fetch('/admin/admin_experience_api', {
+					method: 'POST',
+					body: formData,
+				});
+				const result = await response.json();
+				if (response.ok && result.success) {
+					allExperiences = allExperiences.filter((exp: any) => exp && exp.id !== currentSelectedId);
+					const cardToRemove = experiencesGrid.querySelector(`.experience-card[data-id="${currentSelectedId}"]`);
+					if (cardToRemove) cardToRemove.remove();
+
+					if (allExperiences.length === 0) {
+						showEmptyState('No experience entries found', 'Click "New" to add your first position.');
+					}
+
+					showStatus('success', 'Experience deleted successfully!');
+					setTimeout(() => {
+						setFormLoading(false);
+						closeDrawer();
+						setNewExperienceState();
+					}, 400);
+				} else {
+					showStatus('error', result.error || 'Failed to delete experience.');
+					setFormLoading(false);
+				}
+			} catch (err) {
+				showStatus('error', 'Network error occurred.');
+				setFormLoading(false);
+			}
+		}
+
+		btnDelete.addEventListener('click', () => {
+			triggerDeleteExperience();
+		});
+
+		function showStatus(type: 'success' | 'error', message: string) {
+			if (typeof (window as any).showToast === 'function') {
+				(window as any).showToast(message, type);
+			}
+			formStatus.classList.remove('hidden', 'bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border-[#0F9D58]/30', 'bg-[#DB4437]/10', 'text-[#DB4437]', 'border-[#DB4437]/30');
+			if (type === 'success') {
+				formStatus.classList.add('bg-[#0F9D58]/10', 'text-[#0F9D58]', 'border', 'border-[#0F9D58]/30');
+			} else {
+				formStatus.classList.add('bg-[#DB4437]/10', 'text-[#DB4437]', 'border', 'border-[#DB4437]/30');
+			}
+			formStatus.textContent = message;
+		}
+
+		function clearStatus() {
+			formStatus.classList.add('hidden');
+			formStatus.textContent = '';
+		}
+
+		function setFormLoading(loading: boolean, label = 'Save') {
+			btnSave.disabled = loading;
+			btnCancel.disabled = loading;
+			btnDelete.disabled = loading;
+			saveBtnText.textContent = label;
+		}
+	});
+</script>
