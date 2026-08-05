@@ -3,6 +3,16 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Icon from "../components/Icon.astro";
 import HomeCountsIsland from "../components/HomeCountsIsland.astro";
 
+// Setup list of contact methods and external links
+const socialLinks = [
+	{ iconName: 'google', href: 'https://gdg.community.dev/u/mcmwd6/', label: 'GDG profile' },
+	{ iconName: 'facebook', href: 'https://www.facebook.com/AbdouSaoudi26/', label: 'Facebook' },
+	{ iconName: 'telegram', href: 'https://t.me/AbdouSAOUDI/', label: 'Telegram' },
+	{ iconName: 'linkedin', href: 'https://www.linkedin.com/in/abderrahmane-saoudi/', label: 'LinkedIn' },
+	{ iconName: 'github', href: 'https://github.com/AbderrahmaneSAOUDI/', label: 'Github' },
+	{ iconName: 'google', href: 'https://g.dev/saoudi26/', label: 'GDP Profile' },
+];
+
 // Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
 Astro.response.headers.set(
 	"Cache-Control",
@@ -715,6 +725,33 @@ Astro.response.headers.set(
 								</p>
 							</div>
 						</a>
+					</div>
+
+					<!-- Social Media Links Row Grid -->
+					<div class="mt-6">
+						<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+							{socialLinks.map((social) => (
+								<a
+									href={social.href}
+									target="_blank"
+									rel="noopener noreferrer"
+									aria-label={social.label}
+									class="bg-surface-container-high border border-white/10 hover:border-primary/40 hover:bg-primary/10 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2.5 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 group cursor-pointer"
+								>
+									<div class="relative w-7 h-7 flex items-center justify-center text-primary">
+										<span class="absolute inset-0 flex items-center justify-center transition-all duration-300 ease-out group-hover:opacity-0 group-hover:scale-90">
+											<Icon name={social.iconName} size={22} />
+										</span>
+										<span class="absolute inset-0 flex items-center justify-center opacity-0 transition-all duration-300 ease-out group-hover:opacity-100 group-hover:scale-110">
+											<Icon name={social.iconName} filled size={22} />
+										</span>
+									</div>
+									<span class="text-white/80 group-hover:text-white text-xs font-semibold tracking-wide transition-colors duration-300">
+										{social.label}
+									</span>
+								</a>
+							))}
+						</div>
 					</div>
 				</div>
 			</div>
