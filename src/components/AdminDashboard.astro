@@ -15,6 +15,7 @@ interface DashboardMetrics {
     experience: number;
     designs: number;
     certificates: number;
+    services?: number;
     volunteering: number;
     resumeDownloads?: number;
   };
@@ -59,7 +60,7 @@ const { counts, systemStatus } = metrics;
 
     <!-- Grid Statistics -->
     <section class="mb-8">
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
         <!-- Projects Card (Active) -->
         <a
           href="/admin/admin_projects"
@@ -76,12 +77,11 @@ const { counts, systemStatus } = metrics;
           <h3 class="font-bold text-[#E6E1E5]">Projects</h3>
         </a>
 
-        <!-- Experience Card (Disabled) -->
-        <button
-          type="button"
-          class="btn-disabled-admin-card text-left p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:ring-2 hover:ring-[#0F9D58]/40 border border-[#2B2930] group cursor-pointer"
+        <!-- Experience Card (Active) -->
+        <a
+          href="/admin/admin_experience"
+          class="block p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:ring-2 hover:ring-[#0F9D58]/40 border border-[#2B2930] group cursor-pointer"
           style="background: #1D1B20"
-          data-title="Experience"
         >
           <div class="flex justify-between items-start mb-4">
             <div class="relative p-2.5 rounded-2xl bg-[#0F9D58]/10 text-[#0F9D58]">
@@ -91,7 +91,23 @@ const { counts, systemStatus } = metrics;
             <span class="text-2xl font-black text-white">{counts.experience}</span>
           </div>
           <h3 class="font-bold text-[#E6E1E5]">Experience</h3>
-        </button>
+        </a>
+
+        <!-- Services Card (Active) -->
+        <a
+          href="/admin/admin_services"
+          class="block p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:ring-2 hover:ring-primary/40 border border-[#2B2930] group cursor-pointer"
+          style="background: #1D1B20"
+        >
+          <div class="flex justify-between items-start mb-4">
+            <div class="relative p-2.5 rounded-2xl bg-primary/10 text-primary">
+              <IconComponent name="business" size={24} class="w-6 h-6 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90" />
+              <IconComponent name="business" filled size={24} class="absolute top-2.5 left-2.5 w-6 h-6 opacity-0 transition-all duration-200 scale-90 group-hover:opacity-100 group-hover:scale-100" />
+            </div>
+            <span class="text-2xl font-black text-white">{counts.services ?? 0}</span>
+          </div>
+          <h3 class="font-bold text-[#E6E1E5]">Services</h3>
+        </a>
 
         <!-- Designs Card (Active) -->
         <a

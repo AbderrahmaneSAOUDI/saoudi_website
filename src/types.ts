@@ -207,6 +207,30 @@ export const volunteeringSchema = z.object({
 	impactMetric: z.string().min(1).optional(),
 });
 
+// ─── Collection: services ──────────────────────────────────────────────────
+
+export interface Service {
+	id: string;
+	order: number;
+	title: string;
+	description: string;
+	logoUrl?: string | null;
+	features?: string[];
+	createdAt?: string;
+	updatedAt?: string;
+}
+
+export const serviceSchema = z.object({
+	id: z.string().min(1),
+	order: z.number().int(),
+	title: z.string().min(1),
+	description: z.string().min(1),
+	logoUrl: z.string().nullable().optional(),
+	features: z.array(z.string().min(1)).optional(),
+	createdAt: z.string().optional(),
+	updatedAt: z.string().optional(),
+});
+
 // ─── Collection: accepted_admin_emails ────────────────────────────────────
 
 export interface AcceptedAdminEmail {
@@ -315,6 +339,14 @@ export const parseCertificate = (data: unknown): Certificate => {
 
 export const parseVolunteering = (data: unknown): Volunteering => {
 	return volunteeringSchema.parse(data);
+};
+
+export const parseService = (data: unknown): Service => {
+	return serviceSchema.parse(data);
+};
+
+export const isValidService = (data: unknown): data is Service => {
+	return serviceSchema.safeParse(data).success;
 };
 
 export const parseAcceptedAdminEmail = (data: unknown): AcceptedAdminEmail => {
