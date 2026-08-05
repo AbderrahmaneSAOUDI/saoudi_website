@@ -25,25 +25,25 @@
 }
 
 @theme {
-  /* Google Colors */
-  --color-google-blue: #4285F4;
-  --color-google-light-blue: #57CAFF;
-  --color-google-lighter-blue: #C3ECF6;
+  /* Google Colors (M3 Dark Theme compliant high-contrast tones) */
+  --color-google-blue: #8AB4F8;
+  --color-google-light-blue: #AECBFA;
+  --color-google-lighter-blue: #D2E3FC;
 
-  --color-google-red: #EA4335;
-  --color-google-light-red: #FF7D7D;
-  --color-google-lighter-red: #F8D8D8;
+  --color-google-red: #F28B82;
+  --color-google-light-red: #F6AEA9;
+  --color-google-lighter-red: #FAD2CF;
 
-  --color-google-yellow: #F9AB00;
-  --color-google-light-yellow: #FFD427;
-  --color-google-lighter-yellow: #FFE7A5;
+  --color-google-yellow: #FDD663;
+  --color-google-light-yellow: #FDE293;
+  --color-google-lighter-yellow: #FEF0D1;
 
-  --color-google-green: #34A853;
-  --color-google-light-green: #5CDB6D;
-  --color-google-lighter-green: #CCF6C5;
+  --color-google-green: #81C784;
+  --color-google-light-green: #A5D6A7;
+  --color-google-lighter-green: #C8E6C9;
 
   --color-google-black: #0F0F0F;
-  --color-google-white: #F0F0F0;
+  --color-google-white: #FFFFFF;
 
   /* Material 3 Token Mapping */
   --color-primary: var(--color-google-blue);

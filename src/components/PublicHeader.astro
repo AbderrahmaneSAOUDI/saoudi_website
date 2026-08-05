@@ -19,6 +19,7 @@ const { pathname } = Astro.url;
 // Define navigation route map
 const navLinks = [
 	{ href: '/', label: 'Home', iconName: 'home' },
+	{ href: '/experience', label: 'Experience', iconName: 'experience' },
 	{ href: '/projects', label: 'Projects', iconName: 'projects' },
 	{ href: '/designs', label: 'Designs', iconName: 'design' },
 	{ href: '/certifications', label: 'Certifications', iconName: 'certifications' },
@@ -51,12 +52,12 @@ const navLinks = [
 				</div>
 			</nav>
 
-			{/* Download Resume Action Pill */}
-			<ActionButton href={resumeUrl} type="header" download ariaLabel="Download resume">
+			{/* My Services Action Pill */}
+			<ActionButton href="/services" type="header" ariaLabel="My Services">
 				<span class="transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110 group-hover:-translate-y-0.5">
-					<Icon name="download" size={16} />
+					<Icon name="business" size={16} />
 				</span>
-				<span class="download-text">Download</span>
+				<span class="download-text">My Services</span>
 			</ActionButton>
 		</div>
 	</div>

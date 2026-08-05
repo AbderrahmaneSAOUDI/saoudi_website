@@ -66,16 +66,31 @@ export const staticDataSchema = z.object({
 
 // ─── Collection: experience ───────────────────────────────────────────────
 
+export type EmploymentType =
+	| 'Full-time'
+	| 'Part-time'
+	| 'Contract / Freelance'
+	| 'Volunteering / Community'
+	| 'Academic / Teaching';
+
+export const EMPLOYMENT_TYPES: EmploymentType[] = [
+	'Full-time',
+	'Part-time',
+	'Contract / Freelance',
+	'Volunteering / Community',
+	'Academic / Teaching',
+];
+
 export interface Experience {
 	id: string;
 	order: number;
 	role: string;
 	company: string;
-	location: string;
-	date: string; // ISO 8601 string for sorting
-	period: string; // Human readable label (e.g. "Jan 2024 - Present")
-	descriptionPoints: string[];
-	technologies: string[];
+	logoUrl: string | null;
+	employmentType: EmploymentType;
+	startDate: string; // ISO partial: YYYY-MM or YYYY-MM-DD
+	endDate: string | null; // null = Present
+	responsibilities: string; // Markdown text
 }
 
 export const experienceSchema = z.object({
@@ -83,11 +98,11 @@ export const experienceSchema = z.object({
 	order: z.number().int(),
 	role: z.string().min(1),
 	company: z.string().min(1),
-	location: z.string().min(1),
-	date: z.string().min(1),
-	period: z.string().min(1),
-	descriptionPoints: z.array(z.string().min(1)),
-	technologies: z.array(z.string().min(1)),
+	logoUrl: z.string().nullable(),
+	employmentType: z.enum(['Full-time', 'Part-time', 'Contract / Freelance', 'Volunteering / Community', 'Academic / Teaching']),
+	startDate: z.string().min(1),
+	endDate: z.string().nullable(),
+	responsibilities: z.string().min(1),
 });
 
 // ─── Collection: projects ─────────────────────────────────────────────────
