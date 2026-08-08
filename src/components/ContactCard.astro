@@ -15,8 +15,8 @@ interface Props {
 const { title = "Contact", animationDelay = "0.7s" } = Astro.props;
 
 const socialLinks = [
-	{ iconName: 'gdg', href: 'https://gdg.community.dev/u/mcmwd6/', label: 'GDG profile' },
-	{ iconName: 'facebook', href: 'https://www.facebook.com/AbdouSaoudi26/', label: 'Facebook' },
+	{ iconName: 'gdg', href: 'https://gdg.community.dev/u/mcmwd6/', label: 'GDG profile', size: 34 },
+	{ iconName: 'facebook', href: 'https://www.facebook.com/saoudi26/', label: 'Facebook' },
 	{ iconName: 'telegram', href: 'https://t.me/saoudi26/', label: 'Telegram' },
 	{ iconName: 'linkedin', href: 'https://www.linkedin.com/in/abderrahmane-saoudi/', label: 'LinkedIn' },
 	{ iconName: 'github', href: 'https://github.com/AbderrahmaneSAOUDI/', label: 'Github' },
@@ -84,12 +84,12 @@ const socialLinks = [
 							aria-label={social.label}
 							class="bg-surface-container-high border border-white/10 hover:border-primary/40 hover:bg-primary/10 rounded-2xl p-5 md:p-6 flex flex-col items-center justify-center text-center gap-3 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 group cursor-pointer"
 						>
-							<div class="relative w-9 h-9 flex items-center justify-center text-primary transition-transform duration-300 ease-out group-hover:scale-125">
+							<div class="relative w-9 h-9 flex items-center justify-center text-primary transition-transform duration-300 ease-out group-hover:scale-135">
 								<span class="absolute inset-0 flex items-center justify-center transition-all duration-300 ease-out group-hover:opacity-0">
-									<Icon name={social.iconName} size={28} />
+									<Icon name={social.iconName} size={social.size || 28} />
 								</span>
 								<span class="absolute inset-0 flex items-center justify-center opacity-0 transition-all duration-300 ease-out group-hover:opacity-100">
-									<Icon name={social.iconName} filled size={28} />
+									<Icon name={social.iconName} filled size={social.size || 28} />
 								</span>
 							</div>
 							<span class="text-white/80 group-hover:text-white text-xs sm:text-sm font-semibold tracking-wide transition-colors duration-300">
