@@ -6,7 +6,16 @@
  * Extracts Google Drive file ID from various Google Drive URL formats.
  */
 export function getGoogleDriveFileId(url: string): string | null {
-	if (!url) return null;
+	if (!url || typeof url !== 'string') return null;
+	if (url.startsWith('data:') || url.startsWith('blob:')) return null;
+
+	const isGoogleUrl =
+		url.includes('drive.google.com') ||
+		url.includes('googleusercontent.com') ||
+		url.includes('docs.google.com');
+
+	if (!isGoogleUrl) return null;
+
 	const matchParam = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
 	if (matchParam && matchParam[1]) return matchParam[1];
 	const matchPath = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
