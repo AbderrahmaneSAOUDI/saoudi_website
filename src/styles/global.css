@@ -440,9 +440,17 @@ html[data-hide-shortcuts="true"] kbd {
 
 /* ── Accessibility & Focus Indicator (WCAG 2.2 AAA) ──────────────────── */
 :root {
+  /* Global Card Interactivity Config - change border thickness from here */
+  --card-hover-border-width: 3px;
+
   --surface-bg: #0b0f19;
   --text-primary: #ffffff;   /* 18.5:1 ratio */
   --text-secondary: #e2e8f0; /* 13.2:1 ratio (Passes AAA) */
+}
+
+/* Card hover border utility driven by --card-hover-border-width */
+.hover-card-border:hover {
+  border-width: var(--card-hover-border-width, 5px);
 }
 
 :focus-visible {

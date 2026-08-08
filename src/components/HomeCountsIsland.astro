@@ -64,7 +64,7 @@ const statCards = [
 		disabled ? (
 			<button
 				type="button"
-				class={`btn-disabled-home-card text-left p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/50 border border-white/10 bg-surface-container group cursor-pointer`}
+				class={`btn-disabled-home-card text-left p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover-card-border hover:border-primary/80 border border-white/10 bg-surface-container group cursor-pointer`}
 				data-title={label}
 			>
 				<div class="flex justify-between items-start mb-4">
@@ -79,7 +79,7 @@ const statCards = [
 		) : (
 			<a
 				href={href}
-				class={`block p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/50 border border-white/10 bg-surface-container group cursor-pointer`}
+				class={`block p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover-card-border hover:border-primary/80 border border-white/10 bg-surface-container group cursor-pointer`}
 			>
 				<div class="flex justify-between items-start mb-4">
 					<div class={`relative p-2.5 rounded-2xl bg-${color}/10 text-${color}`}>
