@@ -53,6 +53,20 @@ if (Astro.request.method === 'POST') {
 
     if (!isAuthorized) {
       console.warn(`Unauthorized admin login attempt from: ${payload.email}`);
+      try {
+        const { addSystemLog } = await import('../../lib/server/system-logs');
+        await addSystemLog({
+          type: 'security',
+          severity: 'warn',
+          action: 'AUTH_LOGIN_UNAUTHORIZED',
+          title: `Unauthorized login attempt: ${payload.email}`,
+          details: `Google GSI authentication attempt from non-approved email: ${payload.email}`,
+          userEmail: payload.email,
+          requestPath: '/admin/admin_login',
+        });
+      } catch (logErr) {
+        console.warn('Could not record unauthorized login log:', logErr);
+      }
       return Response.json({ error: 'Unauthorized access. Email not accepted.' }, { status: 403 });
     }
 
@@ -62,14 +76,16 @@ if (Astro.request.method === 'POST') {
     
     // Log authentication event in system_logs
     try {
-      const { addSystemLog } = await import('../../lib/server/system-logs');
       const isPrimary = userEmail === (ADMIN_EMAIL || '').toLowerCase().trim();
+      const { addSystemLog } = await import('../../lib/server/system-logs');
       await addSystemLog({
         type: 'auth',
-        action: isPrimary ? 'PRIMARY_ADMIN_LOGIN' : 'SECONDARY_ADMIN_LOGIN',
-        title: isPrimary ? 'Owner logged into Admin Dashboard' : `Admin email entered Admin Dashboard: ${userEmail}`,
+        severity: 'info',
+        action: isPrimary ? 'AUTH_LOGIN_PRIMARY' : 'AUTH_LOGIN_SECONDARY',
+        title: isPrimary ? `Owner logged into Admin Dashboard` : `Secondary admin entered Admin Dashboard`,
         details: `Authenticated via Google GSI for ${userEmail}`,
         userEmail: userEmail,
+        requestPath: '/admin/admin_login',
       });
     } catch (logErr) {
       console.warn('Could not record system login log:', logErr);
@@ -86,6 +102,20 @@ if (Astro.request.method === 'POST') {
     return Response.json({ success: true });
   } catch (error) {
     console.error('Google GSI verification error:', error);
+    try {
+      const { addSystemLog } = await import('../../lib/server/system-logs');
+      await addSystemLog({
+        type: 'security',
+        severity: 'warn',
+        action: 'AUTH_LOGIN_FAILED',
+        title: 'Google GSI token verification failed',
+        details: error instanceof Error ? error.message : String(error),
+        userEmail: 'unknown',
+        requestPath: '/admin/admin_login',
+      });
+    } catch (logErr) {
+      console.warn('Could not record login failure log:', logErr);
+    }
     return Response.json({ error: 'Token verification failed.' }, { status: 400 });
   }
 }

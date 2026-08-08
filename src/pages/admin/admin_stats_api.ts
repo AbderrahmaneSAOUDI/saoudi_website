@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
-import { addSystemLog } from '../../lib/server/system-logs';
 import { getEnv } from '../../lib/server/env';
 import { clearCache } from '../../lib/server/cache';
 import { getErrorMessage, getFormString, isFormRequest, jsonResponse } from '../../lib/server/http';
@@ -76,14 +75,6 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
 				secure: true,
 			});
 
-			await addSystemLog({
-				type: 'content',
-				action: 'ADMIN_DOWNLOADS_EXCLUSION_TOGGLED',
-				title: `Admin Downloads Exclusion ${newVal ? 'Enabled' : 'Disabled'}`,
-				details: `Admin ${locals.adminEmail} updated admin downloads setting to: ${newVal ? 'Exclude' : 'Include'}.`,
-				userEmail: locals.adminEmail,
-			});
-
 			clearCache('admin_dashboard_counts');
 			return jsonResponse({ success: true, excludeAdminDownloads: newVal });
 		}
@@ -106,14 +97,6 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
 				},
 				{ merge: true }
 			);
-
-			await addSystemLog({
-				type: 'content',
-				action: 'RESUME_DOWNLOADS_RESET',
-				title: 'Resume Downloads Counter Reset',
-				details: `Admin ${locals.adminEmail} reset resume download counter to 0.`,
-				userEmail: locals.adminEmail,
-			});
 
 			clearCache('admin_dashboard_counts');
 			return jsonResponse({ success: true, count: 0 });

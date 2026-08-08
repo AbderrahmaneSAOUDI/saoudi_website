@@ -50,6 +50,9 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const docSnap = await docRef.get();
 			if (!docSnap.exists) return jsonResponse({ error: 'Experience not found' }, 404);
 
+			const deletedRole = docSnap.data()?.role || '';
+			const deletedCompany = docSnap.data()?.company || '';
+			const deletedTitle = deletedRole && deletedCompany ? `${deletedRole} at ${deletedCompany}` : experienceId;
 			const logoUrl = docSnap.data()?.logoUrl;
 			await docRef.delete();
 			if (typeof logoUrl === 'string' && !logoUrl.startsWith('data:')) {
@@ -57,6 +60,24 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			}
 
 			invalidateExperienceCaches(true);
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'content',
+					severity: 'warn',
+					action: 'EXPERIENCE_DELETED',
+					title: `Removed experience entry: "${deletedTitle}"`,
+					details: `Experience entry permanently deleted by ${locals.adminEmail}`,
+					userEmail: locals.adminEmail,
+					targetCollection: 'experience',
+					targetDocId: experienceId,
+					changeType: 'delete',
+				});
+			} catch (logErr) {
+				console.warn('Could not log experience delete event:', logErr);
+			}
+
 			return jsonResponse({ success: true });
 		}
 
@@ -144,7 +165,25 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				await deleteFile(previousLogoUrl, EXPERIENCE_DIRECTORY);
 			}
 
-			invalidateExperienceCaches(!docSnap.exists);
+			const isNewExp = !docSnap.exists;
+			invalidateExperienceCaches(isNewExp);
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'content',
+					severity: 'info',
+					action: isNewExp ? 'EXPERIENCE_CREATED' : 'EXPERIENCE_UPDATED',
+					title: `${isNewExp ? 'Added' : 'Updated'} experience entry: "${role} at ${company}"`,
+					details: `Type: ${employmentType}, Period: ${startDate} to ${endDate || 'Present'}`,
+					userEmail: locals.adminEmail,
+					targetCollection: 'experience',
+					targetDocId: experienceId,
+					changeType: isNewExp ? 'create' : 'update',
+				});
+			} catch (logErr) {
+				console.warn('Could not log experience save event:', logErr);
+			}
 			return jsonResponse({ success: true, experience });
 		}
 

@@ -79,10 +79,14 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				const { addSystemLog } = await import('../../lib/server/system-logs');
 				await addSystemLog({
 					type: 'content',
+					severity: 'warn',
 					action: 'DESIGN_DELETED',
 					title: `Removed design card: "${deletedTitle}"`,
 					details: `Design card deleted by ${locals.adminEmail}`,
 					userEmail: locals.adminEmail,
+					targetCollection: 'designs',
+					targetDocId: designId,
+					changeType: 'delete',
 				});
 			} catch (logErr) {
 				console.warn('Could not log design delete event:', logErr);
@@ -143,6 +147,21 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			await db.collection('configuration').doc('designs_companies').set({ companies });
 
 			invalidateDesignCaches(false);
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'content',
+					severity: 'info',
+					action: 'DESIGN_COMPANIES_UPDATED',
+					title: 'Updated design companies list',
+					details: `Companies: ${companies.join(', ')}`,
+					userEmail: locals.adminEmail,
+				});
+			} catch (logErr) {
+				console.warn('Could not log design companies save event:', logErr);
+			}
+
 			return jsonResponse({ success: true });
 		}
 
@@ -205,10 +224,14 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				const { addSystemLog } = await import('../../lib/server/system-logs');
 				await addSystemLog({
 					type: 'content',
-					action: isNewDesign ? 'DESIGN_ADDED' : 'DESIGN_UPDATED',
+					severity: 'info',
+					action: isNewDesign ? 'DESIGN_CREATED' : 'DESIGN_UPDATED',
 					title: `${isNewDesign ? 'Added new' : 'Updated'} design card: "${title || company}"`,
 					details: `Company: ${company}`,
 					userEmail: locals.adminEmail,
+					targetCollection: 'designs',
+					targetDocId: designId,
+					changeType: isNewDesign ? 'create' : 'update',
 				});
 			} catch (logErr) {
 				console.warn('Could not log design save event:', logErr);

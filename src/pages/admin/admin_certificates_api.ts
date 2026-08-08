@@ -49,6 +49,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const docSnap = await docRef.get();
 			if (!docSnap.exists) return jsonResponse({ error: 'Certificate not found' }, 404);
 
+			const deletedTitle = docSnap.data()?.title || certificateId;
 			const imageUrl = docSnap.data()?.imageUrl;
 			await docRef.delete();
 			if (typeof imageUrl === 'string' && !imageUrl.startsWith('data:')) {
@@ -56,6 +57,24 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			}
 
 			invalidateCertificateCaches(true);
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'content',
+					severity: 'warn',
+					action: 'CERTIFICATE_DELETED',
+					title: `Removed certificate: "${deletedTitle}"`,
+					details: `Certificate permanently deleted by ${locals.adminEmail}`,
+					userEmail: locals.adminEmail,
+					targetCollection: 'certificates',
+					targetDocId: certificateId,
+					changeType: 'delete',
+				});
+			} catch (logErr) {
+				console.warn('Could not log certificate delete event:', logErr);
+			}
+
 			return jsonResponse({ success: true });
 		}
 
@@ -134,7 +153,25 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				await deleteFile(previousImageUrl, CERTIFICATES_DIRECTORY);
 			}
 
-			invalidateCertificateCaches(!docSnap.exists);
+			const isNewCert = !docSnap.exists;
+			invalidateCertificateCaches(isNewCert);
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'content',
+					severity: 'info',
+					action: isNewCert ? 'CERTIFICATE_CREATED' : 'CERTIFICATE_UPDATED',
+					title: `${isNewCert ? 'Added new' : 'Updated'} certificate: "${title}"`,
+					details: `Issuer: ${issuer}, Type: ${type}, Date: ${date}`,
+					userEmail: locals.adminEmail,
+					targetCollection: 'certificates',
+					targetDocId: certificateId,
+					changeType: isNewCert ? 'create' : 'update',
+				});
+			} catch (logErr) {
+				console.warn('Could not log certificate save event:', logErr);
+			}
 			return jsonResponse({ success: true, certificate });
 		}
 

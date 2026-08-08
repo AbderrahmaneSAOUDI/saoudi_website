@@ -98,14 +98,18 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			try {
 				const { addSystemLog } = await import('../../lib/server/system-logs');
 				await addSystemLog({
-					type: 'admin',
-					action: 'EMAIL_REVOKED',
-					title: `Revoked admin access for ${email}`,
-					details: `Admin privileges removed by ${locals.adminEmail}`,
+					type: 'system',
+					severity: 'warn',
+					action: 'ADMIN_EMAIL_REVOKED',
+					title: `Revoked admin email access: ${email}`,
+					details: `Email access revoked by ${locals.adminEmail}`,
 					userEmail: locals.adminEmail,
+					targetCollection: 'accepted_admin_emails',
+					targetDocId: email,
+					changeType: 'delete',
 				});
 			} catch (logErr) {
-				console.warn('Could not log email delete event:', logErr);
+				console.warn('Could not log admin email delete event:', logErr);
 			}
 
 			return jsonResponse({ success: true, deletedEmail: email });
@@ -135,14 +139,18 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			try {
 				const { addSystemLog } = await import('../../lib/server/system-logs');
 				await addSystemLog({
-					type: 'admin',
-					action: 'EMAIL_ADDED',
-					title: `Granted admin access to ${email}`,
-					details: `Added to accepted admin list by ${locals.adminEmail}`,
+					type: 'system',
+					severity: 'info',
+					action: 'ADMIN_EMAIL_ADDED',
+					title: `Added authorized admin email: ${email}`,
+					details: `Email granted access by ${locals.adminEmail}. Notes: ${notes || 'Accepted Admin User'}`,
 					userEmail: locals.adminEmail,
+					targetCollection: 'accepted_admin_emails',
+					targetDocId: email,
+					changeType: 'create',
 				});
 			} catch (logErr) {
-				console.warn('Could not log email add event:', logErr);
+				console.warn('Could not log admin email add event:', logErr);
 			}
 
 			return jsonResponse({ success: true, email: newRecord });

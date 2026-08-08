@@ -86,6 +86,24 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			await db.collection('admin_todos').doc(newId).set(todoItem);
 			clearCache('admin_todos');
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'task',
+					severity: 'info',
+					action: 'TODO_CREATED',
+					title: `Created admin task: "${title}"`,
+					details: `Category: ${category}, Priority: ${priority}`,
+					userEmail: creatorEmail,
+					targetCollection: 'admin_todos',
+					targetDocId: newId,
+					changeType: 'create',
+				});
+			} catch (logErr) {
+				console.warn('Could not log todo create event:', logErr);
+			}
+
 			return jsonResponse({ success: true, todo: todoItem });
 		}
 
@@ -100,6 +118,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		}
 
 		const existing = docSnap.data() || {};
+		const todoTitle = existing.title || todoId;
 
 		if (action === 'toggle_complete') {
 			const isCompleted = existing.status === 'completed';
@@ -112,6 +131,24 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			});
 
 			clearCache('admin_todos');
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'task',
+					severity: 'info',
+					action: newStatus === 'completed' ? 'TODO_COMPLETED' : 'TODO_UNCOMPLETED',
+					title: `${newStatus === 'completed' ? 'Completed' : 'Reopened'} admin task: "${todoTitle}"`,
+					details: `Task status set to ${newStatus} by ${locals.adminEmail}`,
+					userEmail: locals.adminEmail,
+					targetCollection: 'admin_todos',
+					targetDocId: todoId,
+					changeType: 'update',
+				});
+			} catch (logErr) {
+				console.warn('Could not log todo toggle event:', logErr);
+			}
+
 			return jsonResponse({
 				success: true,
 				id: todoId,
@@ -128,6 +165,24 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			});
 
 			clearCache('admin_todos');
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'task',
+					severity: 'info',
+					action: 'TODO_ARCHIVED',
+					title: `Archived admin task: "${todoTitle}"`,
+					details: `Task archived by ${locals.adminEmail}`,
+					userEmail: locals.adminEmail,
+					targetCollection: 'admin_todos',
+					targetDocId: todoId,
+					changeType: 'update',
+				});
+			} catch (logErr) {
+				console.warn('Could not log todo archive event:', logErr);
+			}
+
 			return jsonResponse({ success: true, id: todoId, status: 'archived', archivedAt });
 		}
 
@@ -138,6 +193,24 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			});
 
 			clearCache('admin_todos');
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'task',
+					severity: 'info',
+					action: 'TODO_RESTORED',
+					title: `Restored admin task: "${todoTitle}"`,
+					details: `Task restored to active status by ${locals.adminEmail}`,
+					userEmail: locals.adminEmail,
+					targetCollection: 'admin_todos',
+					targetDocId: todoId,
+					changeType: 'update',
+				});
+			} catch (logErr) {
+				console.warn('Could not log todo restore event:', logErr);
+			}
+
 			return jsonResponse({ success: true, id: todoId, status: 'active' });
 		}
 
@@ -151,6 +224,24 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			await docRef.delete();
 			clearCache('admin_todos');
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'task',
+					severity: 'warn',
+					action: 'TODO_DELETED',
+					title: `Permanently deleted admin task: "${todoTitle}"`,
+					details: `Task deleted by primary admin ${locals.adminEmail}`,
+					userEmail: locals.adminEmail,
+					targetCollection: 'admin_todos',
+					targetDocId: todoId,
+					changeType: 'delete',
+				});
+			} catch (logErr) {
+				console.warn('Could not log todo delete event:', logErr);
+			}
+
 			return jsonResponse({ success: true, id: todoId, deleted: true });
 		}
 

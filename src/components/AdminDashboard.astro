@@ -31,32 +31,11 @@ interface Props {
 }
 
 const { metrics, initialAcceptedEmails = [], initialTodos = [], initialLogs = [], isPrimaryAdmin = true } = Astro.props;
-const { counts, systemStatus } = metrics;
+const { counts } = metrics;
 ---
 
 <div class="text-[#E6E1E5] flex flex-col justify-between space-y-8">
   <div>
-
-    <!-- System Status Banner -->
-    <div class="mb-6 p-4 rounded-2xl bg-[#1D1B20] border border-[#2B2930] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="p-2.5 rounded-xl bg-[#0F9D58]/10 text-[#0F9D58]">
-          <IconComponent name="security" size={24} class="w-6 h-6" />
-        </div>
-        <div>
-          <p class="text-sm font-bold text-white">System Security & Infrastructure</p>
-          <p class="text-xs text-[#E6E1E5]/50">Middleware protection is active. Secure cookies are enforced.</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-4 text-xs">
-        <span class="px-3 py-1 rounded-full bg-[#211F26] border border-[#2B2930] text-[#E6E1E5]/70">
-          Environment: <strong class="text-white">Production</strong>
-        </span>
-        <span class="px-3 py-1 rounded-full bg-[#0F9D58]/10 text-[#0F9D58] border border-[#0F9D58]/20 font-medium">
-          Firestore: {systemStatus}
-        </span>
-      </div>
-    </div>
 
     <!-- Grid Statistics -->
     <section class="mb-8">

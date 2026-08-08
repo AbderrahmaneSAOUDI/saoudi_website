@@ -47,6 +47,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const docSnap = await docRef.get();
 			if (!docSnap.exists) return jsonResponse({ error: 'Service not found' }, 404);
 
+			const deletedTitle = docSnap.data()?.title || serviceId;
 			const logoUrl = docSnap.data()?.logoUrl;
 			await docRef.delete();
 			if (typeof logoUrl === 'string' && !logoUrl.startsWith('data:')) {
@@ -54,6 +55,24 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			}
 
 			invalidateServicesCaches(true);
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'content',
+					severity: 'warn',
+					action: 'SERVICE_DELETED',
+					title: `Removed service card: "${deletedTitle}"`,
+					details: `Service card permanently deleted by ${locals.adminEmail}`,
+					userEmail: locals.adminEmail,
+					targetCollection: 'services',
+					targetDocId: serviceId,
+					changeType: 'delete',
+				});
+			} catch (logErr) {
+				console.warn('Could not log service delete event:', logErr);
+			}
+
 			return jsonResponse({ success: true });
 		}
 
@@ -127,7 +146,25 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				await deleteFile(previousLogoUrl, SERVICES_DIRECTORY);
 			}
 
-			invalidateServicesCaches(!docSnap.exists);
+			const isNewService = !docSnap.exists;
+			invalidateServicesCaches(isNewService);
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'content',
+					severity: 'info',
+					action: isNewService ? 'SERVICE_CREATED' : 'SERVICE_UPDATED',
+					title: `${isNewService ? 'Added new' : 'Updated'} service card: "${title}"`,
+					details: `Order: ${order}, Features count: ${features.length}`,
+					userEmail: locals.adminEmail,
+					targetCollection: 'services',
+					targetDocId: serviceId,
+					changeType: isNewService ? 'create' : 'update',
+				});
+			} catch (logErr) {
+				console.warn('Could not log service save event:', logErr);
+			}
 			return jsonResponse({ success: true, service: serviceData });
 		}
 

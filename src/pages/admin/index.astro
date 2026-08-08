@@ -90,7 +90,7 @@ try {
     volunteeringCount = -1;
 }
 
-import { addSystemLog, getSystemLogs } from "../../lib/server/system-logs";
+import { getSystemLogs } from "../../lib/server/system-logs";
 
 let initialAcceptedEmails: any[] = [];
 let initialTodos: any[] = [];
@@ -114,19 +114,6 @@ try {
 const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
 const currentAdminEmail = (adminEmail || '').toLowerCase().trim();
 const isPrimaryAdmin = currentAdminEmail === primaryEmail;
-
-// Record admin dashboard view event
-try {
-  await addSystemLog({
-    type: 'admin',
-    action: 'DASHBOARD_OPENED',
-    title: 'Admin opened Dashboard',
-    details: `Admin session accessed by ${currentAdminEmail}`,
-    userEmail: currentAdminEmail,
-  });
-} catch (logErr) {
-  console.warn('Could not log dashboard view event:', logErr);
-}
 
 if (primaryEmail && !initialAcceptedEmails.some(e => e.email?.toLowerCase() === primaryEmail)) {
   initialAcceptedEmails.unshift({
@@ -154,7 +141,7 @@ const metrics = {
 ---
 
 <BackgroundBaseLayout title="Admin Workspace Dashboard">
-  <AdminLayout>
+  <AdminLayout systemStatus={systemStatus}>
     <AdminDashboard metrics={metrics} initialAcceptedEmails={initialAcceptedEmails} initialTodos={initialTodos} initialLogs={initialLogs} isPrimaryAdmin={isPrimaryAdmin} />
   </AdminLayout>
   <AdminNavDock currentPath={Astro.url.pathname} />

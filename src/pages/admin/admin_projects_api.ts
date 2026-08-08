@@ -60,10 +60,14 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				const { addSystemLog } = await import('../../lib/server/system-logs');
 				await addSystemLog({
 					type: 'content',
+					severity: 'warn',
 					action: 'PROJECT_DELETED',
 					title: `Removed project card: "${deletedTitle}"`,
 					details: `Project card permanently deleted by ${locals.adminEmail}`,
 					userEmail: locals.adminEmail,
+					targetCollection: 'projects',
+					targetDocId: projectId,
+					changeType: 'delete',
 				});
 			} catch (logErr) {
 				console.warn('Could not log project delete event:', logErr);
@@ -91,6 +95,21 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			await db.collection('configuration').doc('projects_fields').set({ fields });
 			invalidateProjectCaches(false);
+
+			try {
+				const { addSystemLog } = await import('../../lib/server/system-logs');
+				await addSystemLog({
+					type: 'content',
+					severity: 'info',
+					action: 'PROJECT_FIELDS_UPDATED',
+					title: 'Updated project category fields list',
+					details: `Fields: ${fields.join(', ')}`,
+					userEmail: locals.adminEmail,
+				});
+			} catch (logErr) {
+				console.warn('Could not log project fields save event:', logErr);
+			}
+
 			return jsonResponse({ success: true });
 		}
 
@@ -195,10 +214,14 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				const { addSystemLog } = await import('../../lib/server/system-logs');
 				await addSystemLog({
 					type: 'content',
-					action: isNewProject ? 'PROJECT_ADDED' : 'PROJECT_UPDATED',
+					severity: 'info',
+					action: isNewProject ? 'PROJECT_CREATED' : 'PROJECT_UPDATED',
 					title: `${isNewProject ? 'Added new' : 'Updated'} project card: "${title}"`,
 					details: `Field: ${field || 'Web Development'}, Techs: ${technologies.join(', ') || 'N/A'}`,
 					userEmail: locals.adminEmail,
+					targetCollection: 'projects',
+					targetDocId: projectId,
+					changeType: isNewProject ? 'create' : 'update',
 				});
 			} catch (logErr) {
 				console.warn('Could not log project save event:', logErr);

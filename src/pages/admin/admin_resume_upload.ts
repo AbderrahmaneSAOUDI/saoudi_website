@@ -122,6 +122,25 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		);
 
 		clearCache('resume_config');
+
+		try {
+			const { addSystemLog } = await import('../../lib/server/system-logs');
+			const updatedFields = uploads.map((u) => (u.field === 'resumeUrl' ? 'PDF' : 'Preview Image')).join(' and ');
+			await addSystemLog({
+				type: 'content',
+				severity: 'info',
+				action: 'RESUME_UPDATED',
+				title: `Updated resume ${updatedFields}`,
+				details: `Uploaded new files to Storage bucket by ${locals.adminEmail}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'configuration',
+				targetDocId: 'static_data',
+				changeType: 'update',
+			});
+		} catch (logErr) {
+			console.warn('Could not log resume upload event:', logErr);
+		}
+
 		return jsonResponse({
 			success: true,
 			...Object.fromEntries(uploads.map(({ field, url }) => [field, url])),

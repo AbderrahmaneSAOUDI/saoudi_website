@@ -22,7 +22,7 @@ const { initialEmails = [], isPrimaryAdmin = (userEmail === primaryEmail && prim
 			</div>
 			<div>
 				<div class="flex items-center gap-2">
-					<h2 class="text-lg font-bold text-white tracking-tight">Accepted Admin Emails</h2>
+					<h2 class="text-lg font-bold text-white tracking-tight">Admin Emails</h2>
 					<span id="email-count-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-primary/15 text-primary border border-primary/30">
 						{initialEmails.length}
 					</span>
@@ -262,6 +262,7 @@ const { initialEmails = [], isPrimaryAdmin = (userEmail === primaryEmail && prim
 								emailsList = emailsList.filter(item => item.email.toLowerCase() !== email.toLowerCase());
 								renderEmails();
 								showStatus(`Revoked access for ${email}`, 'success');
+								window.dispatchEvent(new CustomEvent('admin-emails-updated'));
 							} else {
 								showStatus(data.error || 'Failed to revoke access.', 'error');
 							}
@@ -315,6 +316,7 @@ const { initialEmails = [], isPrimaryAdmin = (userEmail === primaryEmail && prim
 					showStatus(`Granted admin access to ${email}`, 'success');
 					emailInput.value = '';
 					formContainer.classList.add('hidden');
+					window.dispatchEvent(new CustomEvent('admin-emails-updated'));
 					await fetchEmails();
 				} else {
 					showStatus(data.error || 'Failed to grant admin access.', 'error');

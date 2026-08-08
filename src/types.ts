@@ -285,29 +285,146 @@ export const adminTodoSchema = z.object({
 
 // ─── Collection: system_logs ───────────────────────────────────────────────
 
-export type LogType = 'auth' | 'content' | 'admin' | 'system';
+export type LogType =
+	| 'auth'
+	| 'content'
+	| 'admin'
+	| 'system'
+	| 'security'
+	| 'visitor'
+	| 'task'
+	| 'storage';
+
+export type LogSeverity = 'info' | 'warn' | 'error' | 'critical';
+
+export type LogAction =
+	// Auth events
+	| 'AUTH_LOGIN_PRIMARY'
+	| 'AUTH_LOGIN_SECONDARY'
+	| 'AUTH_LOGIN_FAILED'
+	| 'AUTH_LOGIN_UNAUTHORIZED'
+	| 'AUTH_LOGOUT'
+	| 'AUTH_SESSION_EXPIRED'
+	| 'AUTH_SESSION_INVALID'
+	// Content — Projects
+	| 'PROJECT_CREATED'
+	| 'PROJECT_UPDATED'
+	| 'PROJECT_DELETED'
+	| 'PROJECT_FIELDS_UPDATED'
+	// Content — Designs
+	| 'DESIGN_CREATED'
+	| 'DESIGN_UPDATED'
+	| 'DESIGN_DELETED'
+	| 'DESIGN_COMPANIES_RENAMED'
+	| 'DESIGN_COMPANIES_UPDATED'
+	// Content — Certificates
+	| 'CERTIFICATE_CREATED'
+	| 'CERTIFICATE_UPDATED'
+	| 'CERTIFICATE_DELETED'
+	// Content — Experience
+	| 'EXPERIENCE_CREATED'
+	| 'EXPERIENCE_UPDATED'
+	| 'EXPERIENCE_DELETED'
+	// Content — Services
+	| 'SERVICE_CREATED'
+	| 'SERVICE_UPDATED'
+	| 'SERVICE_DELETED'
+	// Admin config
+	| 'ADMIN_EMAIL_ADDED'
+	| 'ADMIN_EMAIL_REVOKED'
+	| 'ADMIN_SETTING_CHANGED'
+	| 'ADMIN_DOWNLOADS_EXCLUSION_TOGGLED'
+	| 'ADMIN_DOWNLOADS_RESET'
+	// Task management
+	| 'TODO_CREATED'
+	| 'TODO_COMPLETED'
+	| 'TODO_UNCOMPLETED'
+	| 'TODO_ARCHIVED'
+	| 'TODO_RESTORED'
+	| 'TODO_DELETED'
+	// Storage / Files
+	| 'FILE_UPLOADED'
+	| 'FILE_REPLACED'
+	| 'FILE_DELETED'
+	| 'RESUME_PDF_UPLOADED'
+	| 'RESUME_PREVIEW_UPLOADED'
+	// Visitor events
+	| 'VISITOR_RESUME_DOWNLOAD'
+	| 'ADMIN_RESUME_DOWNLOAD'
+	// Security events
+	| 'SECURITY_UNAUTHORIZED_ACCESS'
+	| 'SECURITY_SESSION_HIJACK_ATTEMPT'
+	| 'SECURITY_RATE_LIMIT_HIT'
+	// System events
+	| 'SYSTEM_STARTUP'
+	| 'SYSTEM_ERROR'
+	| 'SYSTEM_CACHE_CLEARED'
+	// Legacy / Compatibility
+	| 'PRIMARY_ADMIN_LOGIN'
+	| 'SECONDARY_ADMIN_LOGIN'
+	| 'PROJECT_ADDED'
+	| 'DESIGN_ADDED'
+	| 'EMAIL_ADDED'
+	| 'EMAIL_REVOKED'
+	| 'RESUME_DOWNLOAD'
+	| 'SYSTEM_INIT'
+	| 'DASHBOARD_OPENED'
+	| 'CUSTOM_EVENT'
+	| (string & {});
 
 export interface SystemLog {
 	id: string;
 	type: LogType;
-	action: string;
+	severity: LogSeverity;
+	action: LogAction;
 	title: string;
 	details?: string;
 	userEmail: string;
 	isPrimaryEmail?: boolean;
 	timestamp: string; // ISO 8601
+
+	// Request context
+	ip?: string;
+	userAgent?: string;
+	requestPath?: string;
+
+	// Session correlation
+	sessionId?: string;
+
+	// Change tracking
+	targetCollection?: string;
+	targetDocId?: string;
+	changeType?: 'create' | 'update' | 'delete';
+	changedFields?: string[];
+	previousValues?: Record<string, any>;
+
+	// Expiration & retention
+	expiresAt?: string; // ISO 8601
+
+	// Structured metadata
 	metadata?: Record<string, any>;
 }
 
 export const systemLogSchema = z.object({
 	id: z.string().min(1),
-	type: z.enum(['auth', 'content', 'admin', 'system']),
+	type: z.enum(['auth', 'content', 'admin', 'system', 'security', 'visitor', 'task', 'storage']),
+	severity: z.enum(['info', 'warn', 'error', 'critical']).default('info'),
 	action: z.string().min(1),
 	title: z.string().min(1),
 	details: z.string().optional(),
 	userEmail: z.string().min(1),
 	isPrimaryEmail: z.boolean().optional(),
 	timestamp: z.string().min(1),
+	expiresAt: z.string().optional(),
+	ip: z.string().optional(),
+	userAgent: z.string().optional(),
+	requestPath: z.string().optional(),
+	sessionId: z.string().optional(),
+	targetCollection: z.string().optional(),
+	targetDocId: z.string().optional(),
+	changeType: z.enum(['create', 'update', 'delete']).optional(),
+	changedFields: z.array(z.string()).optional(),
+	previousValues: z.record(z.string(), z.any()).optional(),
 	metadata: z.record(z.string(), z.any()).optional(),
 });
 

@@ -40,6 +40,20 @@ export const onRequest = defineMiddleware(async (context, next) => {
     } else if (isAdminRoute && !isLoginRoute) {
       context.cookies.delete('admin_session', { path: '/' });
       context.cookies.delete('admin_remember', { path: '/' });
+      try {
+        const { addSystemLog } = await import('./lib/server/system-logs');
+        await addSystemLog({
+          type: 'security',
+          severity: 'warn',
+          action: 'AUTH_SESSION_INVALID',
+          title: 'Invalid or expired session cookie presented',
+          details: `Session verification failed for route: ${pathname}`,
+          userEmail: 'anonymous',
+          requestPath: pathname,
+        });
+      } catch (err) {
+        console.warn('Could not log invalid session in middleware:', err);
+      }
     }
   }
 
