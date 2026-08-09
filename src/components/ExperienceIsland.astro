@@ -118,7 +118,10 @@ function formatDate(dateStr: string | null): string {
 												loading={index < 3 ? 'eager' : 'lazy'}
 											/>
 										) : (
-											<Icon name="business" size={24} class="text-white/40 group-hover:text-primary transition-colors" />
+											<div class="relative flex items-center justify-center">
+												<Icon name="business" size={24} class="text-white/40 group-hover:!hidden" />
+												<Icon name="business" filled size={24} class="text-primary !hidden group-hover:!inline-flex" />
+											</div>
 										)}
 									</div>
 									<div>

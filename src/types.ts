@@ -254,7 +254,7 @@ export const acceptedAdminEmailSchema = z.object({
 // ─── Collection: admin_todos ──────────────────────────────────────────────
 
 export type TodoCategory = 'Feature' | 'Bug' | 'Refactor' | 'Idea' | 'Content' | 'General';
-export type TodoPriority = 'High' | 'Medium' | 'Low';
+export type TodoPriority = 'High' | 'Medium' | 'Low' | '' | undefined;
 export type TodoStatus = 'active' | 'completed' | 'archived';
 
 export interface AdminTodo {
@@ -262,7 +262,7 @@ export interface AdminTodo {
 	title: string;
 	description?: string;
 	category: TodoCategory;
-	priority: TodoPriority;
+	priority?: TodoPriority;
 	status: TodoStatus;
 	createdAt: string; // ISO 8601
 	completedAt?: string | null;
@@ -275,7 +275,7 @@ export const adminTodoSchema = z.object({
 	title: z.string().min(1),
 	description: z.string().optional(),
 	category: z.enum(['Feature', 'Bug', 'Refactor', 'Idea', 'Content', 'General']),
-	priority: z.enum(['High', 'Medium', 'Low']),
+	priority: z.enum(['High', 'Medium', 'Low', '']).optional(),
 	status: z.enum(['active', 'completed', 'archived']),
 	createdAt: z.string().min(1),
 	completedAt: z.string().nullable().optional(),

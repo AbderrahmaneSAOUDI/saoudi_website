@@ -1,4 +1,6 @@
 ---
+import Icon from './Icon.astro';
+
 /**
  * GlobalLightbox Component
  * 
@@ -14,6 +16,17 @@ interface Props {}
 <div id="global-lightbox" class="lightbox-overlay fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
 	<!-- Clicking the overlay background clears the hash to close the lightbox -->
 	<a href="#" class="absolute inset-0 cursor-zoom-out" aria-label="Close Lightbox"></a>
+	
+	<!-- Close button -->
+	<a
+		href="#"
+		class="group absolute top-4 right-4 sm:top-6 sm:right-6 z-20 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all cursor-pointer shadow-lg"
+		aria-label="Close Lightbox"
+		title="Close (Esc)"
+	>
+		<Icon name="close" size={24} class="w-6 h-6 group-hover:hidden" />
+		<Icon name="close" filled size={24} class="w-6 h-6 hidden group-hover:block" />
+	</a>
 	
 	<div class="relative max-w-5xl max-h-[85vh] z-10 flex flex-col items-center">
 		<img

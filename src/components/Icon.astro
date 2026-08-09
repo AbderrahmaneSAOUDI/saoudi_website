@@ -64,6 +64,7 @@ import openInNew from '../icons/open_in_new.svg?raw';
 import phone from '../icons/phone.svg?raw';
 import phoneFilled from '../icons/phone_filled.svg?raw';
 import plus from '../icons/plus.svg?raw';
+import priority from '../icons/priority.svg?raw';
 import projects from '../icons/projects.svg?raw';
 import projectsFilled from '../icons/projects_filled.svg?raw';
 import save from '../icons/save.svg?raw';
@@ -81,6 +82,9 @@ import shieldWarning from '../icons/shield_warning.svg?raw';
 import shieldWarningFilled from '../icons/shield_warning_filled.svg?raw';
 import show from '../icons/show.svg?raw';
 import tag from '../icons/tag.svg?raw';
+import taskActive from '../icons/task_active.svg?raw';
+import taskArchive from '../icons/task_archive.svg?raw';
+import taskDone from '../icons/task_done.svg?raw';
 import telegram from '../icons/telegram.svg?raw';
 import telegramFilled from '../icons/telegram_filled.svg?raw';
 import trash from '../icons/trash.svg?raw';
@@ -141,6 +145,7 @@ const icons = {
     phone,
     phone_filled: phoneFilled,
     plus,
+    priority,
     projects,
     projects_filled: projectsFilled,
     save,
@@ -158,6 +163,9 @@ const icons = {
     shield_warning_filled: shieldWarningFilled,
     show,
     tag,
+    task_active: taskActive,
+    task_archive: taskArchive,
+    task_done: taskDone,
     telegram,
     telegram_filled: telegramFilled,
     trash,
@@ -179,6 +187,16 @@ if (processedSvg) {
             .replace(/<svg([^>]*)>/, `<svg$1 fill="none" stroke="${fillColor}">`);
     } else if (iconName === 'gdg_filled') {
         // Keep multi-color fills in gdg_filled intact
+    } else if (iconName === 'task_done') {
+        processedSvg = processedSvg
+            .replace(/stroke="#222222"/g, `stroke="${fillColor}"`)
+            .replace(/fill="#222222"/g, `fill="${fillColor}"`);
+    } else if (iconName === 'task_active') {
+        processedSvg = processedSvg.replace(/fill="#0F1F3C"/g, `fill="${fillColor}"`);
+    } else if (iconName === 'task_archive') {
+        processedSvg = processedSvg.replace(/fill="#1C274C"/g, `fill="${fillColor}"`);
+    } else if (iconName === 'priority') {
+        processedSvg = processedSvg.replace(/fill="#000000"/g, `fill="${fillColor}"`);
     } else {
         processedSvg = processedSvg
             .replace(/fill="[^"]*"/g, '')
@@ -189,8 +207,8 @@ if (processedSvg) {
 
 {processedSvg ? (
     <span 
-        class={className} 
-        style={`display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;${color ? `color:${color};` : 'color:inherit;'}${style || ''}`}
+        class:list={['inline-flex items-center justify-center', className]} 
+        style={`width:${size}px;height:${size}px;${color ? `color:${color};` : 'color:inherit;'}${style || ''}`}
         set:html={processedSvg} 
     />
 ) : null}

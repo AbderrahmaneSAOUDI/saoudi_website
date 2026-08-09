@@ -42,8 +42,10 @@ const firestoreBadgeStyle = isConnected
 			<span class="px-2.5 py-1 rounded-full bg-[#211F26] border border-[#2B2930] text-[#E6E1E5]/70 text-[11px] md:text-xs">
 				Environment: <strong class="text-white font-semibold">Production</strong>
 			</span>
-			<span class={`px-2.5 py-1 rounded-full border font-medium text-[11px] md:text-xs ${firestoreBadgeStyle}`}>
-				Firestore: {systemStatus}
+			<span class={`px-2.5 py-1 rounded-full border font-medium text-[11px] md:text-xs flex items-center gap-1.5 group/shield ${firestoreBadgeStyle}`}>
+				<Icon name={isConnected ? "shield_protected" : "shield_empty"} size={14} class="w-3.5 h-3.5 group-hover/shield:!hidden" />
+				<Icon name={isConnected ? "shield_protected_filled" : "shield_empty_filled"} size={14} class="w-3.5 h-3.5 !hidden group-hover/shield:!inline-flex" />
+				<span>Firestore: {systemStatus}</span>
 			</span>
 		</div>
 

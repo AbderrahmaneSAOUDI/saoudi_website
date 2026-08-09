@@ -30,25 +30,28 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 			<button
 				type="button"
 				data-tab="active"
-				class="todo-tab-btn px-3 py-1.5 rounded-xl bg-primary text-white font-bold transition-all cursor-pointer flex items-center gap-1.5"
+				class="todo-tab-btn px-2.5 py-1.5 rounded-xl bg-primary text-white font-bold transition-all cursor-pointer flex items-center gap-1.5"
+				title="Active Tasks"
 			>
-				<span>Active</span>
+				<Icon name="task_active" size={16} class="w-4 h-4" />
 				<span id="tab-count-active" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white">0</span>
 			</button>
 			<button
 				type="button"
 				data-tab="completed"
-				class="todo-tab-btn px-3 py-1.5 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
+				class="todo-tab-btn px-2.5 py-1.5 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
+				title="Completed Tasks"
 			>
-				<span>Done</span>
+				<Icon name="task_done" size={16} class="w-4 h-4" />
 				<span id="tab-count-completed" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/10 text-white/70">0</span>
 			</button>
 			<button
 				type="button"
 				data-tab="archived"
-				class="todo-tab-btn px-3 py-1.5 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
+				class="todo-tab-btn px-2.5 py-1.5 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
+				title="Archived Tasks"
 			>
-				<span>Archive</span>
+				<Icon name="task_archive" size={16} class="w-4 h-4" />
 				<span id="tab-count-archived" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/10 text-white/70">0</span>
 			</button>
 		</div>
@@ -61,7 +64,7 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 				type="text"
 				id="todo-title-input"
 				required
-				placeholder="Brainstorm a task or idea... (e.g. Refactor Firestore cache, Add dark theme setting)"
+				placeholder="Brainstorm a task or idea..."
 				class="flex-1 px-3.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-xs focus:outline-none focus:border-primary transition-colors placeholder-[#E6E1E5]/40"
 			/>
 
@@ -78,21 +81,21 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 					<option value="General" selected>General</option>
 				</select>
 
-				<select
-					id="todo-priority-select"
-					class="px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-xs focus:outline-none focus:border-primary cursor-pointer"
+				<input type="hidden" id="todo-priority-input" name="priority" value="" />
+				<button
+					type="button"
+					id="todo-priority-toggle"
+					class="px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-[#E6E1E5]/40 hover:text-white transition-all cursor-pointer flex items-center justify-center gap-1"
+					title="Priority: Off (Click to set High)"
 				>
-					<option value="High">⚡ High</option>
-					<option value="Medium" selected>📌 Medium</option>
-					<option value="Low">💤 Low</option>
-				</select>
+					<Icon name="priority" size={16} class="w-4 h-4" />
+				</button>
 
 				<button
 					type="submit"
 					class="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shadow shrink-0"
 				>
 					<Icon name="plus" size={16} class="w-4 h-4" />
-					<span class="hidden sm:inline">Add Task</span>
 				</button>
 			</div>
 		</div>
@@ -135,13 +138,45 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 		const addTodoForm = document.getElementById('add-todo-form') as HTMLFormElement;
 		const titleInput = document.getElementById('todo-title-input') as HTMLInputElement;
 		const categorySelect = document.getElementById('todo-category-select') as HTMLSelectElement;
-		const prioritySelect = document.getElementById('todo-priority-select') as HTMLSelectElement;
+		const priorityInput = document.getElementById('todo-priority-input') as HTMLInputElement;
+		const priorityToggle = document.getElementById('todo-priority-toggle') as HTMLButtonElement;
 
 		const statusMessage = document.getElementById('todo-status-message') as HTMLDivElement;
 		const tabButtons = document.querySelectorAll('.todo-tab-btn') as NodeListOf<HTMLButtonElement>;
 
 		let currentTab: 'active' | 'completed' | 'archived' = 'active';
 		let todos: any[] = (window as any).initialAdminTodos || [];
+
+		function updatePriorityToggleUI() {
+			const val = priorityInput ? priorityInput.value : '';
+			if (!priorityToggle) return;
+			if (val === 'High') {
+				priorityToggle.className = 'px-2.5 py-2 rounded-xl border border-[#DB4437]/50 bg-[#DB4437]/15 text-[#DB4437] transition-all cursor-pointer flex items-center justify-center gap-1';
+				priorityToggle.title = 'Priority: High (Click for Medium)';
+			} else if (val === 'Medium') {
+				priorityToggle.className = 'px-2.5 py-2 rounded-xl border border-[#F4B400]/50 bg-[#F4B400]/15 text-[#F4B400] transition-all cursor-pointer flex items-center justify-center gap-1';
+				priorityToggle.title = 'Priority: Medium (Click for Low)';
+			} else if (val === 'Low') {
+				priorityToggle.className = 'px-2.5 py-2 rounded-xl border border-primary/50 bg-primary/15 text-primary transition-all cursor-pointer flex items-center justify-center gap-1';
+				priorityToggle.title = 'Priority: Low (Click to turn Off)';
+			} else {
+				priorityToggle.className = 'px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-[#E6E1E5]/40 hover:text-white transition-all cursor-pointer flex items-center justify-center gap-1';
+				priorityToggle.title = 'Priority: Off (Click to set High)';
+			}
+		}
+
+		if (priorityToggle && priorityInput) {
+			priorityToggle.addEventListener('click', () => {
+				const current = priorityInput.value;
+				let next = '';
+				if (!current) next = 'High';
+				else if (current === 'High') next = 'Medium';
+				else if (current === 'Medium') next = 'Low';
+				else next = '';
+				priorityInput.value = next;
+				updatePriorityToggleUI();
+			});
+		}
 
 		// Fetch fresh data from API with cache buster
 		fetchTodos();
@@ -232,11 +267,17 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 					'General': 'bg-white/10 text-white/70 border-white/10',
 				}[todo.category as string] || 'bg-white/10 text-white/70 border-white/10';
 
-				const priorityBadge = {
-					'High': 'text-[#DB4437] border-[#DB4437]/40 bg-[#DB4437]/10',
-					'Medium': 'text-[#F4B400] border-[#F4B400]/40 bg-[#F4B400]/10',
-					'Low': 'text-primary border-primary/40 bg-primary/10',
-				}[todo.priority as string] || 'text-white/50 border-white/20 bg-white/5';
+				const priorityBadge = todo.priority && todo.priority !== ''
+					? `<span class="px-1.5 py-0.5 rounded-md text-[10px] font-semibold border flex items-center justify-center shrink-0 ${
+							todo.priority === 'High'
+								? 'text-[#DB4437] border-[#DB4437]/40 bg-[#DB4437]/10'
+								: todo.priority === 'Medium'
+								? 'text-[#F4B400] border-[#F4B400]/40 bg-[#F4B400]/10'
+								: 'text-primary border-primary/40 bg-primary/10'
+						}" title="Priority: ${todo.priority}">
+							<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 52 52" class="w-3 h-3"><path d="M9 3.5C9 2.7 8.3 2 7.5 2h-3C3.7 2 3 2.7 3 3.5v45c0 .8.7 1.5 1.5 1.5h3c.8 0 1.5-.7 1.5-1.5zm38.5 4.2c-16 8.4-14.2-8.8-33.5-2.1-.6.2-1 .8-1 1.4v23.3c0 .7.7 1.2 1.3.9 19.2-6.4 17.2 11.2 33.9 1.8.5-.3.8-.8.8-1.3V8.5c0-.7-.8-1.2-1.5-.8"/></svg>
+						</span>`
+					: '';
 
 				const creatorBadge = isPrimary && todo.createdBy
 					? `<span class="px-1.5 py-0.2 rounded-md text-[10px] font-mono border border-white/10 text-white/50 bg-white/5 truncate max-w-[120px]" title="Created by ${todo.createdBy}">by ${todo.createdBy}</span>`
@@ -275,9 +316,7 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 								<span class="px-2 py-0.2 rounded-md text-[10px] font-bold border uppercase tracking-wider ${categoryColor}">
 									${todo.category || 'General'}
 								</span>
-								<span class="px-1.5 py-0.2 rounded-md text-[10px] font-semibold border ${priorityBadge}">
-									${todo.priority || 'Medium'}
-								</span>
+								${priorityBadge}
 								${creatorBadge}
 							</div>
 						</div>
@@ -481,7 +520,7 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 			e.preventDefault();
 			const title = titleInput.value.trim();
 			const category = categorySelect.value;
-			const priority = prioritySelect.value;
+			const priority = priorityInput ? priorityInput.value : '';
 
 			if (!title) return;
 
@@ -500,6 +539,8 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 				const data = await res.json();
 				if (res.ok && data.success) {
 					titleInput.value = '';
+					if (priorityInput) priorityInput.value = '';
+					updatePriorityToggleUI();
 					showStatus('New task added to brainstorm list! 🚀', 'success');
 					if (data.todo) {
 						// Remove any existing todo with same ID if present and unshift

@@ -17,8 +17,9 @@ const { initialEmails = [], isPrimaryAdmin = (userEmail === primaryEmail && prim
 	<!-- Card Header -->
 	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#2B2930]/80 pb-4 shrink-0">
 		<div class="flex items-center gap-3">
-			<div class="p-2.5 rounded-2xl bg-primary/10 text-primary border border-primary/20">
-				<Icon name="security" size={24} class="w-6 h-6" />
+			<div class="p-2.5 rounded-2xl bg-primary/10 text-primary border border-primary/20 group/shield cursor-pointer">
+				<Icon name="shield_protected" size={24} class="w-6 h-6 group-hover/shield:!hidden" />
+				<Icon name="shield_protected_filled" size={24} class="w-6 h-6 !hidden group-hover/shield:!inline-flex" />
 			</div>
 			<div>
 				<div class="flex items-center gap-2">
@@ -46,7 +47,10 @@ const { initialEmails = [], isPrimaryAdmin = (userEmail === primaryEmail && prim
 	<div id="add-email-form-container" class="hidden mt-4 p-4 rounded-2xl bg-[#211F26] border border-[#2B2930] transition-all duration-300 space-y-3 shrink-0">
 		<div class="flex items-center justify-between">
 			<h3 class="text-xs font-bold text-white uppercase tracking-wider">Grant Admin Access</h3>
-			<button type="button" id="btn-close-add-email" class="text-[#E6E1E5]/50 hover:text-white text-sm font-bold cursor-pointer">&times;</button>
+			<button type="button" id="btn-close-add-email" class="group p-1 rounded-lg text-[#E6E1E5]/50 hover:text-white hover:bg-white/5 transition-all cursor-pointer" title="Close">
+				<Icon name="close" size={16} class="w-4 h-4 group-hover:!hidden" />
+				<Icon name="close_filled" size={16} class="w-4 h-4 !hidden group-hover:!inline-flex" />
+			</button>
 		</div>
 		<form id="add-email-form" class="space-y-3">
 			<div>

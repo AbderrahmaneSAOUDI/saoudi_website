@@ -113,9 +113,11 @@ try {
 						<button
 							type="button"
 							id="btn-close-filters"
-							class="text-[#E6E1E5]/60 hover:text-white transition-colors cursor-pointer text-xl font-bold"
+							class="group p-1.5 rounded-lg text-[#E6E1E5]/60 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+							title="Close Filters"
 						>
-							&times;
+							<Icon name="close" size={18} class="w-4.5 h-4.5 group-hover:hidden" />
+							<Icon name="close" filled size={18} class="w-4.5 h-4.5 hidden group-hover:block" />
 						</button>
 					</div>
 
@@ -402,7 +404,10 @@ try {
 				<div>
 					<div class="border-b border-[#2B2930]/60 pb-3 flex justify-between items-center mb-4">
 						<h3 class="text-lg font-bold text-white">Manage Companies</h3>
-						<button id="close-companies-modal" class="text-[#E6E1E5]/60 hover:text-white transition-colors cursor-pointer text-xl font-bold">&times;</button>
+						<button id="close-companies-modal" type="button" class="group p-1.5 rounded-lg text-[#E6E1E5]/60 hover:text-white hover:bg-white/5 transition-all cursor-pointer" title="Close">
+							<Icon name="close" size={18} class="w-4.5 h-4.5 group-hover:hidden" />
+							<Icon name="close" filled size={18} class="w-4.5 h-4.5 hidden group-hover:block" />
+						</button>
 					</div>
 
 					<!-- Scrollable companies list with rearrange handles -->

@@ -66,7 +66,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			}
 
 			const category: TodoCategory = VALID_CATEGORIES.has(categoryRaw) ? categoryRaw : 'General';
-			const priority: TodoPriority = VALID_PRIORITIES.has(priorityRaw) ? priorityRaw : 'Medium';
+			const priority: TodoPriority = VALID_PRIORITIES.has(priorityRaw) ? priorityRaw : '';
 			const newId = todoId || `todo_${crypto.randomUUID().substring(0, 8)}`;
 			const now = new Date().toISOString();
 			const creatorEmail = (locals.adminEmail || '').toLowerCase().trim();
