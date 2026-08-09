@@ -4,11 +4,6 @@ import Icon from "../components/Icon.astro";
 import HomeCountsIsland from "../components/HomeCountsIsland.astro";
 import ContactCard from "../components/ContactCard.astro";
 
-// Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
-Astro.response.headers.set(
-	"Cache-Control",
-	"public, max-age=0, s-maxage=3600, stale-while-revalidate=600",
-);
 ---
 
 <BaseLayout title="Home">

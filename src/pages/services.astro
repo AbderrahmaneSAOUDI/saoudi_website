@@ -13,12 +13,6 @@ import type { Service } from "../types";
 import { getFirebaseAdminDb } from "../lib/server/firebase-admin";
 import { CACHE_TTL_MS, getOrSetCached } from "../lib/server/cache";
 
-// Cache page response at edge CDN for 1 hour, revalidate in background up to 10 minutes
-Astro.response.headers.set(
-	"Cache-Control",
-	"public, max-age=0, s-maxage=3600, stale-while-revalidate=600",
-);
-
 let services: Service[] = [];
 let errorMsg = "";
 
