@@ -131,16 +131,18 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 			)}
 		</div>
 
-		<!-- Admin Email Filter Dropdown -->
-		<div class="relative shrink-0">
-			<select
-				id="log-email-filter"
-				class="px-2.5 py-1.5 rounded-xl bg-[#211F26] border border-[#2B2930] text-xs text-[#E6E1E5]/80 focus:outline-none focus:border-primary/50 transition-all cursor-pointer max-w-[150px] truncate"
-				title="Filter by admin email"
-			>
-				<option value="all">All Emails</option>
-			</select>
-		</div>
+		<!-- Admin Email Filter Dropdown (Primary Admin Only) -->
+		{isPrimaryAdmin && (
+			<div class="relative shrink-0">
+				<select
+					id="log-email-filter"
+					class="px-2.5 py-1.5 rounded-xl bg-[#211F26] border border-[#2B2930] text-xs text-[#E6E1E5]/80 focus:outline-none focus:border-primary/50 transition-all cursor-pointer max-w-[150px] truncate"
+					title="Filter by admin email"
+				>
+					<option value="all">All Emails</option>
+				</select>
+			</div>
+		)}
 	</div>
 
 	<!-- Scrollable Activity Logs Container -->
@@ -237,6 +239,7 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 		}
 
 		async function fetchActiveEmails() {
+			if (!(window as any).isPrimaryAdminUser) return;
 			try {
 				const res = await fetch('/admin/admin_emails_api');
 				if (res.ok) {

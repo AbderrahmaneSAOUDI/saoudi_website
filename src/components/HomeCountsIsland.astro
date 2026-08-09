@@ -45,56 +45,129 @@ try {
 }
 
 function formatStatCount(count: number): string {
-	if (count <= 0) return '0';
-	if (count < 10) return `${count}`;
-	return `+${count}`;
+	if (count <= 10) return `${Math.max(0, count)}`;
+	const floored = Math.floor(count / 10) * 10;
+	return `+${floored}`;
 }
 
 const statCards = [
-	{ label: 'Projects', value: formatStatCount(counts.projects), icon: 'projects', color: 'primary', href: '/projects', disabled: false },
-	{ label: 'Experience', value: formatStatCount(counts.experience), icon: 'experience', color: 'secondary', href: '/experience', disabled: false },
-	{ label: 'Designs', value: formatStatCount(counts.designs), icon: 'design', color: 'tertiary', href: '/designs', disabled: false },
-	{ label: 'Certificates', value: formatStatCount(counts.certificates), icon: 'certifications', color: 'primary', href: '/certifications', disabled: false },
-	{ label: 'Volunteering', value: formatStatCount(counts.volunteering), icon: 'business', color: 'secondary', href: '#', disabled: true },
+	{ label: 'Projects', rawValue: counts.projects, value: formatStatCount(counts.projects), icon: 'projects', color: 'primary', href: '/projects', disabled: false },
+	{ label: 'Experience', rawValue: counts.experience, value: formatStatCount(counts.experience), icon: 'experience', color: 'secondary', href: '/experience', disabled: false },
+	{ label: 'Designs', rawValue: counts.designs, value: formatStatCount(counts.designs), icon: 'design', color: 'tertiary', href: '/designs', disabled: false },
+	{ label: 'Certificates', rawValue: counts.certificates, value: formatStatCount(counts.certificates), icon: 'certifications', color: 'primary', href: '/certifications', disabled: false },
+	{ label: 'Volunteering', rawValue: counts.volunteering, value: formatStatCount(counts.volunteering), icon: 'business', color: 'secondary', href: '#', disabled: true },
 ];
 ---
 
 <div class="relative grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-	{statCards.map(({ label, value, icon, color, href, disabled }) => 
+	{statCards.map(({ label, rawValue, value, icon, color, href, disabled }) => 
 		disabled ? (
 			<button
 				type="button"
-				class={`btn-disabled-home-card text-left p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover-card-border hover:border-primary/80 border border-white/10 bg-surface-container group cursor-pointer`}
+				class={`btn-disabled-home-card text-left p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover-card-border hover:border-primary/80 hover:bg-surface-container-high border border-white/10 bg-surface-container group cursor-pointer shadow-none`}
 				data-title={label}
 			>
 				<div class="flex justify-between items-start mb-4">
-					<div class={`relative p-2.5 rounded-2xl bg-${color}/10 text-${color}`}>
+					<div class={`relative w-11 h-11 flex items-center justify-center rounded-2xl bg-${color}/10 text-${color} transition-transform duration-300 group-hover:scale-105`}>
 						<Icon name={icon} size={24} class="w-6 h-6 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90" />
-						<Icon name={icon} filled size={24} class="absolute top-2.5 left-2.5 w-6 h-6 opacity-0 transition-all duration-200 scale-90 group-hover:opacity-100 group-hover:scale-100" />
+						<Icon name={icon} filled size={24} class="absolute inset-0 m-auto w-6 h-6 opacity-0 transition-all duration-200 scale-90 group-hover:opacity-100 group-hover:scale-100" />
 					</div>
-					<span class="text-2xl font-black text-white">{value}</span>
+					<span class="stat-counter-value text-2xl font-black text-white inline-block transition-transform duration-200" data-target={rawValue}>{value}</span>
 				</div>
-				<h3 class="font-bold text-[#E6E1E5]">{label}</h3>
+				<h3 class="font-bold text-[#E6E1E5] transition-colors duration-200 group-hover:text-white">{label}</h3>
 			</button>
 		) : (
 			<a
 				href={href}
-				class={`block p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover-card-border hover:border-primary/80 border border-white/10 bg-surface-container group cursor-pointer`}
+				class={`block p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover-card-border hover:border-primary/80 hover:bg-surface-container-high border border-white/10 bg-surface-container group cursor-pointer shadow-none`}
 			>
 				<div class="flex justify-between items-start mb-4">
-					<div class={`relative p-2.5 rounded-2xl bg-${color}/10 text-${color}`}>
+					<div class={`relative w-11 h-11 flex items-center justify-center rounded-2xl bg-${color}/10 text-${color} transition-transform duration-300 group-hover:scale-105`}>
 						<Icon name={icon} size={24} class="w-6 h-6 transition-all duration-200 group-hover:opacity-0 group-hover:scale-90" />
-						<Icon name={icon} filled size={24} class="absolute top-2.5 left-2.5 w-6 h-6 opacity-0 transition-all duration-200 scale-90 group-hover:opacity-100 group-hover:scale-100" />
+						<Icon name={icon} filled size={24} class="absolute inset-0 m-auto w-6 h-6 opacity-0 transition-all duration-200 scale-90 group-hover:opacity-100 group-hover:scale-100" />
 					</div>
-					<span class="text-2xl font-black text-white">{value}</span>
+					<span class="stat-counter-value text-2xl font-black text-white inline-block transition-transform duration-200" data-target={rawValue}>{value}</span>
 				</div>
-				<h3 class="font-bold text-[#E6E1E5]">{label}</h3>
+				<h3 class="font-bold text-[#E6E1E5] transition-colors duration-200 group-hover:text-white">{label}</h3>
 			</a>
 		)
 	)}
 </div>
 
 <script>
+	function formatStatCount(count: number): string {
+		if (count <= 10) return `${Math.max(0, count)}`;
+		const floored = Math.floor(count / 10) * 10;
+		return `+${floored}`;
+	}
+
+	function animateCounters() {
+		const counterEls = document.querySelectorAll<HTMLElement>('.stat-counter-value');
+		if (!counterEls.length) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						const el = entry.target as HTMLElement;
+						observer.unobserve(el);
+
+						const targetRaw = parseInt(el.getAttribute('data-target') || '0', 10);
+						if (isNaN(targetRaw) || targetRaw <= 0) {
+							el.textContent = '0';
+							return;
+						}
+
+						const isOverTen = targetRaw > 10;
+						const targetLimit = isOverTen ? Math.floor(targetRaw / 10) * 10 : targetRaw;
+						el.textContent = isOverTen ? '+0' : '0';
+
+						const duration = 1600; // 1.6s smooth easing
+						const startTime = performance.now();
+						let lastVal = -1;
+
+						function step(now: number) {
+							const elapsed = now - startTime;
+							const progress = Math.min(elapsed / duration, 1);
+							// Quartic ease-out for ultra-smooth deceleration
+							const easeProgress = 1 - Math.pow(1 - progress, 4);
+							const currentVal = Math.floor(targetLimit * easeProgress);
+
+							if (currentVal !== lastVal) {
+								lastVal = currentVal;
+								el.textContent = isOverTen ? `+${currentVal}` : `${currentVal}`;
+							}
+
+							if (progress < 1) {
+								requestAnimationFrame(step);
+							} else {
+								el.textContent = formatStatCount(targetRaw);
+								// Subtle finish pop for visual feedback (shadow-free)
+								el.classList.add('scale-110');
+								setTimeout(() => {
+									el.classList.remove('scale-110');
+								}, 200);
+							}
+						}
+
+						requestAnimationFrame(step);
+					}
+				});
+			},
+			{ threshold: 0.2, rootMargin: '0px 0px -20px 0px' }
+		);
+
+		counterEls.forEach((el) => {
+			observer.observe(el);
+		});
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', animateCounters);
+	} else {
+		animateCounters();
+	}
+
 	document.addEventListener('DOMContentLoaded', () => {
 		document.querySelectorAll('.btn-disabled-home-card').forEach((btn) => {
 			btn.addEventListener('click', () => {

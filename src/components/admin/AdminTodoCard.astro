@@ -116,11 +116,12 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 	</div>
 </div>
 
-<script is:inline define:vars={{ initialTodosData: initialTodos, isPrimaryAdminUser: isPrimaryAdmin, currentAdminEmail: userEmail }}>
+<script is:inline define:vars={{ initialTodosData: initialTodos, isPrimaryAdminUser: isPrimaryAdmin, currentAdminEmail: userEmail, primaryAdminEmail: primaryEmail }}>
 	Object.assign(window, { 
 		initialAdminTodos: initialTodosData || [],
 		isPrimaryAdminUser: Boolean(isPrimaryAdminUser),
-		currentAdminEmail: currentAdminEmail || ''
+		currentAdminEmail: currentAdminEmail || '',
+		primaryAdminEmail: primaryAdminEmail || ''
 	});
 </script>
 
@@ -146,6 +147,22 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 
 		let currentTab: 'active' | 'completed' | 'archived' = 'active';
 		let todos: any[] = (window as any).initialAdminTodos || [];
+
+		function formatEmailLabel(email: string): string {
+			if (!email || typeof email !== 'string') return '';
+			const primaryOwner = ((window as any).primaryAdminEmail || '').toLowerCase().trim();
+			const cleanEmail = email.toLowerCase().trim();
+
+			if (primaryOwner && cleanEmail === primaryOwner) {
+				return 'Owner';
+			}
+
+			if (cleanEmail.endsWith('@gmail.com')) {
+				return cleanEmail.slice(0, -10);
+			}
+
+			return email;
+		}
 
 		function updatePriorityToggleUI() {
 			const val = priorityInput ? priorityInput.value : '';
@@ -279,8 +296,9 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 						</span>`
 					: '';
 
+				const creatorLabel = formatEmailLabel(todo.createdBy);
 				const creatorBadge = isPrimary && todo.createdBy
-					? `<span class="px-1.5 py-0.2 rounded-md text-[10px] font-mono border border-white/10 text-white/50 bg-white/5 truncate max-w-[120px]" title="Created by ${todo.createdBy}">by ${todo.createdBy}</span>`
+					? `<span class="px-1.5 py-0.2 rounded-md text-[10px] font-mono border border-white/10 text-white/50 bg-white/5 truncate max-w-[120px]" title="Created by ${creatorLabel}">by ${creatorLabel}</span>`
 					: '';
 
 				const card = document.createElement('div');
