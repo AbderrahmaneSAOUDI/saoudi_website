@@ -4,10 +4,15 @@ import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
 import {
 	getErrorMessage,
 	getFormFile,
-	isFormRequest,
 	jsonResponse,
 } from '../../lib/server/http';
 import { deleteFile, saveFile } from '../../lib/server/storage';
+import {
+	safeSystemLog,
+	validateAdminSession,
+	validateFormRequest,
+	validateWebpImage,
+} from '../../lib/server/api-guards';
 
 const RESUME_DIRECTORY = 'uploads/resume';
 const MAX_FILE_BYTES = 800 * 1024;
@@ -18,10 +23,10 @@ type UploadedFile = {
 };
 
 export const POST: APIRoute = async ({ locals, request }) => {
-	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
-	if (!isFormRequest(request)) {
-		return jsonResponse({ error: 'Expected a form-encoded request.' }, 415);
-	}
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
+	const formErr = validateFormRequest(request);
+	if (formErr) return formErr;
 
 	try {
 		const formData = await request.formData();
@@ -41,12 +46,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		}
 
 		if (resumePreview) {
-			if (resumePreview.type !== 'image/webp') {
-				return jsonResponse({ error: 'Preview must be a WebP image' }, 400);
-			}
-			if (resumePreview.size > MAX_FILE_BYTES) {
-				return jsonResponse({ error: 'Preview image must be under 800KB' }, 400);
-			}
+			const imageErr = validateWebpImage(resumePreview, MAX_FILE_BYTES, 'Preview must be a WebP image', 'Preview image must be under 800KB');
+			if (imageErr) return imageErr;
 		}
 
 		const db = getFirebaseAdminDb();
@@ -123,23 +124,18 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 		clearCache('resume_config');
 
-		try {
-			const { addSystemLog } = await import('../../lib/server/system-logs');
-			const updatedFields = uploads.map((u) => (u.field === 'resumeUrl' ? 'PDF' : 'Preview Image')).join(' and ');
-			await addSystemLog({
-				type: 'content',
-				severity: 'info',
-				action: 'RESUME_UPDATED',
-				title: `Updated resume ${updatedFields}`,
-				details: `Uploaded new files to Storage bucket by ${locals.adminEmail}`,
-				userEmail: locals.adminEmail,
-				targetCollection: 'configuration',
-				targetDocId: 'static_data',
-				changeType: 'update',
-			});
-		} catch (logErr) {
-			console.warn('Could not log resume upload event:', logErr);
-		}
+		const updatedFields = uploads.map((u) => (u.field === 'resumeUrl' ? 'PDF' : 'Preview Image')).join(' and ');
+		await safeSystemLog({
+			type: 'content',
+			severity: 'info',
+			action: 'RESUME_UPDATED',
+			title: `Updated resume ${updatedFields}`,
+			details: `Uploaded new files to Storage bucket by ${locals.adminEmail}`,
+			userEmail: locals.adminEmail,
+			targetCollection: 'configuration',
+			targetDocId: 'static_data',
+			changeType: 'update',
+		});
 
 		return jsonResponse({
 			success: true,

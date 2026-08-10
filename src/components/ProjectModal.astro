@@ -268,6 +268,20 @@ const { projects = [] } = Astro.props;
 					div.appendChild(a);
 				});
 				return div;
+			} else if (block.type === 'list') {
+				const items = Array.isArray(block.items) ? block.items : [];
+				if (items.length === 0) return null;
+				const isNumbered = block.listType === 'number';
+				const listEl = document.createElement(isNumbered ? 'ol' : 'ul');
+				listEl.className = `text-xs sm:text-sm text-white/80 space-y-1.5 my-2 pl-5 ${isNumbered ? 'list-decimal' : 'list-disc'}`;
+				items.forEach(itemText => {
+					if (!itemText || !itemText.trim()) return;
+					const li = document.createElement('li');
+					li.className = 'leading-relaxed';
+					li.textContent = itemText;
+					listEl.appendChild(li);
+				});
+				return listEl;
 			}
 			return null;
 		}

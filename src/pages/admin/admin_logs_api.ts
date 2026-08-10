@@ -1,19 +1,28 @@
 import type { APIRoute } from 'astro';
-import { getSystemLogs, addSystemLog, deleteSystemLog, purgeExpiredSystemLogs, canUserAccessLog } from '../../lib/server/system-logs';
+import {
+	getSystemLogs,
+	addSystemLog,
+	deleteSystemLog,
+	purgeExpiredSystemLogs,
+	canUserAccessLog,
+} from '../../lib/server/system-logs';
 import { getEnv } from '../../lib/server/env';
+import { getErrorMessage, jsonResponse } from '../../lib/server/http';
+import {
+	safeSystemLog,
+	validateAdminSession,
+	validateFormRequest,
+	validateOwnerPermission,
+} from '../../lib/server/api-guards';
 
 export const GET: APIRoute = async ({ url, locals }) => {
-	try {
-		const adminEmail = locals.adminEmail;
-		if (!adminEmail) {
-			return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-				status: 401,
-				headers: { 'Content-Type': 'application/json' },
-			});
-		}
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
 
+	try {
+		const adminEmail = locals.adminEmail!;
 		const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
-		const callerEmail = (adminEmail || '').toLowerCase().trim();
+		const callerEmail = adminEmail.toLowerCase().trim();
 		const isPrimaryAdmin = callerEmail === primaryEmail && primaryEmail !== '';
 
 		const requestedFilter = url.searchParams.get('type') || 'all';
@@ -21,75 +30,56 @@ export const GET: APIRoute = async ({ url, locals }) => {
 
 		// For secondary admin requesting hidden types (admin, security, system), return empty early
 		if (!isPrimaryAdmin && ['admin', 'security', 'system'].includes(requestedFilter)) {
-			return new Response(JSON.stringify({ success: true, logs: [] }), {
-				status: 200,
-				headers: { 'Content-Type': 'application/json' },
-			});
+			return jsonResponse({ success: true, logs: [] });
 		}
 
 		const fetchType = requestedFilter === 'my_activity' ? 'all' : requestedFilter;
 		let logs = await getSystemLogs(100, fetchType);
 
 		// Apply Access Control Matrix filtering
-		logs = logs.filter(l => canUserAccessLog(l, callerEmail, isPrimaryAdmin));
+		logs = logs.filter((l) => canUserAccessLog(l, callerEmail, isPrimaryAdmin));
 
 		// Additional filter for 'my_activity' tab (only logs produced by current user)
 		if (requestedFilter === 'my_activity') {
-			logs = logs.filter(l => (l.userEmail || '').toLowerCase().trim() === callerEmail);
+			logs = logs.filter((l) => (l.userEmail || '').toLowerCase().trim() === callerEmail);
 		}
 
 		if (searchQuery) {
 			logs = logs.filter(
-				l =>
+				(l) =>
 					l.title.toLowerCase().includes(searchQuery) ||
 					(l.details && l.details.toLowerCase().includes(searchQuery)) ||
 					l.userEmail.toLowerCase().includes(searchQuery) ||
-					l.action.toLowerCase().includes(searchQuery)
+					l.action.toLowerCase().includes(searchQuery),
 			);
 		}
 
-		return new Response(JSON.stringify({ success: true, logs }), {
-			status: 200,
-			headers: { 'Content-Type': 'application/json' },
-		});
+		return jsonResponse({ success: true, logs });
 	} catch (error) {
 		console.error('Error fetching admin logs:', error);
-		return new Response(JSON.stringify({ error: 'Failed to fetch logs' }), {
-			status: 500,
-			headers: { 'Content-Type': 'application/json' },
-		});
+		return jsonResponse({ error: getErrorMessage(error, 'Failed to fetch logs') }, 500);
 	}
 };
 
 export const POST: APIRoute = async ({ request, locals }) => {
-	try {
-		const adminEmail = locals.adminEmail;
-		if (!adminEmail) {
-			return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-				status: 401,
-				headers: { 'Content-Type': 'application/json' },
-			});
-		}
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
+	const formErr = validateFormRequest(request);
+	if (formErr) return formErr;
 
+	try {
+		const adminEmail = locals.adminEmail!;
 		const formData = await request.formData();
 		const action = formData.get('action') as string;
 
 		if (action === 'purge_expired') {
-			const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
-			const callerEmail = (adminEmail || '').toLowerCase().trim();
-			const isOwner = callerEmail === primaryEmail && primaryEmail !== '';
-
-			if (!isOwner) {
-				return new Response(JSON.stringify({ error: 'Permission denied. Only the owner can purge logs.' }), {
-					status: 403,
-					headers: { 'Content-Type': 'application/json' },
-				});
-			}
+			const ownerErr = validateOwnerPermission(adminEmail);
+			if (ownerErr) return ownerErr;
 
 			const { success, deletedCount } = await purgeExpiredSystemLogs();
 
 			if (success) {
-				await addSystemLog({
+				await safeSystemLog({
 					type: 'system',
 					severity: 'info',
 					action: 'SYSTEM_CACHE_CLEARED',
@@ -98,49 +88,26 @@ export const POST: APIRoute = async ({ request, locals }) => {
 					userEmail: adminEmail,
 				});
 
-				return new Response(JSON.stringify({ success: true, deletedCount }), {
-					status: 200,
-					headers: { 'Content-Type': 'application/json' },
-				});
+				return jsonResponse({ success: true, deletedCount });
 			} else {
-				return new Response(JSON.stringify({ error: 'Failed to purge expired logs' }), {
-					status: 500,
-					headers: { 'Content-Type': 'application/json' },
-				});
+				return jsonResponse({ error: 'Failed to purge expired logs' }, 500);
 			}
 		}
 
 		if (action === 'delete_log') {
-			const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
-			const callerEmail = (adminEmail || '').toLowerCase().trim();
-			const isOwner = callerEmail === primaryEmail && primaryEmail !== '';
-
-			if (!isOwner) {
-				return new Response(JSON.stringify({ error: 'Permission denied. Only the owner can delete logs.' }), {
-					status: 403,
-					headers: { 'Content-Type': 'application/json' },
-				});
-			}
+			const ownerErr = validateOwnerPermission(adminEmail);
+			if (ownerErr) return ownerErr;
 
 			const logId = formData.get('logId') as string;
 			if (!logId) {
-				return new Response(JSON.stringify({ error: 'Log ID is required' }), {
-					status: 400,
-					headers: { 'Content-Type': 'application/json' },
-				});
+				return jsonResponse({ error: 'Log ID is required' }, 400);
 			}
 
 			const success = await deleteSystemLog(logId);
 			if (success) {
-				return new Response(JSON.stringify({ success: true, logId }), {
-					status: 200,
-					headers: { 'Content-Type': 'application/json' },
-				});
+				return jsonResponse({ success: true, logId });
 			} else {
-				return new Response(JSON.stringify({ error: 'Failed to delete log' }), {
-					status: 500,
-					headers: { 'Content-Type': 'application/json' },
-				});
+				return jsonResponse({ error: 'Failed to delete log' }, 500);
 			}
 		}
 
@@ -158,45 +125,24 @@ export const POST: APIRoute = async ({ request, locals }) => {
 				userEmail: adminEmail,
 			});
 
-			return new Response(JSON.stringify({ success: true, log: createdLog }), {
-				status: 200,
-				headers: { 'Content-Type': 'application/json' },
-			});
+			return jsonResponse({ success: true, log: createdLog });
 		}
 
-		return new Response(JSON.stringify({ error: 'Invalid action' }), {
-			status: 400,
-			headers: { 'Content-Type': 'application/json' },
-		});
+		return jsonResponse({ error: 'Invalid action' }, 400);
 	} catch (error) {
 		console.error('Error in admin_logs_api POST:', error);
-		return new Response(JSON.stringify({ error: 'Internal server error' }), {
-			status: 500,
-			headers: { 'Content-Type': 'application/json' },
-		});
+		return jsonResponse({ error: getErrorMessage(error, 'Internal server error') }, 500);
 	}
 };
 
 export const DELETE: APIRoute = async ({ request, locals }) => {
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
+
 	try {
-		const adminEmail = locals.adminEmail;
-		if (!adminEmail) {
-			return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-				status: 401,
-				headers: { 'Content-Type': 'application/json' },
-			});
-		}
-
-		const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
-		const callerEmail = (adminEmail || '').toLowerCase().trim();
-		const isOwner = callerEmail === primaryEmail && primaryEmail !== '';
-
-		if (!isOwner) {
-			return new Response(JSON.stringify({ error: 'Permission denied. Only the owner can delete logs.' }), {
-				status: 403,
-				headers: { 'Content-Type': 'application/json' },
-			});
-		}
+		const adminEmail = locals.adminEmail!;
+		const ownerErr = validateOwnerPermission(adminEmail);
+		if (ownerErr) return ownerErr;
 
 		const url = new URL(request.url);
 		let logId = url.searchParams.get('id');
@@ -207,29 +153,17 @@ export const DELETE: APIRoute = async ({ request, locals }) => {
 		}
 
 		if (!logId) {
-			return new Response(JSON.stringify({ error: 'Log ID is required' }), {
-				status: 400,
-				headers: { 'Content-Type': 'application/json' },
-			});
+			return jsonResponse({ error: 'Log ID is required' }, 400);
 		}
 
 		const success = await deleteSystemLog(logId);
 		if (success) {
-			return new Response(JSON.stringify({ success: true, logId }), {
-				status: 200,
-				headers: { 'Content-Type': 'application/json' },
-			});
+			return jsonResponse({ success: true, logId });
 		} else {
-			return new Response(JSON.stringify({ error: 'Failed to delete log' }), {
-				status: 500,
-				headers: { 'Content-Type': 'application/json' },
-			});
+			return jsonResponse({ error: 'Failed to delete log' }, 500);
 		}
 	} catch (error) {
 		console.error('Error in admin_logs_api DELETE:', error);
-		return new Response(JSON.stringify({ error: 'Internal server error' }), {
-			status: 500,
-			headers: { 'Content-Type': 'application/json' },
-		});
+		return jsonResponse({ error: getErrorMessage(error, 'Internal server error') }, 500);
 	}
 };

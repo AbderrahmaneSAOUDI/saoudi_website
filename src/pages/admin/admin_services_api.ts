@@ -5,11 +5,16 @@ import {
 	getErrorMessage,
 	getFormFile,
 	getFormString,
-	isFormRequest,
 	jsonResponse,
 } from '../../lib/server/http';
 import { deleteFile, saveFile } from '../../lib/server/storage';
-import { getEnv } from '../../lib/server/env';
+import {
+	safeSystemLog,
+	validateAdminSession,
+	validateFormRequest,
+	validateOwnerPermission,
+	validateWebpImage,
+} from '../../lib/server/api-guards';
 
 const SERVICES_DIRECTORY = 'uploads/services';
 const MAX_LOGO_BYTES = 50 * 1024; // 50KB max for logos
@@ -23,10 +28,10 @@ function invalidateServicesCaches(countChanged: boolean): void {
 }
 
 export const POST: APIRoute = async ({ locals, request }) => {
-	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
-	if (!isFormRequest(request)) {
-		return jsonResponse({ error: 'Expected a form-encoded request.' }, 415);
-	}
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
+	const formErr = validateFormRequest(request);
+	if (formErr) return formErr;
 
 	try {
 		const formData = await request.formData();
@@ -38,11 +43,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		const docRef = db.collection('services').doc(serviceId);
 
 		if (action === 'delete') {
-			const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
-			const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
-			if (callerEmail !== primaryEmail) {
-				return jsonResponse({ error: 'Permission denied. Only the website owner can do this action.' }, 403);
-			}
+			const ownerErr = validateOwnerPermission(locals.adminEmail);
+			if (ownerErr) return ownerErr;
 
 			const docSnap = await docRef.get();
 			if (!docSnap.exists) return jsonResponse({ error: 'Service not found' }, 404);
@@ -56,22 +58,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			invalidateServicesCaches(true);
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'content',
-					severity: 'warn',
-					action: 'SERVICE_DELETED',
-					title: `Removed service card: "${deletedTitle}"`,
-					details: `Service card permanently deleted by ${locals.adminEmail}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'services',
-					targetDocId: serviceId,
-					changeType: 'delete',
-				});
-			} catch (logErr) {
-				console.warn('Could not log service delete event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'content',
+				severity: 'warn',
+				action: 'SERVICE_DELETED',
+				title: `Removed service card: "${deletedTitle}"`,
+				details: `Service card permanently deleted by ${locals.adminEmail}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'services',
+				targetDocId: serviceId,
+				changeType: 'delete',
+			});
 
 			return jsonResponse({ success: true });
 		}
@@ -102,12 +99,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			let uploadedLogoUrl: string | undefined;
 
 			if (logoFile) {
-				if (logoFile.type !== 'image/webp') {
-					return jsonResponse({ error: 'Logo must be a WebP file.' }, 400);
-				}
-				if (logoFile.size > MAX_LOGO_BYTES) {
-					return jsonResponse({ error: 'Logo file size must be under 50KB.' }, 400);
-				}
+				const imageErr = validateWebpImage(logoFile, MAX_LOGO_BYTES, 'Logo must be a WebP file.', 'Logo file size must be under 50KB.');
+				if (imageErr) return imageErr;
 
 				uploadedLogoUrl = await saveFile({
 					file: logoFile,
@@ -149,22 +142,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const isNewService = !docSnap.exists;
 			invalidateServicesCaches(isNewService);
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'content',
-					severity: 'info',
-					action: isNewService ? 'SERVICE_CREATED' : 'SERVICE_UPDATED',
-					title: `${isNewService ? 'Added new' : 'Updated'} service card: "${title}"`,
-					details: `Order: ${order}, Features count: ${features.length}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'services',
-					targetDocId: serviceId,
-					changeType: isNewService ? 'create' : 'update',
-				});
-			} catch (logErr) {
-				console.warn('Could not log service save event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'content',
+				severity: 'info',
+				action: isNewService ? 'SERVICE_CREATED' : 'SERVICE_UPDATED',
+				title: `${isNewService ? 'Added new' : 'Updated'} service card: "${title}"`,
+				details: `Order: ${order}, Features count: ${features.length}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'services',
+				targetDocId: serviceId,
+				changeType: isNewService ? 'create' : 'update',
+			});
 			return jsonResponse({ success: true, service: serviceData });
 		}
 

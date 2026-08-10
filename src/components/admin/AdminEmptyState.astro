@@ -1,0 +1,24 @@
+---
+import Icon from "../Icon.astro";
+
+interface Props {
+	title?: string;
+	subtitle?: string;
+	class?: string;
+	imageSrc?: string;
+}
+
+const {
+	title = "No data found",
+	subtitle = "No items available to display.",
+	class: className = "",
+	imageSrc = "/no_data.webp",
+} = Astro.props;
+---
+
+<div class={`empty-state col-span-full py-16 text-center text-[#E6E1E5]/50 bg-[#1D1B20] rounded-3xl border border-[#2B2930] ${className}`}>
+	<img src={imageSrc} alt="No data" class="w-28 h-28 mx-auto mb-4 object-contain opacity-90" />
+	<p class="font-semibold text-white">{title}</p>
+	<p class="text-xs mt-1">{subtitle}</p>
+	<slot />
+</div>

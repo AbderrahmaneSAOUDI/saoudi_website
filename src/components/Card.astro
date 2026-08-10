@@ -8,6 +8,7 @@
 import type { Design, Certificate, Project } from '../types';
 import Icon from './Icon.astro';
 import { getThumbnailUrl, getImageSrcSet } from '../lib/images';
+import { formatAdminDate } from '../lib/date-utils';
 
 interface Props {
 	item: Design | Certificate | Project;
@@ -30,38 +31,7 @@ const design = !isLoading && type === 'design' ? (item as Design) : undefined;
 const certificate = !isLoading && type === 'certificate' ? (item as Certificate) : undefined;
 const project = !isLoading && type === 'project' ? (item as Project) : undefined;
 
-// Format date dynamically: ISO string / YYYY-MM-DD / YYYY-MM / YYYY
-const formatDate = (dateStr?: string) => {
-	if (!dateStr || !dateStr.trim()) return '';
-	try {
-		const parts = dateStr.trim().split('-');
-		if (parts.length === 3) {
-			const year = parseInt(parts[0], 10);
-			const month = parseInt(parts[1], 10) - 1;
-			const day = parseInt(parts[2], 10);
-			const date = new Date(year, month, day);
-			if (!isNaN(date.getTime())) {
-				return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-			}
-		} else if (parts.length === 2) {
-			const year = parseInt(parts[0], 10);
-			const month = parseInt(parts[1], 10) - 1;
-			const date = new Date(year, month, 1);
-			if (!isNaN(date.getTime())) {
-				return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-			}
-		} else if (parts.length === 1 && parts[0].length === 4) {
-			return parts[0];
-		}
-		const date = new Date(dateStr);
-		if (!isNaN(date.getTime())) {
-			return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-		}
-	} catch (e) {}
-	return dateStr;
-};
-
-const formattedDate = formatDate(item?.date);
+const formattedDate = formatAdminDate(item?.date);
 const certType = certificate?.type;
 
 const typeColors = {

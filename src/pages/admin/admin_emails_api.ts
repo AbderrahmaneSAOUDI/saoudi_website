@@ -1,14 +1,21 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
 import { clearCache } from '../../lib/server/cache';
-import { getErrorMessage, getFormString, isFormRequest, jsonResponse } from '../../lib/server/http';
+import { getErrorMessage, getFormString, jsonResponse } from '../../lib/server/http';
 import { getEnv } from '../../lib/server/env';
 import { z } from 'zod';
+import {
+	safeSystemLog,
+	validateAdminSession,
+	validateFormRequest,
+	validateOwnerPermission,
+} from '../../lib/server/api-guards';
 
 const emailSchema = z.string().email();
 
 export const GET: APIRoute = async ({ locals }) => {
-	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
 
 	try {
 		const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
@@ -60,21 +67,19 @@ export const GET: APIRoute = async ({ locals }) => {
 };
 
 export const POST: APIRoute = async ({ locals, request }) => {
-	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
-	if (!isFormRequest(request)) {
-		return jsonResponse({ error: 'Expected a form-encoded or JSON request.' }, 415);
-	}
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
+	const formErr = validateFormRequest(request);
+	if (formErr) return formErr;
 
 	try {
 		const formData = await request.formData();
 		const action = getFormString(formData, 'action');
 		const email = getFormString(formData, 'email').toLowerCase().trim();
 		const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
-		const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
 
-		if (callerEmail !== primaryEmail) {
-			return jsonResponse({ error: 'Permission denied. Only the website owner can do this action.' }, 403);
-		}
+		const ownerErr = validateOwnerPermission(locals.adminEmail);
+		if (ownerErr) return ownerErr;
 
 		if (!email) {
 			return jsonResponse({ error: 'Email address is required.' }, 400);
@@ -95,22 +100,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			clearCache('admin_accepted_emails');
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'system',
-					severity: 'warn',
-					action: 'ADMIN_EMAIL_REVOKED',
-					title: `Revoked admin email access: ${email}`,
-					details: `Email access revoked by ${locals.adminEmail}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'accepted_admin_emails',
-					targetDocId: email,
-					changeType: 'delete',
-				});
-			} catch (logErr) {
-				console.warn('Could not log admin email delete event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'system',
+				severity: 'warn',
+				action: 'ADMIN_EMAIL_REVOKED',
+				title: `Revoked admin email access: ${email}`,
+				details: `Email access revoked by ${locals.adminEmail}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'accepted_admin_emails',
+				targetDocId: email,
+				changeType: 'delete',
+			});
 
 			return jsonResponse({ success: true, deletedEmail: email });
 		}
@@ -136,22 +136,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			await docRef.set(newRecord, { merge: true });
 			clearCache('admin_accepted_emails');
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'system',
-					severity: 'info',
-					action: 'ADMIN_EMAIL_ADDED',
-					title: `Added authorized admin email: ${email}`,
-					details: `Email granted access by ${locals.adminEmail}. Notes: ${notes || 'Accepted Admin User'}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'accepted_admin_emails',
-					targetDocId: email,
-					changeType: 'create',
-				});
-			} catch (logErr) {
-				console.warn('Could not log admin email add event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'system',
+				severity: 'info',
+				action: 'ADMIN_EMAIL_ADDED',
+				title: `Added authorized admin email: ${email}`,
+				details: `Email granted access by ${locals.adminEmail}. Notes: ${notes || 'Accepted Admin User'}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'accepted_admin_emails',
+				targetDocId: email,
+				changeType: 'create',
+			});
 
 			return jsonResponse({ success: true, email: newRecord });
 		}

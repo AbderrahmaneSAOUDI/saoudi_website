@@ -1,15 +1,22 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
 import { clearCache } from '../../lib/server/cache';
-import { getErrorMessage, getFormString, isFormRequest, jsonResponse } from '../../lib/server/http';
+import { getErrorMessage, getFormString, jsonResponse } from '../../lib/server/http';
 import { getEnv } from '../../lib/server/env';
 import type { TodoCategory, TodoPriority, TodoStatus } from '../../types';
+import {
+	safeSystemLog,
+	validateAdminSession,
+	validateFormRequest,
+	validateOwnerPermission,
+} from '../../lib/server/api-guards';
 
 const VALID_CATEGORIES = new Set<TodoCategory>(['Feature', 'Bug', 'Refactor', 'Idea', 'Content', 'General']);
 const VALID_PRIORITIES = new Set<TodoPriority>(['High', 'Medium', 'Low']);
 
 export const GET: APIRoute = async ({ locals }) => {
-	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
 
 	try {
 		const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
@@ -43,10 +50,10 @@ export const GET: APIRoute = async ({ locals }) => {
 };
 
 export const POST: APIRoute = async ({ locals, request }) => {
-	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
-	if (!isFormRequest(request)) {
-		return jsonResponse({ error: 'Expected a form-encoded or JSON request.' }, 415);
-	}
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
+	const formErr = validateFormRequest(request);
+	if (formErr) return formErr;
 
 	try {
 		const formData = await request.formData();
@@ -87,22 +94,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			await db.collection('admin_todos').doc(newId).set(todoItem);
 			clearCache('admin_todos');
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'task',
-					severity: 'info',
-					action: 'TODO_CREATED',
-					title: `Created admin task: "${title}"`,
-					details: `Category: ${category}, Priority: ${priority}`,
-					userEmail: creatorEmail,
-					targetCollection: 'admin_todos',
-					targetDocId: newId,
-					changeType: 'create',
-				});
-			} catch (logErr) {
-				console.warn('Could not log todo create event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'task',
+				severity: 'info',
+				action: 'TODO_CREATED',
+				title: `Created admin task: "${title}"`,
+				details: `Category: ${category}, Priority: ${priority}`,
+				userEmail: creatorEmail,
+				targetCollection: 'admin_todos',
+				targetDocId: newId,
+				changeType: 'create',
+			});
 
 			return jsonResponse({ success: true, todo: todoItem });
 		}
@@ -132,22 +134,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			clearCache('admin_todos');
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'task',
-					severity: 'info',
-					action: newStatus === 'completed' ? 'TODO_COMPLETED' : 'TODO_UNCOMPLETED',
-					title: `${newStatus === 'completed' ? 'Completed' : 'Reopened'} admin task: "${todoTitle}"`,
-					details: `Task status set to ${newStatus} by ${locals.adminEmail}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'admin_todos',
-					targetDocId: todoId,
-					changeType: 'update',
-				});
-			} catch (logErr) {
-				console.warn('Could not log todo toggle event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'task',
+				severity: 'info',
+				action: newStatus === 'completed' ? 'TODO_COMPLETED' : 'TODO_UNCOMPLETED',
+				title: `${newStatus === 'completed' ? 'Completed' : 'Reopened'} admin task: "${todoTitle}"`,
+				details: `Task status set to ${newStatus} by ${locals.adminEmail}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'admin_todos',
+				targetDocId: todoId,
+				changeType: 'update',
+			});
 
 			return jsonResponse({
 				success: true,
@@ -166,22 +163,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			clearCache('admin_todos');
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'task',
-					severity: 'info',
-					action: 'TODO_ARCHIVED',
-					title: `Archived admin task: "${todoTitle}"`,
-					details: `Task archived by ${locals.adminEmail}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'admin_todos',
-					targetDocId: todoId,
-					changeType: 'update',
-				});
-			} catch (logErr) {
-				console.warn('Could not log todo archive event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'task',
+				severity: 'info',
+				action: 'TODO_ARCHIVED',
+				title: `Archived admin task: "${todoTitle}"`,
+				details: `Task archived by ${locals.adminEmail}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'admin_todos',
+				targetDocId: todoId,
+				changeType: 'update',
+			});
 
 			return jsonResponse({ success: true, id: todoId, status: 'archived', archivedAt });
 		}
@@ -194,53 +186,39 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			clearCache('admin_todos');
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'task',
-					severity: 'info',
-					action: 'TODO_RESTORED',
-					title: `Restored admin task: "${todoTitle}"`,
-					details: `Task restored to active status by ${locals.adminEmail}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'admin_todos',
-					targetDocId: todoId,
-					changeType: 'update',
-				});
-			} catch (logErr) {
-				console.warn('Could not log todo restore event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'task',
+				severity: 'info',
+				action: 'TODO_RESTORED',
+				title: `Restored admin task: "${todoTitle}"`,
+				details: `Task restored to active status by ${locals.adminEmail}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'admin_todos',
+				targetDocId: todoId,
+				changeType: 'update',
+			});
 
 			return jsonResponse({ success: true, id: todoId, status: 'active' });
 		}
 
 		if (action === 'delete') {
-			const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
-			const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
-
-			if (callerEmail !== primaryEmail) {
-				return jsonResponse({ error: 'Permission denied. Only the website owner can do this action.' }, 403);
-			}
+			const ownerErr = validateOwnerPermission(locals.adminEmail);
+			if (ownerErr) return ownerErr;
 
 			await docRef.delete();
 			clearCache('admin_todos');
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'task',
-					severity: 'warn',
-					action: 'TODO_DELETED',
-					title: `Permanently deleted admin task: "${todoTitle}"`,
-					details: `Task deleted by primary admin ${locals.adminEmail}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'admin_todos',
-					targetDocId: todoId,
-					changeType: 'delete',
-				});
-			} catch (logErr) {
-				console.warn('Could not log todo delete event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'task',
+				severity: 'warn',
+				action: 'TODO_DELETED',
+				title: `Permanently deleted admin task: "${todoTitle}"`,
+				details: `Task deleted by primary admin ${locals.adminEmail}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'admin_todos',
+				targetDocId: todoId,
+				changeType: 'delete',
+			});
 
 			return jsonResponse({ success: true, id: todoId, deleted: true });
 		}

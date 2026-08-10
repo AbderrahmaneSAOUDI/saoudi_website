@@ -6,12 +6,17 @@ import {
 	getErrorMessage,
 	getFormFile,
 	getFormString,
-	isFormRequest,
 	jsonResponse,
 } from '../../lib/server/http';
 import { deleteFile, saveFile } from '../../lib/server/storage';
-import { getEnv } from '../../lib/server/env';
 import { EMPLOYMENT_TYPES } from '../../types';
+import {
+	safeSystemLog,
+	validateAdminSession,
+	validateFormRequest,
+	validateOwnerPermission,
+	validateWebpImage,
+} from '../../lib/server/api-guards';
 
 const EXPERIENCE_DIRECTORY = 'uploads/experience';
 const MAX_LOGO_BYTES = 50 * 1024; // 50KB max for logos
@@ -26,10 +31,10 @@ function invalidateExperienceCaches(countChanged: boolean): void {
 }
 
 export const POST: APIRoute = async ({ locals, request }) => {
-	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
-	if (!isFormRequest(request)) {
-		return jsonResponse({ error: 'Expected a form-encoded request.' }, 415);
-	}
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
+	const formErr = validateFormRequest(request);
+	if (formErr) return formErr;
 
 	try {
 		const formData = await request.formData();
@@ -41,11 +46,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		const docRef = db.collection('experience').doc(experienceId);
 
 		if (action === 'delete') {
-			const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
-			const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
-			if (callerEmail !== primaryEmail) {
-				return jsonResponse({ error: 'Permission denied. Only the website owner can do this action.' }, 403);
-			}
+			const ownerErr = validateOwnerPermission(locals.adminEmail);
+			if (ownerErr) return ownerErr;
 
 			const docSnap = await docRef.get();
 			if (!docSnap.exists) return jsonResponse({ error: 'Experience not found' }, 404);
@@ -61,22 +63,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			invalidateExperienceCaches(true);
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'content',
-					severity: 'warn',
-					action: 'EXPERIENCE_DELETED',
-					title: `Removed experience entry: "${deletedTitle}"`,
-					details: `Experience entry permanently deleted by ${locals.adminEmail}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'experience',
-					targetDocId: experienceId,
-					changeType: 'delete',
-				});
-			} catch (logErr) {
-				console.warn('Could not log experience delete event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'content',
+				severity: 'warn',
+				action: 'EXPERIENCE_DELETED',
+				title: `Removed experience entry: "${deletedTitle}"`,
+				details: `Experience entry permanently deleted by ${locals.adminEmail}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'experience',
+				targetDocId: experienceId,
+				changeType: 'delete',
+			});
 
 			return jsonResponse({ success: true });
 		}
@@ -111,12 +108,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			let uploadedLogoUrl: string | undefined;
 
 			if (logoFile) {
-				if (logoFile.type !== 'image/webp') {
-					return jsonResponse({ error: 'Logo must be a WebP file.' }, 400);
-				}
-				if (logoFile.size > MAX_LOGO_BYTES) {
-					return jsonResponse({ error: 'Logo file size must be under 50KB.' }, 400);
-				}
+				const imageErr = validateWebpImage(logoFile, MAX_LOGO_BYTES, 'Logo must be a WebP file.', 'Logo file size must be under 50KB.');
+				if (imageErr) return imageErr;
 
 				uploadedLogoUrl = await saveFile({
 					file: logoFile,
@@ -168,22 +161,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const isNewExp = !docSnap.exists;
 			invalidateExperienceCaches(isNewExp);
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'content',
-					severity: 'info',
-					action: isNewExp ? 'EXPERIENCE_CREATED' : 'EXPERIENCE_UPDATED',
-					title: `${isNewExp ? 'Added' : 'Updated'} experience entry: "${role} at ${company}"`,
-					details: `Type: ${employmentType}, Period: ${startDate} to ${endDate || 'Present'}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'experience',
-					targetDocId: experienceId,
-					changeType: isNewExp ? 'create' : 'update',
-				});
-			} catch (logErr) {
-				console.warn('Could not log experience save event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'content',
+				severity: 'info',
+				action: isNewExp ? 'EXPERIENCE_CREATED' : 'EXPERIENCE_UPDATED',
+				title: `${isNewExp ? 'Added' : 'Updated'} experience entry: "${role} at ${company}"`,
+				details: `Type: ${employmentType}, Period: ${startDate} to ${endDate || 'Present'}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'experience',
+				targetDocId: experienceId,
+				changeType: isNewExp ? 'create' : 'update',
+			});
 			return jsonResponse({ success: true, experience });
 		}
 

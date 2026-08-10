@@ -1,15 +1,20 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
-import { getEnv } from '../../lib/server/env';
 import { clearCache } from '../../lib/server/cache';
 import {
 	getErrorMessage,
 	getFormFile,
 	getFormString,
-	isFormRequest,
 	jsonResponse,
 } from '../../lib/server/http';
 import { deleteFile, saveFile } from '../../lib/server/storage';
+import {
+	safeSystemLog,
+	validateAdminSession,
+	validateFormRequest,
+	validateOwnerPermission,
+	validateWebpImage,
+} from '../../lib/server/api-guards';
 
 const PROJECTS_DIRECTORY = 'uploads/projects';
 const MAX_IMAGE_BYTES = 800 * 1024;
@@ -23,10 +28,10 @@ function invalidateProjectCaches(countChanged: boolean): void {
 }
 
 export const POST: APIRoute = async ({ locals, request }) => {
-	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
-	if (!isFormRequest(request)) {
-		return jsonResponse({ error: 'Expected a form-encoded request.' }, 415);
-	}
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
+	const formErr = validateFormRequest(request);
+	if (formErr) return formErr;
 
 	try {
 		const formData = await request.formData();
@@ -38,11 +43,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		const docRef = db.collection('projects').doc(projectId);
 
 		if (action === 'delete') {
-			const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
-			const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
-			if (callerEmail !== primaryEmail) {
-				return jsonResponse({ error: 'Permission denied. Only the website owner can do this action.' }, 403);
-			}
+			const ownerErr = validateOwnerPermission(locals.adminEmail);
+			if (ownerErr) return ownerErr;
 
 			const docSnap = await docRef.get();
 			if (!docSnap.exists) return jsonResponse({ error: 'Project not found' }, 404);
@@ -56,22 +58,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			invalidateProjectCaches(true);
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'content',
-					severity: 'warn',
-					action: 'PROJECT_DELETED',
-					title: `Removed project card: "${deletedTitle}"`,
-					details: `Project card permanently deleted by ${locals.adminEmail}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'projects',
-					targetDocId: projectId,
-					changeType: 'delete',
-				});
-			} catch (logErr) {
-				console.warn('Could not log project delete event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'content',
+				severity: 'warn',
+				action: 'PROJECT_DELETED',
+				title: `Removed project card: "${deletedTitle}"`,
+				details: `Project card permanently deleted by ${locals.adminEmail}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'projects',
+				targetDocId: projectId,
+				changeType: 'delete',
+			});
 
 			return jsonResponse({ success: true });
 		}
@@ -96,19 +93,14 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			await db.collection('configuration').doc('projects_fields').set({ fields });
 			invalidateProjectCaches(false);
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'content',
-					severity: 'info',
-					action: 'PROJECT_FIELDS_UPDATED',
-					title: 'Updated project category fields list',
-					details: `Fields: ${fields.join(', ')}`,
-					userEmail: locals.adminEmail,
-				});
-			} catch (logErr) {
-				console.warn('Could not log project fields save event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'content',
+				severity: 'info',
+				action: 'PROJECT_FIELDS_UPDATED',
+				title: 'Updated project category fields list',
+				details: `Fields: ${fields.join(', ')}`,
+				userEmail: locals.adminEmail,
+			});
 
 			return jsonResponse({ success: true });
 		}
@@ -157,12 +149,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			let uploadedImageUrl: string | undefined;
 
 			if (imageFile) {
-				if (imageFile.type !== 'image/webp') {
-					return jsonResponse({ error: 'Image must be a WebP file.' }, 400);
-				}
-				if (imageFile.size > MAX_IMAGE_BYTES) {
-					return jsonResponse({ error: 'Image file size must be under 800KB.' }, 400);
-				}
+				const imageErr = validateWebpImage(imageFile, MAX_IMAGE_BYTES);
+				if (imageErr) return imageErr;
 
 				uploadedImageUrl = await saveFile({
 					file: imageFile,
@@ -210,22 +198,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const isNewProject = !docSnap.exists;
 			invalidateProjectCaches(isNewProject);
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'content',
-					severity: 'info',
-					action: isNewProject ? 'PROJECT_CREATED' : 'PROJECT_UPDATED',
-					title: `${isNewProject ? 'Added new' : 'Updated'} project card: "${title}"`,
-					details: `Field: ${field || 'Web Development'}, Techs: ${technologies.join(', ') || 'N/A'}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'projects',
-					targetDocId: projectId,
-					changeType: isNewProject ? 'create' : 'update',
-				});
-			} catch (logErr) {
-				console.warn('Could not log project save event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'content',
+				severity: 'info',
+				action: isNewProject ? 'PROJECT_CREATED' : 'PROJECT_UPDATED',
+				title: `${isNewProject ? 'Added new' : 'Updated'} project card: "${title}"`,
+				details: `Field: ${field || 'Web Development'}, Techs: ${technologies.join(', ') || 'N/A'}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'projects',
+				targetDocId: projectId,
+				changeType: isNewProject ? 'create' : 'update',
+			});
 
 			return jsonResponse({ success: true, project });
 		}

@@ -3,7 +3,7 @@
  * PublicFooter Component
  * 
  * Displays the copyright notice and application version.
- * Adheres to strict zero client-side JavaScript guidelines.
+ * Long press on version opens the admin section.
  */
 import pkg from '../../package.json';
 ---
@@ -20,9 +20,47 @@ import pkg from '../../package.json';
 			</div>
 
 			{/* Website version */}
-			<p class="text-white/40 text-xs font-mono text-center sm:text-right">
+			<p class="text-white/40 hover:text-white/70 text-xs font-mono text-center sm:text-right transition-colors duration-200 cursor-pointer select-none py-1 px-2.5 rounded-lg hover:bg-white/5 active:scale-95" id="footer-version">
 				v{pkg.version}
 			</p>
 		</div>
 	</div>
 </footer>
+
+<script>
+	const versionEl = document.getElementById('footer-version');
+	if (versionEl) {
+		let timer: ReturnType<typeof setTimeout> | null = null;
+		let isLongPress = false;
+		const LONG_PRESS_DURATION = 600;
+
+		const startPress = (e: PointerEvent) => {
+			if (e.button !== 0) return; // Only primary press
+			isLongPress = false;
+			if (timer) clearTimeout(timer);
+
+			timer = setTimeout(() => {
+				isLongPress = true;
+				window.location.href = '/admin';
+			}, LONG_PRESS_DURATION);
+		};
+
+		const cancelPress = () => {
+			if (timer) {
+				clearTimeout(timer);
+				timer = null;
+			}
+		};
+
+		versionEl.addEventListener('pointerdown', startPress);
+		versionEl.addEventListener('pointerup', cancelPress);
+		versionEl.addEventListener('pointerleave', cancelPress);
+		versionEl.addEventListener('pointercancel', cancelPress);
+
+		versionEl.addEventListener('contextmenu', (e) => {
+			if (isLongPress) {
+				e.preventDefault();
+			}
+		});
+	}
+</script>

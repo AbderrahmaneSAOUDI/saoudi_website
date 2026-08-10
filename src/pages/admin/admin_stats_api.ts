@@ -1,11 +1,16 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
-import { getEnv } from '../../lib/server/env';
 import { clearCache } from '../../lib/server/cache';
-import { getErrorMessage, getFormString, isFormRequest, jsonResponse } from '../../lib/server/http';
+import { getErrorMessage, getFormString, jsonResponse } from '../../lib/server/http';
+import {
+	validateAdminSession,
+	validateFormRequest,
+	validateOwnerPermission,
+} from '../../lib/server/api-guards';
 
 export const GET: APIRoute = async ({ locals }) => {
-	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
 
 	try {
 		const db = getFirebaseAdminDb();
@@ -31,15 +36,15 @@ export const GET: APIRoute = async ({ locals }) => {
 		return jsonResponse({ success: true, counts });
 	} catch (error) {
 		console.error('Error fetching admin live stats:', error);
-		return jsonResponse({ error: 'Failed to fetch admin stats' }, 500);
+		return jsonResponse({ error: getErrorMessage(error, 'Failed to fetch admin stats') }, 500);
 	}
 };
 
 export const POST: APIRoute = async ({ locals, request, cookies }) => {
-	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
-	if (!isFormRequest(request)) {
-		return jsonResponse({ error: 'Expected form-encoded or JSON request' }, 415);
-	}
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
+	const formErr = validateFormRequest(request);
+	if (formErr) return formErr;
 
 	try {
 		const formData = await request.formData();
@@ -80,11 +85,8 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
 		}
 
 		if (action === 'reset_downloads') {
-			const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
-			const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
-			if (callerEmail !== primaryEmail) {
-				return jsonResponse({ error: 'Permission denied. Only the website owner can do this action.' }, 403);
-			}
+			const ownerErr = validateOwnerPermission(locals.adminEmail);
+			if (ownerErr) return ownerErr;
 
 			const db = getFirebaseAdminDb();
 			const configRef = db.collection('configuration').doc('static_data');

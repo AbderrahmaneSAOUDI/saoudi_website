@@ -1,16 +1,21 @@
 import type { APIRoute } from 'astro';
 import type { DocumentReference } from 'firebase-admin/firestore';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
-import { getEnv } from '../../lib/server/env';
 import { clearCache, clearCacheByPrefix } from '../../lib/server/cache';
 import {
 	getErrorMessage,
 	getFormFile,
 	getFormString,
-	isFormRequest,
 	jsonResponse,
 } from '../../lib/server/http';
 import { deleteFile, saveFile } from '../../lib/server/storage';
+import {
+	safeSystemLog,
+	validateAdminSession,
+	validateFormRequest,
+	validateOwnerPermission,
+	validateWebpImage,
+} from '../../lib/server/api-guards';
 
 const DESIGNS_DIRECTORY = 'uploads/designs';
 const MAX_IMAGE_BYTES = 800 * 1024;
@@ -38,10 +43,10 @@ async function commitCompanyUpdates(
 }
 
 export const POST: APIRoute = async ({ locals, request }) => {
-	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
-	if (!isFormRequest(request)) {
-		return jsonResponse({ error: 'Expected a form-encoded request.' }, 415);
-	}
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
+	const formErr = validateFormRequest(request);
+	if (formErr) return formErr;
 
 	try {
 		const formData = await request.formData();
@@ -55,11 +60,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		const db = getFirebaseAdminDb();
 
 		if (action === 'delete') {
-			const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
-			const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
-			if (callerEmail !== primaryEmail) {
-				return jsonResponse({ error: 'Permission denied. Only the website owner can do this action.' }, 403);
-			}
+			const ownerErr = validateOwnerPermission(locals.adminEmail);
+			if (ownerErr) return ownerErr;
 
 			const docRef = db.collection('designs').doc(designId);
 			const docSnap = await docRef.get();
@@ -75,22 +77,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			invalidateDesignCaches(true);
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'content',
-					severity: 'warn',
-					action: 'DESIGN_DELETED',
-					title: `Removed design card: "${deletedTitle}"`,
-					details: `Design card deleted by ${locals.adminEmail}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'designs',
-					targetDocId: designId,
-					changeType: 'delete',
-				});
-			} catch (logErr) {
-				console.warn('Could not log design delete event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'content',
+				severity: 'warn',
+				action: 'DESIGN_DELETED',
+				title: `Removed design card: "${deletedTitle}"`,
+				details: `Design card deleted by ${locals.adminEmail}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'designs',
+				targetDocId: designId,
+				changeType: 'delete',
+			});
 
 			return jsonResponse({ success: true });
 		}
@@ -148,19 +145,14 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			invalidateDesignCaches(false);
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'content',
-					severity: 'info',
-					action: 'DESIGN_COMPANIES_UPDATED',
-					title: 'Updated design companies list',
-					details: `Companies: ${companies.join(', ')}`,
-					userEmail: locals.adminEmail,
-				});
-			} catch (logErr) {
-				console.warn('Could not log design companies save event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'content',
+				severity: 'info',
+				action: 'DESIGN_COMPANIES_UPDATED',
+				title: 'Updated design companies list',
+				details: `Companies: ${companies.join(', ')}`,
+				userEmail: locals.adminEmail,
+			});
 
 			return jsonResponse({ success: true });
 		}
@@ -179,12 +171,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			let uploadedImageUrl: string | undefined;
 
 			if (imageFile) {
-				if (imageFile.type !== 'image/webp') {
-					return jsonResponse({ error: 'Image must be a WebP file.' }, 400);
-				}
-				if (imageFile.size > MAX_IMAGE_BYTES) {
-					return jsonResponse({ error: 'Image file size must be under 800KB.' }, 400);
-				}
+				const imageErr = validateWebpImage(imageFile, MAX_IMAGE_BYTES);
+				if (imageErr) return imageErr;
 
 				uploadedImageUrl = await saveFile({
 					file: imageFile,
@@ -220,22 +208,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const isNewDesign = !docSnap.exists;
 			invalidateDesignCaches(isNewDesign);
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'content',
-					severity: 'info',
-					action: isNewDesign ? 'DESIGN_CREATED' : 'DESIGN_UPDATED',
-					title: `${isNewDesign ? 'Added new' : 'Updated'} design card: "${title || company}"`,
-					details: `Company: ${company}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'designs',
-					targetDocId: designId,
-					changeType: isNewDesign ? 'create' : 'update',
-				});
-			} catch (logErr) {
-				console.warn('Could not log design save event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'content',
+				severity: 'info',
+				action: isNewDesign ? 'DESIGN_CREATED' : 'DESIGN_UPDATED',
+				title: `${isNewDesign ? 'Added new' : 'Updated'} design card: "${title || company}"`,
+				details: `Company: ${company}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'designs',
+				targetDocId: designId,
+				changeType: isNewDesign ? 'create' : 'update',
+			});
 
 			return jsonResponse({ success: true, design });
 		}

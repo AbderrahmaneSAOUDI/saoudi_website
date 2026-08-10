@@ -6,11 +6,16 @@ import {
 	getErrorMessage,
 	getFormFile,
 	getFormString,
-	isFormRequest,
 	jsonResponse,
 } from '../../lib/server/http';
 import { deleteFile, saveFile } from '../../lib/server/storage';
-import { getEnv } from '../../lib/server/env';
+import {
+	safeSystemLog,
+	validateAdminSession,
+	validateFormRequest,
+	validateOwnerPermission,
+	validateWebpImage,
+} from '../../lib/server/api-guards';
 
 const CERTIFICATES_DIRECTORY = 'uploads/certificates';
 const MAX_IMAGE_BYTES = 800 * 1024;
@@ -25,10 +30,10 @@ function invalidateCertificateCaches(countChanged: boolean): void {
 }
 
 export const POST: APIRoute = async ({ locals, request }) => {
-	if (!locals.adminEmail) return jsonResponse({ error: 'Unauthorized' }, 401);
-	if (!isFormRequest(request)) {
-		return jsonResponse({ error: 'Expected a form-encoded request.' }, 415);
-	}
+	const authErr = validateAdminSession(locals);
+	if (authErr) return authErr;
+	const formErr = validateFormRequest(request);
+	if (formErr) return formErr;
 
 	try {
 		const formData = await request.formData();
@@ -40,11 +45,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		const docRef = db.collection('certificates').doc(certificateId);
 
 		if (action === 'delete') {
-			const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
-			const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
-			if (callerEmail !== primaryEmail) {
-				return jsonResponse({ error: 'Permission denied. Only the website owner can do this action.' }, 403);
-			}
+			const ownerErr = validateOwnerPermission(locals.adminEmail);
+			if (ownerErr) return ownerErr;
 
 			const docSnap = await docRef.get();
 			if (!docSnap.exists) return jsonResponse({ error: 'Certificate not found' }, 404);
@@ -58,22 +60,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			invalidateCertificateCaches(true);
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'content',
-					severity: 'warn',
-					action: 'CERTIFICATE_DELETED',
-					title: `Removed certificate: "${deletedTitle}"`,
-					details: `Certificate permanently deleted by ${locals.adminEmail}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'certificates',
-					targetDocId: certificateId,
-					changeType: 'delete',
-				});
-			} catch (logErr) {
-				console.warn('Could not log certificate delete event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'content',
+				severity: 'warn',
+				action: 'CERTIFICATE_DELETED',
+				title: `Removed certificate: "${deletedTitle}"`,
+				details: `Certificate permanently deleted by ${locals.adminEmail}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'certificates',
+				targetDocId: certificateId,
+				changeType: 'delete',
+			});
 
 			return jsonResponse({ success: true });
 		}
@@ -103,12 +100,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			let uploadedImageUrl: string | undefined;
 
 			if (imageFile) {
-				if (imageFile.type !== 'image/webp') {
-					return jsonResponse({ error: 'Image must be a WebP file.' }, 400);
-				}
-				if (imageFile.size > MAX_IMAGE_BYTES) {
-					return jsonResponse({ error: 'Image file size must be under 800KB.' }, 400);
-				}
+				const imageErr = validateWebpImage(imageFile, MAX_IMAGE_BYTES);
+				if (imageErr) return imageErr;
 
 				uploadedImageUrl = await saveFile({
 					file: imageFile,
@@ -156,22 +149,18 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const isNewCert = !docSnap.exists;
 			invalidateCertificateCaches(isNewCert);
 
-			try {
-				const { addSystemLog } = await import('../../lib/server/system-logs');
-				await addSystemLog({
-					type: 'content',
-					severity: 'info',
-					action: isNewCert ? 'CERTIFICATE_CREATED' : 'CERTIFICATE_UPDATED',
-					title: `${isNewCert ? 'Added new' : 'Updated'} certificate: "${title}"`,
-					details: `Issuer: ${issuer}, Type: ${type}, Date: ${date}`,
-					userEmail: locals.adminEmail,
-					targetCollection: 'certificates',
-					targetDocId: certificateId,
-					changeType: isNewCert ? 'create' : 'update',
-				});
-			} catch (logErr) {
-				console.warn('Could not log certificate save event:', logErr);
-			}
+			await safeSystemLog({
+				type: 'content',
+				severity: 'info',
+				action: isNewCert ? 'CERTIFICATE_CREATED' : 'CERTIFICATE_UPDATED',
+				title: `${isNewCert ? 'Added new' : 'Updated'} certificate: "${title}"`,
+				details: `Issuer: ${issuer}, Type: ${type}, Date: ${date}`,
+				userEmail: locals.adminEmail,
+				targetCollection: 'certificates',
+				targetDocId: certificateId,
+				changeType: isNewCert ? 'create' : 'update',
+			});
+
 			return jsonResponse({ success: true, certificate });
 		}
 
