@@ -3,11 +3,15 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GlobalLightbox from '../components/GlobalLightbox.astro';
 import ProjectsIsland from '../components/ProjectsIsland.astro';
+import SkeletonCardGrid from '../components/SkeletonCardGrid.astro';
+
 ---
 
 <BaseLayout title="Projects" description="Explore open-source software, web apps, and full-stack projects by Abderrahmane SAOUDI.">
 	<div class="mx-auto px-4 sm:px-6 lg:px-8 pt-8 max-w-7xl">
-		<ProjectsIsland />
+		<ProjectsIsland server:defer>
+			<SkeletonCardGrid slot="fallback" variant="project" count={8} groups={2} />
+		</ProjectsIsland>
 	</div>
 
 	<!-- Render Lightbox outside transform scopes -->

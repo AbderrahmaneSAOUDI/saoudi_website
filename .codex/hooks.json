@@ -1,0 +1,54 @@
+{
+  "description": "Repository guards migrated from .agents, .trae, and .devin policies.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/project_guard.py\"",
+            "timeout": 30,
+            "statusMessage": "Checking project command policy"
+          }
+        ]
+      },
+      {
+        "matcher": "^(apply_patch|Edit|Write)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/project_guard.py\"",
+            "timeout": 30,
+            "statusMessage": "Checking project file policy"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/post_build_review.py\"",
+            "timeout": 30,
+            "statusMessage": "Reviewing production build output"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/version_increment.py\"",
+            "timeout": 5,
+            "statusMessage": "Finalizing project version"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -2,6 +2,7 @@
 import type { Experience } from '../types';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
 import { CACHE_TTL_MS, getOrSetCached } from '../lib/server/cache';
+import { getPublicMediaUrl } from '../lib/media';
 import Icon from './Icon.astro';
 
 let experiences: Experience[] = [];
@@ -17,14 +18,14 @@ try {
 				const data = doc.data();
 				return {
 					id: doc.id,
-					order: data.order ?? 0,
-					role: data.role ?? '',
-					company: data.company ?? '',
-					logoUrl: data.logoUrl ?? null,
-					employmentType: data.employmentType ?? 'Full-time',
-					startDate: data.startDate ?? '',
-					endDate: data.endDate ?? null,
-					responsibilities: data.responsibilities ?? '',
+					order: Number.isFinite(Number(data.order)) ? Number(data.order) : 0,
+					role: typeof data.role === 'string' ? data.role : '',
+					company: typeof data.company === 'string' ? data.company : '',
+					logoUrl: getPublicMediaUrl(data.logoUrl, 'experience', doc.id) ?? null,
+					employmentType: typeof data.employmentType === 'string' ? data.employmentType : 'Full-time',
+					startDate: typeof data.startDate === 'string' ? data.startDate : '',
+					endDate: typeof data.endDate === 'string' ? data.endDate : null,
+					responsibilities: typeof data.responsibilities === 'string' ? data.responsibilities : '',
 				};
 			}) as Experience[];
 
@@ -51,6 +52,7 @@ function formatDate(dateStr: string | null): string {
 	const mIdx = parseInt(month, 10) - 1;
 	return `${months[mIdx] || month} ${year}`;
 }
+const lazyImagePlaceholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 ---
 
 {errorMsg && (
@@ -112,10 +114,12 @@ function formatDate(dateStr: string | null): string {
 									<div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center shrink-0 group-hover:border-primary/30 group-hover:scale-105 transition-all duration-300">
 										{exp.logoUrl ? (
 											<img
-												src={exp.logoUrl}
+												src={index === 0 ? exp.logoUrl : lazyImagePlaceholder}
+												data-src={index === 0 ? undefined : exp.logoUrl}
 												alt={exp.company}
 												class="w-full h-full object-contain p-2"
-												loading={index < 3 ? 'eager' : 'lazy'}
+												loading={index === 0 ? 'eager' : 'lazy'}
+												decoding="async"
 											/>
 										) : (
 											<div class="relative flex items-center justify-center">
@@ -185,6 +189,11 @@ function formatDate(dateStr: string | null): string {
 		</div>
 	)}
 </div>
+
+<script>
+	import { startDeferredImageLoader } from '../lib/client-deferred-images';
+	startDeferredImageLoader();
+</script>
 
 <style>
 	/* Timeline Line Entrance Animation */

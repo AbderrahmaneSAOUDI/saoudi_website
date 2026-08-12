@@ -13,9 +13,10 @@ import {
 	validateFormRequest,
 	validateWebpImage,
 } from '../../lib/server/api-guards';
+import { getPublicMediaUrl } from '../../lib/media';
 
 const RESUME_DIRECTORY = 'uploads/resume';
-const MAX_FILE_BYTES = 800 * 1024;
+const MAX_FILE_BYTES = 700 * 1024;
 
 type UploadedFile = {
 	field: 'resumeUrl' | 'previewUrl';
@@ -41,12 +42,12 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				return jsonResponse({ error: 'Resume must be a PDF file' }, 400);
 			}
 			if (resumePdf.size > MAX_FILE_BYTES) {
-				return jsonResponse({ error: 'PDF must be under 800KB' }, 400);
+				return jsonResponse({ error: 'PDF must be under 700KB' }, 400);
 			}
 		}
 
 		if (resumePreview) {
-			const imageErr = validateWebpImage(resumePreview, MAX_FILE_BYTES, 'Preview must be a WebP image', 'Preview image must be under 800KB');
+			const imageErr = validateWebpImage(resumePreview, MAX_FILE_BYTES, 'Preview must be a WebP image', 'Preview image must be under 700KB');
 			if (imageErr) return imageErr;
 		}
 
@@ -139,7 +140,10 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 		return jsonResponse({
 			success: true,
-			...Object.fromEntries(uploads.map(({ field, url }) => [field, url])),
+			...Object.fromEntries(uploads.map(({ field, url }) => [
+				field,
+				getPublicMediaUrl(url, 'configuration', 'static_data', field) || url,
+			])),
 		});
 	} catch (error) {
 		console.error('Resume upload failed:', error);

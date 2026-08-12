@@ -7,6 +7,7 @@ import Icon from "../../components/Icon.astro";
 import GlobalLightbox from "../../components/GlobalLightbox.astro";
 import AdminControlsStrip from "../../components/admin/AdminControlsStrip.astro";
 import { getEnv } from "../../lib/server/env";
+import { getMediaProxyUrl } from "../../lib/media";
 
 // Extra safety: double-check authentication
 const adminEmail = Astro.locals.adminEmail;
@@ -25,20 +26,31 @@ try {
 	// Fetch companies and designs in parallel to improve page load speed
 	const [companiesDoc, snapshot] = await Promise.all([
 		db.collection("configuration").doc("designs_companies").get(),
-		db.collection("designs").orderBy("date", "desc").get()
+		db.collection("designs")
+			.select('title', 'description', 'date', 'company', 'tags')
+			.orderBy("date", "desc")
+			.get()
 	]);
 
 	if (companiesDoc.exists) {
-		companies = companiesDoc.data()?.companies || companies;
-	} else {
-		// Auto-initialize companies configuration in DB
-		await db.collection("configuration").doc("designs_companies").set({ companies });
+		const savedCompanies = companiesDoc.data()?.companies;
+		if (Array.isArray(savedCompanies) && savedCompanies.every(company => typeof company === 'string')) {
+			companies = savedCompanies;
+		}
 	}
 
-	designs = snapshot.docs.map(doc => ({
-		id: doc.id,
-		...doc.data()
-	}));
+	designs = snapshot.docs.map(doc => {
+		const data = doc.data();
+		return {
+			id: doc.id,
+			title: typeof data.title === 'string' ? data.title : '',
+			description: typeof data.description === 'string' ? data.description : '',
+			imageUrl: getMediaProxyUrl('designs', doc.id, undefined, doc.updateTime.toMillis()),
+			date: typeof data.date === 'string' ? data.date : '',
+			company: typeof data.company === 'string' ? data.company : '',
+			tags: Array.isArray(data.tags) ? data.tags.filter((tag: unknown): tag is string => typeof tag === 'string') : [],
+		};
+	});
 	
 	// Extract unique sorted years
 	years = [...new Set(designs.map(d => {
@@ -116,8 +128,8 @@ try {
 							class="group p-1.5 rounded-lg text-[#E6E1E5]/60 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
 							title="Close Filters"
 						>
-							<Icon name="close" size={18} class="w-4.5 h-4.5 group-hover:hidden" />
-							<Icon name="close" filled size={18} class="w-4.5 h-4.5 hidden group-hover:block" />
+							<Icon name="close" size={18} class="w-4.5 h-4.5 group-hover:!hidden" />
+							<Icon name="close" filled size={18} class="w-4.5 h-4.5 !hidden group-hover:!inline-flex" />
 						</button>
 					</div>
 
@@ -405,8 +417,8 @@ try {
 					<div class="border-b border-[#2B2930]/60 pb-3 flex justify-between items-center mb-4">
 						<h3 class="text-lg font-bold text-white">Manage Companies</h3>
 						<button id="close-companies-modal" type="button" class="group p-1.5 rounded-lg text-[#E6E1E5]/60 hover:text-white hover:bg-white/5 transition-all cursor-pointer" title="Close">
-							<Icon name="close" size={18} class="w-4.5 h-4.5 group-hover:hidden" />
-							<Icon name="close" filled size={18} class="w-4.5 h-4.5 hidden group-hover:block" />
+							<Icon name="close" size={18} class="w-4.5 h-4.5 group-hover:!hidden" />
+							<Icon name="close" filled size={18} class="w-4.5 h-4.5 !hidden group-hover:!inline-flex" />
 						</button>
 					</div>
 
@@ -470,6 +482,7 @@ try {
 <script>
 	import { compressImageToWebp } from '../../lib/client-image';
 	import { formatAdminDate } from '../../lib/date-utils';
+	import { escapeAttribute, escapeHtml, getSafeImageSrc } from '../../lib/client-safety';
 
 	document.addEventListener('DOMContentLoaded', () => {
 		// Element Declarations
@@ -704,8 +717,8 @@ try {
 			emptyState.className = 'empty-state col-span-full pb-8 text-center text-[#E6E1E5]/50 bg-[#1D1B20] rounded-3xl border border-[#2B2930]';
 			emptyState.innerHTML = `
 				<img src="/no_data.webp" alt="No data" class="w-48 h-48 mx-auto mb-4 object-contain opacity-90" />
-				<p class="font-semibold text-white">${title}</p>
-				<p class="text-xs mt-1">${subtitle}</p>
+				<p class="font-semibold text-white">${escapeHtml(title)}</p>
+				<p class="text-xs mt-1">${escapeHtml(subtitle)}</p>
 			`;
 			designsGrid.appendChild(emptyState);
 		}
@@ -751,27 +764,28 @@ try {
 
 		function createDesignCard(design: any) {
 			const formattedDate = formatAdminDate(design.date);
+			const imageUrl = getSafeImageSrc(design.imageUrl);
 
 			const cardWrapper = document.createElement('div');
 			cardWrapper.innerHTML = `
 				<article 
 					class="design-card group border rounded-3xl p-4 transition-all duration-300 flex flex-col justify-between h-full border-[#2B2930] bg-[#1D1B20] hover:ring-2 hover:ring-primary/40 cursor-pointer"
-					data-id="${design.id}"
+					data-id="${escapeAttribute(design.id)}"
 				>
 					<div>
 						<a 
-							href="${design.imageUrl}"
+							href="${escapeAttribute(imageUrl || '#')}"
 							target="_blank"
 							rel="noopener noreferrer"
-							data-lightbox-src="${design.imageUrl}"
-							data-lightbox-title="${design.title || design.company}"
-							data-lightbox-subtitle="${design.title ? (design.company || '') : ''}"
+							data-lightbox-src="${escapeAttribute(imageUrl)}"
+							data-lightbox-title="${escapeAttribute(design.title || design.company)}"
+							data-lightbox-subtitle="${escapeAttribute(design.title ? (design.company || '') : '')}"
 							class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-0 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block"
 						>
 							<div class="absolute inset-0 skeleton"></div>
 							<img
-								src="${design.imageUrl}"
-								alt="${design.title || design.company}"
+								src="${escapeAttribute(imageUrl)}"
+								alt="${escapeAttribute(design.title || design.company)}"
 								class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10 opacity-0 transition-opacity duration-300"
 								loading="lazy"
 								decoding="async"
@@ -784,13 +798,13 @@ try {
 					<div class="design-card-footer mt-3.5 flex justify-between items-center text-xs">
 						${formattedDate ? `
 							<span class="text-white/40 flex items-center gap-1 font-medium whitespace-nowrap shrink-0">
-								<Icon name="calendar" size={14} class="w-3.5 h-3.5" />
-								${formattedDate}
+								<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+								${escapeHtml(formattedDate)}
 							</span>
 						` : '<span></span>'}
 						${design.company ? `
 							<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary">
-								${design.company}
+								${escapeHtml(design.company)}
 							</span>
 						` : ''}
 					</div>
@@ -803,6 +817,8 @@ try {
 		function attachCardEventListeners() {
 			const designCards = designsGrid.querySelectorAll('.design-card') as NodeListOf<HTMLDivElement>;
 			designCards.forEach(card => {
+				if (card.dataset.eventsBound === 'true') return;
+				card.dataset.eventsBound = 'true';
 				card.addEventListener('click', (e) => {
 					// If clicking the image link, let the CSS lightbox handle it and stop propagation
 					if ((e.target as HTMLElement).closest('.image-zoom-trigger, [data-lightbox-src]')) {
@@ -844,6 +860,17 @@ try {
 		}
 
 		// --- Drawer Controls ---
+		function updateBodyScroll() {
+			const isAnyOpen =
+				(filterPanel && filterPanel.classList.contains('translate-x-0')) ||
+				(editorPanel && editorPanel.classList.contains('translate-x-0'));
+			if (isAnyOpen) {
+				document.body.style.overflow = 'hidden';
+			} else {
+				document.body.style.overflow = '';
+			}
+		}
+
 		function openDrawer() {
 			editorBackdrop.classList.remove('hidden');
 			// Allow reflow for transition
@@ -851,6 +878,7 @@ try {
 				editorBackdrop.classList.add('opacity-100');
 				editorPanel.classList.remove('translate-x-full');
 				editorPanel.classList.add('translate-x-0');
+				updateBodyScroll();
 			}, 10);
 		}
 
@@ -870,6 +898,7 @@ try {
 
 			setTimeout(() => {
 				editorBackdrop.classList.add('hidden');
+				updateBodyScroll();
 			}, 350);
 		}
 
@@ -880,6 +909,7 @@ try {
 				editorBackdrop.classList.add('opacity-100');
 				filterPanel.classList.remove('-translate-x-full');
 				filterPanel.classList.add('translate-x-0');
+				updateBodyScroll();
 			}, 10);
 		}
 
@@ -890,6 +920,7 @@ try {
 
 			setTimeout(() => {
 				editorBackdrop.classList.add('hidden');
+				updateBodyScroll();
 			}, 350);
 		}
 
@@ -1058,7 +1089,7 @@ try {
 							${index === 0 ? 'disabled' : ''}
 							title="Move Up"
 						>
-							<Icon name="chevron_up" size={14} class="w-3.5 h-3.5" />
+							<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 15-6-6-6 6"/></svg>
 						</button>
 						<button 
 							type="button" 
@@ -1067,13 +1098,13 @@ try {
 							${index === modalCompanies.length - 1 ? 'disabled' : ''}
 							title="Move Down"
 						>
-							<Icon name="chevron_down" size={14} class="w-3.5 h-3.5" />
+							<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
 						</button>
 					</div>
 					<div class="flex-grow min-w-0">
 						<input 
 							type="text" 
-							value="${comp.currentName}" 
+							value="${escapeAttribute(comp.currentName)}"
 							class="company-input-field w-full bg-[#141218] border border-[#2B2930] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-primary transition-colors font-medium"
 							data-index="${index}"
 						/>
@@ -1085,7 +1116,7 @@ try {
 						data-index="${index}"
 						title="Delete Company"
 					>
-						<Icon name="trash" size={16} class="w-4 h-4" />
+						<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
 					</button>
 				`;
 
@@ -1406,7 +1437,7 @@ try {
 
 			try {
 				const processedFile = await compressImageToWebp(file);
-				if (processedFile.size > 800 * 1024) {
+				if (processedFile.size > 700 * 1024) {
 					showStatus('error', `Optimized image is too large (${(processedFile.size / 1024).toFixed(0)}KB). Please upload a smaller or less complex image.`);
 					selectedImageFile = null;
 					return;
@@ -1488,7 +1519,7 @@ try {
 						allDesigns[existingIndex] = savedDesign;
 
 						// Update existing card in DOM
-						const existingCard = designsGrid.querySelector(`.design-card[data-id="${savedDesign.id}"]`);
+						const existingCard = designsGrid.querySelector(`.design-card[data-id="${CSS.escape(String(savedDesign.id))}"]`);
 						const updatedCard = createDesignCard(savedDesign);
 						updatedCard.addEventListener('click', (e) => {
 							if ((e.target as HTMLElement).closest('.image-zoom-trigger, [data-lightbox-src]')) return;
@@ -1566,7 +1597,7 @@ try {
 					allDesigns = allDesigns.filter((d: any) => d && d.id !== currentSelectedId);
 
 					// Remove card from DOM
-					const cardToRemove = designsGrid.querySelector(`.design-card[data-id="${currentSelectedId}"]`);
+					const cardToRemove = designsGrid.querySelector(`.design-card[data-id="${CSS.escape(String(currentSelectedId))}"]`);
 					if (cardToRemove) cardToRemove.remove();
 
 					// If grid is empty, show empty state
@@ -1731,7 +1762,7 @@ try {
 					return;
 				}
 				if (editorPanel && editorPanel.classList.contains('translate-x-0') && currentSelectedId) {
-					const card = designsGrid.querySelector(`.design-card[data-id="${currentSelectedId}"]`);
+					const card = designsGrid.querySelector(`.design-card[data-id="${CSS.escape(String(currentSelectedId))}"]`);
 					const trigger = card?.querySelector('[data-lightbox-src]') as HTMLElement;
 					if (trigger) trigger.click();
 					return;

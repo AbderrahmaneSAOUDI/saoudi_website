@@ -2,10 +2,14 @@
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ResumeIsland from '../components/ResumeIsland.astro';
+import SkeletonCardGrid from '../components/SkeletonCardGrid.astro';
+
 ---
 
 <BaseLayout title="Resume" description="Download or view the official software engineer resume of Abderrahmane SAOUDI.">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-		<ResumeIsland />
+		<ResumeIsland server:defer>
+			<SkeletonCardGrid slot="fallback" variant="resume" />
+		</ResumeIsland>
 	</div>
 </BaseLayout>

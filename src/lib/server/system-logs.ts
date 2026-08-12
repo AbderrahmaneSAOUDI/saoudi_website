@@ -146,19 +146,19 @@ export async function purgeExpiredSystemLogs(): Promise<{ success: boolean; dele
 			.get();
 
 		if (!expiredSnap.empty) {
-			const batch = db.batch();
-			expiredSnap.docs.forEach(doc => {
-				batch.delete(doc.ref);
-				deletedCount++;
-			});
-			await batch.commit();
+			for (let offset = 0; offset < expiredSnap.docs.length; offset += 450) {
+				const batch = db.batch();
+				const chunk = expiredSnap.docs.slice(offset, offset + 450);
+				chunk.forEach((doc) => batch.delete(doc.ref));
+				await batch.commit();
+				deletedCount += chunk.length;
+			}
 		}
 
 		// 2. Query legacy logs without expiresAt field and check against retention matrix
 		const allLogsSnap = await db.collection('system_logs').get();
 		if (!allLogsSnap.empty) {
-			const legacyBatch = db.batch();
-			let legacyCount = 0;
+			const legacyRefs: FirebaseFirestore.DocumentReference[] = [];
 
 			allLogsSnap.docs.forEach(doc => {
 				const data = doc.data();
@@ -168,15 +168,17 @@ export async function purgeExpiredSystemLogs(): Promise<{ success: boolean; dele
 					const logTime = new Date(data.timestamp).getTime();
 
 					if (!isNaN(logTime) && (nowTime - logTime > retentionDays * 24 * 60 * 60 * 1000)) {
-						legacyBatch.delete(doc.ref);
-						legacyCount++;
+						legacyRefs.push(doc.ref);
 					}
 				}
 			});
 
-			if (legacyCount > 0) {
-				await legacyBatch.commit();
-				deletedCount += legacyCount;
+			for (let offset = 0; offset < legacyRefs.length; offset += 450) {
+				const batch = db.batch();
+				const chunk = legacyRefs.slice(offset, offset + 450);
+				chunk.forEach((ref) => batch.delete(ref));
+				await batch.commit();
+				deletedCount += chunk.length;
 			}
 		}
 
@@ -201,11 +203,6 @@ export async function getSystemLogs(limitCount: number = 50, typeFilter?: string
 
 		const snap = await query.orderBy('timestamp', 'desc').limit(limitCount).get();
 		
-		if (snap.empty && (!typeFilter || typeFilter === 'all')) {
-			// Return clean default system logs if none exist yet
-			return getSeedSystemLogs();
-		}
-
 		return snap.docs.map(doc => {
 			const data = doc.data();
 			return {
@@ -216,72 +213,6 @@ export async function getSystemLogs(limitCount: number = 50, typeFilter?: string
 		});
 	} catch (err) {
 		console.warn('Failed to retrieve system logs from Firestore:', err);
-		return getSeedSystemLogs();
+		throw err;
 	}
-}
-
-/**
- * Initial seed logs for visual demonstration if database collection is brand new.
- */
-export function getSeedSystemLogs(): SystemLog[] {
-	const primaryEmail = (getEnv('ADMIN_EMAIL') || 'saoudi.dev@gmail.com').toLowerCase().trim();
-	const now = new Date();
-
-	return [
-		{
-			id: 'seed-log-1',
-			type: 'auth',
-			severity: 'info',
-			action: 'AUTH_LOGIN_PRIMARY',
-			title: 'Admin Dashboard session active',
-			details: `Authorized login for ${primaryEmail}`,
-			userEmail: primaryEmail,
-			isPrimaryEmail: true,
-			timestamp: new Date(now.getTime() - 5 * 60 * 1000).toISOString(),
-		},
-		{
-			id: 'seed-log-2',
-			type: 'content',
-			severity: 'info',
-			action: 'PROJECT_UPDATED',
-			title: 'Card updated: Projects section',
-			details: 'Modified project order & technology tags',
-			userEmail: primaryEmail,
-			isPrimaryEmail: true,
-			timestamp: new Date(now.getTime() - 25 * 60 * 1000).toISOString(),
-		},
-		{
-			id: 'seed-log-3',
-			type: 'auth',
-			severity: 'info',
-			action: 'AUTH_LOGIN_SECONDARY',
-			title: 'Granted admin entered Admin Dashboard',
-			details: 'Secondary email collaborator@saoudi.online signed in via Google GSI',
-			userEmail: 'collaborator@saoudi.online',
-			isPrimaryEmail: false,
-			timestamp: new Date(now.getTime() - 90 * 60 * 1000).toISOString(),
-		},
-		{
-			id: 'seed-log-4',
-			type: 'admin',
-			severity: 'info',
-			action: 'ADMIN_EMAIL_ADDED',
-			title: 'Granted new admin email access',
-			details: 'Added collaborator@saoudi.online to accepted admin emails',
-			userEmail: primaryEmail,
-			isPrimaryEmail: true,
-			timestamp: new Date(now.getTime() - 120 * 60 * 1000).toISOString(),
-		},
-		{
-			id: 'seed-log-5',
-			type: 'system',
-			severity: 'info',
-			action: 'SYSTEM_STARTUP',
-			title: 'Middleware & Security rules active',
-			details: 'HMAC session token protection & Firestore Security active',
-			userEmail: 'system',
-			isPrimaryEmail: true,
-			timestamp: new Date(now.getTime() - 240 * 60 * 1000).toISOString(),
-		},
-	];
 }

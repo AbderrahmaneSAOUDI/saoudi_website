@@ -159,7 +159,7 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 	</div>
 </div>
 
-<script is:inline define:vars={{ initialLogsData: filteredLogs, isPrimaryAdminUser: isPrimaryAdmin, primaryAdminEmail: primaryEmail }}>
+<script is:inline define:vars={{ initialLogsData: filteredLogs, isPrimaryAdminUser: isPrimaryAdmin, primaryAdminEmail: isPrimaryAdmin ? primaryEmail : '' }}>
 	Object.assign(window, { 
 		initialSystemLogs: initialLogsData || [],
 		isPrimaryAdminUser: Boolean(isPrimaryAdminUser),
@@ -168,6 +168,8 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 </script>
 
 <script>
+	import { escapeAttribute, escapeHtml } from '../../lib/client-safety';
+
 	document.addEventListener('DOMContentLoaded', () => {
 		const listContainer = document.getElementById('logs-list-container') as HTMLDivElement;
 		const emptyState = document.getElementById('logs-empty-state') as HTMLDivElement;
@@ -256,8 +258,7 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 
 		// Load live data on mount
 		populateEmailFilterOptions();
-		fetchActiveEmails();
-		fetchLogs();
+		renderLogs();
 
 		window.addEventListener('admin-emails-updated', () => {
 			fetchActiveEmails();
@@ -478,12 +479,22 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 				const sevStyle = getSeverityBadgeStyle(log.severity);
 				const iconSvg = getLogTypeIcon(log.type);
 
-				const displayUserEmail = log.userEmail ? formatEmailLabel(log.userEmail) : 'system';
+				const displayUserEmail = log.isPrimaryEmail
+					? 'Owner'
+					: log.userEmail
+						? formatEmailLabel(log.userEmail)
+						: 'system';
 
 				let displayTitle = log.title || '';
 				if (displayTitle.includes('entered Admin Dashboard:')) {
-					displayTitle = displayTitle.split(':')[0].trim();
+					 displayTitle = displayTitle.split(':')[0].trim();
 				}
+				const safeTitle = escapeHtml(displayTitle);
+				const safeUserEmail = escapeHtml(displayUserEmail);
+				const safeLogId = escapeAttribute(log.id);
+				const changedFields = Array.isArray(log.changedFields)
+					? log.changedFields.map((field: unknown) => String(field)).join(', ')
+					: '';
 
 				const card = document.createElement('div');
 				card.className = `p-3 rounded-2xl bg-[#211F26] border ${typeStyle.borderAccent} hover:border-white/30 transition-all cursor-pointer flex flex-col gap-2 group`;
@@ -497,13 +508,13 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 							</div>
 
 							<!-- Log Title -->
-							<p class="text-xs font-semibold text-white truncate min-w-0 flex-1" title="${displayTitle}">
-								${displayTitle}
+							<p class="text-xs font-semibold text-white truncate min-w-0 flex-1" title="${escapeAttribute(displayTitle)}">
+								${safeTitle}
 							</p>
 
 							<!-- Email & Time Ago -->
 							<div class="flex items-center gap-1.5 text-[10px] text-[#E6E1E5]/40 shrink-0">
-								<span class="font-mono ${isNonPrimaryLogin ? 'text-[#F9AB00] font-semibold' : ''}">${displayUserEmail}</span>
+								<span class="font-mono ${isNonPrimaryLogin ? 'text-[#F9AB00] font-semibold' : ''}">${safeUserEmail}</span>
 								<span>•</span>
 								<span>${formatTimeAgo(log.timestamp)}</span>
 							</div>
@@ -518,7 +529,7 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 								<button
 									type="button"
 									class="delete-log-btn opacity-0 group-hover:opacity-100 p-1 rounded-lg text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-all shrink-0 cursor-pointer"
-									data-log-id="${log.id}"
+									data-log-id="${safeLogId}"
 									title="Delete log entry"
 								>
 									<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
@@ -536,13 +547,13 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 								${sevStyle.label}
 							</span>
 						</div>
-						${log.details ? `<p class="leading-relaxed text-white/80">${log.details}</p>` : ''}
+						${log.details ? `<p class="leading-relaxed text-white/80">${escapeHtml(log.details)}</p>` : ''}
 						<div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1 text-[10px] text-white/50 pt-1 font-mono">
-							${log.requestPath ? `<div><span class="text-white/30">Path:</span> ${log.requestPath}</div>` : ''}
-							${log.ip ? `<div><span class="text-white/30">IP:</span> ${log.ip}</div>` : ''}
-							${log.userAgent ? `<div class="sm:col-span-2 truncate" title="${log.userAgent}"><span class="text-white/30">UA:</span> ${log.userAgent}</div>` : ''}
-							${log.changedFields ? `<div class="sm:col-span-2"><span class="text-white/30">Fields:</span> ${log.changedFields.join(', ')}</div>` : ''}
-							${log.previousValues ? `<div class="sm:col-span-2"><span class="text-white/30">Prev:</span> ${JSON.stringify(log.previousValues)}</div>` : ''}
+							${log.requestPath ? `<div><span class="text-white/30">Path:</span> ${escapeHtml(log.requestPath)}</div>` : ''}
+							${log.ip ? `<div><span class="text-white/30">IP:</span> ${escapeHtml(log.ip)}</div>` : ''}
+							${log.userAgent ? `<div class="sm:col-span-2 truncate" title="${escapeAttribute(log.userAgent)}"><span class="text-white/30">UA:</span> ${escapeHtml(log.userAgent)}</div>` : ''}
+							${changedFields ? `<div class="sm:col-span-2"><span class="text-white/30">Fields:</span> ${escapeHtml(changedFields)}</div>` : ''}
+							${log.previousValues ? `<div class="sm:col-span-2"><span class="text-white/30">Prev:</span> ${escapeHtml(JSON.stringify(log.previousValues))}</div>` : ''}
 							${log.expiresAt ? `<div class="sm:col-span-2"><span class="text-white/30">Expires:</span> ${new Date(log.expiresAt).toLocaleDateString()}</div>` : ''}
 						</div>
 					</div>

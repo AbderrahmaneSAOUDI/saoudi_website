@@ -7,6 +7,7 @@ import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
 import Icon from "../../components/Icon.astro";
 import AdminControlsStrip from "../../components/admin/AdminControlsStrip.astro";
 import { getEnv } from "../../lib/server/env";
+import { getPublicMediaUrl } from "../../lib/media";
 
 // Extra safety: double-check that the middleware successfully set Astro.locals.adminEmail
 const adminEmail = Astro.locals.adminEmail;
@@ -35,20 +36,35 @@ try {
 		if (Array.isArray(data?.fields) && data.fields.length > 0) {
 			fields = data.fields;
 		}
-	} else {
-		await db.collection("configuration").doc("projects_fields").set({ fields });
 	}
 
-	projects = snapshot.docs.map(doc => ({
-		id: doc.id,
-		...doc.data()
-	}));
+	projects = snapshot.docs.map(doc => {
+		const data = doc.data();
+		return {
+			id: doc.id,
+			order: Number.isFinite(Number(data.order)) ? Number(data.order) : 0,
+			title: typeof data.title === 'string' ? data.title : '',
+			field: typeof data.field === 'string' ? data.field : '',
+			description: typeof data.description === 'string' ? data.description : '',
+			imageUrl: getPublicMediaUrl(data.imageUrl, 'projects', doc.id) || '',
+			projectUrl: typeof data.projectUrl === 'string' ? data.projectUrl : '',
+			githubUrl: typeof data.githubUrl === 'string' ? data.githubUrl : '',
+			date: typeof data.date === 'string' ? data.date : '',
+			technologies: Array.isArray(data.technologies)
+				? data.technologies.filter((technology: unknown): technology is string => typeof technology === 'string')
+				: [],
+			blocks: Array.isArray(data.blocks) ? data.blocks : [],
+			featured: Boolean(data.featured),
+		};
+	});
 
 	// Extract unique sorted technologies
 	const techSet = new Set<string>();
 	projects.forEach(p => {
 		if (Array.isArray(p.technologies)) {
-			p.technologies.forEach((t: string) => t && techSet.add(t));
+			p.technologies.forEach((technology: unknown) => {
+				if (typeof technology === 'string' && technology) techSet.add(technology);
+			});
 		}
 	});
 	technologiesList = Array.from(techSet).sort((a, b) => a.localeCompare(b));
@@ -126,10 +142,13 @@ try {
 					<button
 						id="btn-close-filters"
 						type="button"
-						class="group p-1.5 rounded-lg text-[#E6E1E5]/60 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+						class="group p-1.5 text-[#E6E1E5]/60 hover:text-white transition-colors cursor-pointer"
 						title="Close Filters"
 					>
-						<Icon name="close" size={18} class="w-4.5 h-4.5 group-hover:rotate-90 transition-transform duration-200" />
+						<span class="relative block w-4.5 h-4.5">
+							<Icon name="close" size={18} class="absolute inset-0 w-4.5 h-4.5 opacity-100 group-hover:opacity-0 transition-opacity" />
+							<Icon name="close_filled" size={18} class="absolute inset-0 w-4.5 h-4.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+						</span>
 					</button>
 				</div>
 
@@ -343,7 +362,7 @@ try {
 								id="btn-open-block-editor"
 								class="w-full py-3 px-4 rounded-xl bg-[#211F26] hover:bg-primary/20 border border-[#2B2930] hover:border-primary/40 text-white font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer group"
 							>
-								<Icon name="edit" size={14} class="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+								<Icon name="settings" size={14} class="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
 								<span>Manage Blocks</span>
 								<span class="text-primary font-bold">←</span>
 							</button>
@@ -383,55 +402,47 @@ try {
 			>
 				<!-- Fixed Header -->
 				<div class="flex-shrink-0 p-6 pb-4 border-b border-[#2B2930]/60 flex items-center justify-between">
-					<div>
-						<h2 class="text-base font-bold text-white">Content Blocks Editor</h2>
-						<p class="text-xs text-[#E6E1E5]/50 mt-0.5">Drag to reorder story blocks</p>
+					<h2 class="text-base font-bold text-white">Content Blocks Editor</h2>
+					<div class="flex items-center gap-3">
+						<button type="button" id="btn-clear-all-blocks" class="text-xs text-[#DB4437] hover:underline font-semibold cursor-pointer">Clear All</button>
+						<button
+							type="button"
+							id="btn-close-block-panel-icon"
+							class="group p-1.5 text-[#E6E1E5]/60 hover:text-white transition-colors cursor-pointer"
+							title="Close Block Editor"
+						>
+							<span class="relative block w-5 h-5">
+								<Icon name="close" size={20} class="absolute inset-0 w-5 h-5 opacity-100 group-hover:opacity-0 transition-opacity" />
+								<Icon name="close_filled" size={20} class="absolute inset-0 w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
+							</span>
+						</button>
 					</div>
-					<button
-						type="button"
-						id="btn-close-block-panel-icon"
-						class="group p-1.5 rounded-lg text-[#E6E1E5]/60 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
-						title="Close Block Editor"
-					>
-						<Icon name="close" size={20} class="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
-					</button>
 				</div>
 
 				<!-- Scrollable Middle Section -->
-				<div id="block-editor-scroll-body" class="flex-1 overflow-y-auto min-h-0 p-6 space-y-5">
-					<!-- Configured Blocks -->
-					<div class="space-y-2">
-						<div class="flex items-center justify-between">
-							<label class="text-xs font-semibold text-[#E6E1E5]/70">Configured Blocks</label>
-							<button type="button" id="btn-clear-all-blocks" class="text-[11px] text-[#DB4437] hover:underline cursor-pointer">Clear All</button>
-						</div>
-
-						<div id="blocks-list-container" class="space-y-1.5 min-h-[100px] relative">
-							<!-- Horizontal Drop Indicator Line -->
-							<div id="drag-drop-line" class="hidden h-1 bg-primary rounded-full my-1.5 transition-all"></div>
-							<!-- Blocks rendered dynamically via JS -->
-						</div>
-					</div>
-
-					<!-- Quick Add Toolbar (Moved to bottom of content area) -->
-					<div class="pt-3 border-t border-[#2B2930]/60 space-y-2">
-						<label class="block text-xs font-semibold text-[#E6E1E5]/70">Add New Content Block</label>
-						<div class="grid grid-cols-4 sm:grid-cols-5 gap-1.5 py-1">
-							<button type="button" data-add-block="heading" title="Heading (H1-H6)" class="py-2 px-1.5 rounded-xl bg-[#211F26] hover:bg-primary/20 hover:border-primary/40 border border-white/5 text-white font-bold text-xs flex items-center justify-center cursor-pointer transition-all">H</button>
-							<button type="button" data-add-block="rich_text" title="Rich Text Paragraph" class="py-2 px-1.5 rounded-xl bg-[#211F26] hover:bg-primary/20 hover:border-primary/40 border border-white/5 text-white font-bold text-xs flex items-center justify-center cursor-pointer transition-all">¶</button>
-							<button type="button" data-add-block="list" data-list-type="bullet" title="Unordered List" class="py-2 px-1.5 rounded-xl bg-[#211F26] hover:bg-primary/20 hover:border-primary/40 border border-white/5 text-white font-bold text-xs flex items-center justify-center cursor-pointer transition-all">• List</button>
-							<button type="button" data-add-block="list" data-list-type="number" title="Ordered List" class="py-2 px-1.5 rounded-xl bg-[#211F26] hover:bg-primary/20 hover:border-primary/40 border border-white/5 text-white font-bold text-xs flex items-center justify-center cursor-pointer transition-all">1. List</button>
-							<button type="button" data-add-block="callout" title="Callout Box" class="py-2 px-1.5 rounded-xl bg-[#211F26] hover:bg-[#F9AB00]/20 hover:border-[#F9AB00]/40 border border-white/5 text-[#F9AB00] font-bold text-xs flex items-center justify-center cursor-pointer transition-all">⚡</button>
-							<button type="button" data-add-block="single_image" title="Single Image" class="py-2 px-1.5 rounded-xl bg-[#211F26] hover:bg-[#34A853]/20 hover:border-[#34A853]/40 border border-white/5 text-[#34A853] font-bold text-xs flex items-center justify-center cursor-pointer transition-all">🖼</button>
-							<button type="button" data-add-block="carousel" title="Image Carousel" class="py-2 px-1.5 rounded-xl bg-[#211F26] hover:bg-[#34A853]/20 hover:border-[#34A853]/40 border border-white/5 text-[#34A853] font-bold text-xs flex items-center justify-center cursor-pointer transition-all">🎠</button>
-							<button type="button" data-add-block="metrics_grid" title="Metrics Grid" class="py-2 px-1.5 rounded-xl bg-[#211F26] hover:bg-[#4285F4]/20 hover:border-[#4285F4]/40 border border-white/5 text-[#4285F4] font-bold text-xs flex items-center justify-center cursor-pointer transition-all">📊</button>
-							<button type="button" data-add-block="action_buttons" title="Action Buttons" class="py-2 px-1.5 rounded-xl bg-[#211F26] hover:bg-[#EA4335]/20 hover:border-[#EA4335]/40 border border-white/5 text-[#EA4335] font-bold text-xs flex items-center justify-center cursor-pointer transition-all">🔗</button>
-						</div>
+				<div id="block-editor-scroll-body" class="flex-1 overflow-y-auto min-h-0 p-4 space-y-3">
+					<div id="blocks-list-container" class="space-y-1.5 min-h-[100px] relative">
+						<!-- Horizontal Drop Indicator Line -->
+						<div id="drag-drop-line" class="hidden h-1 bg-primary rounded-full my-1.5 transition-all"></div>
+						<!-- Blocks rendered dynamically via JS -->
 					</div>
 				</div>
 
 				<!-- Fixed Footer -->
-				<div class="flex-shrink-0 p-6 pt-4 border-t border-[#2B2930]">
+				<div class="flex-shrink-0 p-4 border-t border-[#2B2930] space-y-3">
+					<!-- Quick Add Toolbar -->
+					<div class="grid grid-cols-7 gap-1.5">
+						<button type="button" data-add-block="heading" title="Heading (H1-H6)" class="h-9 min-w-0 rounded-lg bg-[#211F26] hover:bg-primary/20 hover:border-primary/40 border border-white/5 text-white font-bold text-xs flex items-center justify-center cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 active:translate-y-0 active:scale-95">H</button>
+						<button type="button" data-add-block="rich_text" title="Rich Text Paragraph" class="h-9 min-w-0 rounded-lg bg-[#211F26] hover:bg-primary/20 hover:border-primary/40 border border-white/5 text-white font-bold text-xs flex items-center justify-center cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 active:translate-y-0 active:scale-95">¶</button>
+						<button type="button" data-add-block="list" data-list-type="bullet" title="Unordered List" class="h-9 min-w-0 rounded-lg bg-[#211F26] hover:bg-primary/20 hover:border-primary/40 border border-white/5 text-white font-bold text-xs flex items-center justify-center cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 active:translate-y-0 active:scale-95">•</button>
+						<button type="button" data-add-block="list" data-list-type="number" title="Ordered List" class="h-9 min-w-0 rounded-lg bg-[#211F26] hover:bg-primary/20 hover:border-primary/40 border border-white/5 text-white font-bold text-xs flex items-center justify-center cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 active:translate-y-0 active:scale-95">1.</button>
+						<button type="button" data-add-block="callout" title="Callout Box" class="h-9 min-w-0 rounded-lg bg-[#211F26] hover:bg-[#F9AB00]/20 hover:border-[#F9AB00]/40 border border-white/5 text-[#F9AB00] font-bold text-xs flex items-center justify-center cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 active:translate-y-0 active:scale-95">⚡</button>
+						<button type="button" data-add-block="single_image" title="Single Image" class="h-9 min-w-0 rounded-lg bg-[#211F26] hover:bg-[#34A853]/20 hover:border-[#34A853]/40 border border-white/5 text-[#34A853] font-bold text-xs flex items-center justify-center cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 active:translate-y-0 active:scale-95">🖼</button>
+						<button type="button" data-add-block="carousel" title="Image Carousel" class="h-9 min-w-0 rounded-lg bg-[#211F26] hover:bg-[#34A853]/20 hover:border-[#34A853]/40 border border-white/5 text-[#34A853] font-bold text-xs flex items-center justify-center cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 active:translate-y-0 active:scale-95">🎠</button>
+						<button type="button" data-add-block="metrics_grid" title="Metrics Grid" class="h-9 min-w-0 rounded-lg bg-[#211F26] hover:bg-[#4285F4]/20 hover:border-[#4285F4]/40 border border-white/5 text-[#4285F4] font-bold text-xs flex items-center justify-center cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 active:translate-y-0 active:scale-95">📊</button>
+						<button type="button" data-add-block="action_buttons" title="Action Buttons" class="h-9 min-w-0 rounded-lg bg-[#211F26] hover:bg-[#EA4335]/20 hover:border-[#EA4335]/40 border border-white/5 text-[#EA4335] font-bold text-xs flex items-center justify-center cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 active:translate-y-0 active:scale-95">🔗</button>
+					</div>
+
 					<button
 						type="button"
 						id="btn-apply-blocks"
@@ -447,8 +458,11 @@ try {
 				<div class="bg-[#1D1B20] border border-[#2B2930] rounded-3xl p-6 w-full max-w-md space-y-4 animate-page-slide-up">
 					<div class="flex justify-between items-center border-b border-[#2B2930] pb-3">
 						<h3 class="text-base font-bold text-white">Manage Main Fields</h3>
-						<button id="btn-close-fields-modal" type="button" class="group p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-all cursor-pointer" title="Close">
-							<Icon name="close" size={18} class="w-4.5 h-4.5 group-hover:rotate-90 transition-transform duration-200" />
+						<button id="btn-close-fields-modal" type="button" class="group p-1 text-white/60 hover:text-white transition-colors cursor-pointer" title="Close">
+							<span class="relative block w-4.5 h-4.5">
+								<Icon name="close" size={18} class="absolute inset-0 w-4.5 h-4.5 opacity-100 group-hover:opacity-0 transition-opacity" />
+								<Icon name="close_filled" size={18} class="absolute inset-0 w-4.5 h-4.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+							</span>
 						</button>
 					</div>
 
@@ -503,6 +517,7 @@ try {
 <script>
 	import { compressImageToWebp } from '../../lib/client-image';
 	import { formatAdminDate } from '../../lib/date-utils';
+	import { escapeAttribute, escapeHtml, getSafeImageSrc } from '../../lib/client-safety';
 
 	document.addEventListener('DOMContentLoaded', () => {
 		// Element Declarations
@@ -604,7 +619,7 @@ try {
 				const div = document.createElement('div');
 				div.className = 'flex items-center justify-between p-2 rounded-xl bg-[#211F26] border border-[#2B2930] text-xs text-white';
 				div.innerHTML = `
-					<span>${f}</span>
+					<span>${escapeHtml(f)}</span>
 					<button type="button" data-delete-field="${idx}" class="text-[#DB4437] hover:bg-[#DB4437]/10 p-1 rounded cursor-pointer">✕</button>
 				`;
 				div.querySelector('[data-delete-field]')?.addEventListener('click', () => {
@@ -619,11 +634,15 @@ try {
 			btnManageFields.addEventListener('click', () => {
 				renderFieldsModalList();
 				fieldsModal.classList.remove('hidden');
+				updateBodyScroll();
 			});
 		}
 
 		if (btnCloseFieldsModal) {
-			btnCloseFieldsModal.addEventListener('click', () => fieldsModal.classList.add('hidden'));
+			btnCloseFieldsModal.addEventListener('click', () => {
+				fieldsModal.classList.add('hidden');
+				updateBodyScroll();
+			});
 		}
 
 		if (btnAddField) {
@@ -652,6 +671,7 @@ try {
 					if (res.ok && data.success) {
 						renderFieldsDropdown();
 						fieldsModal.classList.add('hidden');
+						updateBodyScroll();
 						showToast('Main fields updated successfully!', 'success');
 					} else {
 						showToast(data.error || 'Failed to update fields', 'error');
@@ -673,12 +693,20 @@ try {
 			if (!blockEditorPanel) return;
 			blockEditorPanel.classList.remove('-translate-x-full');
 			blockEditorPanel.classList.add('translate-x-0');
+			updateBodyScroll();
+			requestAnimationFrame(() => {
+				autoResizeAllTextareas();
+			});
+			setTimeout(() => {
+				autoResizeAllTextareas();
+			}, 360);
 		}
 
 		function closeBlockEditorDrawer() {
 			if (!blockEditorPanel) return;
 			blockEditorPanel.classList.remove('translate-x-0');
 			blockEditorPanel.classList.add('-translate-x-full');
+			updateBodyScroll();
 		}
 
 		if (btnOpenBlockEditor) {
@@ -693,8 +721,8 @@ try {
 			btnApplyBlocks.addEventListener('click', async () => {
 				updateBlocksUI();
 				showToast('Saving content blocks to Firebase...', 'info');
-				// Dispatch form submit event directly
-				projectForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+				// Use the native form path so required fields are validated before saving.
+				projectForm.requestSubmit(btnSave);
 			});
 		}
 
@@ -722,10 +750,9 @@ try {
 					currentBlocks.push({ id, type, content: '' });
 				} else if (type === 'callout') {
 					currentBlocks.push({ id, type, variant: 'info', title: '', text: '' });
-				} else if (type === 'bullet_list') {
-					currentBlocks.push({ id, type: 'list', listType: 'bullet', items: [] });
-				} else if (type === 'numbered_list') {
-					currentBlocks.push({ id, type: 'list', listType: 'number', items: [] });
+				} else if (type === 'list') {
+					const listType = btn.getAttribute('data-list-type') === 'number' ? 'number' : 'bullet';
+					currentBlocks.push({ id, type: 'list', listType, items: [] });
 				} else if (type === 'carousel') {
 					currentBlocks.push({ id, type, images: [] });
 				} else if (type === 'single_image') {
@@ -881,7 +908,7 @@ try {
 				if (block.type === 'heading') {
 					contentWrapper.innerHTML = `
 						<div class="flex gap-2">
-							<select data-field="level" class="px-2 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs">
+							<select data-field="level" class="px-2 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm">
 								<option value="1" ${block.level === 1 ? 'selected' : ''}>H1</option>
 								<option value="2" ${block.level === 2 ? 'selected' : ''}>H2</option>
 								<option value="3" ${block.level === 3 ? 'selected' : ''}>H3</option>
@@ -889,26 +916,26 @@ try {
 								<option value="5" ${block.level === 5 ? 'selected' : ''}>H5</option>
 								<option value="6" ${block.level === 6 ? 'selected' : ''}>H6</option>
 							</select>
-							<input type="text" data-field="text" value="${block.text || ''}" placeholder="Heading text..." class="flex-1 px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary" />
+							<input type="text" data-field="text" value="${escapeAttribute(block.text || '')}" placeholder="Heading text..." class="flex-1 px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary" />
 						</div>
 					`;
 				} else if (block.type === 'rich_text') {
 					contentWrapper.innerHTML = `
-						<textarea data-field="content" rows="3" placeholder="Write text content..." class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary">${block.content || ''}</textarea>
+						<textarea data-field="content" rows="3" placeholder="Write text content..." class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm leading-5 focus:outline-none focus:border-primary resize-none overflow-hidden">${escapeHtml(block.content || '')}</textarea>
 					`;
 				} else if (block.type === 'callout') {
 					contentWrapper.innerHTML = `
 						<div class="space-y-2">
 							<div class="flex gap-2">
-								<select data-field="variant" class="px-2 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs">
+								<select data-field="variant" class="px-2 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm">
 									<option value="info" ${block.variant === 'info' ? 'selected' : ''}>Info (Blue)</option>
 									<option value="success" ${block.variant === 'success' ? 'selected' : ''}>Success (Green)</option>
 									<option value="warning" ${block.variant === 'warning' ? 'selected' : ''}>Warning (Yellow)</option>
 									<option value="error" ${block.variant === 'error' ? 'selected' : ''}>Alert (Red)</option>
 								</select>
-								<input type="text" data-field="title" value="${block.title || ''}" placeholder="Callout Title..." class="flex-1 px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary" />
+							<input type="text" data-field="title" value="${escapeAttribute(block.title || '')}" placeholder="Callout Title..." class="flex-1 px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary" />
 							</div>
-							<textarea data-field="text" rows="2" placeholder="Callout body message..." class="w-full px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary">${block.text || ''}</textarea>
+							<textarea data-field="text" rows="2" placeholder="Callout body message..." class="w-full px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm leading-5 focus:outline-none focus:border-primary resize-none overflow-hidden">${escapeHtml(block.text || '')}</textarea>
 						</div>
 					`;
 				} else if (block.type === 'list') {
@@ -916,20 +943,21 @@ try {
 					contentWrapper.innerHTML = `
 						<div class="space-y-2">
 							<div class="flex items-center gap-2">
-								<select data-field="listType" class="px-2 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs">
+								<select data-field="listType" class="px-2 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm">
 									<option value="bullet" ${block.listType === 'bullet' ? 'selected' : ''}>Bullet List (•)</option>
 									<option value="number" ${block.listType === 'number' ? 'selected' : ''}>Numbered List (1.)</option>
 								</select>
 								<span class="text-[10px] text-[#E6E1E5]/50">One list item per line</span>
 							</div>
-							<textarea data-field="items_str" rows="3" placeholder="Item 1&#10;Item 2&#10;Item 3" class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary">${itemsStr}</textarea>
+							<textarea data-field="items_str" rows="3" placeholder="Item 1&#10;Item 2&#10;Item 3" class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm leading-5 focus:outline-none focus:border-primary resize-none overflow-hidden">${escapeHtml(itemsStr)}</textarea>
 						</div>
 					`;
 				} else if (block.type === 'single_image') {
 					if (block.imageUrl) {
+						const imageUrl = getSafeImageSrc(block.imageUrl);
 						contentWrapper.innerHTML = `
 							<div class="relative group/img rounded-xl overflow-hidden border border-white/10 bg-black/40 aspect-[16/9]">
-								<img src="${block.imageUrl}" class="w-full h-full object-cover" />
+								<img src="${escapeAttribute(imageUrl)}" class="w-full h-full object-cover" />
 								<div class="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 flex items-center justify-center gap-2 transition-opacity">
 									<button type="button" class="btn-change-single-img px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold cursor-pointer">Change Image</button>
 									<button type="button" class="btn-remove-single-img px-3 py-1.5 rounded-xl bg-[#DB4437] text-white text-xs font-bold cursor-pointer">Remove</button>
@@ -1028,11 +1056,11 @@ try {
 							const thumb = document.createElement('div');
 							thumb.className = 'relative group/thumb aspect-[16/10] rounded-lg overflow-hidden border border-white/10 bg-black/40';
 							thumb.innerHTML = `
-								<img src="${imgUrl}" class="w-full h-full object-cover" />
-								<button type="button" data-remove-carousel-img="${imgIdx}" class="absolute top-1 right-1 bg-black/70 hover:bg-[#EA4335] text-white p-1 rounded-full flex items-center justify-center cursor-pointer transition-all group/car-del" title="Remove image">
+								<img src="${escapeAttribute(getSafeImageSrc(imgUrl))}" class="w-full h-full object-cover" />
+								<button type="button" data-remove-carousel-img="${imgIdx}" class="absolute top-1 right-1 bg-black/70 hover:bg-[#EA4335] text-white p-1 rounded-full flex items-center justify-center cursor-pointer transition-all group" title="Remove image">
 									<div class="relative w-3.5 h-3.5 flex items-center justify-center">
-										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-3.5 h-3.5 transition-all duration-200 group-hover/car-del:opacity-0 group-hover/car-del:scale-90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 7 7 17M7 7l10 10"/></svg>
-										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-3.5 h-3.5 absolute inset-0 opacity-0 transition-all duration-200 scale-90 group-hover/car-del:opacity-100 group-hover/car-del:scale-100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 9 3 3m0 0 3 3m-3-3-3 3m3-3 3-3m-3 12a9 9 0 110-18 9 9 0 010 18"/></svg>
+										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-3.5 h-3.5 absolute inset-0 opacity-100 group-hover:opacity-0 transition-opacity duration-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 7 7 17M7 7l10 10"/></svg>
+										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-3.5 h-3.5 absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 9 3 3m0 0 3 3m-3-3-3 3m3-3 3-3m-3 12a9 9 0 110-18 9 9 0 010 18"/></svg>
 									</div>
 								</button>
 							`;
@@ -1080,22 +1108,22 @@ try {
 					});
 				} else if (block.type === 'metrics_grid') {
 					const metricsStr = Array.isArray(block.items) 
-						? block.items.map((it: any) => `${it.label || ''}:${it.value || ''}`).join(', ')
+						? block.items.filter((item: unknown) => item && typeof item === 'object').map((it: any) => `${it.label || ''}:${it.value || ''}`).join(', ')
 						: '';
 					contentWrapper.innerHTML = `
 						<div class="space-y-1.5">
 							<label class="block text-[10px] text-[#E6E1E5]/60">Metrics (Label:Value separated by commas)</label>
-							<input type="text" data-field="metrics_str" value="${metricsStr}" placeholder="Lighthouse:100, Speed:Fast" class="w-full px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary" />
+							<input type="text" data-field="metrics_str" value="${escapeAttribute(metricsStr)}" placeholder="Lighthouse:100, Speed:Fast" class="w-full px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm focus:outline-none focus:border-primary" />
 						</div>
 					`;
 				} else if (block.type === 'action_buttons') {
 					const btnsStr = Array.isArray(block.buttons)
-						? block.buttons.map((b: any) => `${b.label || ''}|${b.url || ''}`).join('\n')
+						? block.buttons.filter((button: unknown) => button && typeof button === 'object').map((b: any) => `${b.label || ''}|${b.url || ''}`).join('\n')
 						: '';
 					contentWrapper.innerHTML = `
 						<div class="space-y-1.5">
 							<label class="block text-[10px] text-[#E6E1E5]/60">Buttons (Label|URL per line)</label>
-							<textarea data-field="buttons_str" rows="2" placeholder="Live Demo|https://example.com&#10;GitHub|https://github.com" class="w-full px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-xs focus:outline-none focus:border-primary">${btnsStr}</textarea>
+							<textarea data-field="buttons_str" rows="2" placeholder="Live Demo|https://example.com&#10;GitHub|https://github.com" class="w-full px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm leading-5 focus:outline-none focus:border-primary resize-none overflow-hidden">${escapeHtml(btnsStr)}</textarea>
 						</div>
 					`;
 				}
@@ -1103,12 +1131,12 @@ try {
 				// Remove block button top right of card body
 				const deleteBtn = document.createElement('button');
 				deleteBtn.type = 'button';
-				deleteBtn.className = 'p-1 rounded-lg text-[#E6E1E5]/40 hover:text-[#EA4335] hover:bg-[#EA4335]/10 cursor-pointer transition-all shrink-0 group/block-del relative mt-0.5';
+				deleteBtn.className = 'p-1 rounded-lg text-[#E6E1E5]/40 hover:text-[#EA4335] hover:bg-[#EA4335]/10 cursor-pointer transition-all shrink-0 group relative mt-0.5';
 				deleteBtn.title = 'Delete Block';
 				deleteBtn.innerHTML = `
 					<div class="relative w-4 h-4 flex items-center justify-center">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4 transition-all duration-200 group-hover/block-del:opacity-0 group-hover/block-del:scale-90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 7 7 17M7 7l10 10"/></svg>
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4 absolute inset-0 opacity-0 transition-all duration-200 scale-90 group-hover/block-del:opacity-100 group-hover/block-del:scale-100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 9 3 3m0 0 3 3m-3-3-3 3m3-3 3-3m-3 12a9 9 0 110-18 9 9 0 010 18"/></svg>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4 absolute inset-0 opacity-100 group-hover:opacity-0 transition-opacity duration-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 7 7 17M7 7l10 10"/></svg>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4 absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 9 3 3m0 0 3 3m-3-3-3 3m3-3 3-3m-3 12a9 9 0 110-18 9 9 0 010 18"/></svg>
 					</div>
 				`;
 				deleteBtn.addEventListener('click', () => {
@@ -1120,6 +1148,8 @@ try {
 				cardBody.appendChild(contentWrapper);
 				cardBody.appendChild(deleteBtn);
 				blockCard.appendChild(cardBody);
+
+				contentWrapper.querySelectorAll('textarea').forEach(ta => autoResizeTextarea(ta as HTMLTextAreaElement));
 
 				contentWrapper.addEventListener('input', (e) => {
 					const target = e.target as HTMLElement;
@@ -1154,6 +1184,10 @@ try {
 						blockCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 					}, 50);
 				}
+			});
+
+			requestAnimationFrame(() => {
+				autoResizeAllTextareas();
 			});
 		}
 
@@ -1200,26 +1234,27 @@ try {
 			const formattedDate = formatAdminDate(project.date);
 
 			const fieldText = project.field || 'Web Development';
+			const imageUrl = getSafeImageSrc(project.imageUrl);
 
 			const cardWrapper = document.createElement('div');
 			cardWrapper.innerHTML = `
 				<article 
 					class="project-card group border rounded-3xl p-4 transition-all duration-300 flex flex-col justify-between h-full border-[#2B2930] bg-[#1D1B20] hover:ring-2 hover:ring-primary/40 cursor-pointer"
-					data-id="${project.id}"
+					data-id="${escapeAttribute(project.id)}"
 				>
 					<div>
-						${project.imageUrl ? `
+						${imageUrl ? `
 							<a
 								href="#global-lightbox"
-								data-lightbox-src="${project.imageUrl}"
-								data-lightbox-title="${project.title || ''}"
-								data-lightbox-subtitle="${project.field || ''}"
+								data-lightbox-src="${escapeAttribute(imageUrl)}"
+								data-lightbox-title="${escapeAttribute(project.title || '')}"
+								data-lightbox-subtitle="${escapeAttribute(project.field || '')}"
 								class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block bg-[#1D1B20]"
 							>
 								<div class="absolute inset-0 skeleton"></div>
 								<img
-									src="${project.imageUrl}"
-									alt="${project.title}"
+									src="${escapeAttribute(imageUrl)}"
+									alt="${escapeAttribute(project.title)}"
 									class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10 opacity-0"
 									loading="lazy"
 									decoding="async"
@@ -1234,7 +1269,7 @@ try {
 						`}
 
 						<h3 class="font-bold text-white text-base group-hover:text-primary transition-colors line-clamp-1">
-							${project.title}
+							${escapeHtml(project.title)}
 						</h3>
 					</div>
 
@@ -1242,11 +1277,11 @@ try {
 						${formattedDate ? `
 							<span class="flex items-center gap-1 font-medium whitespace-nowrap shrink-0">
 								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-								${formattedDate}
+								${escapeHtml(formattedDate)}
 							</span>
 						` : '<span></span>'}
 						<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary line-clamp-1 max-w-[140px]">
-							${fieldText}
+							${escapeHtml(fieldText)}
 						</span>
 					</div>
 				</article>
@@ -1258,6 +1293,8 @@ try {
 		function attachCardEventListeners() {
 			const projectCards = projectsGrid.querySelectorAll('.project-card') as NodeListOf<HTMLDivElement>;
 			projectCards.forEach(card => {
+				if (card.dataset.eventsBound === 'true') return;
+				card.dataset.eventsBound = 'true';
 				card.addEventListener('click', (e) => {
 					if ((e.target as HTMLElement).closest('.stop-propagation, .image-zoom-trigger, [data-lightbox-src]')) {
 						return;
@@ -1294,6 +1331,41 @@ try {
 			}
 		}
 
+		// --- Helper Functions ---
+		function updateBodyScroll() {
+			const isAnyOpen =
+				(filterPanel && filterPanel.classList.contains('translate-x-0')) ||
+				(editorPanel && editorPanel.classList.contains('translate-x-0')) ||
+				(blockEditorPanel && blockEditorPanel.classList.contains('translate-x-0')) ||
+				(fieldsModal && !fieldsModal.classList.contains('hidden'));
+			if (isAnyOpen) {
+				document.body.style.overflow = 'hidden';
+			} else {
+				document.body.style.overflow = '';
+			}
+		}
+
+		function autoResizeTextarea(ta: HTMLTextAreaElement) {
+			if (!ta || ta.tagName !== 'TEXTAREA') return;
+			ta.style.height = '0px';
+			if (ta.scrollHeight > 0) {
+				ta.style.height = `${ta.scrollHeight}px`;
+			}
+		}
+
+		function autoResizeAllTextareas() {
+			if (!blockEditorPanel) return;
+			const textareas = blockEditorPanel.querySelectorAll('textarea');
+			textareas.forEach(ta => autoResizeTextarea(ta as HTMLTextAreaElement));
+		}
+
+		document.addEventListener('input', (e) => {
+			const target = e.target as HTMLElement;
+			if (target && target.tagName === 'TEXTAREA') {
+				autoResizeTextarea(target as HTMLTextAreaElement);
+			}
+		});
+
 		// --- Drawer Controls (Opens BOTH drawers on card click) ---
 		function openDrawer() {
 			editorBackdrop.classList.remove('hidden');
@@ -1302,6 +1374,7 @@ try {
 				editorPanel.classList.remove('translate-x-full');
 				editorPanel.classList.add('translate-x-0');
 				openBlockEditorDrawer();
+				updateBodyScroll();
 			}, 10);
 		}
 
@@ -1320,6 +1393,7 @@ try {
 
 			setTimeout(() => {
 				editorBackdrop.classList.add('hidden');
+				updateBodyScroll();
 			}, 350);
 		}
 
@@ -1329,6 +1403,7 @@ try {
 				editorBackdrop.classList.add('opacity-100');
 				filterPanel.classList.remove('-translate-x-full');
 				filterPanel.classList.add('translate-x-0');
+				updateBodyScroll();
 			}, 10);
 		}
 
@@ -1339,6 +1414,7 @@ try {
 
 			setTimeout(() => {
 				editorBackdrop.classList.add('hidden');
+				updateBodyScroll();
 			}, 350);
 		}
 
@@ -1405,14 +1481,17 @@ try {
 			if (project.field) {
 				formField.value = project.field;
 			}
-			formTechnologies.value = Array.isArray(project.technologies) ? project.technologies.join(', ') : '';
-			formDate.value = project.date ? project.date.substring(0, 7) : '';
+			formTechnologies.value = Array.isArray(project.technologies)
+				? project.technologies.filter((technology: unknown) => typeof technology === 'string').join(', ')
+				: '';
+			formDate.value = typeof project.date === 'string' ? project.date.substring(0, 7) : '';
 			formProjectUrl.value = project.projectUrl || '';
 			formGithubUrl.value = project.githubUrl || '';
 
 			selectedImageFile = null;
-			if (project.imageUrl) {
-				imagePreview.src = project.imageUrl;
+			const projectImageUrl = getSafeImageSrc(project.imageUrl);
+			if (projectImageUrl) {
+				imagePreview.src = projectImageUrl;
 				imagePreview.classList.remove('hidden');
 				dropZonePrompt.classList.add('hidden');
 				fileDetails.textContent = '✓ Current Image';
@@ -1442,7 +1521,11 @@ try {
 				btnDelete.title = 'Only website owner can do this action';
 			}
 
-			currentBlocks = Array.isArray(project.blocks) ? JSON.parse(JSON.stringify(project.blocks)) : [];
+			currentBlocks = Array.isArray(project.blocks)
+				? JSON.parse(JSON.stringify(project.blocks)).filter(
+					(block: unknown) => block && typeof block === 'object' && !Array.isArray(block) && typeof (block as any).type === 'string',
+				)
+				: [];
 			updateBlocksUI();
 
 			clearStatus();
@@ -1528,9 +1611,9 @@ try {
 
 			try {
 				const processedFile = await compressImageToWebp(file);
-				if (processedFile.size > 800 * 1024) {
+				if (processedFile.size > 700 * 1024) {
 					setStatus(`Optimized image is too large (${(processedFile.size / 1024).toFixed(0)}KB). Please upload a smaller image.`, 'error');
-					showToast('Optimized image exceeds 800KB limit.', 'error');
+					showToast('Optimized image exceeds 700KB limit.', 'error');
 					selectedImageFile = null;
 					return;
 				}
@@ -1569,6 +1652,7 @@ try {
 		// --- Form Submission & Deletion ---
 		projectForm.addEventListener('submit', async (e) => {
 			e.preventDefault();
+			if (btnSave.disabled) return;
 			setFormLoading(true, 'Saving...');
 
 			try {
@@ -1587,21 +1671,30 @@ try {
 					formData.append('image', selectedImageFile);
 				}
 
-				const res = await fetch('/admin/admin_projects_api', {
+				const res = await fetch(new URL('/admin/admin_projects_api', window.location.origin), {
 					method: 'POST',
 					body: formData,
+					credentials: 'same-origin',
+					headers: { Accept: 'application/json' },
 				});
 
-				const data = await res.json();
+				const responseText = await res.text();
+				const data = responseText ? JSON.parse(responseText) : {};
 				if (res.ok && data.success) {
 					showToast(currentSelectedId ? 'Project updated successfully!' : 'Project created successfully!', 'success');
 					
 					if (currentSelectedId) {
 						const idx = allProjects.findIndex(p => p.id === data.project.id);
-						if (idx !== -1) allProjects[idx] = data.project;
+						if (idx !== -1) {
+							// Preserve references held by rendered cards and editor state.
+							Object.assign(allProjects[idx], data.project);
+						} else {
+							allProjects.unshift(data.project);
+						}
 					} else {
 						allProjects.unshift(data.project);
 					}
+					(window as any).projects = allProjects;
 
 					applyFilters();
 					closeDrawer();

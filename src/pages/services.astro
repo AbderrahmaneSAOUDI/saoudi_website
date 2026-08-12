@@ -12,6 +12,7 @@ import ContactCard from "../components/ContactCard.astro";
 import type { Service } from "../types";
 import { getFirebaseAdminDb } from "../lib/server/firebase-admin";
 import { CACHE_TTL_MS, getOrSetCached } from "../lib/server/cache";
+import { getPublicMediaUrl } from "../lib/media";
 
 let services: Service[] = [];
 let errorMsg = "";
@@ -26,13 +27,13 @@ try {
 				const data = doc.data();
 				return {
 					id: doc.id,
-					order: data.order ?? 0,
-					title: data.title ?? "",
-					description: data.description ?? "",
-					logoUrl: data.logoUrl ?? null,
-					features: data.features ?? [],
-					createdAt: data.createdAt ?? "",
-					updatedAt: data.updatedAt ?? "",
+					order: Number.isFinite(Number(data.order)) ? Number(data.order) : 0,
+					title: typeof data.title === 'string' ? data.title : "",
+					description: typeof data.description === 'string' ? data.description : "",
+					logoUrl: getPublicMediaUrl(data.logoUrl, 'services', doc.id) ?? null,
+					features: Array.isArray(data.features) ? data.features.filter((feature: unknown): feature is string => typeof feature === 'string') : [],
+					createdAt: typeof data.createdAt === 'string' ? data.createdAt : "",
+					updatedAt: typeof data.updatedAt === 'string' ? data.updatedAt : "",
 				};
 			}) as Service[];
 
@@ -93,7 +94,8 @@ const colorAccents = [
 													src={service.logoUrl}
 													alt={service.title}
 													class="w-full h-full object-contain p-2.5"
-													loading={index < 3 ? 'eager' : 'lazy'}
+											loading={index < 3 ? 'eager' : 'lazy'}
+											decoding="async"
 												/>
 											) : (
 												<Icon name="business" size={28} class={accent.text} />

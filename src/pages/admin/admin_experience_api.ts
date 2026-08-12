@@ -98,11 +98,12 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				return jsonResponse({ error: 'Invalid employment type.' }, 400);
 			}
 
-			const order = orderRaw ? parseInt(orderRaw, 10) : 0;
 			const endDate = endDateRaw || null;
 
 			const docSnap = await docRef.get();
 			const existingData = docSnap.data() ?? {};
+			const parsedOrder = orderRaw ? parseInt(orderRaw, 10) : Number(existingData.order ?? 0);
+			const order = Number.isFinite(parsedOrder) ? parsedOrder : 0;
 			const previousLogoUrl = existingData.logoUrl;
 			let logoUrl = typeof previousLogoUrl === 'string' ? previousLogoUrl : null;
 			let uploadedLogoUrl: string | undefined;
@@ -123,7 +124,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			const experience = {
 				id: experienceId,
-				order: isNaN(order) ? 0 : order,
+				order,
 				role,
 				company,
 				logoUrl,

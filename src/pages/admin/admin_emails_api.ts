@@ -6,12 +6,13 @@ import { getEnv } from '../../lib/server/env';
 import { z } from 'zod';
 import {
 	safeSystemLog,
+	isOwnerAdmin,
 	validateAdminSession,
 	validateFormRequest,
 	validateOwnerPermission,
 } from '../../lib/server/api-guards';
 
-const emailSchema = z.string().email();
+const emailSchema = z.email();
 
 export const GET: APIRoute = async ({ locals }) => {
 	const authErr = validateAdminSession(locals);
@@ -55,7 +56,11 @@ export const GET: APIRoute = async ({ locals }) => {
 			}
 		}
 
-		const emails = Array.from(emailsMap.values());
+		let emails = Array.from(emailsMap.values());
+		if (!isOwnerAdmin(locals.adminEmail)) {
+			const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
+			emails = emails.filter((item) => item.email === callerEmail);
+		}
 		return jsonResponse({ success: true, emails });
 	} catch (error) {
 		console.error('Admin Emails GET API error:', error);

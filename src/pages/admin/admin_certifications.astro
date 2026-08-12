@@ -7,6 +7,7 @@ import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
 import Icon from "../../components/Icon.astro";
 import AdminControlsStrip from "../../components/admin/AdminControlsStrip.astro";
 import { getEnv } from "../../lib/server/env";
+import { getMediaProxyUrl } from "../../lib/media";
 
 const adminEmail = Astro.locals.adminEmail;
 if (!adminEmail) return Astro.redirect("/admin/admin_login");
@@ -23,12 +24,37 @@ let errorMsg = '';
 try {
 	const db = getFirebaseAdminDb();
 	
-	// Fetch all certificates sorted by date descending
-	const snapshot = await db.collection("certificates").orderBy("date", "desc").get();
-	certificates = snapshot.docs.map(doc => ({
-		id: doc.id,
-		...doc.data()
-	}));
+	// Fetch metadata separately from large legacy image fields.
+	const certificatesRef = db.collection("certificates");
+	const snapshot = await certificatesRef
+		.select('title', 'issuer', 'date', 'type', 'credentialUrl')
+		.orderBy("date", "desc")
+		.get();
+	let imageIds: Set<string>;
+	try {
+		const imageSnapshot = await certificatesRef.where('imageUrl', '>', '').select().get();
+		imageIds = new Set(imageSnapshot.docs.map(doc => doc.id));
+	} catch (error) {
+		console.warn('Certificate image-presence query unavailable; using legacy fallback:', error);
+		const imageSnapshot = await certificatesRef.select('imageUrl').get();
+		imageIds = new Set(imageSnapshot.docs
+			.filter(doc => typeof doc.data().imageUrl === 'string' && doc.data().imageUrl.length > 0)
+			.map(doc => doc.id));
+	}
+	certificates = snapshot.docs.map(doc => {
+		const data = doc.data();
+		return {
+			id: doc.id,
+			title: typeof data.title === 'string' ? data.title : '',
+			issuer: typeof data.issuer === 'string' ? data.issuer : '',
+			date: typeof data.date === 'string' ? data.date : '',
+			type: ['Online', 'In-Person', 'Hybrid'].includes(data.type) ? data.type : 'Online',
+			credentialUrl: typeof data.credentialUrl === 'string' ? data.credentialUrl : '',
+			imageUrl: imageIds.has(doc.id)
+				? getMediaProxyUrl('certificates', doc.id, undefined, doc.updateTime.toMillis())
+				: '',
+		};
+	});
 
 	// Extract unique sorted issuers
 	issuers = [...new Set(certificates.map(c => c.issuer).filter(Boolean))].sort((a, b) => a.localeCompare(b));
@@ -109,8 +135,8 @@ try {
 							class="group p-1.5 rounded-lg text-[#E6E1E5]/60 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
 							title="Close Filters"
 						>
-							<Icon name="close" size={18} class="w-4.5 h-4.5 group-hover:hidden" />
-							<Icon name="close" filled size={18} class="w-4.5 h-4.5 hidden group-hover:block" />
+							<Icon name="close" size={18} class="w-4.5 h-4.5 group-hover:!hidden" />
+							<Icon name="close" filled size={18} class="w-4.5 h-4.5 !hidden group-hover:!inline-flex" />
 						</button>
 					</div>
 
@@ -381,6 +407,7 @@ try {
 <script>
 	import { compressImageToWebp } from '../../lib/client-image';
 	import { formatAdminDate } from '../../lib/date-utils';
+	import { escapeAttribute, escapeHtml, getSafeImageSrc, getSafePublicHref } from '../../lib/client-safety';
 
 	document.addEventListener('DOMContentLoaded', () => {
 		// Element Declarations
@@ -449,8 +476,8 @@ try {
 			emptyState.className = 'empty-state col-span-full py-16 text-center text-[#E6E1E5]/50 bg-[#1D1B20] rounded-3xl border border-[#2B2930]';
 			emptyState.innerHTML = `
 				<img src="/no_data.webp" alt="No data" class="w-28 h-28 mx-auto mb-4 object-contain opacity-90" />
-				<p class="font-semibold text-white">${title}</p>
-				<p class="text-xs mt-1">${subtitle}</p>
+				<p class="font-semibold text-white">${escapeHtml(title)}</p>
+				<p class="text-xs mt-1">${escapeHtml(subtitle)}</p>
 			`;
 			certificatesGrid.appendChild(emptyState);
 		}
@@ -493,27 +520,29 @@ try {
 			};
 
 			const formattedDate = formatAdminDate(cert.date);
+			const imageUrl = getSafeImageSrc(cert.imageUrl);
+			const credentialUrl = getSafePublicHref(cert.credentialUrl);
 
 			const cardWrapper = document.createElement('div');
 			cardWrapper.innerHTML = `
 				<article 
 					class="certificate-card group border rounded-3xl p-5 transition-all duration-300 flex flex-col justify-between h-full border-[#2B2930] bg-[#1D1B20] hover:ring-2 hover:ring-primary/40 cursor-pointer"
-					data-id="${cert.id}"
+					data-id="${escapeAttribute(cert.id)}"
 				>
 					<div class="space-y-4">
-						${cert.imageUrl ? `
+						${imageUrl ? `
 							<div class="relative">
 								<a
 									href="#global-lightbox"
-									data-lightbox-src="${cert.imageUrl}"
-									data-lightbox-title="${cert.title || ''}"
-									data-lightbox-subtitle="${cert.issuer || ''}"
+									data-lightbox-src="${escapeAttribute(imageUrl)}"
+									data-lightbox-title="${escapeAttribute(cert.title || '')}"
+									data-lightbox-subtitle="${escapeAttribute(cert.issuer || '')}"
 									class="relative aspect-[16/10] rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block bg-[#1D1B20]"
 								>
 									<div class="absolute inset-0 skeleton"></div>
 									<img
-										src="${cert.imageUrl}"
-										alt="${cert.title}"
+										src="${escapeAttribute(imageUrl)}"
+										alt="${escapeAttribute(cert.title)}"
 										class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-transform duration-500 relative z-10 opacity-0 transition-opacity duration-300"
 										loading="lazy"
 										decoding="async"
@@ -523,19 +552,19 @@ try {
 								</a>
 								${cert.type ? `
 									<span class="absolute top-2.5 right-2.5 z-20 px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase border backdrop-blur-md shadow-sm pointer-events-none select-none ${typeColors[cert.type as keyof typeof typeColors] || ''}">
-										${cert.type}
+										${escapeHtml(cert.type)}
 									</span>
 								` : ''}
 							</div>
 						` : `
 							<div class="p-3 w-fit rounded-2xl bg-secondary/10 text-secondary border border-secondary/20 group-hover:scale-110 transition-transform duration-300">
-								<Icon name="image" size={24} class="w-6 h-6" />
+								<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
 							</div>
 						`}
 
 						<div>
 							<h3 class="font-bold text-white text-lg group-hover:text-primary transition-colors line-clamp-2">
-								${cert.title}
+								${escapeHtml(cert.title)}
 							</h3>
 						</div>
 					</div>
@@ -543,29 +572,29 @@ try {
 					<div class="mt-4 pt-3 flex justify-between items-center text-xs border-t border-white/5 text-white/40 font-medium">
 						<div class="flex items-center gap-2">
 							<span class="flex items-center gap-1">
-								<Icon name="calendar" size={14} class="w-3.5 h-3.5" />
-								${formattedDate}
+								<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+								${escapeHtml(formattedDate)}
 							</span>
-							${!cert.imageUrl && cert.type ? `
+							${!imageUrl && cert.type ? `
 								<span class="px-2 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase border ${typeColors[cert.type as keyof typeof typeColors] || ''}">
-									${cert.type}
+									${escapeHtml(cert.type)}
 								</span>
 							` : ''}
-							${cert.credentialUrl ? `
+							${credentialUrl ? `
 								<a 
-									href="${cert.credentialUrl}" 
+									href="${escapeAttribute(credentialUrl)}"
 									target="_blank" 
 									rel="noopener noreferrer"
 									class="transition-all duration-300 cursor-pointer text-white/40 hover:text-primary stop-propagation"
 									title="Verify Credential"
 								>
-									<Icon name="open_in_new" size={14} class="w-3.5 h-3.5" />
+									<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
 								</a>
 							` : ''}
 						</div>
 						${cert.issuer ? `
 							<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary">
-								${cert.issuer}
+								${escapeHtml(cert.issuer)}
 							</span>
 						` : ''}
 					</div>
@@ -578,6 +607,8 @@ try {
 		function attachCardEventListeners() {
 			const certificateCards = certificatesGrid.querySelectorAll('.certificate-card') as NodeListOf<HTMLDivElement>;
 			certificateCards.forEach(card => {
+				if (card.dataset.eventsBound === 'true') return;
+				card.dataset.eventsBound = 'true';
 				card.addEventListener('click', (e) => {
 					// Don't open drawer if clicking on external link or image lightbox
 					if ((e.target as HTMLElement).closest('.stop-propagation, .image-zoom-trigger, [data-lightbox-src]')) {
@@ -617,12 +648,24 @@ try {
 		}
 
 		// --- Drawer Controls ---
+		function updateBodyScroll() {
+			const isAnyOpen =
+				(filterPanel && filterPanel.classList.contains('translate-x-0')) ||
+				(editorPanel && editorPanel.classList.contains('translate-x-0'));
+			if (isAnyOpen) {
+				document.body.style.overflow = 'hidden';
+			} else {
+				document.body.style.overflow = '';
+			}
+		}
+
 		function openDrawer() {
 			editorBackdrop.classList.remove('hidden');
 			setTimeout(() => {
 				editorBackdrop.classList.add('opacity-100');
 				editorPanel.classList.remove('translate-x-full');
 				editorPanel.classList.add('translate-x-0');
+				updateBodyScroll();
 			}, 10);
 		}
 
@@ -642,6 +685,7 @@ try {
 
 			setTimeout(() => {
 				editorBackdrop.classList.add('hidden');
+				updateBodyScroll();
 			}, 350);
 		}
 
@@ -651,6 +695,7 @@ try {
 				editorBackdrop.classList.add('opacity-100');
 				filterPanel.classList.remove('-translate-x-full');
 				filterPanel.classList.add('translate-x-0');
+				updateBodyScroll();
 			}, 10);
 		}
 
@@ -661,6 +706,7 @@ try {
 
 			setTimeout(() => {
 				editorBackdrop.classList.add('hidden');
+				updateBodyScroll();
 			}, 350);
 		}
 
@@ -916,7 +962,7 @@ try {
 
 			try {
 				const processedFile = await compressImageToWebp(file);
-				if (processedFile.size > 800 * 1024) {
+				if (processedFile.size > 700 * 1024) {
 					showStatus('error', `Optimized image is too large (${(processedFile.size / 1024).toFixed(0)}KB). Please upload a smaller or less complex image.`);
 					selectedImageFile = null;
 					return;
@@ -997,7 +1043,7 @@ try {
 						allCertificates[existingIndex] = savedCert;
 
 						// Update existing card in DOM
-						const existingCard = certificatesGrid.querySelector(`.certificate-card[data-id="${savedCert.id}"]`);
+						const existingCard = certificatesGrid.querySelector(`.certificate-card[data-id="${CSS.escape(String(savedCert.id))}"]`);
 						const updatedCard = createCertificateCard(savedCert);
 						updatedCard.addEventListener('click', (e) => {
 							if ((e.target as HTMLElement).closest('.stop-propagation, .image-zoom-trigger, [data-lightbox-src]')) return;
@@ -1075,7 +1121,7 @@ try {
 					allCertificates = allCertificates.filter((c: any) => c && c.id !== currentSelectedId);
 
 					// Remove card from DOM
-					const cardToRemove = certificatesGrid.querySelector(`.certificate-card[data-id="${currentSelectedId}"]`);
+					const cardToRemove = certificatesGrid.querySelector(`.certificate-card[data-id="${CSS.escape(String(currentSelectedId))}"]`);
 					if (cardToRemove) cardToRemove.remove();
 
 					// If grid is empty, show empty state
@@ -1236,7 +1282,7 @@ try {
 					return;
 				}
 				if (editorPanel && editorPanel.classList.contains('translate-x-0') && currentSelectedId) {
-					const card = certificatesGrid.querySelector(`.certificate-card[data-id="${currentSelectedId}"]`);
+					const card = certificatesGrid.querySelector(`.certificate-card[data-id="${CSS.escape(String(currentSelectedId))}"]`);
 					const trigger = card?.querySelector('[data-lightbox-src]') as HTMLElement;
 					if (trigger) trigger.click();
 					return;

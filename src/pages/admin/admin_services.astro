@@ -8,6 +8,7 @@ import Icon from "../../components/Icon.astro";
 import AdminControlsStrip from "../../components/admin/AdminControlsStrip.astro";
 import { getEnv } from "../../lib/server/env";
 import type { Service } from "../../types";
+import { getPublicMediaUrl } from "../../lib/media";
 
 const adminEmail = Astro.locals.adminEmail;
 if (!adminEmail) return Astro.redirect("/admin/admin_login");
@@ -26,13 +27,13 @@ try {
 		const data = doc.data();
 		return {
 			id: doc.id,
-			order: data.order ?? 0,
-			title: data.title ?? '',
-			description: data.description ?? '',
-			logoUrl: data.logoUrl ?? null,
-			features: data.features ?? [],
-			createdAt: data.createdAt ?? '',
-			updatedAt: data.updatedAt ?? '',
+			order: Number.isFinite(Number(data.order)) ? Number(data.order) : 0,
+			title: typeof data.title === 'string' ? data.title : '',
+			description: typeof data.description === 'string' ? data.description : '',
+			logoUrl: getPublicMediaUrl(data.logoUrl, 'services', doc.id) ?? null,
+			features: Array.isArray(data.features) ? data.features.filter((feature: unknown): feature is string => typeof feature === 'string') : [],
+			createdAt: typeof data.createdAt === 'string' ? data.createdAt : '',
+			updatedAt: typeof data.updatedAt === 'string' ? data.updatedAt : '',
 		};
 	}) as Service[];
 
@@ -242,6 +243,7 @@ try {
 
 <script>
 	import { compressImageToWebp } from '../../lib/client-image';
+	import { escapeAttribute, escapeHtml, getSafeImageSrc } from '../../lib/client-safety';
 
 	document.addEventListener('DOMContentLoaded', () => {
 		const searchInput = document.getElementById('search-input') as HTMLInputElement;
@@ -288,8 +290,8 @@ try {
 			emptyState.className = 'empty-state col-span-full py-16 text-center text-[#E6E1E5]/50 bg-[#1D1B20] rounded-3xl border border-[#2B2930]';
 			emptyState.innerHTML = `
 				<img src="/no_data.webp" alt="No data" class="w-28 h-28 mx-auto mb-4 object-contain opacity-90" />
-				<p class="font-semibold text-white">${title}</p>
-				<p class="text-xs mt-1">${subtitle}</p>
+				<p class="font-semibold text-white">${escapeHtml(title)}</p>
+				<p class="text-xs mt-1">${escapeHtml(subtitle)}</p>
 			`;
 			servicesGrid.appendChild(emptyState);
 		}
@@ -319,35 +321,38 @@ try {
 
 		function createServiceCard(service: any) {
 			const cardWrapper = document.createElement('div');
-			const featuresList = (service.features || [])
-				.map((f: string) => `<li class="flex items-start gap-2 text-xs text-[#E6E1E5]/80"><span class="w-1.5 h-1.5 rounded-full bg-primary/60 mt-1 shrink-0"></span><span>${f}</span></li>`)
+			const features = Array.isArray(service.features) ? service.features : [];
+			const featuresList = features
+				.map((feature: unknown) => `<li class="flex items-start gap-2 text-xs text-[#E6E1E5]/80"><span class="w-1.5 h-1.5 rounded-full bg-primary/60 mt-1 shrink-0"></span><span>${escapeHtml(feature)}</span></li>`)
 				.join('');
+			const logoUrl = getSafeImageSrc(service.logoUrl);
+			const order = Number.isFinite(Number(service.order)) ? Number(service.order) : 0;
 
 			cardWrapper.innerHTML = `
 				<article 
 					class="service-card group border rounded-3xl p-6 transition-all duration-300 flex flex-col justify-between h-full border-[#2B2930] bg-[#1D1B20] hover:ring-2 hover:ring-primary/40 cursor-pointer relative overflow-hidden"
-					data-id="${service.id}"
+					data-id="${escapeAttribute(service.id)}"
 				>
 					<div class="space-y-4">
 						<div class="flex items-center justify-between">
 							<div class="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300">
-								${service.logoUrl ? `
-									<img src="${service.logoUrl}" alt="${service.title}" class="w-full h-full object-contain p-2" />
+								${logoUrl ? `
+									<img src="${escapeAttribute(logoUrl)}" alt="${escapeAttribute(service.title)}" class="w-full h-full object-contain p-2" />
 								` : `
 									<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
 								`}
 							</div>
 							<span class="px-2.5 py-1 rounded-full bg-[#211F26] border border-[#2B2930] text-[11px] font-mono text-[#E6E1E5]/60">
-								Order: ${service.order ?? 0}
+								Order: ${order}
 							</span>
 						</div>
 
 						<div>
 							<h3 class="font-bold text-white text-lg sm:text-xl group-hover:text-primary transition-colors leading-snug">
-								${service.title}
+								${escapeHtml(service.title)}
 							</h3>
 							<p class="text-xs text-[#E6E1E5]/70 mt-2 line-clamp-3 leading-relaxed">
-								${service.description}
+								${escapeHtml(service.description)}
 							</p>
 						</div>
 
@@ -367,6 +372,8 @@ try {
 		function attachCardEventListeners() {
 			const cards = servicesGrid.querySelectorAll('.service-card') as NodeListOf<HTMLDivElement>;
 			cards.forEach(card => {
+				if (card.dataset.eventsBound === 'true') return;
+				card.dataset.eventsBound = 'true';
 				card.addEventListener('click', () => {
 					const id = card.getAttribute('data-id');
 					const service = allServices.find((s: any) => s.id === id);
@@ -398,6 +405,7 @@ try {
 
 		function openDrawer() {
 			editorBackdrop.classList.remove('hidden');
+			document.body.style.overflow = 'hidden';
 			setTimeout(() => {
 				editorBackdrop.classList.add('opacity-100');
 				editorPanel.classList.remove('translate-x-full');
@@ -419,6 +427,7 @@ try {
 
 			setTimeout(() => {
 				editorBackdrop.classList.add('hidden');
+				document.body.style.overflow = '';
 			}, 350);
 		}
 

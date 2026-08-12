@@ -3,6 +3,7 @@ import BackgroundBaseLayout from "../../layouts/BackgroundBaseLayout.astro";
 import AdminLayout from "../../components/admin/AdminLayout.astro";
 import AdminNavDock from "../../components/admin/AdminNavDock.astro";
 import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
+import { getPublicMediaUrl } from "../../lib/media";
 import Icon from "../../components/Icon.astro";
 
 // Extra safety: double-check that the middleware successfully set Astro.locals.adminEmail
@@ -11,7 +12,6 @@ if (!adminEmail) return Astro.redirect("/admin/admin_login");
 
 // Fetch current resume data from Firestore configuration
 let currentPreviewUrl = '/resume.webp';
-let currentResumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
 
 try {
 	const db = getFirebaseAdminDb();
@@ -20,11 +20,16 @@ try {
 	if (configDoc.exists) {
 		const data = configDoc.data();
 		if (data?.previewUrl) currentPreviewUrl = data.previewUrl;
-		if (data?.resumeUrl) currentResumeUrl = data.resumeUrl;
 	}
 } catch (error) {
 	console.warn('Failed to fetch resume config from Firestore:', error);
 }
+currentPreviewUrl = getPublicMediaUrl(
+	currentPreviewUrl,
+	'configuration',
+	'static_data',
+	'previewUrl',
+) || '/resume.webp';
 ---
 
 <BackgroundBaseLayout title="Resume Workspace">
@@ -70,7 +75,7 @@ try {
 								<p class="text-sm font-medium text-white">
 									Drop PDF here or <span class="text-primary">browse</span>
 								</p>
-								<p class="text-xs text-[#E6E1E5]/40 mt-1">PDF only, max 10MB</p>
+								<p class="text-xs text-[#E6E1E5]/40 mt-1">PDF only, max 700KB</p>
 							</div>
 						</div>
 						<!-- Selected file name -->
@@ -154,7 +159,7 @@ try {
 							</div>
 						</div>
 						<a
-							href={currentResumeUrl}
+							href="/api/download_resume"
 							target="_blank"
 							rel="noopener noreferrer"
 							download
@@ -399,7 +404,8 @@ try {
 
 					// Update preview image with the new URL and cache-buster
 					if (result.previewUrl) {
-						previewImg.src = result.previewUrl + '?t=' + Date.now();
+						const separator = result.previewUrl.includes('?') ? '&' : '?';
+						previewImg.src = `${result.previewUrl}${separator}t=${Date.now()}`;
 					}
 				} else {
 					showStatus('error', result.error || 'Upload failed. Please try again.');

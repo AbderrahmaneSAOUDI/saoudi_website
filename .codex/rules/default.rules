@@ -1,0 +1,74 @@
+# Project-local Codex command policy. Complex and file-aware checks are handled
+# by .codex/hooks/project_guard.py.
+
+prefix_rule(
+    pattern = ["npm"],
+    decision = "forbidden",
+    justification = "This repository uses pnpm exclusively.",
+    match = ["npm install", "npm i astro", "npm run build"],
+    not_match = ["pnpm install", "pnpm run build"],
+)
+
+prefix_rule(
+    pattern = ["yarn"],
+    decision = "forbidden",
+    justification = "This repository uses pnpm exclusively.",
+    match = ["yarn add astro", "yarn install", "yarn build"],
+    not_match = ["pnpm add astro"],
+)
+
+prefix_rule(
+    pattern = ["npx"],
+    decision = "prompt",
+    justification = "Prefer pnpm dlx; review whether npx is genuinely required.",
+    match = ["npx astro check"],
+    not_match = ["pnpm dlx astro check"],
+)
+
+prefix_rule(
+    pattern = ["pnpm", "add", ["framer-motion", "gsap", "animate.css", "lottie-web", "masonry-layout"]],
+    decision = "forbidden",
+    justification = "Animation and masonry dependencies are prohibited by the project architecture.",
+    match = ["pnpm add gsap", "pnpm add framer-motion"],
+    not_match = ["pnpm add zod"],
+)
+
+prefix_rule(
+    pattern = ["pnpm", "add", ["firebase", "@tanstack/react-query", "swr"]],
+    decision = "prompt",
+    justification = "Confirm that this dependency is restricted to admin-only code and does not reach public routes.",
+    match = ["pnpm add firebase", "pnpm add swr"],
+    not_match = ["pnpm add firebase-admin"],
+)
+
+prefix_rule(
+    pattern = ["rm", ["-r", "-rf", "-fr"], "node_modules"],
+    decision = "prompt",
+    justification = "Prefer pnpm install to repair dependencies before deleting node_modules.",
+    match = ["rm -rf node_modules"],
+    not_match = ["rm -rf dist"],
+)
+
+prefix_rule(
+    pattern = ["rm", ["-r", "-rf", "-fr"], ["dist", ".astro"]],
+    decision = "allow",
+    justification = "These are generated build directories.",
+    match = ["rm -rf dist", "rm -rf .astro"],
+    not_match = ["rm -rf src"],
+)
+
+prefix_rule(
+    pattern = ["rm", ["-r", "-rf", "-fr"], "src"],
+    decision = "forbidden",
+    justification = "The source tree must never be deleted.",
+    match = ["rm -rf src", "rm -r src"],
+    not_match = ["rm -rf dist"],
+)
+
+prefix_rule(
+    pattern = ["rm", ".env"],
+    decision = "forbidden",
+    justification = "The local environment configuration must not be deleted.",
+    match = ["rm .env"],
+    not_match = ["rm .env.example"],
+)

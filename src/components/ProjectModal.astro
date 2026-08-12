@@ -14,11 +14,25 @@ interface Props {
 const { projects = [] } = Astro.props;
 ---
 
-<div id="project-details-modal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-[100] items-center justify-center p-4 sm:p-6 overflow-y-auto no-scrollbar">
+<div
+	id="project-details-modal"
+	role="dialog"
+	aria-modal="true"
+	aria-labelledby="project-modal-title"
+	aria-hidden="true"
+	inert
+	class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-[100] items-center justify-center p-4 sm:p-6 overflow-y-auto no-scrollbar"
+>
 	<!-- Backdrop Click to Close -->
 	<div id="project-modal-backdrop" class="fixed inset-0 cursor-default"></div>
 
 	<div class="relative w-full max-w-3xl bg-[#1D1B20] border border-[#2B2930] rounded-3xl shadow-2xl z-10 my-auto p-5 sm:p-7 space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar animate-page-slide-up">
+		<button
+			type="button"
+			id="project-modal-close"
+			class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white text-xl leading-none cursor-pointer"
+			aria-label="Close project details"
+		>×</button>
 
 		<!-- Modal Content Body -->
 		<div id="project-modal-content" class="space-y-4">
@@ -52,16 +66,23 @@ const { projects = [] } = Astro.props;
 <script is:inline define:vars={{ initialProjects: projects }}>
 	(function() {
 		const projectsMap = new Map();
+		let lastFocusedElement = null;
 		if (Array.isArray(initialProjects)) {
-			initialProjects.forEach(p => projectsMap.set(p.id, p));
+			initialProjects.forEach(p => {
+				if (p && typeof p === 'object' && typeof p.id === 'string') projectsMap.set(p.id, p);
+			});
 		}
 
 		function openModal() {
 			const modal = document.getElementById('project-details-modal');
 			if (modal) {
+				lastFocusedElement = document.activeElement;
 				modal.classList.remove('hidden');
 				modal.classList.add('flex');
+				modal.removeAttribute('inert');
+				modal.setAttribute('aria-hidden', 'false');
 				document.body.style.overflow = 'hidden';
+				modal.querySelector('#project-modal-close')?.focus();
 			}
 		}
 
@@ -70,8 +91,21 @@ const { projects = [] } = Astro.props;
 			if (modal) {
 				modal.classList.add('hidden');
 				modal.classList.remove('flex');
+				modal.setAttribute('inert', '');
+				modal.setAttribute('aria-hidden', 'true');
 				document.body.style.overflow = '';
+				if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+					lastFocusedElement.focus();
+				}
 			}
+		}
+
+		function openProjectFromTrigger(trigger) {
+			const id = trigger?.getAttribute('data-project-card-id');
+			const project = projectsMap.get(id);
+			if (!project) return;
+			populateProjectModal(project);
+			openModal();
 		}
 
 		document.addEventListener('click', (e) => {
@@ -88,16 +122,35 @@ const { projects = [] } = Astro.props;
 			if (e.target.closest('a[target="_blank"]')) return;
 
 			e.preventDefault();
-			const id = trigger.getAttribute('data-project-card-id');
-			const project = projectsMap.get(id);
-			if (!project) return;
-
-			populateProjectModal(project);
-			openModal();
+			openProjectFromTrigger(trigger);
 		});
 
+		document.addEventListener('keydown', (e) => {
+			if (e.key !== 'Enter' && e.key !== ' ') return;
+			const trigger = e.target.closest?.('[data-project-card-id]');
+			if (!trigger) return;
+			e.preventDefault();
+			openProjectFromTrigger(trigger);
+		});
+
+		document.getElementById('project-modal-close')?.addEventListener('click', closeModal);
+
+		function getSafeUrl(value, allowImageData = false) {
+			if (typeof value !== 'string' || !value.trim()) return null;
+			const candidate = value.trim();
+			if (allowImageData && /^data:image\/(?:webp|png|jpe?g|gif);base64,/i.test(candidate)) {
+				return candidate;
+			}
+			try {
+				const parsed = new URL(candidate, window.location.origin);
+				return parsed.protocol === 'http:' || parsed.protocol === 'https:' ? parsed.href : null;
+			} catch {
+				return null;
+			}
+		}
+
 		function formatModalDate(dateStr) {
-			if (!dateStr || !dateStr.trim()) return '';
+			if (typeof dateStr !== 'string' || !dateStr.trim()) return '';
 			try {
 				const parts = dateStr.trim().split('-');
 				if (parts.length >= 2) {
@@ -131,6 +184,7 @@ const { projects = [] } = Astro.props;
 				techContainer.innerHTML = '';
 				if (Array.isArray(project.technologies)) {
 					project.technologies.forEach(tech => {
+						if (typeof tech !== 'string') return;
 						const pill = document.createElement('span');
 						pill.className = 'px-2.5 py-0.5 rounded-lg text-xs font-medium bg-primary/10 text-primary border border-primary/20';
 						pill.textContent = tech;
@@ -141,22 +195,24 @@ const { projects = [] } = Astro.props;
 
 			if (linksContainer) {
 				linksContainer.innerHTML = '';
-				if (project.projectUrl) {
+				const projectUrl = getSafeUrl(project.projectUrl);
+				if (projectUrl) {
 					const btn = document.createElement('a');
-					btn.href = project.projectUrl;
+					btn.href = projectUrl;
 					btn.target = '_blank';
 					btn.rel = 'noopener noreferrer';
 					btn.className = 'px-3.5 py-1.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold transition-colors flex items-center gap-1.5';
-					btn.innerHTML = '<span>Project Link</span> ↗';
+					btn.textContent = 'Project Link ↗';
 					linksContainer.appendChild(btn);
 				}
-				if (project.githubUrl) {
+				const githubUrl = getSafeUrl(project.githubUrl);
+				if (githubUrl) {
 					const btn = document.createElement('a');
-					btn.href = project.githubUrl;
+					btn.href = githubUrl;
 					btn.target = '_blank';
 					btn.rel = 'noopener noreferrer';
 					btn.className = 'px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors flex items-center gap-1.5';
-					btn.innerHTML = '<span>Source Code</span> ↗';
+					btn.textContent = 'Source Code ↗';
 					linksContainer.appendChild(btn);
 				}
 			}
@@ -173,7 +229,7 @@ const { projects = [] } = Astro.props;
 		}
 
 		function renderBlockElement(block) {
-			if (!block || !block.type) return null;
+			if (!block || typeof block !== 'object' || typeof block.type !== 'string') return null;
 
 			if (block.type === 'heading') {
 				const lvl = block.level || 2;
@@ -202,7 +258,8 @@ const { projects = [] } = Astro.props;
 					warning: 'bg-[#F9AB00]/10 border-[#F9AB00]/30 text-[#F9AB00]',
 					error: 'bg-[#EA4335]/10 border-[#EA4335]/30 text-[#EA4335]'
 				};
-				div.className = `p-3 rounded-2xl border ${variants[block.variant || 'info']} space-y-0.5 my-1`;
+				const variantClass = variants[block.variant] || variants.info;
+				div.className = `p-3 rounded-2xl border ${variantClass} space-y-0.5 my-1`;
 				if (block.title) {
 					const title = document.createElement('p');
 					title.className = 'font-bold text-xs uppercase tracking-wider';
@@ -217,14 +274,20 @@ const { projects = [] } = Astro.props;
 				}
 				return div;
 			} else if (block.type === 'single_image') {
-				if (!block.imageUrl) return null;
+				const imageUrl = getSafeUrl(block.imageUrl, true);
+				if (!imageUrl) return null;
 				const div = document.createElement('div');
 				div.className = 'my-1.5';
-				div.innerHTML = `
-					<div class="rounded-2xl overflow-hidden border border-white/10 bg-black/40">
-						<img src="${block.imageUrl}" alt="" class="w-full h-auto object-cover" loading="lazy" />
-					</div>
-				`;
+				const imageWrapper = document.createElement('div');
+				imageWrapper.className = 'rounded-2xl overflow-hidden border border-white/10 bg-black/40';
+				const image = document.createElement('img');
+				image.src = imageUrl;
+				image.alt = '';
+				image.className = 'w-full h-auto object-cover';
+				image.loading = 'lazy';
+				image.decoding = 'async';
+				imageWrapper.appendChild(image);
+				div.appendChild(imageWrapper);
 				return div;
 			} else if (block.type === 'carousel') {
 				if (!Array.isArray(block.images) || block.images.length === 0) return null;
@@ -233,9 +296,17 @@ const { projects = [] } = Astro.props;
 				const grid = document.createElement('div');
 				grid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-1.5';
 				block.images.forEach(imgUrl => {
+					const safeImageUrl = getSafeUrl(imgUrl, true);
+					if (!safeImageUrl) return;
 					const imgWrapper = document.createElement('div');
 					imgWrapper.className = 'aspect-[16/10] rounded-xl overflow-hidden border border-white/10 bg-black/40';
-					imgWrapper.innerHTML = `<img src="${imgUrl}" alt="" class="w-full h-full object-cover" loading="lazy" />`;
+					const image = document.createElement('img');
+					image.src = safeImageUrl;
+					image.alt = '';
+					image.className = 'w-full h-full object-cover';
+					image.loading = 'lazy';
+					image.decoding = 'async';
+					imgWrapper.appendChild(image);
 					grid.appendChild(imgWrapper);
 				});
 				div.appendChild(grid);
@@ -245,12 +316,16 @@ const { projects = [] } = Astro.props;
 				const div = document.createElement('div');
 				div.className = 'grid grid-cols-2 sm:grid-cols-3 gap-2 my-1.5';
 				block.items.forEach(it => {
+					if (!it || typeof it !== 'object') return;
 					const card = document.createElement('div');
 					card.className = 'p-2.5 rounded-2xl bg-white/5 border border-white/10 text-center space-y-0.5';
-					card.innerHTML = `
-						<p class="text-sm sm:text-base font-extrabold text-primary">${it.value || ''}</p>
-						<p class="text-[10px] font-semibold text-white/50 uppercase tracking-wider">${it.label || ''}</p>
-					`;
+					const value = document.createElement('p');
+					value.className = 'text-sm sm:text-base font-extrabold text-primary';
+					value.textContent = String(it.value || '');
+					const label = document.createElement('p');
+					label.className = 'text-[10px] font-semibold text-white/50 uppercase tracking-wider';
+					label.textContent = String(it.label || '');
+					card.append(value, label);
 					div.appendChild(card);
 				});
 				return div;
@@ -259,12 +334,15 @@ const { projects = [] } = Astro.props;
 				const div = document.createElement('div');
 				div.className = 'flex flex-wrap gap-1.5 my-1.5';
 				block.buttons.forEach(b => {
+					if (!b || typeof b !== 'object') return;
+					const buttonUrl = getSafeUrl(b.url);
+					if (!buttonUrl) return;
 					const a = document.createElement('a');
-					a.href = b.url || '#';
+					a.href = buttonUrl;
 					a.target = '_blank';
 					a.rel = 'noopener noreferrer';
 					a.className = 'px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors flex items-center gap-1';
-					a.innerHTML = `<span>${b.label || 'Link'}</span> ↗`;
+					a.textContent = `${String(b.label || 'Link')} ↗`;
 					div.appendChild(a);
 				});
 				return div;
@@ -275,7 +353,7 @@ const { projects = [] } = Astro.props;
 				const listEl = document.createElement(isNumbered ? 'ol' : 'ul');
 				listEl.className = `text-xs sm:text-sm text-white/80 space-y-1.5 my-2 pl-5 ${isNumbered ? 'list-decimal' : 'list-disc'}`;
 				items.forEach(itemText => {
-					if (!itemText || !itemText.trim()) return;
+					if (typeof itemText !== 'string' || !itemText.trim()) return;
 					const li = document.createElement('li');
 					li.className = 'leading-relaxed';
 					li.textContent = itemText;
@@ -288,8 +366,25 @@ const { projects = [] } = Astro.props;
 
 		// Escape key to close modal
 		document.addEventListener('keydown', (e) => {
+			const modal = document.getElementById('project-details-modal');
+			if (!modal || modal.getAttribute('aria-hidden') !== 'false') return;
 			if (e.key === 'Escape') {
+				e.preventDefault();
 				closeModal();
+				return;
+			}
+			if (e.key !== 'Tab') return;
+			const focusable = Array.from(modal.querySelectorAll('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+				.filter(element => !element.hasAttribute('disabled'));
+			if (!focusable.length) return;
+			const first = focusable[0];
+			const last = focusable[focusable.length - 1];
+			if (e.shiftKey && document.activeElement === first) {
+				e.preventDefault();
+				last.focus();
+			} else if (!e.shiftKey && document.activeElement === last) {
+				e.preventDefault();
+				first.focus();
 			}
 		});
 	})();

@@ -244,7 +244,7 @@ export interface AcceptedAdminEmail {
 
 export const acceptedAdminEmailSchema = z.object({
 	id: z.string().min(1),
-	email: z.string().email(),
+	email: z.email(),
 	addedAt: z.string().min(1),
 	addedBy: z.string().min(1),
 	isPrimary: z.boolean().optional(),
@@ -477,4 +477,3 @@ export const parseAdminTodo = (data: unknown): AdminTodo => {
 export const parseSystemLog = (data: unknown): SystemLog => {
 	return systemLogSchema.parse(data);
 };
-

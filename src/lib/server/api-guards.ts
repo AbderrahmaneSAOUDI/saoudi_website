@@ -48,13 +48,32 @@ export function validateOwnerPermission(adminEmail: string | undefined): Respons
 	return null;
 }
 
+/** Accepts blank values, absolute HTTP(S) URLs, and same-origin root-relative paths. */
+export function isSafePublicUrl(value: string): boolean {
+	if (!value) return true;
+	if (value.startsWith('/') && !value.startsWith('//')) return true;
+	try {
+		const parsed = new URL(value);
+		return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+	} catch {
+		return false;
+	}
+}
+
+export function validateOptionalPublicUrl(value: string, label: string): Response | null {
+	if (!isSafePublicUrl(value)) {
+		return jsonResponse({ error: `${label} must use an HTTP or HTTPS URL.` }, 400);
+	}
+	return null;
+}
+
 /**
- * Validates WebP image format and file size limit (default 800KB).
+ * Validates WebP image format and file size limit (default 700KB).
  * Returns an HTTP 400 Response if invalid, or null if valid.
  */
 export function validateWebpImage(
 	file: File,
-	maxBytes = 800 * 1024,
+	maxBytes = 700 * 1024,
 	typeErrorMsg?: string,
 	sizeErrorMsg?: string,
 ): Response | null {

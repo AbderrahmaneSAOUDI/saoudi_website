@@ -14,11 +14,12 @@ import {
 	validateAdminSession,
 	validateFormRequest,
 	validateOwnerPermission,
+	validateOptionalPublicUrl,
 	validateWebpImage,
 } from '../../lib/server/api-guards';
 
 const CERTIFICATES_DIRECTORY = 'uploads/certificates';
-const MAX_IMAGE_BYTES = 800 * 1024;
+const MAX_IMAGE_BYTES = 700 * 1024;
 const VALID_TYPES = new Set(['Online', 'In-Person', 'Hybrid']);
 
 function invalidateCertificateCaches(countChanged: boolean): void {
@@ -92,6 +93,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			if (!VALID_TYPES.has(type)) {
 				return jsonResponse({ error: 'Invalid certificate type.' }, 400);
 			}
+			const credentialUrlErr = validateOptionalPublicUrl(credentialUrl, 'Credential URL');
+			if (credentialUrlErr) return credentialUrlErr;
 
 			const docSnap = await docRef.get();
 			const existingData = docSnap.data() ?? {};

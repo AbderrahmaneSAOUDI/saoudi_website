@@ -115,7 +115,16 @@ const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
 const currentAdminEmail = (adminEmail || '').toLowerCase().trim();
 const isPrimaryAdmin = currentAdminEmail === primaryEmail;
 
-if (primaryEmail && !initialAcceptedEmails.some(e => e.email?.toLowerCase() === primaryEmail)) {
+if (!isPrimaryAdmin) {
+  initialTodos = initialTodos.filter(
+    (todo) => String(todo.createdBy || primaryEmail).toLowerCase().trim() === currentAdminEmail,
+  );
+  initialAcceptedEmails = initialAcceptedEmails.filter(
+    (item) => String(item.email || item.id).toLowerCase().trim() === currentAdminEmail,
+  );
+}
+
+if (isPrimaryAdmin && primaryEmail && !initialAcceptedEmails.some(e => e.email?.toLowerCase() === primaryEmail)) {
   initialAcceptedEmails.unshift({
     id: 'primary_env_email',
     email: primaryEmail,

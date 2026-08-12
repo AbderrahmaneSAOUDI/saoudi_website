@@ -1,10 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ExperienceIsland from '../components/ExperienceIsland.astro';
+import SkeletonCardGrid from '../components/SkeletonCardGrid.astro';
+
 ---
 
 <BaseLayout title="Experience" description="Professional work experience, roles, and career achievements of Abderrahmane SAOUDI.">
 	<div class="mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 max-w-7xl">
-		<ExperienceIsland />
+		<ExperienceIsland server:defer>
+			<SkeletonCardGrid slot="fallback" variant="project" count={4} groups={1} />
+		</ExperienceIsland>
 	</div>
 </BaseLayout>

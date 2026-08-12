@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import {
 	getSystemLogs,
-	addSystemLog,
 	deleteSystemLog,
 	purgeExpiredSystemLogs,
 	canUserAccessLog,
@@ -109,23 +108,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			} else {
 				return jsonResponse({ error: 'Failed to delete log' }, 500);
 			}
-		}
-
-		if (action === 'log_event') {
-			const type = (formData.get('type') as any) || 'system';
-			const eventAction = (formData.get('eventAction') as string) || 'CUSTOM_EVENT';
-			const title = (formData.get('title') as string) || 'Client Action Logged';
-			const details = (formData.get('details') as string) || '';
-
-			const createdLog = await addSystemLog({
-				type,
-				action: eventAction,
-				title,
-				details,
-				userEmail: adminEmail,
-			});
-
-			return jsonResponse({ success: true, log: createdLog });
 		}
 
 		return jsonResponse({ error: 'Invalid action' }, 400);

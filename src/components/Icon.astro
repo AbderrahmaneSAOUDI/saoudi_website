@@ -184,7 +184,13 @@ const svgContent = icons[iconName as keyof typeof icons] || icons[name as keyof 
 let processedSvg = svgContent || '';
 if (processedSvg) {
     const fillColor = color || 'currentColor';
-    if (iconName === 'telegram' || iconName === 'gdg' || name === 'hide' || name === 'show') {
+    if (name === 'close' || name === 'close_filled') {
+        // Close icons are stroke-only. Applying a default fill here turns the
+        // transparent 24x24 background path into a visible square.
+        processedSvg = processedSvg
+            .replace(/stroke="[^"]*"/g, `stroke="${fillColor}"`)
+            .replace(/<svg([^>]*)>/, `<svg$1 fill="none">`);
+    } else if (iconName === 'telegram' || iconName === 'gdg' || name === 'hide' || name === 'show') {
         processedSvg = processedSvg
             .replace(/stroke="[^"]*"/g, `stroke="${fillColor}"`)
             .replace(/fill="[^"]*"/g, '')

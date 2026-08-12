@@ -3,18 +3,15 @@
  * PublicHeader Component
  * 
  * Renders the primary navigation header for all public routes.
- * Fetches the active resume download URL server-side from Firestore.
  * Produces ZERO client-side JavaScript as per strict architecture requirements.
  */
 import NavItem from '../components/NavItem.astro';
 import ActionButton from '../components/ActionButton.astro';
 import Icon from './Icon.astro';
 
-// Download endpoint that increments download count and redirects to PDF
-let resumeUrl = '/api/download_resume';
-
 // Read current request pathname to determine active route highlighting
-const { pathname } = Astro.url;
+const rawPathname = Astro.url.pathname.toLowerCase();
+const pathname = rawPathname === '/' ? '/' : rawPathname.replace(/\/+$/, '');
 
 // Define navigation route map
 const navLinks = [
@@ -29,15 +26,15 @@ const navLinks = [
 
 <header class="top-0 z-50 sticky">
 	<div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-		<div class="flex justify-between items-center h-16">
+		<div class="flex justify-between items-center gap-2 h-16">
 			{/* Brand Logo Pill Link */}
 			<a href="/" class="header-logo group h-11 inline-flex items-center bg-surface/60 hover:bg-surface-container-high backdrop-blur-xl px-5 border border-white/10 hover:border-white/30 rounded-full origin-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.06] active:scale-95">
 				<span class="font-bold text-primary text-lg transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105">saoudi.online</span>
 			</a>
 
 			{/* Main Route Navigation Bar */}
-			<nav class="flex items-center">
-				<div class="flex items-center gap-1.5 sm:gap-2 h-11 bg-surface/60 backdrop-blur-xl px-1.5 border border-white/10 hover:border-white/20 rounded-full shadow-[0_8px_24px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.15)] transition-all duration-300">
+			<nav class="flex min-w-0 flex-1 items-center justify-center" aria-label="Primary navigation">
+				<div class="flex w-max max-w-full items-center gap-1.5 sm:gap-2 h-11 bg-surface/60 backdrop-blur-xl px-1.5 border border-white/10 hover:border-white/20 rounded-full shadow-[0_8px_24px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.15)] transition-all duration-300 overflow-x-auto scrollbar-hide">
 					{navLinks.map((link) => {
 						const isActive = pathname === link.href;
 						return (
@@ -53,7 +50,7 @@ const navLinks = [
 			</nav>
 
 			{/* My Services Action Pill */}
-			<ActionButton href="/services" type="header" ariaLabel="My Services">
+			<ActionButton href="/services" type="header" ariaLabel="My Services" extraClass="shrink-0">
 				<span class="relative inline-flex items-center justify-center transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110">
 					<Icon name="service" size={16} class="transition-all duration-200 group-hover:opacity-0" />
 					<Icon name="service" filled size={16} class="absolute inset-0 opacity-0 transition-all duration-200 group-hover:opacity-100" />

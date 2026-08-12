@@ -18,7 +18,8 @@ import {
 } from '../../lib/server/api-guards';
 
 const DESIGNS_DIRECTORY = 'uploads/designs';
-const MAX_IMAGE_BYTES = 800 * 1024;
+const MAX_IMAGE_BYTES = 700 * 1024;
+const DEFAULT_DESIGN_COMPANIES = ['Google', 'GDG', 'Freelance', 'Personal'];
 
 function invalidateDesignCaches(countChanged: boolean): void {
 	clearCacheByPrefix('designs_');
@@ -108,6 +109,9 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				}
 
 				companies = [...new Set(parsedCompanies.map((value) => value.trim()).filter(Boolean))];
+				if (companies.length === 0) {
+					return jsonResponse({ error: 'At least one company is required.' }, 400);
+				}
 				if (companies.length > 100 || companies.some((value) => value.length > 100)) {
 					return jsonResponse({ error: 'Company names exceed the supported limit.' }, 400);
 				}
@@ -127,6 +131,20 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				.filter((entry): entry is [string, string] => typeof entry[1] === 'string')
 				.map(([oldCompany, newCompany]) => [oldCompany.trim(), newCompany.trim()] as const)
 				.filter(([oldCompany, newCompany]) => oldCompany && newCompany && oldCompany !== newCompany);
+			const renameMap = new Map(renameEntries);
+			const usageSnapshot = await db.collection('designs').select('company').get();
+			const orphanedCompanies = [...new Set(
+				usageSnapshot.docs
+					.map(doc => doc.data().company)
+					.filter((company): company is string => typeof company === 'string' && company.length > 0)
+					.map(company => renameMap.get(company) || company)
+					.filter(company => !companies.includes(company)),
+			)];
+			if (orphanedCompanies.length > 0) {
+				return jsonResponse({
+					error: `These companies are still used by designs: ${orphanedCompanies.join(', ')}. Rename or reassign them first.`,
+				}, 409);
+			}
 
 			// All exact-match rename queries are independent, so fetch them concurrently.
 			const snapshots = await Promise.all(
@@ -165,7 +183,15 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			if (!company) return jsonResponse({ error: 'Company is required.' }, 400);
 
 			const docRef = db.collection('designs').doc(designId);
-			const docSnap = await docRef.get();
+			const companiesRef = db.collection('configuration').doc('designs_companies');
+			const [docSnap, companiesSnapshot] = await Promise.all([docRef.get(), companiesRef.get()]);
+			const configuredCompanies = companiesSnapshot.data()?.companies;
+			const allowedCompanies = Array.isArray(configuredCompanies)
+				? configuredCompanies.filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+				: DEFAULT_DESIGN_COMPANIES;
+			if (!allowedCompanies.includes(company)) {
+				return jsonResponse({ error: 'Select a company from the current configured list.' }, 409);
+			}
 			const previousImageUrl = docSnap.exists ? docSnap.data()?.imageUrl : '';
 			let imageUrl = typeof previousImageUrl === 'string' ? previousImageUrl : '';
 			let uploadedImageUrl: string | undefined;

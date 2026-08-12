@@ -4,8 +4,19 @@ import { clearCache } from '../../lib/server/cache';
 import { FieldValue } from 'firebase-admin/firestore';
 import { addSystemLog } from '../../lib/server/system-logs';
 
-export const GET: APIRoute = async ({ redirect, locals, cookies }) => {
+function isSafeDownloadTarget(value: string): boolean {
+	if (value.startsWith('/') && !value.startsWith('//')) return true;
+	try {
+		const parsed = new URL(value);
+		return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+	} catch {
+		return false;
+	}
+}
+
+export const GET: APIRoute = async ({ locals }) => {
 	let targetUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
+	let inlineResumeUrl: string | null = null;
 
 	try {
 		const db = getFirebaseAdminDb();
@@ -17,7 +28,9 @@ export const GET: APIRoute = async ({ redirect, locals, cookies }) => {
 		if (snapshot.exists) {
 			const data = snapshot.data();
 			if (data?.resumeUrl) {
-				targetUrl = data.resumeUrl;
+				const configuredUrl = String(data.resumeUrl);
+				if (configuredUrl.startsWith('data:')) inlineResumeUrl = configuredUrl;
+				else if (isSafeDownloadTarget(configuredUrl)) targetUrl = configuredUrl;
 			}
 			if (typeof data?.excludeAdminDownloads === 'boolean') {
 				excludeSetting = data.excludeAdminDownloads;
@@ -25,13 +38,12 @@ export const GET: APIRoute = async ({ redirect, locals, cookies }) => {
 		}
 
 		// Check if request originates from an authenticated admin
-		const ignoreCookie = cookies.get('ignore_admin_downloads')?.value;
 		const adminEmail = locals.adminEmail;
-		const hasAdminSession = Boolean(cookies.get('admin_session')?.value);
-		const isAdmin = Boolean(adminEmail || hasAdminSession);
+		// Middleware only sets locals.adminEmail after verifying the signature,
+		// expiry, and current authorization. Cookie presence alone is not proof.
+		const isAdmin = Boolean(adminEmail);
 		
-		// Exclude admin downloads if setting is enabled and requester is an admin (unless cookie is explicitly 'false')
-		const isExcluded = excludeSetting && isAdmin && ignoreCookie !== 'false';
+		const isExcluded = excludeSetting && isAdmin;
 
 		if (!isExcluded) {
 			// Atomically increment resume download count for public visitors
@@ -68,5 +80,27 @@ export const GET: APIRoute = async ({ redirect, locals, cookies }) => {
 		console.error('Error tracking resume download count:', error);
 	}
 
-	return redirect(targetUrl, 302);
+	if (inlineResumeUrl) {
+		const match = /^data:application\/pdf;base64,([A-Za-z0-9+/=\r\n]+)$/i.exec(inlineResumeUrl);
+		if (match) {
+			const buffer = Buffer.from(match[1], 'base64');
+			return new Response(new Uint8Array(buffer), {
+				headers: {
+					'Cache-Control': 'private, no-store',
+					'Content-Disposition': 'attachment; filename="Abderrahmane_SAOUDI_Resume.pdf"',
+					'Content-Length': String(buffer.byteLength),
+					'Content-Type': 'application/pdf',
+					'X-Content-Type-Options': 'nosniff',
+				},
+			});
+		}
+	}
+
+	return new Response(null, {
+		status: 302,
+		headers: {
+			'Cache-Control': 'private, no-store',
+			Location: targetUrl,
+		},
+	});
 };

@@ -59,7 +59,7 @@ const statCards = [
 ];
 ---
 
-<div class="relative grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+<div id="home-counts-island" class="relative grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
 	{statCards.map(({ label, rawValue, value, icon, color, href, disabled }) => 
 		disabled ? (
 			<button
@@ -102,7 +102,7 @@ const statCards = [
 	}
 
 	function animateCounters() {
-		const counterEls = document.querySelectorAll<HTMLElement>('.stat-counter-value');
+		const counterEls = document.querySelectorAll<HTMLElement>('.stat-counter-value:not([data-counter-initialized])');
 		if (!counterEls.length) return;
 
 		const observer = new IntersectionObserver(
@@ -158,24 +158,33 @@ const statCards = [
 		);
 
 		counterEls.forEach((el) => {
+			el.dataset.counterInitialized = 'true';
 			observer.observe(el);
 		});
 	}
 
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', animateCounters);
-	} else {
-		animateCounters();
+	// Server islands can be inserted after DOMContentLoaded. Initialize both the
+	// immediate DOM and the eventual island response without keeping an observer alive.
+	animateCounters();
+	if (!document.getElementById('home-counts-island')) {
+		const islandObserver = new MutationObserver(() => {
+			if (!document.getElementById('home-counts-island')) return;
+			animateCounters();
+			islandObserver.disconnect();
+		});
+		islandObserver.observe(document.documentElement, { childList: true, subtree: true });
 	}
 
-	document.addEventListener('DOMContentLoaded', () => {
-		document.querySelectorAll('.btn-disabled-home-card').forEach((btn) => {
-			btn.addEventListener('click', () => {
-				const title = btn.getAttribute('data-title') || 'This section';
-				if (typeof (window as any).showToast === 'function') {
-					(window as any).showToast(`${title} section coming soon!`, 'info');
-				}
-			});
+	if (!(window as any).__homeCountsClickHandlerBound) {
+		(window as any).__homeCountsClickHandlerBound = true;
+		document.addEventListener('click', (event) => {
+			const target = event.target as HTMLElement | null;
+			const button = target?.closest('.btn-disabled-home-card') as HTMLElement | null;
+			if (!button) return;
+			const title = button.getAttribute('data-title') || 'This section';
+			if (typeof (window as any).showToast === 'function') {
+				(window as any).showToast(`${title} section coming soon!`, 'info');
+			}
 		});
-	});
+	}
 </script>

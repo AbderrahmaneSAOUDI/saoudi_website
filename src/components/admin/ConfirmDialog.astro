@@ -8,6 +8,12 @@
 ---
 <div
 	id="custom-confirm-dialog-backdrop"
+	role="dialog"
+	aria-modal="true"
+	aria-hidden="true"
+	aria-labelledby="confirm-dialog-title"
+	aria-describedby="confirm-dialog-message"
+	inert
 	class="fixed inset-0 bg-black/75 backdrop-blur-sm z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300"
 >
 	<div
@@ -56,6 +62,7 @@
 	const messageEl = document.getElementById('confirm-dialog-message') as HTMLParagraphElement;
 	const btnCancel = document.getElementById('confirm-dialog-btn-cancel') as HTMLButtonElement;
 	const btnConfirm = document.getElementById('confirm-dialog-btn-confirm') as HTMLButtonElement;
+	let previouslyFocused: HTMLElement | null = null;
 
 	function closeDialog(result: boolean) {
 		if (!backdrop || !card) return;
@@ -63,11 +70,15 @@
 		card.classList.remove('scale-100', 'translate-y-0');
 		backdrop.classList.add('opacity-0', 'pointer-events-none');
 		backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+		backdrop.setAttribute('aria-hidden', 'true');
+		backdrop.setAttribute('inert', '');
 
 		if (currentResolver) {
 			currentResolver(result);
 			currentResolver = null;
 		}
+		previouslyFocused?.focus();
+		previouslyFocused = null;
 	}
 
 	function showConfirmDialog(title: string, message: string): Promise<boolean> {
@@ -79,10 +90,14 @@
 			if (messageEl) messageEl.textContent = message || 'Are you sure you want to proceed?';
 
 			if (backdrop && card) {
+				previouslyFocused = document.activeElement as HTMLElement | null;
+				backdrop.removeAttribute('inert');
+				backdrop.setAttribute('aria-hidden', 'false');
 				backdrop.classList.remove('opacity-0', 'pointer-events-none');
 				backdrop.classList.add('opacity-100', 'pointer-events-auto');
 				card.classList.remove('scale-95', 'translate-y-4');
 				card.classList.add('scale-100', 'translate-y-0');
+				btnConfirm?.focus();
 			}
 		});
 	}
@@ -100,6 +115,27 @@
 			if (e.target === backdrop) closeDialog(false);
 		});
 	}
+
+	document.addEventListener('keydown', (event) => {
+		if (!backdrop || backdrop.getAttribute('aria-hidden') !== 'false') return;
+		if (event.key === 'Escape') {
+			event.preventDefault();
+			closeDialog(false);
+			return;
+		}
+		if (event.key !== 'Tab') return;
+		const focusable = [btnCancel, btnConfirm].filter(Boolean);
+		if (!focusable.length) return;
+		const first = focusable[0];
+		const last = focusable[focusable.length - 1];
+		if (event.shiftKey && document.activeElement === first) {
+			event.preventDefault();
+			last.focus();
+		} else if (!event.shiftKey && document.activeElement === last) {
+			event.preventDefault();
+			first.focus();
+		}
+	});
 
 	// Attach to global window object
 	(window as any).showConfirmDialog = showConfirmDialog;

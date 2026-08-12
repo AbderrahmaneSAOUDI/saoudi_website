@@ -13,19 +13,20 @@ import Icon from './Icon.astro';
 interface Props {}
 ---
 
-<div id="global-lightbox" class="lightbox-overlay fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
+<div id="global-lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="lightbox-title" inert class="lightbox-overlay fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
 	<!-- Clicking the overlay background clears the hash to close the lightbox -->
 	<a href="#" class="absolute inset-0 cursor-zoom-out" aria-label="Close Lightbox"></a>
 	
 	<!-- Close button -->
 	<a
+		id="global-lightbox-close"
 		href="#"
 		class="group absolute top-4 right-4 sm:top-6 sm:right-6 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all cursor-pointer shadow-lg"
 		aria-label="Close Lightbox"
 		title="Close (Esc)"
 	>
-		<Icon name="close" size={24} class="w-6 h-6 group-hover:hidden" />
-		<Icon name="close" filled size={24} class="w-6 h-6 hidden group-hover:block" />
+		<Icon name="close" size={24} class="w-6 h-6 group-hover:!hidden" />
+		<Icon name="close" filled size={24} class="w-6 h-6 !hidden group-hover:!inline-flex" />
 	</a>
 	
 	<div class="relative max-w-5xl max-h-[85vh] z-10 flex flex-col items-center">
@@ -45,6 +46,7 @@ interface Props {}
 
 <script is:inline>
 	(function() {
+		let previouslyFocused = null;
 		const setupLightbox = () => {
 			document.addEventListener('click', (e) => {
 				const trigger = e.target.closest('[data-lightbox-src]');
@@ -59,6 +61,9 @@ interface Props {}
 				
 				const lightbox = document.getElementById('global-lightbox');
 				if (lightbox) {
+					previouslyFocused = document.activeElement;
+					lightbox.removeAttribute('inert');
+					lightbox.setAttribute('aria-hidden', 'false');
 					const img = lightbox.querySelector('#lightbox-img');
 					const titleEl = lightbox.querySelector('#lightbox-title');
 					const subtitleEl = lightbox.querySelector('#lightbox-subtitle');
@@ -71,6 +76,7 @@ interface Props {}
 					if (subtitleEl) subtitleEl.textContent = subtitle;
 					
 					window.location.hash = 'global-lightbox';
+					lightbox.querySelector('#global-lightbox-close')?.focus();
 				}
 			}, true);
 
@@ -83,10 +89,16 @@ interface Props {}
 			});
 
 			// Free image/graphics memory when closed
-			window.addEventListener('hashchange', () => {
-				if (window.location.hash !== '#global-lightbox') {
+			const syncLightboxState = () => {
+				if (window.location.hash === '#global-lightbox') {
+					const lightbox = document.getElementById('global-lightbox');
+					lightbox?.removeAttribute('inert');
+					lightbox?.setAttribute('aria-hidden', 'false');
+				} else {
 					const lightbox = document.getElementById('global-lightbox');
 					if (lightbox) {
+						lightbox.setAttribute('inert', '');
+						lightbox.setAttribute('aria-hidden', 'true');
 						const img = lightbox.querySelector('#lightbox-img');
 						const titleEl = lightbox.querySelector('#lightbox-title');
 						const subtitleEl = lightbox.querySelector('#lightbox-subtitle');
@@ -97,9 +109,13 @@ interface Props {}
 						}
 						if (titleEl) titleEl.textContent = '';
 						if (subtitleEl) subtitleEl.textContent = '';
+						if (previouslyFocused && typeof previouslyFocused.focus === 'function') previouslyFocused.focus();
+						previouslyFocused = null;
 					}
 				}
-			});
+			};
+			window.addEventListener('hashchange', syncLightboxState);
+			syncLightboxState();
 		};
 
 		if (document.readyState === 'loading') {

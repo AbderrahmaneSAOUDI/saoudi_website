@@ -12,6 +12,7 @@ import ProjectModal from './ProjectModal.astro';
 import type { Project } from '../types';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
 import { CACHE_TTL_MS, getOrSetCached } from '../lib/server/cache';
+import { getProjectBlockMediaUrl, getPublicMediaUrl } from '../lib/media';
 
 interface Props {}
 
@@ -28,10 +29,47 @@ try {
 			const snapshot = await db.collection("projects")
 				.orderBy("date", "desc")
 				.get();
-			return snapshot.docs.map(doc => ({
-				id: doc.id,
-				...doc.data()
-			})) as Project[];
+			return snapshot.docs.map((doc) => {
+				const data = doc.data();
+				const blocks = Array.isArray(data.blocks)
+					? data.blocks.map((block: Record<string, any>) => {
+						if (!block || typeof block !== 'object' || typeof block.id !== 'string') return block;
+						if (block.type === 'single_image') {
+							return {
+								...block,
+								imageUrl: getProjectBlockMediaUrl(block.imageUrl, doc.id, block.id) || '',
+							};
+						}
+						if (block.type === 'carousel' && Array.isArray(block.images)) {
+							return {
+								...block,
+								images: block.images.map((imageUrl: string, imageIndex: number) =>
+									getProjectBlockMediaUrl(imageUrl, doc.id, block.id, imageIndex) || '',
+								),
+							};
+						}
+						return block;
+					})
+					: [];
+
+				return {
+					id: doc.id,
+					order: Number.isFinite(Number(data.order)) ? Number(data.order) : 0,
+					title: typeof data.title === 'string' ? data.title : '',
+					field: typeof data.field === 'string' ? data.field : undefined,
+					tagline: typeof data.tagline === 'string' ? data.tagline : undefined,
+					description: typeof data.description === 'string' ? data.description : undefined,
+					imageUrl: getPublicMediaUrl(data.imageUrl, 'projects', doc.id) || '',
+					projectUrl: typeof data.projectUrl === 'string' ? data.projectUrl : '',
+					githubUrl: typeof data.githubUrl === 'string' ? data.githubUrl : '',
+					date: typeof data.date === 'string' ? data.date : '',
+					technologies: Array.isArray(data.technologies)
+						? data.technologies.filter((technology: unknown): technology is string => typeof technology === 'string')
+						: [],
+					blocks,
+					featured: Boolean(data.featured),
+				};
+			}) as Project[];
 		},
 		CACHE_TTL_MS.PUBLIC_DATA,
 	);
@@ -82,10 +120,10 @@ const groupOffsets = activeYears.map(year => {
 		const toggleId = `toggle-year-${year}`;
 		return (
 			<section class="space-y-4 animate-page-slide-up" style={`animation-delay: ${100 + groupIndex * 100}ms;`}>
-				<input type="checkbox" id={toggleId} class="peer hidden" checked />
+				<input type="checkbox" id={toggleId} class="peer sr-only" aria-label={`Toggle ${year} projects`} checked />
 
 				<!-- Section Title -->
-				<label for={toggleId} class="flex items-center justify-between border-b border-white/5 pb-3 cursor-pointer select-none group peer-checked:[&_.chevron-icon]:rotate-180">
+				<label for={toggleId} class="flex items-center justify-between border-b border-white/5 pb-3 cursor-pointer select-none group rounded-xl peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-surface peer-checked:[&_.chevron-icon]:rotate-180">
 					<div class="flex items-center gap-3">
 						<div class="w-1.5 h-6 bg-primary rounded-full transition-transform group-hover:scale-y-125"></div>
 						<h2 class="font-bold text-white text-xl tracking-tight group-hover:text-primary transition-colors">{year}</h2>
@@ -106,7 +144,7 @@ const groupOffsets = activeYears.map(year => {
 						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 pb-1">
 							{groupProjects.map((project, index) => {
 								const globalIndex = groupOffset + index;
-								const isEager = globalIndex < 4;
+								const isEager = globalIndex === 0;
 								return (
 									<div class="animate-page-card-fade" style={`animation-delay: ${index * 50}ms`}>
 										<Card

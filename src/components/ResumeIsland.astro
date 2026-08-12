@@ -3,15 +3,15 @@
  * ResumeIsland — Server Island for Resume Content
  * 
  * Deferred component fetched asynchronously via server:defer.
- * Fetches the resume configuration (preview image URL + PDF download URL) from Firestore.
+ * Fetches the resume preview image URL from Firestore.
  * The parent page shows a skeleton placeholder while this loads.
  */
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
 import { CACHE_TTL_MS, getOrSetCached } from '../lib/server/cache';
+import { getPublicMediaUrl } from '../lib/media';
 
 interface Props {}
 
-let resumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
 let resumePreviewUrl = '/resume.webp';
 
 const cacheKeyResume = 'resume_config';
@@ -22,17 +22,20 @@ try {
 		async () => {
 		const db = getFirebaseAdminDb();
 		const configDoc = await db.collection('configuration').doc('static_data').get();
-		if (configDoc.exists) {
-			const data = configDoc.data();
-			if (data?.resumeUrl) resumeUrl = data.resumeUrl;
-			if (data?.previewUrl) resumePreviewUrl = data.previewUrl;
-		}
-		return { resumeUrl, resumePreviewUrl };
+			if (configDoc.exists) {
+				const data = configDoc.data();
+				if (data?.previewUrl) resumePreviewUrl = data.previewUrl;
+			}
+			return { resumePreviewUrl };
 		},
 		CACHE_TTL_MS.PUBLIC_DATA,
 	);
-	resumeUrl = config.resumeUrl;
-	resumePreviewUrl = config.resumePreviewUrl;
+	resumePreviewUrl = getPublicMediaUrl(
+		config.resumePreviewUrl,
+		'configuration',
+		'static_data',
+		'previewUrl',
+	) || '/resume.webp';
 } catch (error) {
 	console.warn('Failed to fetch resume config in public page:', error);
 }
@@ -46,6 +49,7 @@ try {
 			width="1530"
 			height="1980"
 			fetchpriority="high"
+			decoding="async"
 			class="w-full rounded-2xl object-cover"
 		/>
 	</div>
@@ -68,6 +72,11 @@ try {
 	<!-- Countdown Modal Overlay -->
 	<div
 		id="resume-download-modal"
+		role="dialog"
+		aria-modal="true"
+		aria-hidden="true"
+		aria-labelledby="resume-download-title"
+		inert
 		class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
 		<div class="bg-[#1E1E1E] border border-white/10 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl transform scale-95 transition-transform duration-300">
 			<div class="w-14 h-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto text-primary font-bold text-xl">
@@ -75,7 +84,7 @@ try {
 			</div>
 			
 			<div class="space-y-1">
-				<h3 class="text-base font-bold text-white">Preparing Download...</h3>
+				<h3 id="resume-download-title" class="text-base font-bold text-white">Preparing Download...</h3>
 				<p class="text-xs text-[#E6E1E5]">Your PDF download will begin automatically.</p>
 			</div>
 
@@ -98,15 +107,10 @@ try {
 </div>
 
 <script>
-	document.addEventListener('DOMContentLoaded', () => {
-		const downloadBtn = document.getElementById('btn-trigger-resume-download');
-		const modal = document.getElementById('resume-download-modal');
-		const modalCard = modal?.querySelector('div');
-		const countdownDisplay = document.getElementById('countdown-timer-display');
-		const skipBtn = document.getElementById('btn-skip-countdown');
-		const cancelBtn = document.getElementById('btn-cancel-countdown');
-
+	if (!(window as any).__resumeDownloadEventsBound) {
+		(window as any).__resumeDownloadEventsBound = true;
 		let timerInterval: any = null;
+		let previouslyFocused: HTMLElement | null = null;
 
 		function triggerDirectDownload() {
 			const link = document.createElement('a');
@@ -118,23 +122,36 @@ try {
 		}
 
 		function openModal() {
+			const modal = document.getElementById('resume-download-modal');
 			if (!modal) return;
+			const modalCard = modal.firstElementChild;
+			previouslyFocused = document.activeElement as HTMLElement | null;
+			modal.removeAttribute('inert');
+			modal.setAttribute('aria-hidden', 'false');
 			modal.classList.remove('opacity-0', 'pointer-events-none');
 			modal.classList.add('opacity-100', 'pointer-events-auto');
 			if (modalCard) modalCard.classList.remove('scale-95');
+			(document.getElementById('btn-skip-countdown') as HTMLButtonElement | null)?.focus();
 		}
 
-		function closeModal() {
+		function closeModal(restoreFocus = true) {
+			const modal = document.getElementById('resume-download-modal');
 			if (!modal) return;
+			const modalCard = modal.firstElementChild;
 			if (timerInterval) clearInterval(timerInterval);
+			timerInterval = null;
 			modal.classList.remove('opacity-100', 'pointer-events-auto');
 			modal.classList.add('opacity-0', 'pointer-events-none');
+			modal.setAttribute('aria-hidden', 'true');
+			modal.setAttribute('inert', '');
 			if (modalCard) modalCard.classList.add('scale-95');
+			if (restoreFocus) previouslyFocused?.focus();
 		}
 
 		function startCountdown() {
 			openModal();
 			let timeLeft = 3;
+			const countdownDisplay = document.getElementById('countdown-timer-display');
 			if (countdownDisplay) countdownDisplay.textContent = '3';
 
 			timerInterval = setInterval(() => {
@@ -143,27 +160,48 @@ try {
 
 				if (timeLeft <= 0) {
 					clearInterval(timerInterval);
-					closeModal();
+					closeModal(false);
 					triggerDirectDownload();
 				}
 			}, 1000);
 		}
 
-		if (downloadBtn) {
-			downloadBtn.addEventListener('click', () => {
+		document.addEventListener('click', (event) => {
+			const target = event.target as HTMLElement | null;
+			if (target?.closest('#btn-trigger-resume-download')) {
 				startCountdown();
-			});
-		}
-
-		if (skipBtn) {
-			skipBtn.addEventListener('click', () => {
-				closeModal();
+				return;
+			}
+			if (target?.closest('#btn-skip-countdown')) {
+				closeModal(false);
 				triggerDirectDownload();
-			});
-		}
+				return;
+			}
+			if (target?.closest('#btn-cancel-countdown')) closeModal();
+		});
 
-		if (cancelBtn) {
-			cancelBtn.addEventListener('click', closeModal);
-		}
-	});
+		document.addEventListener('keydown', (event) => {
+			const modal = document.getElementById('resume-download-modal');
+			if (modal?.getAttribute('aria-hidden') !== 'false') return;
+			if (event.key === 'Escape') {
+				event.preventDefault();
+				closeModal();
+				return;
+			}
+			if (event.key !== 'Tab') return;
+			const focusable = [
+				document.getElementById('btn-skip-countdown'),
+				document.getElementById('btn-cancel-countdown'),
+			].filter((element): element is HTMLElement => element instanceof HTMLElement);
+			const first = focusable[0];
+			const last = focusable[focusable.length - 1];
+			if (event.shiftKey && document.activeElement === first) {
+				event.preventDefault();
+				last.focus();
+			} else if (!event.shiftKey && document.activeElement === last) {
+				event.preventDefault();
+				first.focus();
+			}
+		});
+	}
 </script>

@@ -1,6 +1,10 @@
 import type { APIRoute } from 'astro';
+import { validateFormRequest } from '../../lib/server/api-guards';
 
-export const GET: APIRoute = async (context) => {
+export const POST: APIRoute = async (context) => {
+  const formErr = validateFormRequest(context.request);
+  if (formErr) return formErr;
+
   const adminEmail = context.locals.adminEmail || 'admin';
   try {
     const { addSystemLog } = await import('../../lib/server/system-logs');
@@ -24,3 +28,8 @@ export const GET: APIRoute = async (context) => {
   // Clean redirect back to the admin login page
   return context.redirect('/admin/admin_login');
 };
+
+export const GET: APIRoute = async () => new Response('Method Not Allowed', {
+  status: 405,
+  headers: { Allow: 'POST', 'Cache-Control': 'private, no-store' },
+});

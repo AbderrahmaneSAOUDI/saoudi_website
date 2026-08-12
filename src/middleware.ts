@@ -1,6 +1,7 @@
 import { defineMiddleware } from 'astro:middleware';
 import { verifySessionToken } from './lib/server/session';
 import { jsonResponse } from './lib/server/http';
+import { isAuthorizedAdminEmail, normalizeAdminEmail } from './lib/server/admin-authorization';
 
 const ADMIN_API_PATHS = new Set([
   '/admin/admin_certificates_api',
@@ -11,6 +12,17 @@ const ADMIN_API_PATHS = new Set([
   '/admin/admin_logs_api',
   '/admin/admin_projects_api',
   '/admin/admin_stats_api',
+]);
+
+const PUBLIC_PAGE_PATHS = new Set([
+  '/',
+  '/projects',
+  '/designs',
+  '/certifications',
+  '/experience',
+  '/resume',
+  '/services',
+  '/volunteering',
 ]);
 
 /**
@@ -24,10 +36,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   // SECURITY: Normalize pathname to lowercase for case-insensitive route matching.
   // Prevents bypass via /Admin/ or /ADMIN/ on case-insensitive file systems.
-  const normalizedPath = pathname.toLowerCase();
+  const lowerPath = pathname.toLowerCase();
+  const normalizedPath = lowerPath === '/' ? '/' : lowerPath.replace(/\/+$/, '');
   const isAdminRoute = normalizedPath === '/admin' || normalizedPath.startsWith('/admin/');
   const isLoginRoute = normalizedPath === '/admin/admin_login';
-  const isAdminApi = ADMIN_API_PATHS.has(normalizedPath);
+  const isAdminApi = ADMIN_API_PATHS.has(normalizedPath) || /^\/admin\/admin_[a-z0-9_]+_api$/.test(normalizedPath);
+  const needsCurrentAdminAuthorization = isAdminRoute || normalizedPath === '/api/download_resume';
+  // Every current server island is public portfolio data. The encrypted query
+  // uniquely identifies its props, so it is safe to share briefly at the CDN.
+  const cachePublicPage = context.request.method === 'GET' && (
+    PUBLIC_PAGE_PATHS.has(normalizedPath) || normalizedPath.startsWith('/_server-islands/')
+  );
 
   // Check for admin session cookie on all incoming requests
   const sessionCookie = context.cookies.get('admin_session')?.value;
@@ -36,8 +55,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (sessionCookie) {
     const session = await verifySessionToken(sessionCookie);
     if (session) {
-      verifiedEmail = session.email;
-    } else if (isAdminRoute && !isLoginRoute) {
+      const normalizedEmail = normalizeAdminEmail(session.email);
+      if (!needsCurrentAdminAuthorization || await isAuthorizedAdminEmail(normalizedEmail)) {
+        verifiedEmail = normalizedEmail;
+      }
+    }
+
+    if (!verifiedEmail && needsCurrentAdminAuthorization && !isLoginRoute) {
       context.cookies.delete('admin_session', { path: '/' });
       context.cookies.delete('admin_remember', { path: '/' });
       try {
@@ -46,8 +70,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
           type: 'security',
           severity: 'warn',
           action: 'AUTH_SESSION_INVALID',
-          title: 'Invalid or expired session cookie presented',
-          details: `Session verification failed for route: ${pathname}`,
+          title: 'Invalid, expired, or revoked admin session presented',
+          details: `Session verification or current authorization failed for route: ${pathname}`,
           userEmail: 'anonymous',
           requestPath: pathname,
         });
@@ -79,14 +103,19 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   // Continue to the next middleware or route handler
   const response = await next();
-  return addSecurityHeaders(response, isAdminRoute, pathname);
+  return addSecurityHeaders(response, isAdminRoute, pathname, cachePublicPage);
 });
 
 /**
  * SECURITY: Injects critical security headers into every HTTP response.
  * These headers mitigate clickjacking, MIME-sniffing, and unauthorized feature access.
  */
-function addSecurityHeaders(response: Response, preventCaching = false, pathname = ''): Response {
+function addSecurityHeaders(
+  response: Response,
+  preventCaching = false,
+  pathname = '',
+  cachePublicPage = false,
+): Response {
   try {
     // Attempt to mutate headers directly. This works for standard dynamic responses.
     response.headers.set('X-Frame-Options', 'DENY');
@@ -95,6 +124,8 @@ function addSecurityHeaders(response: Response, preventCaching = false, pathname
     response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
     if (preventCaching) {
       response.headers.set('Cache-Control', 'private, no-store');
+    } else if (cachePublicPage) {
+      response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=60, stale-while-revalidate=300');
     } else if (pathname.startsWith('/uploads/') || pathname.endsWith('.webp')) {
       response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
     }
@@ -109,6 +140,8 @@ function addSecurityHeaders(response: Response, preventCaching = false, pathname
     headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
     if (preventCaching) {
       headers.set('Cache-Control', 'private, no-store');
+    } else if (cachePublicPage) {
+      headers.set('Cache-Control', 'public, max-age=0, s-maxage=60, stale-while-revalidate=300');
     } else if (pathname.startsWith('/uploads/') || pathname.endsWith('.webp')) {
       headers.set('Cache-Control', 'public, max-age=31536000, immutable');
     }

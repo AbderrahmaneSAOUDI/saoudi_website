@@ -3,6 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Icon from "../components/Icon.astro";
 import HomeCountsIsland from "../components/HomeCountsIsland.astro";
 import ContactCard from "../components/ContactCard.astro";
+import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 
 ---
 
@@ -172,7 +173,8 @@ import ContactCard from "../components/ContactCard.astro";
 							src="/cover.webp"
 							alt="Profile"
 							class="w-full h-48 object-cover"
-							fetchpriority="high"
+							loading="lazy"
+							fetchpriority="low"
 							decoding="async"
 							width="1280"
 							height="192"
@@ -331,7 +333,9 @@ import ContactCard from "../components/ContactCard.astro";
 				>
 				</div>
 
-				<HomeCountsIsland />
+				<HomeCountsIsland server:defer>
+					<SkeletonCardGrid slot="fallback" variant="stat" />
+				</HomeCountsIsland>
 			</div>
 		</section>
 

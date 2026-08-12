@@ -74,7 +74,9 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			const category: TodoCategory = VALID_CATEGORIES.has(categoryRaw) ? categoryRaw : 'General';
 			const priority: TodoPriority = VALID_PRIORITIES.has(priorityRaw) ? priorityRaw : '';
-			const newId = todoId || `todo_${crypto.randomUUID().substring(0, 8)}`;
+			// IDs are always generated server-side so a caller cannot overwrite a
+			// different administrator's task by supplying its document ID.
+			const newId = `todo_${crypto.randomUUID().substring(0, 8)}`;
 			const now = new Date().toISOString();
 			const creatorEmail = (locals.adminEmail || '').toLowerCase().trim();
 
@@ -121,6 +123,14 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 		const existing = docSnap.data() || {};
 		const todoTitle = existing.title || todoId;
+		const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
+		const callerEmail = (locals.adminEmail || '').toLowerCase().trim();
+		const creatorEmail = String(existing.createdBy || primaryEmail).toLowerCase().trim();
+		const isPrimaryAdmin = Boolean(primaryEmail && callerEmail === primaryEmail);
+
+		if (!isPrimaryAdmin && creatorEmail !== callerEmail) {
+			return jsonResponse({ error: 'Permission denied for this task.' }, 403);
+		}
 
 		if (action === 'toggle_complete') {
 			const isCompleted = existing.status === 'completed';

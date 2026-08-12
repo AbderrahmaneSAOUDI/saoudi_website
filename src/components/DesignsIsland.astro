@@ -11,6 +11,7 @@ import Icon from './Icon.astro';
 import type { Design } from '../types';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
 import { CACHE_TTL_MS, getOrSetCached } from '../lib/server/cache';
+import { getMediaProxyUrl } from '../lib/media';
 
 interface Props {}
 
@@ -26,20 +27,30 @@ try {
 		const [companiesDoc, snapshot] = await Promise.all([
 			db.collection("configuration").doc("designs_companies").get(),
 			db.collection("designs")
-				.select('title', 'imageUrl', 'company', 'date', 'tags')
+				.select('title', 'company', 'date', 'tags')
 				.orderBy('date', 'desc')
 				.get(),
 		]);
 
-		const loadedDesigns = snapshot.docs.map(doc => ({
-			id: doc.id,
-			...doc.data()
-		})) as Design[];
+		const loadedDesigns = snapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				id: doc.id,
+				title: typeof data.title === 'string' ? data.title : undefined,
+				description: typeof data.description === 'string' ? data.description : undefined,
+				imageUrl: getMediaProxyUrl('designs', doc.id, undefined, doc.updateTime.toMillis()),
+				date: typeof data.date === 'string' ? data.date : undefined,
+				company: typeof data.company === 'string' ? data.company : '',
+				tags: Array.isArray(data.tags) ? data.tags.filter((tag: unknown): tag is string => typeof tag === 'string') : [],
+			};
+		}) as Design[];
 
 		const configuredCompanies = companiesDoc.data()?.companies;
 		return {
 			designs: loadedDesigns,
-			companies: Array.isArray(configuredCompanies) ? configuredCompanies : companies,
+			companies: Array.isArray(configuredCompanies)
+				? configuredCompanies.filter((company: unknown): company is string => typeof company === 'string')
+				: companies,
 		};
 		},
 		CACHE_TTL_MS.PUBLIC_DATA,
@@ -99,10 +110,10 @@ const groupOffsets = activeGroups.map(co => {
 		const toggleId = `toggle-company-${groupIndex}`;
 		return (
 			<section class="space-y-4 animate-page-slide-up" style={`animation-delay: ${100 + groupIndex * 100}ms;`}>
-				<input type="checkbox" id={toggleId} class="peer hidden" checked />
+				<input type="checkbox" id={toggleId} class="peer sr-only" aria-label={`Toggle ${companyName} designs`} checked />
 
 				<!-- Section Title -->
-				<label for={toggleId} class="flex items-center justify-between border-b border-white/5 pb-3 cursor-pointer select-none group peer-checked:[&_.chevron-icon]:rotate-180">
+				<label for={toggleId} class="flex items-center justify-between border-b border-white/5 pb-3 cursor-pointer select-none group rounded-xl peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-surface peer-checked:[&_.chevron-icon]:rotate-180">
 					<div class="flex items-center gap-3">
 						<div class="w-1.5 h-6 bg-primary rounded-full transition-transform group-hover:scale-y-125"></div>
 						<h2 class="font-bold text-white text-xl tracking-tight group-hover:text-primary transition-colors">{companyName}</h2>
@@ -123,7 +134,7 @@ const groupOffsets = activeGroups.map(co => {
 						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 pb-1">
 							{groupDesigns.map((design, index) => {
 								const globalIndex = groupOffset + index;
-								const isEager = globalIndex < 4;
+								const isEager = globalIndex === 0;
 								return (
 									<div class="animate-page-card-fade" style={`animation-delay: ${index * 50}ms`}>
 										<Card

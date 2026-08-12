@@ -252,9 +252,11 @@ const { counts } = metrics;
       }
     }
 
-    // Initial check and 5-second polling interval
-    updateLiveStats();
-    setInterval(updateLiveStats, 5000);
+	// Initial setting check, then a low-frequency poll only while the tab is visible.
+	updateLiveStats();
+	setInterval(() => {
+		if (!document.hidden) updateLiveStats();
+	}, 30000);
 
     // Reset download counter button handler
     if (btnResetDownloads) {
