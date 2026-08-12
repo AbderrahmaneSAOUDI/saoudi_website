@@ -4,6 +4,7 @@
  * Provides the foundational HTML structure, global CSS imports, and common UI elements
  * like the PublicHeader and PublicFooter. Used across most public-facing pages.
  */
+import SpeedInsights from '@vercel/speed-insights/astro';
 import PublicHeader from '../components/PublicHeader.astro';
 import PublicFooter from '../components/PublicFooter.astro';
 import Head from '../components/Head.astro';
@@ -47,5 +48,6 @@ const primaryColor = getRandomColor();
 			<PublicFooter />
 		</div>
 		<Toast />
+		<SpeedInsights />
 	</body>
 </html>

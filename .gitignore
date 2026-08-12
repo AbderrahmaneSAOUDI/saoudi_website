@@ -29,3 +29,4 @@ pnpm-debug.log*
 
 # local file uploads (dev only)
 public/uploads/
+.env*

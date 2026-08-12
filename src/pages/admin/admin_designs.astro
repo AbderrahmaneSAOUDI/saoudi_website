@@ -930,7 +930,7 @@ try {
 			}, 350);
 		}
 
-		btnCancel.addEventListener('click', closeDrawer);
+		btnCancel.addEventListener('click', () => closeDrawer());
 		if (btnCloseFilters) {
 			btnCloseFilters.addEventListener('click', closeFilterDrawer);
 		}
