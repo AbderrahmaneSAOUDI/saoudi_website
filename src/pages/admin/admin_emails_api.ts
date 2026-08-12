@@ -43,7 +43,7 @@ export const GET: APIRoute = async ({ locals }) => {
 		}
 
 		for (const item of dbEmails) {
-			const itemEmail = (item.email || item.id).toLowerCase().trim();
+			const itemEmail = String(item.email || item.id).toLowerCase().trim();
 			if (!emailsMap.has(itemEmail)) {
 				emailsMap.set(itemEmail, {
 					id: item.id,

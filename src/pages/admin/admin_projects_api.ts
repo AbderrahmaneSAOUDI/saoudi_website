@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
 import { clearCache } from '../../lib/server/cache';
+import { getPublicMediaUrl } from '../../lib/media';
 import {
 	getErrorMessage,
 	getFormFile,
@@ -309,19 +310,28 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				return jsonResponse({ error: 'Invalid JSON in fields.' }, 400);
 			}
 
-			const projectsSnapshot = await db.collection('projects').select('field').get();
-			const removedUsedFields = [...new Set(
-				projectsSnapshot.docs
-					.map(doc => doc.data().field)
-					.filter((field): field is string => typeof field === 'string' && field.length > 0 && !fields.includes(field)),
-			)];
-			if (removedUsedFields.length > 0) {
-				return jsonResponse({
-					error: `These fields are still used by projects: ${removedUsedFields.join(', ')}. Reassign those projects first.`,
-				}, 409);
+			const fieldsRef = db.collection('configuration').doc('projects_fields');
+			try {
+				await db.runTransaction(async transaction => {
+					const projectsSnapshot = await transaction.get(db.collection('projects').select('field'));
+					const removedUsedFields = [...new Set(
+						projectsSnapshot.docs
+							.map(doc => doc.data().field)
+							.filter((field): field is string => typeof field === 'string' && field.length > 0 && !fields.includes(field)),
+					)];
+					if (removedUsedFields.length > 0) {
+						throw new ProjectSaveConflictError(
+							`These fields are still used by projects: ${removedUsedFields.join(', ')}. Reassign those projects first.`,
+						);
+					}
+					transaction.set(fieldsRef, { fields });
+				});
+			} catch (error) {
+				if (error instanceof ProjectSaveConflictError) {
+					return jsonResponse({ error: error.message }, 409);
+				}
+				throw error;
 			}
-
-			await db.collection('configuration').doc('projects_fields').set({ fields });
 			invalidateProjectCaches(false);
 
 			await safeSystemLog({
@@ -484,6 +494,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 					})) {
 						throw new ProjectSaveConflictError('Project media changed during this edit. Reload and try again.');
 					}
+					// Serialize field-list edits with project saves to prevent write skew.
+					transaction.set(fieldsRef, { fields: currentFields }, { merge: true });
 					transaction.set(docRef, projectPayload, { merge: true });
 				});
 			} catch (error) {
@@ -509,7 +521,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			if (!savedSnapshot.exists) {
 				throw new Error('Project was not found after it was saved.');
 			}
-			const savedProject = { id: savedSnapshot.id, ...savedSnapshot.data() };
+			const savedData = savedSnapshot.data() ?? {};
+			const savedProject = { id: savedSnapshot.id, ...savedData };
 
 			if (
 				uploadedImageUrl &&
@@ -535,7 +548,17 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				changeType: isNewProject ? 'create' : 'update',
 			});
 
-			return jsonResponse({ success: true, project: savedProject });
+			return jsonResponse({
+				success: true,
+				project: {
+					...savedProject,
+					imageUrl: getPublicMediaUrl(
+						typeof savedData.imageUrl === 'string' ? savedData.imageUrl : '',
+						'projects',
+						projectId,
+					) || '',
+				},
+			});
 		}
 
 		return jsonResponse({ error: 'Invalid action specified.' }, 400);

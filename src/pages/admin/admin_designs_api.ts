@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import type { DocumentReference } from 'firebase-admin/firestore';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
 import { clearCache, clearCacheByPrefix } from '../../lib/server/cache';
+import { getPublicMediaUrl } from '../../lib/media';
 import {
 	getErrorMessage,
 	getFormFile,
@@ -20,26 +20,25 @@ import {
 const DESIGNS_DIRECTORY = 'uploads/designs';
 const MAX_IMAGE_BYTES = 700 * 1024;
 const DEFAULT_DESIGN_COMPANIES = ['Google', 'GDG', 'Freelance', 'Personal'];
+const MAX_TRANSACTION_RENAMES = 450;
+
+class DesignConflictError extends Error {
+	constructor(message: string, readonly status = 409) {
+		super(message);
+	}
+}
+
+function getConfiguredCompanies(value: unknown): string[] {
+	return Array.isArray(value)
+		? value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+		: DEFAULT_DESIGN_COMPANIES;
+}
 
 function invalidateDesignCaches(countChanged: boolean): void {
 	clearCacheByPrefix('designs_');
 	if (countChanged) {
 		clearCache('public_dashboard_counts');
 		clearCache('admin_dashboard_counts');
-	}
-}
-
-async function commitCompanyUpdates(
-	updates: Array<{ ref: DocumentReference; company: string }>,
-): Promise<void> {
-	const db = getFirebaseAdminDb();
-
-	for (let offset = 0; offset < updates.length; offset += 500) {
-		const batch = db.batch();
-		for (const update of updates.slice(offset, offset + 500)) {
-			batch.update(update.ref, { company: update.company });
-		}
-		await batch.commit();
 	}
 }
 
@@ -132,34 +131,37 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				.map(([oldCompany, newCompany]) => [oldCompany.trim(), newCompany.trim()] as const)
 				.filter(([oldCompany, newCompany]) => oldCompany && newCompany && oldCompany !== newCompany);
 			const renameMap = new Map(renameEntries);
-			const usageSnapshot = await db.collection('designs').select('company').get();
-			const orphanedCompanies = [...new Set(
-				usageSnapshot.docs
-					.map(doc => doc.data().company)
-					.filter((company): company is string => typeof company === 'string' && company.length > 0)
-					.map(company => renameMap.get(company) || company)
-					.filter(company => !companies.includes(company)),
-			)];
-			if (orphanedCompanies.length > 0) {
-				return jsonResponse({
-					error: `These companies are still used by designs: ${orphanedCompanies.join(', ')}. Rename or reassign them first.`,
-				}, 409);
+			const designsQuery = db.collection('designs').select('company');
+			const companiesRef = db.collection('configuration').doc('designs_companies');
+			try {
+				await db.runTransaction(async transaction => {
+					const usageSnapshot = await transaction.get(designsQuery);
+					const updates = usageSnapshot.docs.flatMap(doc => {
+						const currentCompany = doc.data().company;
+						if (typeof currentCompany !== 'string' || !currentCompany) return [];
+						const nextCompany = renameMap.get(currentCompany) || currentCompany;
+						if (!companies.includes(nextCompany)) {
+							throw new DesignConflictError(
+								`The company "${currentCompany}" is still used by a design. Rename or reassign it first.`,
+							);
+						}
+						return nextCompany === currentCompany ? [] : [{ ref: doc.ref, company: nextCompany }];
+					});
+					if (updates.length > MAX_TRANSACTION_RENAMES) {
+						throw new DesignConflictError(
+							`This rename affects more than ${MAX_TRANSACTION_RENAMES} designs. Reassign them in smaller groups.`,
+							400,
+						);
+					}
+					for (const update of updates) transaction.update(update.ref, { company: update.company });
+					transaction.set(companiesRef, { companies });
+				});
+			} catch (error) {
+				if (error instanceof DesignConflictError) {
+					return jsonResponse({ error: error.message }, error.status);
+				}
+				throw error;
 			}
-
-			// All exact-match rename queries are independent, so fetch them concurrently.
-			const snapshots = await Promise.all(
-				renameEntries.map(([oldCompany]) =>
-					db.collection('designs').where('company', '==', oldCompany).get(),
-				),
-			);
-
-			const updates = snapshots.flatMap((snapshot, index) => {
-				const newCompany = renameEntries[index][1];
-				return snapshot.docs.map((doc) => ({ ref: doc.ref, company: newCompany }));
-			});
-
-			await commitCompanyUpdates(updates);
-			await db.collection('configuration').doc('designs_companies').set({ companies });
 
 			invalidateDesignCaches(false);
 
@@ -182,18 +184,14 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const imageFile = getFormFile(formData, 'image');
 			if (!company) return jsonResponse({ error: 'Company is required.' }, 400);
 
-			const docRef = db.collection('designs').doc(designId);
 			const companiesRef = db.collection('configuration').doc('designs_companies');
-			const [docSnap, companiesSnapshot] = await Promise.all([docRef.get(), companiesRef.get()]);
-			const configuredCompanies = companiesSnapshot.data()?.companies;
-			const allowedCompanies = Array.isArray(configuredCompanies)
-				? configuredCompanies.filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
-				: DEFAULT_DESIGN_COMPANIES;
+			const companiesSnapshot = await companiesRef.get();
+			const allowedCompanies = getConfiguredCompanies(companiesSnapshot.data()?.companies);
 			if (!allowedCompanies.includes(company)) {
 				return jsonResponse({ error: 'Select a company from the current configured list.' }, 409);
 			}
-			const previousImageUrl = docSnap.exists ? docSnap.data()?.imageUrl : '';
-			let imageUrl = typeof previousImageUrl === 'string' ? previousImageUrl : '';
+
+			const docRef = db.collection('designs').doc(designId);
 			let uploadedImageUrl: string | undefined;
 
 			if (imageFile) {
@@ -207,18 +205,39 @@ export const POST: APIRoute = async ({ locals, request }) => {
 					filename: `design_${crypto.randomUUID()}.webp`,
 					contentType: imageFile.type,
 				});
-				imageUrl = uploadedImageUrl;
 			}
 
-			if (!imageUrl) {
-				return jsonResponse({ error: 'An image is required for this design project.' }, 400);
-			}
-
-			const design = { id: designId, title, imageUrl, company, date };
+			let design: { id: string; title: string; imageUrl: string; company: string; date: string };
+			let previousImageUrl = '';
+			let isNewDesign = false;
 			try {
-				await docRef.set(design, { merge: true });
+				await db.runTransaction(async transaction => {
+					const [currentCompaniesSnapshot, currentDesignSnapshot] = await Promise.all([
+						transaction.get(companiesRef),
+						transaction.get(docRef),
+					]);
+					const currentCompanies = getConfiguredCompanies(currentCompaniesSnapshot.data()?.companies);
+					if (!currentCompanies.includes(company)) {
+						throw new DesignConflictError('The selected company is no longer available. Reload and try again.');
+					}
+					const storedImageUrl = currentDesignSnapshot.data()?.imageUrl;
+					previousImageUrl = typeof storedImageUrl === 'string' ? storedImageUrl : '';
+					const imageUrl = uploadedImageUrl || previousImageUrl;
+					if (!imageUrl) {
+						throw new DesignConflictError('An image is required for this design project.', 400);
+					}
+					design = { id: designId, title, imageUrl, company, date };
+					isNewDesign = !currentDesignSnapshot.exists;
+					// Writing the validated configuration back unchanged makes company-list
+					// edits and design saves conflict instead of creating a write-skew orphan.
+					transaction.set(companiesRef, { companies: currentCompanies }, { merge: true });
+					transaction.set(docRef, design, { merge: true });
+				});
 			} catch (error) {
 				if (uploadedImageUrl) await deleteFile(uploadedImageUrl, DESIGNS_DIRECTORY);
+				if (error instanceof DesignConflictError) {
+					return jsonResponse({ error: error.message }, error.status);
+				}
 				throw error;
 			}
 
@@ -231,7 +250,6 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				await deleteFile(previousImageUrl, DESIGNS_DIRECTORY);
 			}
 
-			const isNewDesign = !docSnap.exists;
 			invalidateDesignCaches(isNewDesign);
 
 			await safeSystemLog({
@@ -246,7 +264,13 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				changeType: isNewDesign ? 'create' : 'update',
 			});
 
-			return jsonResponse({ success: true, design });
+			return jsonResponse({
+				success: true,
+				design: {
+					...design!,
+					imageUrl: getPublicMediaUrl(design!.imageUrl, 'designs', designId) || '',
+				},
+			});
 		}
 
 		return jsonResponse({ error: 'Invalid action specified.' }, 400);

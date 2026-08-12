@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
 import { clearCache } from '../../lib/server/cache';
+import { getPublicMediaUrl } from '../../lib/media';
 import {
 	getErrorMessage,
 	getFormFile,
@@ -164,7 +165,13 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				changeType: isNewCert ? 'create' : 'update',
 			});
 
-			return jsonResponse({ success: true, certificate });
+			return jsonResponse({
+				success: true,
+				certificate: {
+					...certificate,
+					imageUrl: getPublicMediaUrl(certificate.imageUrl, 'certificates', certificateId) || null,
+				},
+			});
 		}
 
 		return jsonResponse({ error: 'Invalid action specified.' }, 400);

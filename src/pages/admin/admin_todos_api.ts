@@ -31,12 +31,12 @@ export const GET: APIRoute = async ({ locals }) => {
 			return {
 				id: doc.id,
 				...data,
-				createdBy: data.createdBy || primaryEmail,
+					createdBy: typeof data.createdBy === 'string' ? data.createdBy : primaryEmail,
 			};
 		});
 
 		if (!isPrimaryAdmin) {
-			todos = todos.filter((t) => (t.createdBy || '').toLowerCase() === callerEmail);
+			todos = todos.filter((t) => String(t.createdBy || '').toLowerCase() === callerEmail);
 		}
 
 		return jsonResponse({ success: true, todos });
@@ -76,7 +76,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			const priority: TodoPriority = VALID_PRIORITIES.has(priorityRaw) ? priorityRaw : '';
 			// IDs are always generated server-side so a caller cannot overwrite a
 			// different administrator's task by supplying its document ID.
-			const newId = `todo_${crypto.randomUUID().substring(0, 8)}`;
+			const newId = `todo_${crypto.randomUUID()}`;
 			const now = new Date().toISOString();
 			const creatorEmail = (locals.adminEmail || '').toLowerCase().trim();
 
@@ -93,7 +93,9 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				createdBy: creatorEmail,
 			};
 
-			await db.collection('admin_todos').doc(newId).set(todoItem);
+			// create() refuses to overwrite an existing document even in the
+			// astronomically unlikely event of an ID collision.
+			await db.collection('admin_todos').doc(newId).create(todoItem);
 			clearCache('admin_todos');
 
 			await safeSystemLog({

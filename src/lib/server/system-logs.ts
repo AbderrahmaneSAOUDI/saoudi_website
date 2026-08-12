@@ -53,8 +53,8 @@ export interface AddLogParams {
 export function canUserAccessLog(log: SystemLog, userEmail: string, isPrimaryAdmin: boolean): boolean {
 	if (isPrimaryAdmin) return true;
 
-	const callerEmail = (userEmail || '').toLowerCase().trim();
-	const logUserEmail = (log.userEmail || '').toLowerCase().trim();
+	const callerEmail = String(userEmail || '').toLowerCase().trim();
+	const logUserEmail = String(log.userEmail || '').toLowerCase().trim();
 
 	// Full access for secondary admins
 	if (log.type === 'content' || log.type === 'visitor' || log.type === 'storage') {
@@ -206,9 +206,14 @@ export async function getSystemLogs(limitCount: number = 50, typeFilter?: string
 		return snap.docs.map(doc => {
 			const data = doc.data();
 			return {
-				id: doc.id,
-				severity: data.severity || 'info',
 				...data,
+				id: doc.id,
+				type: typeof data.type === 'string' ? data.type : 'system',
+				severity: typeof data.severity === 'string' ? data.severity : 'info',
+				action: typeof data.action === 'string' ? data.action : 'SYSTEM_ERROR',
+				title: typeof data.title === 'string' ? data.title : 'Untitled system event',
+				details: typeof data.details === 'string' ? data.details : '',
+				userEmail: typeof data.userEmail === 'string' ? data.userEmail : 'system',
 			} as SystemLog;
 		});
 	} catch (err) {

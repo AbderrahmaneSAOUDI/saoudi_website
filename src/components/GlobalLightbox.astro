@@ -15,7 +15,7 @@ interface Props {}
 
 <div id="global-lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="lightbox-title" inert class="lightbox-overlay fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
 	<!-- Clicking the overlay background clears the hash to close the lightbox -->
-	<a href="#" class="absolute inset-0 cursor-zoom-out" aria-label="Close Lightbox"></a>
+	<a href="#" tabindex="-1" class="absolute inset-0 cursor-zoom-out" aria-label="Close Lightbox"></a>
 	
 	<!-- Close button -->
 	<a
@@ -80,20 +80,32 @@ interface Props {}
 				}
 			}, true);
 
-			// Escape key to close lightbox
-			document.addEventListener('keydown', (e) => {
-				if (e.key === 'Escape' && window.location.hash === '#global-lightbox') {
-					e.preventDefault();
-					window.location.hash = '#';
-				}
-			});
+				// Keep keyboard focus inside the open dialog and support Escape.
+				document.addEventListener('keydown', (e) => {
+					if (window.location.hash !== '#global-lightbox') return;
+					if (e.key === 'Escape') {
+						e.preventDefault();
+						window.location.hash = '#';
+						return;
+					}
+					if (e.key === 'Tab') {
+						const closeButton = document.getElementById('global-lightbox-close');
+						if (closeButton) {
+							e.preventDefault();
+							closeButton.focus();
+						}
+					}
+				});
 
 			// Free image/graphics memory when closed
 			const syncLightboxState = () => {
 				if (window.location.hash === '#global-lightbox') {
-					const lightbox = document.getElementById('global-lightbox');
-					lightbox?.removeAttribute('inert');
-					lightbox?.setAttribute('aria-hidden', 'false');
+						const lightbox = document.getElementById('global-lightbox');
+						lightbox?.removeAttribute('inert');
+						lightbox?.setAttribute('aria-hidden', 'false');
+						if (lightbox && !lightbox.contains(document.activeElement)) {
+							lightbox.querySelector('#global-lightbox-close')?.focus();
+						}
 				} else {
 					const lightbox = document.getElementById('global-lightbox');
 					if (lightbox) {

@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
 import { clearCache } from '../../lib/server/cache';
+import { getPublicMediaUrl } from '../../lib/media';
 import {
 	getErrorMessage,
 	getFormFile,
@@ -153,7 +154,13 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				targetDocId: serviceId,
 				changeType: isNewService ? 'create' : 'update',
 			});
-			return jsonResponse({ success: true, service: serviceData });
+			return jsonResponse({
+				success: true,
+				service: {
+					...serviceData,
+					logoUrl: getPublicMediaUrl(serviceData.logoUrl, 'services', serviceId) ?? null,
+				},
+			});
 		}
 
 		return jsonResponse({ error: 'Invalid action specified.' }, 400);

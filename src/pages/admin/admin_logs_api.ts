@@ -40,16 +40,16 @@ export const GET: APIRoute = async ({ url, locals }) => {
 
 		// Additional filter for 'my_activity' tab (only logs produced by current user)
 		if (requestedFilter === 'my_activity') {
-			logs = logs.filter((l) => (l.userEmail || '').toLowerCase().trim() === callerEmail);
+			logs = logs.filter((l) => String(l.userEmail || '').toLowerCase().trim() === callerEmail);
 		}
 
 		if (searchQuery) {
 			logs = logs.filter(
 				(l) =>
-					l.title.toLowerCase().includes(searchQuery) ||
-					(l.details && l.details.toLowerCase().includes(searchQuery)) ||
-					l.userEmail.toLowerCase().includes(searchQuery) ||
-					l.action.toLowerCase().includes(searchQuery),
+					String(l.title || '').toLowerCase().includes(searchQuery) ||
+					String(l.details || '').toLowerCase().includes(searchQuery) ||
+					String(l.userEmail || '').toLowerCase().includes(searchQuery) ||
+					String(l.action || '').toLowerCase().includes(searchQuery),
 			);
 		}
 
