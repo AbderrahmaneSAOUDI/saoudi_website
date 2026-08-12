@@ -21,8 +21,8 @@
 
 ## ✨ Key Features (M3 Visual Core)
 
-- **Material 3 Dark Mode:** The entire visual language follows M3 geometry, elevation, and motion principles adapted for a dark theme.
-- **Color Palette & Contrast Foundations:** The background uses a solid dark baseline (`#141218`). Component surfaces use explicit M3 elevations (`#1D1B20`, `#211F26`). High-contrast typography is rendered in M3 standard light gray (`#E6E1E5`) and pure white (`#FFFFFF`) for headers. Google Blue (`#4285F4`), Google Red (`#DB4437`), Google Yellow (`#F4B400`), and Google Green (`#0F9D58`) are used strictly as accent/indicator/highlight colors.
+- **Material 3 Dark Mode Policy:** Agent-created and modified UI follows M3 geometry, tonal elevation, and motion principles adapted for a dark theme. All such elevation must be expressed without shadows.
+- **Color Palette & Contrast Foundations:** The background uses a solid dark baseline (`#141218`). Component surfaces use explicit M3 tonal elevations (`#1D1B20`, `#211F26`). High-contrast typography is rendered in M3 standard light gray (`#E6E1E5`) and pure white (`#FFFFFF`) for headers. Google Blue (`#4285F4`), Google Red (`#DB4437`), Google Yellow (`#F4B400`), and Google Green (`#0F9D58`) are used strictly as accent/indicator/highlight colors.
 - **Heavy, Pervasive CSS Animations:** All motion is implemented with CSS `@keyframes` and Tailwind utility classes (`transition-all`, `duration-300`, custom `cubic-bezier` easings).
 - **Zero JS for Visitors:** Public routes deliver absolutely zero client-side JavaScript. Obfuscation of contact links is implemented purely using CSS text-direction reversal and attribute styling.
 - **Zero-JS Responsive Navigation:** Public pages avoid hamburger menus. On smaller mobile viewports, navigation links automatically collapse into direct shortcut icons.
@@ -78,11 +78,13 @@
 
 - **Geometry:** Strict M3 curvature: expressive rounded geometry is required — use `rounded-3xl` for primary panels and `rounded-xl` for chips, buttons, and badges.
 
+- **Absolute Shadow Ban:** Every AI agent must never use or recommend visual shadows. CSS `box-shadow`, `text-shadow`, `filter: drop-shadow()`, SVG `<feDropShadow>`, and shadow-producing Tailwind utilities are prohibited in every state and animation. Use solid tonal surfaces, borders, rings, spacing, color changes, or transforms instead. When modifying an interface area that already contains a shadow, remove that shadow as part of the change.
+
 ### 2. Heavy Animation Infrastructure (CSS & Tailwind Only)
 
 - **Animated Background:** A persistent, ambient background animation implemented in `src/styles/global.css` using CSS `@keyframes` (e.g., slow-floating geometric shapes or radial ambient pulses). Shapes are tinted using soft desaturated Google brand accents at low opacity.
 
-- **Hover & Interaction:** Every card, button, link, and chip uses Tailwind-native transitions: `transition-all duration-300 ease-in-out`, combined with M3-like elevation changes (`hover:-translate-y-1.5`) and ring indicators (`hover:ring-2 hover:ring-primary/40`).
+- **Hover & Interaction:** Every card, button, link, and chip uses Tailwind-native transitions: `transition-all duration-300 ease-in-out`, combined with shadow-free transform feedback (`hover:-translate-y-1.5`) and ring indicators (`hover:ring-2 hover:ring-primary/40`).
 
 - **Motion Easing:** Use M3-appropriate easing via Tailwind (`ease-in-out`) or custom cubic curves (`cubic-bezier(0.2, 0.0, 0.2, 1)`). Staggered entry animations use pure CSS animation-delay utility attributes.
 

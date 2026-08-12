@@ -20,7 +20,6 @@ import {
 } from '../../lib/server/api-guards';
 
 const PROJECTS_DIRECTORY = 'uploads/projects';
-const MAX_IMAGE_BYTES = 700 * 1024;
 const MAX_BLOCKS = 40;
 const MAX_BLOCK_IMAGES = 30;
 const DEFAULT_PROJECT_FIELDS = ['Web Development', 'Mobile App', 'UI/UX Design', 'Full-Stack', 'AI / ML'];
@@ -412,7 +411,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				}
 			}
 			if (imageFile) {
-				const imageErr = validateWebpImage(imageFile, MAX_IMAGE_BYTES);
+				const imageErr = validateWebpImage(imageFile);
 				if (imageErr) return imageErr;
 			}
 

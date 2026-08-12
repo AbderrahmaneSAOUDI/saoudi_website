@@ -232,7 +232,7 @@ try {
 								<input
 									type="file"
 									id="image-file-input"
-									accept="image/jpeg,image/png,image/webp"
+									accept="image/*"
 									class="hidden"
 								/>
 								
@@ -253,7 +253,7 @@ try {
 											Drop cover or <span class="text-primary font-semibold">browse</span>
 											<kbd class="px-1.5 py-0.5 text-[10px] font-mono bg-white/10 text-white/50 rounded border border-white/10">CapsLock</kbd>
 										</p>
-										<p class="text-[10px] text-[#E6E1E5]/40 mt-0.5">JPEG, PNG, WebP (Max 10MB)</p>
+										<p class="text-[10px] text-[#E6E1E5]/40 mt-0.5">Any image format, converted to WebP automatically</p>
 									</div>
 								</div>
 
@@ -563,6 +563,7 @@ try {
 		initDateInputListeners();
 		renderDesigns();
 		initFromUrl();
+		window.addEventListener('popstate', syncDrawerWithUrl);
 
 		function updateCombinedDate() {
 			let combinedDate = '';
@@ -846,17 +847,21 @@ try {
 
 		// Handle URL state initialization
 		function initFromUrl() {
+			syncDrawerWithUrl();
+		}
+
+		function syncDrawerWithUrl() {
 			const urlParams = new URLSearchParams(window.location.search);
 			const urlId = urlParams.get('id');
+			const design = urlId ? allDesigns.find((d: any) => d.id === urlId) : null;
 
-			if (urlId) {
-				const design = allDesigns.find((d: any) => d.id === urlId);
-				if (design) {
-					selectDesign(design);
-					openDrawer();
-					return;
-				}
+			if (design) {
+				selectDesign(design);
+				openDrawer();
+				return;
 			}
+
+			closeDrawer(true);
 		}
 
 		// --- Drawer Controls ---
@@ -882,15 +887,16 @@ try {
 			}, 10);
 		}
 
-		function closeDrawer() {
+		function closeDrawer(syncUrl = false) {
 			editorBackdrop.classList.remove('opacity-100');
 			editorPanel.classList.remove('translate-x-0');
 			editorPanel.classList.add('translate-x-full');
 
-			// Clean query params on close
-			const newUrl = new URL(window.location.href);
-			newUrl.searchParams.delete('id');
-			window.history.pushState(null, '', newUrl.toString());
+			if (!syncUrl) {
+				const newUrl = new URL(window.location.href);
+				newUrl.searchParams.delete('id');
+				window.history.replaceState(null, '', newUrl.toString());
+			}
 
 			// Highlights cards off
 			const designCards = designsGrid.querySelectorAll('.design-card') as NodeListOf<HTMLDivElement>;

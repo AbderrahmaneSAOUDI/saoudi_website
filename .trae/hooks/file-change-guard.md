@@ -41,6 +41,11 @@ trigger: file_change
 - Must contain `@theme {}` block with Google brand color tokens
 - Must import `background_animation.css`
 
+### Visual source files (`.astro`, `.tsx`, `.ts`, `.jsx`, `.js`, `.css`, `.scss`, `.svg`)
+- Must NEVER add a visual shadow, including CSS `box-shadow`, `text-shadow`, `filter: drop-shadow()`, SVG `<feDropShadow>`, or shadow-producing Tailwind utilities
+- Use solid tonal surfaces, borders, rings, spacing, color changes, or transforms for separation, elevation, focus, and interaction feedback
+- When modifying an interface area that already contains a shadow, remove that shadow as part of the change
+
 ### `.env` / `.env.example`
 - `.env` must NEVER be committed (check `.gitignore`)
 - `.env.example` should list all required variables without real values

@@ -20,7 +20,7 @@ You must strictly obey these 15 individual engineering and design rules for ever
 
 5. **Strict Dark-Mode Baseline:** The user interface must be strictly Dark-Mode Only. Do not generate light themes, light-mode media queries, or theme toggles.
 6. **Opaque Background Space:** Maintain a solid, dark background canvas color space adhering to Material 3 specifications (e.g., `#141218`). Glassmorphism layers, alpha-channel transparent backdrops, and blur masks are strictly banned.
-7. **Component Surface Elevations:** Group all card layouts and dashboard blocks using solid Material 3 container elevation tokens (`Surface Container Low`, `Surface Container`, `Surface Container High`).
+7. **Component Surface Elevations & Absolute Shadow Ban:** Group all card layouts and dashboard blocks using solid Material 3 container tonal elevation tokens (`Surface Container Low`, `Surface Container`, `Surface Container High`). Never use or recommend visual shadows of any kind, including CSS `box-shadow`, `text-shadow`, `filter: drop-shadow()`, SVG `<feDropShadow>`, or shadow-producing Tailwind utilities. Remove shadows from any interface area you modify and use solid surfaces, borders, rings, color changes, or transforms instead.
 8. **Strict Google Brand Color Palette:** Restrict all accent variations, hover states, active chips, and buttons exclusively to official Google Brand Colors optimized for dark-mode contrast:
    - **Primary/Accent:** Google Blue (`#8AB4F8`).
    - **Secondary/Success:** Google Green (`#81C995`).
@@ -39,3 +39,4 @@ You must strictly obey these 15 individual engineering and design rules for ever
 14. **Strict Entry Type Literals:** Every document written to the `entries` collection must strictly match the exact TypeScript type literal constraint: `type: 'project' | 'experience' | 'volunteering' | 'certificate'`.
 15. **Anti-Spam Link Obfuscation:** Public communication channels (Email, Telegram, WhatsApp) must be hardcoded in standard markup as Base64-encoded strings, resolved via native inline `atob()` decoders exclusively upon direct human click or hover intent.
 16. **Atomic Resume Overwrite Lifecycle:** Modifying the curriculum vitae PDF must invoke a strict asynchronous sequence: call `deleteObject()` on Firebase Storage to permanently clear the old asset *before* executing `uploadBytes()` to initialize the new document, preventing free-tier bloat.
+17. **Media Asset Optimization:** All raster images must be converted to WebP and kept under 50 KB, and all SVG files must be compressed before use or commit.

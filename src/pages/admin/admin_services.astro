@@ -66,7 +66,7 @@ try {
 				)}
 
 				<!-- Grid of Services -->
-				<div id="services-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+				<div id="services-grid" class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-6">
 					{/* Cards will be dynamically rendered via JS */}
 				</div>
 
@@ -120,7 +120,7 @@ try {
 								<input
 									type="file"
 									id="logo-file-input"
-									accept="image/jpeg,image/png,image/webp"
+									accept="image/*"
 									class="hidden"
 								/>
 								
@@ -139,7 +139,7 @@ try {
 										<p class="text-xs font-medium text-white flex items-center gap-1.5">
 											Drop logo or <span class="text-primary font-semibold">browse</span>
 										</p>
-										<p class="text-[10px] text-[#E6E1E5]/40 mt-0.5">JPEG, PNG, WebP (Max 50KB)</p>
+										<p class="text-[10px] text-[#E6E1E5]/40 mt-0.5">Any image format, converted to WebP automatically</p>
 									</div>
 								</div>
 
@@ -242,7 +242,7 @@ try {
 </script>
 
 <script>
-	import { compressImageToWebp } from '../../lib/client-image';
+	import { compressImageToWebpUnderTargetKB } from '../../lib/client-image';
 	import { escapeAttribute, escapeHtml, getSafeImageSrc } from '../../lib/client-safety';
 
 	document.addEventListener('DOMContentLoaded', () => {
@@ -562,7 +562,7 @@ try {
 				return;
 			}
 			try {
-				const webpFile = await compressImageToWebp(file, 400, 0.85);
+				const webpFile = await compressImageToWebpUnderTargetKB(file, 10, 400);
 				selectedLogoFile = webpFile;
 				logoPreview.src = URL.createObjectURL(webpFile);
 				logoPreview.classList.remove('hidden');

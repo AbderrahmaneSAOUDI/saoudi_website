@@ -43,12 +43,12 @@ Both are `position: fixed`, `pointer-events: none`, `z-index: -1`, using `mix-bl
 Standard hover pattern for all interactive elements:
 
 ```html
-class="transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg hover:ring-2 hover:ring-primary/40"
+class="transition-all duration-300 hover:-translate-y-1.5 hover:ring-2 hover:ring-primary/40"
 ```
 
-For cards with border glow:
+For cards with border and surface feedback:
 ```html
-class="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10 hover:border-primary/30"
+class="transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:bg-surface-container-high"
 ```
 
 ### Entrance Animations
@@ -110,5 +110,6 @@ animation: fade-in-up 0.5s cubic-bezier(0.2, 0, 0.2, 1) both;
 
 - Never use JavaScript for animation timing or staggering.
 - Never import Framer Motion, GSAP, Animate.css, or Lottie.
+- Never use visual shadows, including CSS `box-shadow`, `text-shadow`, `filter: drop-shadow()`, SVG `<feDropShadow>`, or shadow-producing Tailwind utilities.
 - Background shapes must use Google brand tones at opacity ≤ 0.18.
 - All hover transitions must include `transition-all duration-300` minimum.

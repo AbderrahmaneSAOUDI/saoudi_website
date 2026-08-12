@@ -125,3 +125,4 @@ GOOGLE_CLIENT_ID=...
 4. **Random primary color** is assigned per page load via `getRandomColor()` from `src/lib/colors.ts`
 5. **pnpm** is the exclusive package manager — never use npm or yarn
 6. **Dev server** runs on `localhost:4321` via `pnpm run dev`
+7. **Visual shadows are universally prohibited** — every agent must avoid CSS, SVG, filter, and Tailwind shadows and use solid tonal surfaces, borders, rings, color changes, or transforms instead

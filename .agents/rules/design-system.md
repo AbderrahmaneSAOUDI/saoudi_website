@@ -35,11 +35,18 @@ All visual output must comply with these Material 3 Dark Mode constraints.
 - Pill-shaped navigation items, action buttons: `rounded-full`
 - Never use `rounded-none` on layout panels.
 
+## Shadow Ban (Absolute)
+
+- This ban applies to every AI agent and every generated, modified, or recommended interface.
+- Never use visual shadows of any kind, including CSS `box-shadow`, `text-shadow`, `filter: drop-shadow()`, SVG `<feDropShadow>`, or shadow-producing Tailwind utilities such as `shadow`, `shadow-*`, and `drop-shadow-*`.
+- Do not preserve or reintroduce a shadow in any interface area you modify; remove any existing shadow from the directly affected markup or styles.
+- Express hierarchy, elevation, focus, and hover feedback with solid surface-container tones, borders, rings, color changes, or transforms instead.
+
 ## Animations (CSS & Tailwind Only)
 
 - All animations use CSS `@keyframes` or Tailwind utility classes.
 - Every interactive element must include `transition-all duration-300` minimum.
-- Hover states use M3-like elevation: `hover:-translate-y-1.5`, `hover:shadow-lg`, `hover:ring-2 hover:ring-primary/40`.
+- Hover states use shadow-free feedback: `hover:-translate-y-1.5`, `hover:ring-2 hover:ring-primary/40`, and solid surface-tone changes.
 - Entrance animations use staggered CSS `animation-delay`, never JavaScript.
 - M3 easing: `cubic-bezier(0.2, 0.0, 0.2, 1)` for entrance animations.
 - Background ambient motion is defined in `src/styles/background_animation.css`.
@@ -52,3 +59,4 @@ All visual output must comply with these Material 3 Dark Mode constraints.
 - No colors outside Google Brand hues and their tonal derivatives.
 - No pure black (`#000000`) as a background.
 - No JavaScript-driven animation on public routes.
+- No visual shadows, glows implemented as shadows, or shadow-based elevation.

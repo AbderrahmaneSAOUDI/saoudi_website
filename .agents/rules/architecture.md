@@ -31,3 +31,4 @@ These rules are **non-negotiable** and apply to every file modification.
 13. Never add animation libraries (Framer Motion, GSAP, Animate.css, Lottie) to the project.
 14. Never add masonry layout libraries.
 15. Never add client-side data fetching libraries (SWR, React Query, TanStack Query) to public routes.
+16. All raster images must be converted to WebP and kept under 50 KB, and all SVG files must be compressed before use or commit.

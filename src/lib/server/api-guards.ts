@@ -68,23 +68,12 @@ export function validateOptionalPublicUrl(value: string, label: string): Respons
 }
 
 /**
- * Validates WebP image format and file size limit (default 700KB).
+ * Validates WebP image format.
  * Returns an HTTP 400 Response if invalid, or null if valid.
  */
-export function validateWebpImage(
-	file: File,
-	maxBytes = 700 * 1024,
-	typeErrorMsg?: string,
-	sizeErrorMsg?: string,
-): Response | null {
+export function validateWebpImage(file: File, typeErrorMsg?: string): Response | null {
 	if (file.type !== 'image/webp') {
-		return jsonResponse({ error: typeErrorMsg || 'Image must be a WebP file.' }, 400);
-	}
-	if (file.size > maxBytes) {
-		return jsonResponse(
-			{ error: sizeErrorMsg || `Image file size must be under ${Math.round(maxBytes / 1024)}KB.` },
-			400,
-		);
+		return jsonResponse({ error: typeErrorMsg || 'Image could not be processed.' }, 400);
 	}
 	return null;
 }

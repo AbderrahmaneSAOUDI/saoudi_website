@@ -18,7 +18,6 @@ import {
 } from '../../lib/server/api-guards';
 
 const DESIGNS_DIRECTORY = 'uploads/designs';
-const MAX_IMAGE_BYTES = 700 * 1024;
 const DEFAULT_DESIGN_COMPANIES = ['Google', 'GDG', 'Freelance', 'Personal'];
 const MAX_TRANSACTION_RENAMES = 450;
 
@@ -195,7 +194,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			let uploadedImageUrl: string | undefined;
 
 			if (imageFile) {
-				const imageErr = validateWebpImage(imageFile, MAX_IMAGE_BYTES);
+				const imageErr = validateWebpImage(imageFile);
 				if (imageErr) return imageErr;
 
 				uploadedImageUrl = await saveFile({

@@ -37,7 +37,7 @@ const variantStyles = {
 const classes = `${variantStyles[variant]} ${extraClass}`.trim();
 ---
 
-<div class={`rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg ${classes}`}>
+<div class={`rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:ring-2 hover:ring-primary/40 ${classes}`}>
   <h3 class="font-bold text-white text-xl mb-2">{title}</h3>
   <slot />
 </div>
@@ -83,3 +83,4 @@ BackgroundBaseLayout.astro
 4. Use Tailwind utility classes for styling — avoid inline `<style>` unless scoped animations are needed.
 5. Icons come from `@lucide/astro` — import the specific icon component.
 6. For conditional classes, use template literals with ternary expressions.
+7. Never use visual shadows or shadow-producing Tailwind utilities; use solid surface tones, borders, rings, color changes, or transforms instead.

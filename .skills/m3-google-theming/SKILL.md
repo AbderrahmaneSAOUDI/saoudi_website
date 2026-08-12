@@ -53,7 +53,7 @@ Use a solid, deep dark baseline:
 ```
 
 - **Completely eliminate** all glassmorphism elements, `backdrop-filter: blur()`, or gradient backgrounds.
-- Component cards must use **solid** surfaces matching M3 elevation tiers.
+- Component cards must use **solid** surfaces matching M3 tonal elevation tiers, never shadow-based elevation.
 
 ### 3 — Geometry
 
@@ -82,7 +82,7 @@ Shapes must use only soft Google brand tones at opacity 0.02–0.08.
 **Hover & interaction states** — every interactive element:
 
 ```html
-class="transition-all duration-300 ease-in-out hover:-translate-y-1.5 hover:shadow-lg hover:ring-2 hover:ring-primary/40 hover:bg-[rgba(138,180,248,0.06)]"
+class="transition-all duration-300 ease-in-out hover:-translate-y-1.5 hover:ring-2 hover:ring-primary/40 hover:bg-[rgba(138,180,248,0.06)]"
 ```
 
 **Entrance animations** — staggered via CSS `animation-delay`, never JS:
@@ -108,6 +108,7 @@ Ensure WCAG AA contrast (4.5:1 minimum) for all text against the `#141218` basel
 - **BANNED:** Framer Motion, GSAP, Animate.css, Lottie, or any third-party animation library on public pages.
 - **BANNED:** Dynamic masonry layout libraries (e.g., `react-masonry-css`, `isotope`).
 - **BANNED:** Translucent / glassmorphism surfaces, `backdrop-filter: blur()`, gradient backgrounds.
+- **BANNED:** Every visual shadow, including CSS `box-shadow`, `text-shadow`, `filter: drop-shadow()`, SVG `<feDropShadow>`, and shadow-producing Tailwind utilities. Remove shadows from any interface area you modify.
 - **BANNED:** Colors outside the four Google Brand hues and their tonal derivatives.
 - **BANNED:** Pure black (`#000000`) as a background or surface.
 - **BANNED:** JavaScript-driven animation staggering on public routes.

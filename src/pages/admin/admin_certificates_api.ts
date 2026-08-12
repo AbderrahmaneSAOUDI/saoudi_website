@@ -20,7 +20,6 @@ import {
 } from '../../lib/server/api-guards';
 
 const CERTIFICATES_DIRECTORY = 'uploads/certificates';
-const MAX_IMAGE_BYTES = 700 * 1024;
 const VALID_TYPES = new Set(['Online', 'In-Person', 'Hybrid']);
 
 function invalidateCertificateCaches(countChanged: boolean): void {
@@ -104,7 +103,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			let uploadedImageUrl: string | undefined;
 
 			if (imageFile) {
-				const imageErr = validateWebpImage(imageFile, MAX_IMAGE_BYTES);
+				const imageErr = validateWebpImage(imageFile);
 				if (imageErr) return imageErr;
 
 				uploadedImageUrl = await saveFile({

@@ -18,7 +18,6 @@ import {
 } from '../../lib/server/api-guards';
 
 const SERVICES_DIRECTORY = 'uploads/services';
-const MAX_LOGO_BYTES = 50 * 1024; // 50KB max for logos
 
 function invalidateServicesCaches(countChanged: boolean): void {
 	clearCache('services_list');
@@ -100,7 +99,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			let uploadedLogoUrl: string | undefined;
 
 			if (logoFile) {
-				const imageErr = validateWebpImage(logoFile, MAX_LOGO_BYTES, 'Logo must be a WebP file.', 'Logo file size must be under 50KB.');
+				const imageErr = validateWebpImage(logoFile, 'Logo image could not be processed.');
 				if (imageErr) return imageErr;
 
 				uploadedLogoUrl = await saveFile({

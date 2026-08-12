@@ -55,8 +55,9 @@ const items: PortfolioEntry[] = snapshot.docs.map(doc => ({
 - Wrap in `BaseLayout` (provides PublicHeader + PublicFooter + animated background)
 - Use M3 surface containers: `bg-surface-container`, `bg-surface-container-high`
 - Cards: `rounded-3xl`, `border border-white/10`
-- Hover: `transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg hover:ring-2 hover:ring-primary/40`
+- Hover: `transition-all duration-300 hover:-translate-y-1.5 hover:ring-2 hover:ring-primary/40 hover:bg-surface-container-high`
 - Text: `text-white` (headings), `text-white/70` (body), `text-primary` (accents)
+- Never use CSS, SVG, filter, or Tailwind shadows; use solid surface tones, borders, rings, and transforms instead.
 
 ### Step 3 — Add Navigation Entry
 
@@ -89,4 +90,5 @@ pnpm run build && grep -r '<script' dist/ --include='*.html' | grep '<name>'
 - [ ] Navigation entry added to header
 - [ ] Hover effects on all interactive elements
 - [ ] `rounded-3xl` on cards, `rounded-xl` on chips/badges
+- [ ] No visual shadows or shadow-producing utilities
 - [ ] No `<script>` tags or client-side JS

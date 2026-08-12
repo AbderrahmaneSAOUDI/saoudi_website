@@ -25,7 +25,8 @@ These instructions apply to every Codex task in this repository.
 - Do not add animation, masonry, or public-route client data-fetching libraries prohibited by `.agents/rules/architecture.md`.
 - Preserve the Material 3 dark-mode and Google-brand design constraints in `.agents/rules/design-system.md`.
 - Give dynamic images and media explicit aspect ratios to prevent layout shifts.
-- Use solid Material 3 surface-container elevations; do not introduce transparent blurred content surfaces.
+- Use solid Material 3 surface-container tonal elevations; do not introduce transparent blurred content surfaces.
+- Never use visual shadows of any kind, including CSS `box-shadow`, `text-shadow`, `filter: drop-shadow()`, SVG `<feDropShadow>`, or shadow-producing Tailwind utilities. Use solid surfaces, borders, rings, color changes, or transforms instead.
 - Obfuscate public Email, Telegram, and WhatsApp contact values with Base64 and decode them only on direct user intent.
 - Preserve the delete-before-upload lifecycle when replacing resume or other Storage assets.
 - Do not introduce new Firestore collections or entry-type literals without reconciling the requested change with `.devin/rules/rules.md` and the repository's existing multi-collection schema.

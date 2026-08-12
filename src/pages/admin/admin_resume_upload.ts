@@ -16,7 +16,6 @@ import {
 import { getPublicMediaUrl } from '../../lib/media';
 
 const RESUME_DIRECTORY = 'uploads/resume';
-const MAX_FILE_BYTES = 700 * 1024;
 
 type UploadedFile = {
 	field: 'resumeUrl' | 'previewUrl';
@@ -41,13 +40,10 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			if (resumePdf.type !== 'application/pdf') {
 				return jsonResponse({ error: 'Resume must be a PDF file' }, 400);
 			}
-			if (resumePdf.size > MAX_FILE_BYTES) {
-				return jsonResponse({ error: 'PDF must be under 700KB' }, 400);
-			}
 		}
 
 		if (resumePreview) {
-			const imageErr = validateWebpImage(resumePreview, MAX_FILE_BYTES, 'Preview must be a WebP image', 'Preview image must be under 700KB');
+			const imageErr = validateWebpImage(resumePreview, 'Preview must be a WebP image');
 			if (imageErr) return imageErr;
 		}
 
