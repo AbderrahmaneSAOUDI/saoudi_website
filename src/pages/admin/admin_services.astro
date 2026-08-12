@@ -90,7 +90,7 @@ try {
 			<!-- Sliding Drawer Detail Editor -->
 			<div
 				id="editor-panel"
-				class="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-[#1D1B20] border-l border-[#2B2930] shadow-2xl transition-transform duration-350 ease-[cubic-bezier(0.2,0,0.2,1)] transform translate-x-full z-[70] p-6 pb-28 sm:pb-6 overflow-y-auto flex flex-col justify-between"
+				class="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-[#1D1B20] border-l border-[#2B2930] transition-transform duration-350 ease-[cubic-bezier(0.2,0,0.2,1)] transform translate-x-full z-[70] p-6 pb-28 sm:pb-6 overflow-y-auto flex flex-col justify-between"
 			>
 				<div class="space-y-5">
 					<div class="border-b border-[#2B2930]/60 pb-4 flex justify-between items-center">
@@ -221,7 +221,7 @@ try {
 							<button
 								type="submit"
 								id="btn-save"
-								class="flex-1 py-3 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md"
+								class="flex-1 py-3 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
 							>
 								<Icon name="save" size={16} class="w-4 h-4" />
 								<span id="save-btn-text">Save</span>
@@ -317,6 +317,13 @@ try {
 			}
 			
 			attachCardEventListeners();
+		}
+
+		function rerenderAllServices() {
+			allServices.sort((a: any, b: any) => (Number(a.order) || 0) - (Number(b.order) || 0));
+			servicesGrid.innerHTML = '';
+			displayedCount = 0;
+			renderServices();
 		}
 
 		function createServiceCard(service: any) {
@@ -559,19 +566,34 @@ try {
 		async function handleLogoFile(file: File) {
 			if (!file.type.startsWith('image/')) {
 				showStatus('Please select an image file.', 'error');
+				if (typeof (window as any).showToast === 'function') {
+					(window as any).showToast('Please select an image file.', 'error');
+				}
 				return;
 			}
 			try {
-				const webpFile = await compressImageToWebpUnderTargetKB(file, 10, 400);
+				const oldKB = Math.round(file.size / 1024);
+				if (typeof (window as any).showToast === 'function') {
+					(window as any).showToast('Compressing logo to WebP (<10KB)...', 'info');
+				}
+				const webpFile = await compressImageToWebpUnderTargetKB(file, 10, 256);
 				selectedLogoFile = webpFile;
 				logoPreview.src = URL.createObjectURL(webpFile);
 				logoPreview.classList.remove('hidden');
 				dropZonePrompt.classList.add('hidden');
-				fileDetails.textContent = `✓ ${file.name} (${(webpFile.size / 1024).toFixed(1)}KB WebP)`;
+				const newKB = parseFloat((webpFile.size / 1024).toFixed(1));
+				const diffPct = oldKB > 0 ? Math.round(((newKB - oldKB) / oldKB) * 100) : 0;
+				fileDetails.textContent = `✓ ${file.name} (${newKB}KB WebP)`;
 				fileDetails.classList.remove('hidden');
+				if (typeof (window as any).showToast === 'function') {
+					(window as any).showToast(`Compressed: ${oldKB}KB → ${newKB}KB (${diffPct}%) WebP`, 'success');
+				}
 			} catch (err) {
 				console.error('Failed to convert image to WebP:', err);
 				showStatus('Could not process image.', 'error');
+				if (typeof (window as any).showToast === 'function') {
+					(window as any).showToast('Could not process image.', 'error');
+				}
 			}
 		}
 
@@ -603,14 +625,43 @@ try {
 				const result = await response.json();
 				if (!response.ok || result.error) {
 					showStatus(result.error || 'Failed to save service.', 'error');
+					if (typeof (window as any).showToast === 'function') {
+						(window as any).showToast(result.error || 'Failed to save service.', 'error');
+					}
 				} else {
 					showStatus('Service saved successfully!', 'success');
+					if (typeof (window as any).showToast === 'function') {
+						(window as any).showToast('Service saved successfully!', 'success');
+					}
+					if (result.service) {
+						const savedSvc = result.service;
+						const existingIdx = allServices.findIndex((s: any) => s && s.id === savedSvc.id);
+						if (existingIdx >= 0) {
+							allServices[existingIdx] = savedSvc;
+						} else {
+							allServices.unshift(savedSvc);
+						}
+						rerenderAllServices();
+						if (searchInput.value) searchInput.dispatchEvent(new Event('input'));
+					}
+					const newUrl = new URL(window.location.href);
+					newUrl.searchParams.delete('id');
+					window.history.replaceState(null, '', newUrl.toString());
+					editorBackdrop.classList.remove('opacity-100');
+					editorPanel.classList.remove('translate-x-0');
+					editorPanel.classList.add('translate-x-full');
+					const cards = servicesGrid.querySelectorAll('.service-card') as NodeListOf<HTMLDivElement>;
+					cards.forEach(c => c.classList.remove('ring-2', 'ring-primary/60', 'border-primary/50'));
 					setTimeout(() => {
-						window.location.reload();
-					}, 500);
+						document.body.style.overflow = '';
+						editorBackdrop.classList.add('hidden');
+					}, 350);
 				}
 			} catch (err) {
 				showStatus('Network error while saving.', 'error');
+				if (typeof (window as any).showToast === 'function') {
+					(window as any).showToast('Network error while saving.', 'error');
+				}
 			} finally {
 				btnSave.disabled = false;
 				saveBtnText.textContent = 'Save';
@@ -643,14 +694,42 @@ try {
 				const result = await response.json();
 				if (!response.ok || result.error) {
 					showStatus(result.error || 'Failed to delete service.', 'error');
+					if (typeof (window as any).showToast === 'function') {
+						(window as any).showToast(result.error || 'Failed to delete service.', 'error');
+					}
 				} else {
 					showStatus('Service deleted!', 'success');
+					if (typeof (window as any).showToast === 'function') {
+						(window as any).showToast('Service deleted successfully!', 'success');
+					}
+					const deletedId = formId.value;
+					const delIdx = allServices.findIndex((s: any) => s && s.id === deletedId);
+					if (delIdx >= 0) allServices.splice(delIdx, 1);
+					const cards = servicesGrid.querySelectorAll('.service-card') as NodeListOf<HTMLDivElement>;
+					cards.forEach(c => {
+						if (c.getAttribute('data-id') === deletedId) c.remove();
+					});
+					if (allServices.length === 0) {
+						showEmptyState('No services listed', 'Click "New" to create your first service offering.');
+						loadMoreContainer.classList.add('hidden');
+					}
+					const newUrl = new URL(window.location.href);
+					newUrl.searchParams.delete('id');
+					window.history.replaceState(null, '', newUrl.toString());
+					editorBackdrop.classList.remove('opacity-100');
+					editorPanel.classList.remove('translate-x-0');
+					editorPanel.classList.add('translate-x-full');
+					cards.forEach(c => c.classList.remove('ring-2', 'ring-primary/60', 'border-primary/50'));
 					setTimeout(() => {
-						window.location.reload();
-					}, 500);
+						document.body.style.overflow = '';
+						editorBackdrop.classList.add('hidden');
+					}, 350);
 				}
 			} catch (err) {
 				showStatus('Network error while deleting.', 'error');
+				if (typeof (window as any).showToast === 'function') {
+					(window as any).showToast('Network error while deleting.', 'error');
+				}
 			} finally {
 				btnDelete.disabled = false;
 			}

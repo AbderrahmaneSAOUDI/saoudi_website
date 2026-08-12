@@ -108,9 +108,10 @@ const groupOffsets = activeGroups.map(co => {
 		const groupDesigns = designsByCompany[companyName];
 		const groupOffset = groupOffsets[groupIndex];
 		const toggleId = `toggle-company-${groupIndex}`;
+		const isFirstGroup = groupIndex === 0;
 		return (
-			<section class="space-y-4 animate-page-slide-up" style={`animation-delay: ${100 + groupIndex * 100}ms;`}>
-				<input type="checkbox" id={toggleId} class="peer sr-only" aria-label={`Toggle ${companyName} designs`} checked />
+			<section class="space-y-4 animate-page-slide-up" data-group-section={!isFirstGroup ? 'collapsed' : 'expanded'} style={`animation-delay: ${100 + groupIndex * 100}ms;`}>
+				<input type="checkbox" id={toggleId} class="peer sr-only" aria-label={`Toggle ${companyName} designs`} checked={isFirstGroup} />
 
 				<!-- Section Title -->
 				<label for={toggleId} class="flex items-center justify-between border-b border-white/5 pb-3 cursor-pointer select-none group rounded-xl peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-surface peer-checked:[&_.chevron-icon]:rotate-180">
@@ -133,15 +134,14 @@ const groupOffsets = activeGroups.map(co => {
 					<div class="overflow-hidden">
 						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 pb-1">
 							{groupDesigns.map((design, index) => {
-								const globalIndex = groupOffset + index;
-								const isEager = globalIndex === 0;
+								const isFirstItemInFirstGroup = isFirstGroup && index === 0;
 								return (
 									<div class="animate-page-card-fade" style={`animation-delay: ${index * 50}ms`}>
 										<Card
 											item={design}
 											type="design"
-											loading={isEager ? 'eager' : 'lazy'}
-											fetchpriority={isEager ? 'high' : 'auto'}
+											loading={isFirstItemInFirstGroup ? 'eager' : 'lazy'}
+											fetchpriority={isFirstItemInFirstGroup ? 'high' : 'auto'}
 										/>
 									</div>
 								);
@@ -163,3 +163,8 @@ const groupOffsets = activeGroups.map(co => {
 		</div>
 	)}
 </div>
+
+<script>
+	import { startLazyGroupLoader } from '../lib/client-lazy-groups';
+	startLazyGroupLoader();
+</script>

@@ -22,13 +22,26 @@ export function startDeferredImageLoader(): void {
 		{ rootMargin: '600px 0px' },
 	);
 
+	const isInsideCollapsedGroup = (image: HTMLImageElement): boolean => {
+		const section = image.closest('section[data-group-section]');
+		if (!section) return false;
+		const status = section.getAttribute('data-group-section');
+		if (status === 'expanded') return false;
+		if (status === 'collapsed') return true;
+		const checkbox = section.querySelector<HTMLInputElement>('input[type="checkbox"]');
+		return checkbox ? !checkbox.checked : false;
+	};
+
 	const discover = (root: ParentNode) => {
 		root.querySelectorAll<HTMLImageElement>('img[data-src]').forEach(image => {
 			if (image.dataset.lazyObserved === 'true') return;
+			if (isInsideCollapsedGroup(image)) return;
 			image.dataset.lazyObserved = 'true';
 			intersectionObserver.observe(image);
 		});
 	};
+
+	(window as any).__discoverDeferredImages = discover;
 
 	discover(document);
 	const mutationObserver = new MutationObserver(records => {

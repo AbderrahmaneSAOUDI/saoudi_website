@@ -146,6 +146,8 @@ export function compressImageToWebp(file: File, maxDim = 1024, quality = 0.8): P
 
 /**
  * Resizes and converts an image File to a compressed WebP File that targets a size limit.
+ * Uses Blob.size for accurate measurements, finer quality steps, quality as low as 0.03,
+ * and aggressive dimension reduction to reliably hit small targets such as 10KB.
  */
 export function compressImageToWebpUnderTargetKB(
 	file: File,
@@ -184,24 +186,58 @@ export function compressImageToWebpUnderTargetKB(
 			ctx.drawImage(img, 0, 0, width, height);
 
 			const targetBytes = targetKB * 1024;
-			let quality = 0.85;
-			let dataUrl = canvas.toDataURL('image/webp', quality);
 
-			while (dataUrlToByteLength(dataUrl) > targetBytes && quality > 0.1) {
-				quality = Math.max(0.1, quality - 0.1);
-				dataUrl = canvas.toDataURL('image/webp', quality);
+			const qualitySteps = [
+				0.9, 0.82, 0.74, 0.66, 0.58, 0.5, 0.42, 0.34, 0.28,
+				0.22, 0.17, 0.13, 0.10, 0.07, 0.05, 0.03,
+			];
+
+			function tryQuality(index: number) {
+				const quality = qualitySteps[Math.min(index, qualitySteps.length - 1)];
+				canvas.toBlob(
+					(blob) => {
+						if (!blob) {
+							if (index < qualitySteps.length - 1) {
+								tryQuality(index + 1);
+							} else {
+								resolve(dataUrlToFile(canvas.toDataURL('image/webp', 0.03), `${baseFileName(file)}.webp`));
+							}
+							return;
+						}
+
+						if (blob.size <= targetBytes) {
+							resolve(new File([blob], `${baseFileName(file)}.webp`, {
+								type: 'image/webp',
+								lastModified: Date.now(),
+							}));
+							return;
+						}
+
+						if (index < qualitySteps.length - 1) {
+							tryQuality(index + 1);
+							return;
+						}
+
+						if (width > 64 || height > 64) {
+							const nextMaxDim = Math.max(64, Math.floor(Math.min(width, height) * 0.6));
+							const midQuality = dataUrlToFile(canvas.toDataURL('image/webp', quality), `${baseFileName(file)}.webp`);
+							compressImageToWebpUnderTargetKB(midQuality, targetKB, nextMaxDim)
+								.then(resolve)
+								.catch(reject);
+							return;
+						}
+
+						resolve(new File([blob], `${baseFileName(file)}.webp`, {
+							type: 'image/webp',
+							lastModified: Date.now(),
+						}));
+					},
+					'image/webp',
+					quality
+				);
 			}
 
-			if (dataUrlToByteLength(dataUrl) > targetBytes && (width > 96 || height > 96)) {
-				const nextMaxDim = Math.max(96, Math.floor(Math.min(width, height) * 0.75));
-				const resizedFile = dataUrlToFile(dataUrl, `${baseFileName(file)}.webp`);
-				compressImageToWebpUnderTargetKB(resizedFile, targetKB, nextMaxDim)
-					.then(resolve)
-					.catch(reject);
-				return;
-			}
-
-			resolve(dataUrlToFile(dataUrl, `${baseFileName(file)}.webp`));
+			tryQuality(0);
 		};
 
 		img.onerror = () => {

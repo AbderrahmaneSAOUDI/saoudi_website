@@ -8,6 +8,12 @@ import SkeletonCardGrid from '../components/SkeletonCardGrid.astro';
 
 <BaseLayout title="Certifications" description="Professional certifications, credentials, and achievements of Abderrahmane SAOUDI.">
 	<div class="mx-auto px-4 sm:px-6 lg:px-8 pt-8 max-w-7xl">
+		<!-- Page Header -->
+		<section class="text-center animate-fade-in">
+			<h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
+				My <span class="text-primary">Certificates</span>
+			</h1>
+		</section>
 		<CertificationsIsland server:defer>
 			<SkeletonCardGrid slot="fallback" variant="certificate" count={8} groups={2} />
 		</CertificationsIsland>
