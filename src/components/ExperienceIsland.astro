@@ -62,20 +62,20 @@ const lazyImagePlaceholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQAB
 )}
 
 <div class="relative max-w-4xl mx-auto py-8 px-2 sm:px-6">
-	<div class="space-y-12 relative">
+	<div class="space-y-6 sm:space-y-[-1rem] relative">
 		<!-- Animated Center Vertical Timeline Spine Line -->
 		{experiences.length > 0 && (
 			<>
 				<!-- Desktop Center Animated Spine Line -->
 				<div 
-					class="absolute left-1/2 top-6 bottom-6 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent -translate-x-1/2 hidden sm:block rounded-full timeline-line-animated z-0"
+					class="absolute left-1/2 top-6 bottom-32 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-primary -translate-x-1/2 hidden sm:block rounded-full timeline-line-animated z-0"
 				>
 					<div class="absolute inset-x-0 w-full h-24 bg-gradient-to-b from-transparent via-white to-transparent opacity-80 timeline-pulse-beam"></div>
 				</div>
 
 				<!-- Mobile Animated Spine Line -->
 				<div 
-					class="absolute left-6 top-6 bottom-6 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent -translate-x-1/2 sm:hidden rounded-full timeline-line-animated z-0"
+					class="absolute left-6 top-6 bottom-32 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-primary -translate-x-1/2 sm:hidden rounded-full timeline-line-animated z-0"
 				>
 					<div class="absolute inset-x-0 w-full h-24 bg-gradient-to-b from-transparent via-white to-transparent opacity-80 timeline-pulse-beam"></div>
 				</div>
@@ -96,7 +96,7 @@ const lazyImagePlaceholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQAB
 				>
 					<!-- Animated Timeline Dot Node -->
 					<div 
-						class="absolute left-6 sm:left-1/2 top-6 -translate-x-1/2 z-20 w-5 h-5 rounded-full bg-surface border-2 border-primary group-hover:scale-125 group-hover:border-white transition-all duration-300 flex items-center justify-center timeline-dot-entrance"
+						class="absolute left-6 sm:left-1/2 top-6 -translate-x-1/2 z-20 w-5 h-5 rounded-full bg-surface border-2 border-primary group-hover:scale-125 transition-all duration-300 flex items-center justify-center timeline-dot-entrance"
 						style={`animation-delay: ${dotDelaySec}s;`}
 					>
 						<div class={`w-1.5 h-1.5 rounded-full ${isPresent ? 'bg-secondary animate-pulse' : 'bg-primary'}`}></div>
@@ -104,10 +104,10 @@ const lazyImagePlaceholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQAB
 
 					<!-- Content Card Wrapper -->
 					<div 
-						class={`w-full sm:w-[calc(50%-2rem)] pl-14 sm:pl-0 timeline-card-entrance ${isEven ? 'timeline-card-even' : 'timeline-card-odd'}`}
+						class={`w-full sm:w-[calc(50%-1.5rem)] pl-14 sm:pl-0 timeline-card-entrance ${isEven ? 'timeline-card-even' : 'timeline-card-odd'}`}
 						style={`animation-delay: ${delaySec}s;`}
 					>
-						<div class="bg-surface-container border border-white/10 hover:border-primary/40 rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1.5 relative overflow-hidden group-hover:bg-surface-container-high/90">
+						<div class="bg-surface-container border border-white/10 hover:border-primary/40 rounded-3xl pt-6 px-6 pb-4 transition-all duration-300 hover:-translate-y-1.5 relative overflow-hidden group-hover:bg-surface-container-high/90">
 							<!-- Card Header: Logo, Role & Company -->
 							<div class="flex items-start justify-between gap-4 mb-4 relative z-10">
 								<div class="flex items-center gap-3.5">

@@ -469,6 +469,7 @@ try {
 
 <script>
 	import { escapeAttribute, escapeHtml, getSafeImageSrc } from '../../lib/client-safety';
+	import { compressImageToWebpUnderTargetKB } from '../../lib/client-image';
 
 	document.addEventListener('DOMContentLoaded', () => {
 		// Element Declarations
@@ -1047,77 +1048,31 @@ try {
 			if (file) handleFileSelection(file);
 		});
 
-		async function handleFileSelection(file: File) {
-			if (!file.type.startsWith('image/')) {
-				showStatus('error', 'Please select an image file.');
-				return;
+			async function handleFileSelection(file: File) {
+				if (!file.type.startsWith('image/')) {
+					showStatus('error', 'Please select an image file.');
+					return;
+				}
+				try {
+					showStatus('success', 'Optimizing and converting logo to WebP...');
+					const compressed = await compressImageToWebpUnderTargetKB(file, 10, 400);
+					selectedLogoFile = compressed;
+
+					const previewUrl = URL.createObjectURL(compressed);
+					imagePreview.onload = () => URL.revokeObjectURL(previewUrl);
+					imagePreview.src = previewUrl;
+					imagePreview.classList.remove('hidden');
+					dropZonePrompt.classList.add('hidden');
+					fileDetails.classList.remove('hidden');
+					fileDetails.textContent = `✓ ${file.name} (${(compressed.size / 1024).toFixed(1)} KB WebP)`;
+					const oldKb = file.size / 1024;
+					const newKb = compressed.size / 1024;
+					const savedPct = oldKb > 0 ? ((oldKb - newKb) / oldKb) * 100 : 0;
+					showStatus('success', `Logo optimized: ${oldKb.toFixed(1)} KB → ${newKb.toFixed(1)} KB (${savedPct.toFixed(2)}%)`);
+				} catch (err: any) {
+					showStatus('error', err.message || 'Failed to process logo image.');
+				}
 			}
-			try {
-				const compressed = await compressImageToWebP(file, 10 * 1024);
-				selectedLogoFile = compressed;
-				showStatus('success', `Logo optimized to WebP (${(compressed.size / 1024).toFixed(1)} KB)`);
-
-				const reader = new FileReader();
-				reader.onload = (e) => {
-					if (e.target?.result) {
-						imagePreview.src = e.target.result as string;
-						imagePreview.classList.remove('hidden');
-						dropZonePrompt.classList.add('hidden');
-						fileDetails.classList.remove('hidden');
-						fileDetails.textContent = `✓ ${compressed.name} (${(compressed.size / 1024).toFixed(1)} KB)`;
-					}
-				};
-				reader.readAsDataURL(compressed);
-			} catch (err: any) {
-				showStatus('error', err.message || 'Failed to process logo image.');
-			}
-		}
-
-		function compressImageToWebP(file: File, maxSizeBytes: number): Promise<File> {
-			return new Promise((resolve, reject) => {
-				const img = new Image();
-				img.src = URL.createObjectURL(file);
-				img.onload = () => {
-					URL.revokeObjectURL(img.src);
-					const maxDim = 400;
-					let w = img.width;
-					let h = img.height;
-					if (w > maxDim || h > maxDim) {
-						if (w > h) {
-							h = Math.round((h * maxDim) / w);
-							w = maxDim;
-						} else {
-							w = Math.round((w * maxDim) / h);
-							h = maxDim;
-						}
-					}
-					const canvas = document.createElement('canvas');
-					canvas.width = w;
-					canvas.height = h;
-					const ctx = canvas.getContext('2d');
-					if (!ctx) return resolve(file);
-					ctx.drawImage(img, 0, 0, w, h);
-
-					canvas.toBlob(
-						(blob) => {
-							if (blob) {
-								if (blob.size > maxSizeBytes) {
-									return reject(new Error(`Optimized logo (${(blob.size / 1024).toFixed(1)}KB) exceeds 10KB limit.`));
-								}
-								const webpFile = new File([blob], `logo_${Date.now()}.webp`, {
-									type: 'image/webp',
-									lastModified: Date.now(),
-								});
-								resolve(webpFile);
-							} else resolve(file);
-						},
-						'image/webp',
-						0.85
-					);
-				};
-				img.onerror = () => reject(new Error('Failed to load logo image file.'));
-			});
-		}
 
 		// --- Submit Form ---
 		experienceForm.addEventListener('submit', async (e) => {
