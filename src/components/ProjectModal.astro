@@ -300,6 +300,12 @@ const { projects = [] } = Astro.props;
 				image.className = 'w-full h-auto object-cover';
 				image.loading = 'lazy';
 				image.decoding = 'async';
+				image.onerror = function() {
+					if (!this.getAttribute('data-fallback-tried')) {
+						this.setAttribute('data-fallback-tried', '1');
+						this.src = '/cover.webp';
+					}
+				};
 				imageWrapper.appendChild(image);
 				div.appendChild(imageWrapper);
 				return div;
@@ -320,6 +326,12 @@ const { projects = [] } = Astro.props;
 					image.className = 'w-full h-full object-cover';
 					image.loading = 'lazy';
 					image.decoding = 'async';
+					image.onerror = function() {
+						if (!this.getAttribute('data-fallback-tried')) {
+							this.setAttribute('data-fallback-tried', '1');
+							this.src = '/cover.webp';
+						}
+					};
 					imgWrapper.appendChild(image);
 					grid.appendChild(imgWrapper);
 				});

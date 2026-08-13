@@ -51,6 +51,7 @@ try {
 			fetchpriority="high"
 			decoding="async"
 			class="w-full rounded-2xl object-cover"
+			onerror="if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/resume.webp');}"
 		/>
 	</div>
 

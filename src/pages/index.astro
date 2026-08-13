@@ -54,6 +54,7 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 										fetchpriority="high"
 										decoding="async"
 										class="w-full h-full object-cover border-4 border-primary rounded-full"
+										onerror="if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/profile.webp');}"
 									/>
 								</div>
 							</div>
@@ -178,6 +179,7 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 							decoding="async"
 							width="1280"
 							height="192"
+							onerror="if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}"
 						/>
 						<div class="p-8 flex-1">
 							<h2

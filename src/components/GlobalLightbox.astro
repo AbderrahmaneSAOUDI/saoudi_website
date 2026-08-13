@@ -34,8 +34,9 @@ interface Props {}
 			id="lightbox-img"
 			src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
 			alt=""
-			class="max-w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl border border-white/10"
+			class="max-w-full max-h-[80vh] object-contain rounded-2xl border border-white/10"
 			decoding="async"
+			onerror="if(!this.getAttribute('data-fallback-tried') && this.src.indexOf('data:image/svg+xml') === -1){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}"
 		/>
 		<div class="mt-4 text-center">
 			<p id="lightbox-title" class="text-white font-bold text-lg"></p>

@@ -15,7 +15,12 @@ interface Props {}
       <img
         src="/linktree_qr.webp"
         alt="Linktree QR code"
-        class="mx-auto w-40 sm:w-44 md:w-48 border border-white/10 shadow-lg rounded-2xl"
+        width="192"
+        height="192"
+        loading="lazy"
+        decoding="async"
+        class="mx-auto w-40 sm:w-44 md:w-48 border border-white/10 rounded-2xl"
+        onerror="if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}"
       />
     </div>
     <a
