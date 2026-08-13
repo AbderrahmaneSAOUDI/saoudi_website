@@ -52,7 +52,6 @@ function formatDate(dateStr: string | null): string {
 	const mIdx = parseInt(month, 10) - 1;
 	return `${months[mIdx] || month} ${year}`;
 }
-const lazyImagePlaceholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 ---
 
 {errorMsg && (
@@ -114,12 +113,12 @@ const lazyImagePlaceholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQAB
 									<div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center shrink-0 group-hover:border-primary/30 group-hover:scale-105 transition-all duration-300">
 										{exp.logoUrl ? (
 											<img
-												src={index === 0 ? exp.logoUrl : lazyImagePlaceholder}
-												data-src={index === 0 ? undefined : exp.logoUrl}
+												src={exp.logoUrl}
 												alt={exp.company}
 												class="w-full h-full object-contain p-2"
 												loading={index === 0 ? 'eager' : 'lazy'}
 												decoding="async"
+												onerror="if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}"
 											/>
 										) : (
 											<div class="relative flex items-center justify-center">
@@ -190,10 +189,7 @@ const lazyImagePlaceholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQAB
 	)}
 </div>
 
-<script>
-	import { startDeferredImageLoader } from '../lib/client-deferred-images';
-	startDeferredImageLoader();
-</script>
+
 
 <style>
 	/* Timeline Line Entrance Animation */

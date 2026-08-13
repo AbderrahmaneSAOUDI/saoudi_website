@@ -30,8 +30,6 @@ const {
 const design = !isLoading && type === 'design' ? (item as Design) : undefined;
 const certificate = !isLoading && type === 'certificate' ? (item as Certificate) : undefined;
 const project = !isLoading && type === 'project' ? (item as Project) : undefined;
-const isDeferredImage = loading === 'lazy';
-const lazyImagePlaceholder = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
 const formattedDate = formatAdminDate(item?.date);
 const certType = certificate?.type;
@@ -96,21 +94,19 @@ const typeColors = {
 			>
 				<div class="absolute inset-0 skeleton"></div>
 				<img
-					src={isDeferredImage ? lazyImagePlaceholder : getThumbnailUrl(design.imageUrl, 800)}
-					data-src={isDeferredImage ? getThumbnailUrl(design.imageUrl, 800) : undefined}
-					srcset={isDeferredImage ? undefined : getImageSrcSet(design.imageUrl)}
-					data-srcset={isDeferredImage ? getImageSrcSet(design.imageUrl) : undefined}
+					src={getThumbnailUrl(design.imageUrl, 800)}
+					srcset={getImageSrcSet(design.imageUrl)}
 					sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
 					alt={design.title || design.company}
 					width="400"
 					height="250"
 					style="aspect-ratio: 16 / 10;"
-					class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10 opacity-0"
+					class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10"
 					loading={loading}
 					fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 					decoding="async"
-					onload="if(!this.dataset.src){this.classList.remove('opacity-0'); this.previousElementSibling?.remove();}"
-					onerror="if(!this.dataset.src){this.classList.remove('opacity-0'); this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}}"
+					onload="this.previousElementSibling?.remove();"
+					onerror="this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}"
 				/>
 			</a>
 		</div>
@@ -155,21 +151,19 @@ const typeColors = {
 					>
 						<div class="absolute inset-0 skeleton"></div>
 						<img
-							src={isDeferredImage ? lazyImagePlaceholder : getThumbnailUrl(certificate.imageUrl, 800)}
-							data-src={isDeferredImage ? getThumbnailUrl(certificate.imageUrl, 800) : undefined}
-							srcset={isDeferredImage ? undefined : getImageSrcSet(certificate.imageUrl)}
-							data-srcset={isDeferredImage ? getImageSrcSet(certificate.imageUrl) : undefined}
+							src={getThumbnailUrl(certificate.imageUrl, 800)}
+							srcset={getImageSrcSet(certificate.imageUrl)}
 							sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
 							alt={certificate.title}
 							width="400"
 							height="250"
 							style="aspect-ratio: 16 / 10;"
-							class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10 opacity-0"
+							class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10"
 							loading={loading}
 							fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 							decoding="async"
-							onload="if(!this.dataset.src){this.classList.remove('opacity-0'); this.previousElementSibling?.remove();}"
-							onerror="if(!this.dataset.src){this.classList.remove('opacity-0'); this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}}"
+							onload="this.previousElementSibling?.remove();"
+							onerror="this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}"
 						/>
 					</a>
 					{certType && (
@@ -251,42 +245,38 @@ const typeColors = {
 					>
 						<div class="absolute inset-0 skeleton"></div>
 						<img
-							src={isDeferredImage ? lazyImagePlaceholder : getThumbnailUrl(project.imageUrl, 800)}
-							data-src={isDeferredImage ? getThumbnailUrl(project.imageUrl, 800) : undefined}
-							srcset={isDeferredImage ? undefined : getImageSrcSet(project.imageUrl)}
-							data-srcset={isDeferredImage ? getImageSrcSet(project.imageUrl) : undefined}
+							src={getThumbnailUrl(project.imageUrl, 800)}
+							srcset={getImageSrcSet(project.imageUrl)}
 							sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
 							alt={project.title}
 							width="400"
 							height="250"
 							style="aspect-ratio: 16 / 10;"
-							class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10 opacity-0"
+							class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10"
 							loading={loading}
 							fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 							decoding="async"
-							onload="if(!this.dataset.src){this.classList.remove('opacity-0'); this.previousElementSibling?.remove();}"
-							onerror="if(!this.dataset.src){this.classList.remove('opacity-0'); this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}}"
+							onload="this.previousElementSibling?.remove();"
+							onerror="this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}"
 						/>
 					</a>
 				) : (
 					<div class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 border border-white/10 flex items-center justify-center bg-[#1D1B20]" style="aspect-ratio: 16 / 10;">
 						<div class="absolute inset-0 skeleton"></div>
 						<img
-							src={isDeferredImage ? lazyImagePlaceholder : getThumbnailUrl(project.imageUrl, 800)}
-							data-src={isDeferredImage ? getThumbnailUrl(project.imageUrl, 800) : undefined}
-							srcset={isDeferredImage ? undefined : getImageSrcSet(project.imageUrl)}
-							data-srcset={isDeferredImage ? getImageSrcSet(project.imageUrl) : undefined}
+							src={getThumbnailUrl(project.imageUrl, 800)}
+							srcset={getImageSrcSet(project.imageUrl)}
 							sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
 							alt={project.title}
 							width="400"
 							height="250"
 							style="aspect-ratio: 16 / 10;"
-							class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10 opacity-0"
+							class="max-w-full max-h-full object-contain group-hover:scale-[1.03] transition-all duration-300 relative z-10"
 							loading={loading}
 							fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 							decoding="async"
-							onload="if(!this.dataset.src){this.classList.remove('opacity-0'); this.previousElementSibling?.remove();}"
-						onerror="if(!this.dataset.src){this.classList.remove('opacity-0'); this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}}"
+							onload="this.previousElementSibling?.remove();"
+							onerror="this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}"
 						/>
 					</div>
 				)
@@ -322,15 +312,10 @@ const typeColors = {
 ) : null}
 
 <script>
-	import { startDeferredImageLoader } from '../lib/client-deferred-images';
-
-	startDeferredImageLoader();
-
-	// Cleanup any skeletons for images that loaded instantly from cache
+	// Cleanup any skeletons for images that finish loading
 	const removeSkeletons = () => {
 		document.querySelectorAll('.skeleton + img').forEach((img) => {
-			if (img instanceof HTMLImageElement && img.complete && !img.dataset.src) {
-				img.classList.remove('opacity-0');
+			if (img instanceof HTMLImageElement && img.complete) {
 				const skeleton = img.previousElementSibling;
 				if (skeleton && skeleton.classList.contains('skeleton')) {
 					skeleton.remove();
@@ -339,13 +324,11 @@ const typeColors = {
 		});
 	};
 
-	// Run once when the DOM is ready, and once more when all resources have loaded
-	// (handles images that finish loading after DOMContentLoaded but before window.load).
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', removeSkeletons, { once: true });
 	} else {
 		removeSkeletons();
 	}
-	// Always attach window.load to catch images loaded after DOMContentLoaded
 	window.addEventListener('load', removeSkeletons, { once: true });
 </script>
+

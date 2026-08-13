@@ -774,6 +774,20 @@ try {
 			renderBlocksList(focusId);
 		}
 
+		function parseInlineMarkdown(text: string): string {
+			if (!text || typeof text !== 'string') return '';
+			let escaped = text
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;')
+				.replace(/'/g, '&#39;');
+			escaped = escaped.replace(/`([^`]+)`/g, '<code class="bg-[#2B2930] text-[#4285F4] px-1.5 py-0.5 rounded-md font-mono text-xs border border-white/10">$1</code>');
+			escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-white">$1</strong>');
+			escaped = escaped.replace(/\*([^*]+)\*/g, '<em class="italic text-white/90">$1</em>');
+			return escaped;
+		}
+
 		// Client-Side WebP Compression Helper
 		function compressImageToWebpUnder50KB(file: File): Promise<{ webpDataUrl: string; oldKB: number; newKB: number; diffPercent: number }> {
 			return new Promise((resolve, reject) => {
@@ -921,7 +935,21 @@ try {
 					`;
 				} else if (block.type === 'rich_text') {
 					contentWrapper.innerHTML = `
-						<textarea data-field="content" rows="3" placeholder="Write text content..." class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm leading-5 focus:outline-none focus:border-primary resize-none overflow-hidden">${escapeHtml(block.content || '')}</textarea>
+						<div class="space-y-1.5">
+							<div class="flex items-center justify-between gap-1 pb-1 border-b border-white/5">
+								<span class="text-[10px] font-semibold text-[#E6E1E5]/60">Rich Text Paragraph</span>
+								<div class="flex items-center gap-1">
+									<button type="button" data-fmt="bold" class="px-2 py-0.5 rounded-lg bg-[#211F26] hover:bg-primary/20 text-white font-bold text-xs border border-white/10 transition-colors cursor-pointer" title="Bold (**text**)">B</button>
+									<button type="button" data-fmt="italic" class="px-2 py-0.5 rounded-lg bg-[#211F26] hover:bg-primary/20 text-white italic text-xs border border-white/10 transition-colors cursor-pointer" title="Italic (*text*)">I</button>
+									<button type="button" data-fmt="code" class="px-2 py-0.5 rounded-lg bg-[#211F26] hover:bg-primary/20 text-[#4285F4] font-mono text-xs border border-white/10 transition-colors cursor-pointer" title="Code (\`text\`)">&lt;/&gt;</button>
+								</div>
+							</div>
+							<textarea data-field="content" rows="3" placeholder="Write text content... Use **bold**, *italic*, \`code\`" class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#211F26] text-white text-sm leading-5 focus:outline-none focus:border-primary resize-none overflow-hidden">${escapeHtml(block.content || '')}</textarea>
+							<div class="p-2.5 rounded-xl border border-white/5 bg-[#18161D] space-y-1">
+								<span class="text-[9px] font-bold uppercase tracking-wider text-white/40 block">Formatted Preview</span>
+								<div data-preview="rich_text" class="text-xs text-white/80 leading-relaxed whitespace-pre-wrap">${parseInlineMarkdown(block.content || '')}</div>
+							</div>
+						</div>
 					`;
 				} else if (block.type === 'callout') {
 					contentWrapper.innerHTML = `
@@ -1151,13 +1179,40 @@ try {
 
 				contentWrapper.querySelectorAll('textarea').forEach(ta => autoResizeTextarea(ta as HTMLTextAreaElement));
 
+				contentWrapper.addEventListener('click', (e) => {
+					const target = e.target as HTMLElement;
+					const btnFmt = target.closest('[data-fmt]') as HTMLButtonElement;
+					if (!btnFmt) return;
+					const fmtType = btnFmt.getAttribute('data-fmt');
+					const textarea = contentWrapper.querySelector('textarea[data-field="content"]') as HTMLTextAreaElement;
+					if (!textarea) return;
+					const start = textarea.selectionStart;
+					const end = textarea.selectionEnd;
+					const val = textarea.value;
+					const sel = val.substring(start, end);
+					let wrapped = '';
+					if (fmtType === 'bold') wrapped = `**${sel || 'bold'}**`;
+					else if (fmtType === 'italic') wrapped = `*${sel || 'italic'}*`;
+					else if (fmtType === 'code') wrapped = `\`${sel || 'code'}\``;
+
+					textarea.value = val.substring(0, start) + wrapped + val.substring(end);
+					textarea.dispatchEvent(new Event('input', { bubbles: true }));
+					textarea.focus();
+					const cursorOffset = fmtType === 'code' ? 1 : fmtType === 'bold' ? 2 : 1;
+					textarea.setSelectionRange(start + cursorOffset, start + wrapped.length - cursorOffset);
+				});
+
 				contentWrapper.addEventListener('input', (e) => {
 					const target = e.target as HTMLElement;
 					const field = target.getAttribute('data-field');
 					if (!field) return;
 
 					const val = (target as HTMLInputElement).value;
-					if (field === 'level') {
+					if (field === 'content') {
+						block.content = val;
+						const previewEl = contentWrapper.querySelector('[data-preview="rich_text"]');
+						if (previewEl) previewEl.innerHTML = parseInlineMarkdown(val);
+					} else if (field === 'level') {
 						block.level = parseInt(val, 10);
 					} else if (field === 'items_str') {
 						block.items = val.split('\n');
