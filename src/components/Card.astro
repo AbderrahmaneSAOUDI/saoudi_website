@@ -89,7 +89,7 @@ const typeColors = {
 				data-lightbox-src={design.imageUrl}
 				data-lightbox-title={design.title || design.company}
 				data-lightbox-subtitle={design.title ? design.company : undefined}
-				class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-0 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block"
+				class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-0 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block bg-[#1D1B20]"
 				style="aspect-ratio: 16 / 10;"
 			>
 				<div class="absolute inset-0 skeleton"></div>
@@ -106,8 +106,12 @@ const typeColors = {
 					fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 					decoding="async"
 					onload="this.previousElementSibling?.remove();"
-					onerror="this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}"
+					onerror="this.style.display='none'; this.previousElementSibling?.remove(); this.nextElementSibling?.classList.remove('hidden');"
 				/>
+				<div class="hidden flex flex-col items-center justify-center p-4 text-center z-10">
+					<Icon name="design" size={32} class="text-primary/60 mb-1" />
+					<span class="text-[11px] text-white/50">{design.title || design.company}</span>
+				</div>
 			</a>
 		</div>
 
@@ -163,8 +167,12 @@ const typeColors = {
 							fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 							decoding="async"
 							onload="this.previousElementSibling?.remove();"
-							onerror="this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}"
+							onerror="this.style.display='none'; this.previousElementSibling?.remove(); this.nextElementSibling?.classList.remove('hidden');"
 						/>
+						<div class="hidden flex flex-col items-center justify-center p-4 text-center z-10">
+							<Icon name="certifications" size={32} class="text-secondary/60 mb-1" />
+							<span class="text-[11px] text-white/50">{certificate.title}</span>
+						</div>
 					</a>
 					{certType && (
 						<span class={`absolute top-2.5 right-2.5 z-20 px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase border backdrop-blur-md shadow-sm pointer-events-none select-none ${typeColors[certType as keyof typeof typeColors] || ''}`}>
@@ -257,8 +265,12 @@ const typeColors = {
 							fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 							decoding="async"
 							onload="this.previousElementSibling?.remove();"
-							onerror="this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}"
+							onerror="this.style.display='none'; this.previousElementSibling?.remove(); this.nextElementSibling?.classList.remove('hidden');"
 						/>
+						<div class="hidden flex flex-col items-center justify-center p-4 text-center z-10">
+							<Icon name="projects" size={32} class="text-primary/60 mb-1" />
+							<span class="text-[11px] text-white/50">{project.title}</span>
+						</div>
 					</a>
 				) : (
 					<div class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 border border-white/10 flex items-center justify-center bg-[#1D1B20]" style="aspect-ratio: 16 / 10;">
@@ -276,8 +288,12 @@ const typeColors = {
 							fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 							decoding="async"
 							onload="this.previousElementSibling?.remove();"
-							onerror="this.previousElementSibling?.remove(); if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}"
+							onerror="this.style.display='none'; this.previousElementSibling?.remove(); this.nextElementSibling?.classList.remove('hidden');"
 						/>
+						<div class="hidden flex flex-col items-center justify-center p-4 text-center z-10">
+							<Icon name="projects" size={32} class="text-primary/60 mb-1" />
+							<span class="text-[11px] text-white/50">{project.title}</span>
+						</div>
 					</div>
 				)
 			) : (

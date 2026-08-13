@@ -118,8 +118,12 @@ function formatDate(dateStr: string | null): string {
 												class="w-full h-full object-contain p-2"
 												loading={index === 0 ? 'eager' : 'lazy'}
 												decoding="async"
-												onerror="if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}"
+												onerror="this.style.display='none'; this.nextElementSibling?.classList.remove('hidden');"
 											/>
+											<div class="hidden relative items-center justify-center">
+												<Icon name="business" size={24} class="text-white/40 group-hover:!hidden" />
+												<Icon name="business" filled size={24} class="text-primary !hidden group-hover:!inline-flex" />
+											</div>
 										) : (
 											<div class="relative flex items-center justify-center">
 												<Icon name="business" size={24} class="text-white/40 group-hover:!hidden" />

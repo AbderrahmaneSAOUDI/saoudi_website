@@ -96,8 +96,11 @@ const colorAccents = [
 													class="w-full h-full object-contain p-2.5"
 													loading={index < 3 ? 'eager' : 'lazy'}
 													decoding="async"
-													onerror="if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/cover.webp');}"
+													onerror="this.style.display='none'; this.nextElementSibling?.classList.remove('hidden');"
 												/>
+												<div class="hidden">
+													<Icon name="business" size={28} class={accent.text} />
+												</div>
 											) : (
 												<Icon name="business" size={28} class={accent.text} />
 											)}
