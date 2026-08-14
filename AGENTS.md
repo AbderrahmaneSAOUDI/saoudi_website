@@ -37,4 +37,4 @@ These instructions apply to every Codex task in this repository.
 - Run `pnpm run check` after code changes when practical.
 - Run `pnpm run build` for changes that can affect production output.
 - Before finishing any task, follow `.agents/rules/version-increment.md` exactly and silently.
-- After finishing each task/prompt, stage, commit, and push all changes (`git add .`, `git commit -m "<concise description of changes>"`, `git push`) per `.agents/rules/git-workflow.md`.
+- After finishing each task/prompt, stage, commit, and push all changes (`git add .`, `git commit -m "updated project version: <concise description of changes>"`, `git push`) per `.agents/rules/git-workflow.md`. Every commit message MUST start with `updated project version`.
