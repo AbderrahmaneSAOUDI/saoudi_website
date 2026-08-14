@@ -1,6 +1,6 @@
 # Prompt: Build the Standalone Admin Mobile App in Flutter (Direct Firebase Integration)
 
-> **Role & Purpose**: You are an expert Flutter engineer and UI/UX designer. Your mission is to build **`saoudi_admin_flutter`**, a completely standalone, cross-platform mobile application (Android & iOS) designed to monitor, track, and manage the administrative overview features directly using the **shared Firebase Project** (Cloud Firestore, Firebase Authentication, and Google Sign-In):
+> **Role & Purpose**: You are an expert Flutter engineer and UI/UX designer. Your mission is to build **`saoudi_app`**, a completely standalone, cross-platform mobile application (Android & iOS) designed to monitor, track, and manage the administrative overview features directly using the **shared Firebase Project** (Cloud Firestore, Firebase Authentication, and Google Sign-In):
 > 1. **Admin Emails Access Management** (`accepted_admin_emails` collection)
 > 2. **System Audit Logs & Telemetry** (`system_logs` collection)
 > 3. **Admin Tasks & Todos Hub** (`admin_todos` collection)

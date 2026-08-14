@@ -1,6 +1,6 @@
 # Mobile Sync Contract & Shared Firebase Specification
 
-This document serves as the **Single Source of Truth (SSOT)** contract between the **Web Admin Panel** (`saoudi_website`) and the **Mobile Admin App** (`saoudi_admin_flutter`). Both applications share the same Firebase Project and operate directly against the same Cloud Firestore database.
+This document serves as the **Single Source of Truth (SSOT)** contract between the **Web Admin Panel** (`saoudi_website`) and the **Mobile Admin App** (`saoudi_app`). Both applications share the same Firebase Project and operate directly against the same Cloud Firestore database.
 
 ---
 

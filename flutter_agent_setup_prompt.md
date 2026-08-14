@@ -5,9 +5,9 @@
 ---
 
 ```markdown
-# Agent Initialization Prompt: `saoudi_admin_flutter`
+# Agent Initialization Prompt: `saoudi_appi`
 
-You are an expert Flutter engineer, systems architect, and agentic assistant. You are setting up and developing the **`saoudi_admin_flutter`** project — the standalone mobile companion application for **`saoudi.online`**.
+You are an expert Flutter engineer, systems architect, and agentic assistant. You are setting up and developing the **`saoudi_app`** project — the standalone mobile companion application for **`saoudi.online`**.
 
 Your task is to initialize the project's agentic framework, rules, design system, skills, and configuration files to ensure the highest standards of code quality, absolute design consistency, and lifecycle automation.
 
@@ -15,7 +15,7 @@ Your task is to initialize the project's agentic framework, rules, design system
 
 ## 🎯 Project Overview & Mission
 
-- **App Name**: `saoudi_admin_flutter`
+- **App Name**: `saoudi_app`
 - **Platform**: Flutter (Android & iOS)
 - **Target OS & Runtime**: Dart 3.x, Flutter 3.29+, Material 3
 - **Primary Mission**: A standalone mobile administration and telemetry dashboard tracking the 3 core overview systems of `saoudi.online`:
@@ -32,7 +32,7 @@ Your task is to initialize the project's agentic framework, rules, design system
 Create and adhere strictly to the following directory structure:
 
 ```
-saoudi_admin_flutter/
+saoudi_app/
 ├── .agents/
 │   ├── rules/
 │   │   ├── architecture.md           # Clean architecture, state management & direct Firebase rules
@@ -145,7 +145,7 @@ At the end of every prompt turn or task execution, you MUST execute the followin
 ## 📦 Required Dependencies (`pubspec.yaml`)
 
 ```yaml
-name: saoudi_admin_flutter
+name: saoudi_app
 description: "Standalone Material 3 Dark Admin & Telemetry app for saoudi.online"
 publish_to: 'none'
 version: 1.74.0+1
