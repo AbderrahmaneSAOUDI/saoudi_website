@@ -51,10 +51,18 @@ export interface AddLogParams {
  * - Hidden: admin, security, system
  */
 export function canUserAccessLog(log: SystemLog, userEmail: string, isPrimaryAdmin: boolean): boolean {
+	const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
+	const logUserEmail = String(log.userEmail || '').toLowerCase().trim();
+	const isLogOwner = log.isPrimaryEmail || (primaryEmail !== '' && logUserEmail === primaryEmail);
+
+	// Do not display [Task] and [Content] logs performed by the owner
+	if (isLogOwner && (log.type === 'task' || log.type === 'content')) {
+		return false;
+	}
+
 	if (isPrimaryAdmin) return true;
 
 	const callerEmail = String(userEmail || '').toLowerCase().trim();
-	const logUserEmail = String(log.userEmail || '').toLowerCase().trim();
 
 	// Full access for secondary admins
 	if (log.type === 'content' || log.type === 'visitor' || log.type === 'storage') {
@@ -79,6 +87,11 @@ export async function addSystemLog(params: AddLogParams): Promise<SystemLog | nu
 		const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
 		const userEmail = (params.userEmail || primaryEmail || 'system').toLowerCase().trim();
 		const isPrimaryEmail = userEmail === primaryEmail;
+
+		// Do not track [Task] and [Content] logs performed by the website owner
+		if (isPrimaryEmail && (params.type === 'task' || params.type === 'content')) {
+			return null;
+		}
 
 		const retentionDays = LOG_RETENTION_DAYS[params.type] || 15;
 		const expiresAt = new Date(Date.now() + retentionDays * 24 * 60 * 60 * 1000).toISOString();

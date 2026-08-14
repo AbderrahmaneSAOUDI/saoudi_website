@@ -13,105 +13,120 @@ const userEmail = (Astro.locals.adminEmail || '').toLowerCase().trim();
 const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && primaryEmail !== '') } = Astro.props;
 ---
 
-<div class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-[380px] lg:h-[calc(90vh-420px)] min-h-[360px] shadow-lg relative overflow-hidden">
+<div id="admin-todo-card" class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-[380px] lg:h-[calc(90vh-420px)] min-h-[360px] relative overflow-hidden transition-all duration-300">
 	<!-- Card Header & Navigation Tabs -->
-	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#2B2930]/80 pb-4 shrink-0">
+	<div id="todos-card-header" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#2B2930]/80 pb-4 shrink-0 transition-all duration-300">
 		<div class="flex items-center gap-3">
 			<div class="p-2.5 rounded-2xl bg-[#F4B400]/10 text-[#F4B400] border border-[#F4B400]/20">
 				<Icon name="design" size={24} class="w-6 h-6" />
 			</div>
 			<div class="flex items-center gap-2">
-				<h2 class="text-lg font-bold text-white tracking-tight">To-Do</h2>
+				<h2 class="text-lg font-bold text-white tracking-tight">Tasks</h2>
 			</div>
 		</div>
 
-		<!-- Status Tabs -->
-		<div class="flex items-center bg-[#211F26] p-1 rounded-2xl border border-[#2B2930] text-xs font-medium self-start sm:self-auto shrink-0">
+		<!-- Status Tabs & Collapse Button -->
+		<div class="flex items-center gap-2 self-start sm:self-auto shrink-0">
+			<div class="flex items-center bg-[#211F26] p-1 rounded-2xl border border-[#2B2930] text-xs font-medium">
+				<button
+					type="button"
+					data-tab="active"
+					class="todo-tab-btn px-2.5 py-1.5 rounded-xl bg-primary text-white font-bold transition-all cursor-pointer flex items-center gap-1.5"
+					title="Active Tasks"
+				>
+					<Icon name="task_active" size={16} class="w-4 h-4" />
+					<span id="tab-count-active" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white">0</span>
+				</button>
+				<button
+					type="button"
+					data-tab="completed"
+					class="todo-tab-btn px-2.5 py-1.5 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
+					title="Completed Tasks"
+				>
+					<Icon name="task_done" size={16} class="w-4 h-4" />
+					<span id="tab-count-completed" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/10 text-white/70">0</span>
+				</button>
+				<button
+					type="button"
+					data-tab="archived"
+					class="todo-tab-btn px-2.5 py-1.5 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
+					title="Archived Tasks"
+				>
+					<Icon name="task_archive" size={16} class="w-4 h-4" />
+					<span id="tab-count-archived" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/10 text-white/70">0</span>
+				</button>
+			</div>
+
 			<button
 				type="button"
-				data-tab="active"
-				class="todo-tab-btn px-2.5 py-1.5 rounded-xl bg-primary text-white font-bold transition-all cursor-pointer flex items-center gap-1.5"
-				title="Active Tasks"
+				id="btn-collapse-todos"
+				class="p-2.5 rounded-xl border border-[#2B2930] hover:bg-[#211F26] text-[#E6E1E5]/70 hover:text-white text-xs font-medium transition-all duration-200 flex items-center justify-center cursor-pointer shrink-0"
+				title="Collapse card"
+				aria-expanded="true"
 			>
-				<Icon name="task_active" size={16} class="w-4 h-4" />
-				<span id="tab-count-active" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white">0</span>
-			</button>
-			<button
-				type="button"
-				data-tab="completed"
-				class="todo-tab-btn px-2.5 py-1.5 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
-				title="Completed Tasks"
-			>
-				<Icon name="task_done" size={16} class="w-4 h-4" />
-				<span id="tab-count-completed" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/10 text-white/70">0</span>
-			</button>
-			<button
-				type="button"
-				data-tab="archived"
-				class="todo-tab-btn px-2.5 py-1.5 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
-				title="Archived Tasks"
-			>
-				<Icon name="task_archive" size={16} class="w-4 h-4" />
-				<span id="tab-count-archived" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/10 text-white/70">0</span>
+				<svg id="chevron-todos" class="w-3.5 h-3.5 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
 			</button>
 		</div>
 	</div>
 
-	<!-- Add Task Input Form -->
-	<form id="add-todo-form" class="mt-4 space-y-3 p-4 rounded-2xl bg-[#211F26] border border-[#2B2930] shrink-0">
-		<div class="flex flex-col sm:flex-row gap-2">
-			<input
-				type="text"
-				id="todo-title-input"
-				required
-				placeholder="Brainstorm a task or idea..."
-				class="flex-1 px-3.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-xs focus:outline-none focus:border-primary transition-colors placeholder-[#E6E1E5]/40"
-			/>
+	<!-- Collapsible Content Wrapper -->
+	<div id="todos-card-content" class="flex-1 min-h-0 flex flex-col transition-all duration-300">
+		<!-- Add Task Input Form -->
+		<form id="add-todo-form" class="mt-4 space-y-3 p-4 rounded-2xl bg-[#211F26] border border-[#2B2930] shrink-0">
+			<div class="flex flex-col sm:flex-row gap-2">
+				<input
+					type="text"
+					id="todo-title-input"
+					required
+					placeholder="Brainstorm a task or idea..."
+					class="flex-1 px-3.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-xs focus:outline-none focus:border-primary transition-colors placeholder-[#E6E1E5]/40"
+				/>
 
-			<div class="flex items-center gap-2">
-				<select
-					id="todo-category-select"
-					class="px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-xs focus:outline-none focus:border-primary cursor-pointer"
-				>
-					<option value="Feature">Feature</option>
-					<option value="Bug">Bug</option>
-					<option value="Refactor">Refactor</option>
-					<option value="Idea">Idea</option>
-					<option value="Content">Content</option>
-					<option value="General" selected>General</option>
-				</select>
+				<div class="flex items-center gap-2">
+					<select
+						id="todo-category-select"
+						class="px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-xs focus:outline-none focus:border-primary cursor-pointer"
+					>
+						<option value="Feature">Feature</option>
+						<option value="Bug">Bug</option>
+						<option value="Refactor">Refactor</option>
+						<option value="Idea">Idea</option>
+						<option value="Content">Content</option>
+						<option value="General" selected>General</option>
+					</select>
 
-				<input type="hidden" id="todo-priority-input" name="priority" value="" />
-				<button
-					type="button"
-					id="todo-priority-toggle"
-					class="px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-[#E6E1E5]/40 hover:text-white transition-all cursor-pointer flex items-center justify-center gap-1"
-					title="Priority: Off (Click to set High)"
-				>
-					<Icon name="priority" size={16} class="w-4 h-4" />
-				</button>
+					<input type="hidden" id="todo-priority-input" name="priority" value="" />
+					<button
+						type="button"
+						id="todo-priority-toggle"
+						class="px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-[#E6E1E5]/40 hover:text-white transition-all cursor-pointer flex items-center justify-center gap-1"
+						title="Priority: Off (Click to set High)"
+					>
+						<Icon name="priority" size={16} class="w-4 h-4" />
+					</button>
 
-				<button
-					type="submit"
-					class="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shadow shrink-0"
-				>
-					<Icon name="plus" size={16} class="w-4 h-4" />
-				</button>
+					<button
+						type="submit"
+						class="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+					>
+						<Icon name="plus" size={16} class="w-4 h-4" />
+					</button>
+				</div>
 			</div>
-		</div>
-	</form>
+		</form>
 
-	<!-- Scrollable Body for Todo Items -->
-	<div class="flex-1 min-h-0 pt-3 overflow-hidden flex flex-col">
-		<!-- Todo Items Container -->
-		<div id="todos-list-container" class="space-y-2.5 overflow-y-auto flex-1 scrollbar-hide pr-1">
-			<!-- Rendered via JS -->
-		</div>
+		<!-- Scrollable Body for Todo Items -->
+		<div class="flex-1 min-h-0 pt-3 overflow-hidden flex flex-col">
+			<!-- Todo Items Container -->
+			<div id="todos-list-container" class="space-y-2.5 overflow-y-auto flex-1 scrollbar-hide pr-1">
+				<!-- Rendered via JS -->
+			</div>
 
-		<!-- Empty State -->
-		<div id="todos-empty-state" class="hidden my-auto py-8 text-center text-[#E6E1E5]/40 bg-[#211F26]/50 rounded-2xl border border-dashed border-[#2B2930]">
-			<p id="empty-state-title" class="text-xs font-semibold text-white">No tasks found</p>
-			<p id="empty-state-subtitle" class="text-[11px] mt-0.5">Use the input above to add a new task to your brainstorming list.</p>
+			<!-- Empty State -->
+			<div id="todos-empty-state" class="hidden my-auto py-8 text-center text-[#E6E1E5]/40 bg-[#211F26]/50 rounded-2xl border border-dashed border-[#2B2930]">
+				<p id="empty-state-title" class="text-xs font-semibold text-white">No tasks found</p>
+				<p id="empty-state-subtitle" class="text-[11px] mt-0.5">Use the input above to add a new task to your brainstorming list.</p>
+			</div>
 		</div>
 	</div>
 </div>
@@ -143,6 +158,46 @@ const { initialTodos = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 		const categorySelect = document.getElementById('todo-category-select') as HTMLSelectElement;
 		const priorityInput = document.getElementById('todo-priority-input') as HTMLInputElement;
 		const priorityToggle = document.getElementById('todo-priority-toggle') as HTMLButtonElement;
+
+		const btnCollapse = document.getElementById('btn-collapse-todos') as HTMLButtonElement;
+		const chevronIcon = document.getElementById('chevron-todos') as HTMLElement | null;
+		const cardElem = document.getElementById('admin-todo-card') as HTMLDivElement;
+		const cardContent = document.getElementById('todos-card-content') as HTMLDivElement;
+		const cardHeader = document.getElementById('todos-card-header') as HTMLDivElement;
+
+		const STORAGE_KEY = 'admin_tasks_collapsed';
+		let isCollapsed = localStorage.getItem(STORAGE_KEY) === 'true';
+
+		function setCollapsedState(collapsed: boolean) {
+			isCollapsed = collapsed;
+			if (collapsed) {
+				cardElem?.classList.remove('h-[380px]', 'lg:h-[calc(90vh-420px)]', 'min-h-[360px]');
+				cardElem?.classList.add('h-auto', 'min-h-0');
+				cardContent?.classList.add('hidden');
+				cardHeader?.classList.remove('border-b', 'pb-4');
+				chevronIcon?.classList.add('rotate-180');
+				btnCollapse?.setAttribute('aria-expanded', 'false');
+				btnCollapse?.setAttribute('title', 'Expand card');
+			} else {
+				cardElem?.classList.add('h-[380px]', 'lg:h-[calc(90vh-420px)]', 'min-h-[360px]');
+				cardElem?.classList.remove('h-auto', 'min-h-0');
+				cardContent?.classList.remove('hidden');
+				cardHeader?.classList.add('border-b', 'pb-4');
+				chevronIcon?.classList.remove('rotate-180');
+				btnCollapse?.setAttribute('aria-expanded', 'true');
+				btnCollapse?.setAttribute('title', 'Collapse card');
+			}
+		}
+
+		setCollapsedState(isCollapsed);
+
+		if (btnCollapse) {
+			btnCollapse.addEventListener('click', () => {
+				const nextState = !isCollapsed;
+				localStorage.setItem(STORAGE_KEY, String(nextState));
+				setCollapsedState(nextState);
+			});
+		}
 
 		const statusMessage = document.getElementById('todo-status-message') as HTMLDivElement;
 		const tabButtons = document.querySelectorAll('.todo-tab-btn') as NodeListOf<HTMLButtonElement>;

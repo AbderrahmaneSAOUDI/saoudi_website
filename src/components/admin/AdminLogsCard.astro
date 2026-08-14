@@ -30,14 +30,15 @@ const cleanLogs = initialLogs.filter(
 		!excludedLogActions.has(l.action) &&
 		!l.title?.startsWith('Revoked admin access for') &&
 		!l.title?.startsWith('Granted admin access to') &&
-		l.title !== 'Owner logged into Admin Dashboard'
+		l.title !== 'Owner logged into Admin Dashboard' &&
+		!((l.type === 'task' || l.type === 'content') && (l.isPrimaryEmail || (primaryEmail !== '' && l.userEmail?.toLowerCase() === primaryEmail)))
 );
 const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrimaryAdmin));
 ---
 
-<div class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-[380px] lg:h-[calc(90vh-420px)] min-h-[360px] shadow-lg relative overflow-hidden">
+<div id="admin-logs-card" class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-[380px] lg:h-[calc(90vh-420px)] min-h-[360px] relative overflow-hidden transition-all duration-300">
 	<!-- Card Header & Title -->
-	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#2B2930]/80 pb-4 shrink-0">
+	<div id="logs-card-header" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#2B2930]/80 pb-4 shrink-0 transition-all duration-300">
 		<div class="flex items-center gap-3">
 			<div class="p-2.5 rounded-2xl bg-primary/10 text-primary border border-primary/20">
 				<Icon name="logs" size={24} class="w-6 h-6" />
@@ -50,7 +51,7 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 			</div>
 		</div>
 
-		<!-- Actions: Search, Export, Refresh & Purge Expired -->
+		<!-- Actions: Search, Export, Refresh, Purge Expired & Collapse -->
 		<div class="flex items-center gap-2 flex-wrap">
 			<!-- Search Bar (Expandable Icon with Animation) -->
 			<div class="relative flex items-center shrink-0">
@@ -101,60 +102,73 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
 			</button>
+
+			<button
+				type="button"
+				id="btn-collapse-logs"
+				class="p-2.5 rounded-xl border border-[#2B2930] hover:bg-[#211F26] text-[#E6E1E5]/70 hover:text-white text-xs font-medium transition-all duration-200 flex items-center justify-center cursor-pointer shrink-0"
+				title="Collapse card"
+				aria-expanded="true"
+			>
+				<svg id="chevron-logs" class="w-3.5 h-3.5 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+			</button>
 		</div>
 	</div>
 
-	<!-- Filter Bar -->
-	<div class="mt-3.5 shrink-0 flex items-center justify-between gap-2 flex-wrap">
-		<!-- Category Tabs -->
-		<div class="flex items-center bg-[#211F26] p-1 rounded-2xl border border-[#2B2930] text-xs font-medium overflow-x-auto scrollbar-hide flex-1 min-w-0">
-			{isPrimaryAdmin ? (
-				<>
-					<button type="button" data-filter="all" class="log-filter-btn px-2.5 py-1 rounded-xl bg-primary text-white font-bold transition-all cursor-pointer whitespace-nowrap">All</button>
-					<button type="button" data-filter="auth" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Auth</button>
-					<button type="button" data-filter="content" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Content</button>
-					<button type="button" data-filter="admin" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Admin</button>
-					<button type="button" data-filter="security" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Security</button>
-					<button type="button" data-filter="visitor" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Visitors</button>
-					<button type="button" data-filter="task" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Tasks</button>
-					<button type="button" data-filter="storage" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Storage</button>
-					<button type="button" data-filter="system" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">System</button>
-				</>
-			) : (
-				<>
-					<button type="button" data-filter="all" class="log-filter-btn px-2.5 py-1 rounded-xl bg-primary text-white font-bold transition-all cursor-pointer whitespace-nowrap">All</button>
-					<button type="button" data-filter="content" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Content</button>
-					<button type="button" data-filter="visitor" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Visitors</button>
-					<button type="button" data-filter="storage" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Storage</button>
-					<button type="button" data-filter="my_activity" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">My Activity</button>
-				</>
+	<!-- Collapsible Content Wrapper -->
+	<div id="logs-card-content" class="flex-1 min-h-0 flex flex-col transition-all duration-300">
+		<!-- Filter Bar -->
+		<div class="mt-3.5 shrink-0 flex items-center justify-between gap-2 flex-wrap">
+			<!-- Category Tabs -->
+			<div class="flex items-center bg-[#211F26] p-1 rounded-2xl border border-[#2B2930] text-xs font-medium overflow-x-auto scrollbar-hide flex-1 min-w-0">
+				{isPrimaryAdmin ? (
+					<>
+						<button type="button" data-filter="all" class="log-filter-btn px-2.5 py-1 rounded-xl bg-primary text-white font-bold transition-all cursor-pointer whitespace-nowrap">All</button>
+						<button type="button" data-filter="auth" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Auth</button>
+						<button type="button" data-filter="content" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Content</button>
+						<button type="button" data-filter="admin" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Admin</button>
+						<button type="button" data-filter="security" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Security</button>
+						<button type="button" data-filter="visitor" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Visitors</button>
+						<button type="button" data-filter="task" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Tasks</button>
+						<button type="button" data-filter="storage" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Storage</button>
+						<button type="button" data-filter="system" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">System</button>
+					</>
+				) : (
+					<>
+						<button type="button" data-filter="all" class="log-filter-btn px-2.5 py-1 rounded-xl bg-primary text-white font-bold transition-all cursor-pointer whitespace-nowrap">All</button>
+						<button type="button" data-filter="content" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Content</button>
+						<button type="button" data-filter="visitor" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Visitors</button>
+						<button type="button" data-filter="storage" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">Storage</button>
+						<button type="button" data-filter="my_activity" class="log-filter-btn px-2.5 py-1 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer whitespace-nowrap">My Activity</button>
+					</>
+				)}
+			</div>
+
+			<!-- Admin Email Filter Dropdown (Primary Admin Only) -->
+			{isPrimaryAdmin && (
+				<div class="relative shrink-0">
+					<select
+						id="log-email-filter"
+						class="px-2.5 py-1.5 rounded-xl bg-[#211F26] border border-[#2B2930] text-xs text-[#E6E1E5]/80 focus:outline-none focus:border-primary/50 transition-all cursor-pointer max-w-[150px] truncate"
+						title="Filter by admin email"
+					>
+						<option value="all">All Emails</option>
+					</select>
+				</div>
 			)}
 		</div>
 
-		<!-- Admin Email Filter Dropdown (Primary Admin Only) -->
-		{isPrimaryAdmin && (
-			<div class="relative shrink-0">
-				<select
-					id="log-email-filter"
-					class="px-2.5 py-1.5 rounded-xl bg-[#211F26] border border-[#2B2930] text-xs text-[#E6E1E5]/80 focus:outline-none focus:border-primary/50 transition-all cursor-pointer max-w-[150px] truncate"
-					title="Filter by admin email"
-				>
-					<option value="all">All Emails</option>
-				</select>
+		<!-- Scrollable Activity Logs Container -->
+		<div class="flex-1 min-h-0 pt-3 overflow-hidden flex flex-col">
+			<div id="logs-list-container" class="space-y-2.5 overflow-y-auto flex-1 scrollbar-hide pr-1">
+				<!-- Logs rendered dynamically via JS -->
 			</div>
-		)}
-	</div>
 
-	<!-- Scrollable Activity Logs Container -->
-	<div class="flex-1 min-h-0 pt-3 overflow-hidden flex flex-col">
-		<div id="logs-list-container" class="space-y-2.5 overflow-y-auto flex-1 scrollbar-hide pr-1">
-			<!-- Logs rendered dynamically via JS -->
-		</div>
-
-		<!-- Empty State -->
-		<div id="logs-empty-state" class="hidden my-auto py-8 text-center text-[#E6E1E5]/40 bg-[#211F26]/50 rounded-2xl border border-dashed border-[#2B2930]">
-			<p class="text-xs font-semibold text-white">No activity logs found</p>
-			<p class="text-[11px] mt-0.5">Matching website events will appear here.</p>
+			<!-- Empty State -->
+			<div id="logs-empty-state" class="hidden my-auto py-8 text-center text-[#E6E1E5]/40 bg-[#211F26]/50 rounded-2xl border border-dashed border-[#2B2930]">
+				<p class="text-xs font-semibold text-white">No activity logs found</p>
+				<p class="text-[11px] mt-0.5">Matching website events will appear here.</p>
+			</div>
 		</div>
 	</div>
 </div>
@@ -181,6 +195,46 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 		const searchInput = document.getElementById('log-search-input') as HTMLInputElement;
 		const emailFilterSelect = document.getElementById('log-email-filter') as HTMLSelectElement;
 		const filterButtons = document.querySelectorAll('.log-filter-btn') as NodeListOf<HTMLButtonElement>;
+
+		const btnCollapse = document.getElementById('btn-collapse-logs') as HTMLButtonElement;
+		const chevronIcon = document.getElementById('chevron-logs') as HTMLElement | null;
+		const cardElem = document.getElementById('admin-logs-card') as HTMLDivElement;
+		const cardContent = document.getElementById('logs-card-content') as HTMLDivElement;
+		const cardHeader = document.getElementById('logs-card-header') as HTMLDivElement;
+
+		const STORAGE_KEY = 'admin_logs_collapsed';
+		let isCollapsed = localStorage.getItem(STORAGE_KEY) === 'true';
+
+		function setCollapsedState(collapsed: boolean) {
+			isCollapsed = collapsed;
+			if (collapsed) {
+				cardElem?.classList.remove('h-[380px]', 'lg:h-[calc(90vh-420px)]', 'min-h-[360px]');
+				cardElem?.classList.add('h-auto', 'min-h-0');
+				cardContent?.classList.add('hidden');
+				cardHeader?.classList.remove('border-b', 'pb-4');
+				chevronIcon?.classList.add('rotate-180');
+				btnCollapse?.setAttribute('aria-expanded', 'false');
+				btnCollapse?.setAttribute('title', 'Expand card');
+			} else {
+				cardElem?.classList.add('h-[380px]', 'lg:h-[calc(90vh-420px)]', 'min-h-[360px]');
+				cardElem?.classList.remove('h-auto', 'min-h-0');
+				cardContent?.classList.remove('hidden');
+				cardHeader?.classList.add('border-b', 'pb-4');
+				chevronIcon?.classList.remove('rotate-180');
+				btnCollapse?.setAttribute('aria-expanded', 'true');
+				btnCollapse?.setAttribute('title', 'Collapse card');
+			}
+		}
+
+		setCollapsedState(isCollapsed);
+
+		if (btnCollapse) {
+			btnCollapse.addEventListener('click', () => {
+				const nextState = !isCollapsed;
+				localStorage.setItem(STORAGE_KEY, String(nextState));
+				setCollapsedState(nextState);
+			});
+		}
 
 		let currentFilter: string = (window as any).isPrimaryAdminUser ? 'all' : 'content';
 		let currentEmailFilter: string = 'all';
@@ -444,6 +498,11 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 				if (log.title === 'Owner logged into Admin Dashboard') return false;
 				if (log.title === 'Resume Downloaded by Admin (Count Skipped)') return false;
 				if (log.title === 'Resume Downloads Counter Reset') return false;
+
+				// Do not track/show Task and Content logs by owner
+				const primaryOwner = ((window as any).primaryAdminEmail || '').toLowerCase().trim();
+				const isOwnerLog = log.isPrimaryEmail || (primaryOwner !== '' && String(log.userEmail || '').toLowerCase().trim() === primaryOwner);
+				if ((log.type === 'task' || log.type === 'content') && isOwnerLog) return false;
 				
 				const matchesFilter = currentFilter === 'all' || currentFilter === 'my_activity' || log.type === currentFilter;
 				if (!matchesFilter) return false;
@@ -656,7 +715,11 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 		// Export Button Action
 		if (btnExport) {
 			btnExport.addEventListener('click', () => {
+				const primaryOwner = ((window as any).primaryAdminEmail || '').toLowerCase().trim();
 				const filtered = logs.filter(log => {
+					const isOwnerLog = log.isPrimaryEmail || (primaryOwner !== '' && String(log.userEmail || '').toLowerCase().trim() === primaryOwner);
+					if ((log.type === 'task' || log.type === 'content') && isOwnerLog) return false;
+
 					const matchesFilter = currentFilter === 'all' || currentFilter === 'my_activity' || log.type === currentFilter;
 					if (!matchesFilter) return false;
 					const matchesEmail = currentEmailFilter === 'all' || log.userEmail?.toLowerCase() === currentEmailFilter.toLowerCase();
