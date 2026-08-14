@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../../lib/server/firebase-admin';
+import { getOrSetCached, CACHE_TTL_MS } from '../../../lib/server/cache';
 
 const ALLOWED_CONTENT_TYPES = new Set([
 	'application/pdf',
@@ -10,16 +11,32 @@ const ALLOWED_CONTENT_TYPES = new Set([
 	'image/webp',
 ]);
 
+type MediaObjectData = {
+	contentType: string;
+	base64: string;
+};
+
 export const GET: APIRoute = async ({ params, request }) => {
 	const id = params.id || '';
 	if (!/^[0-9a-f-]{36}$/i.test(id)) return new Response('Not found', { status: 404 });
 
-	const snapshot = await getFirebaseAdminDb().collection('media_objects').doc(id).get();
-	if (!snapshot.exists) return new Response('Not found', { status: 404 });
+	const mediaData = await getOrSetCached<MediaObjectData | null>(
+		`media_obj_${id}`,
+		async () => {
+			const snapshot = await getFirebaseAdminDb().collection('media_objects').doc(id).get();
+			if (!snapshot.exists) return null;
+			const data = snapshot.data() || {};
+			return {
+				contentType: String(data.contentType || '').toLowerCase(),
+				base64: typeof data.base64 === 'string' ? data.base64 : '',
+			};
+		},
+		CACHE_TTL_MS.PUBLIC_DATA,
+	);
 
-	const data = snapshot.data() || {};
-	const contentType = String(data.contentType || '').toLowerCase();
-	const base64 = typeof data.base64 === 'string' ? data.base64 : '';
+	if (!mediaData) return new Response('Not found', { status: 404 });
+
+	const { contentType, base64 } = mediaData;
 	if (!ALLOWED_CONTENT_TYPES.has(contentType) || !base64) {
 		return new Response('Invalid media', { status: 422 });
 	}

@@ -15,6 +15,7 @@ import AdminNavDock from "../../components/admin/AdminNavDock.astro";
 import { getFirebaseAdminDb } from "../../lib/server/firebase-admin";
 import { CACHE_TTL_MS, getOrSetCached } from "../../lib/server/cache";
 import { getEnv } from "../../lib/server/env";
+import { getSystemLogs } from "../../lib/server/system-logs";
 
 // Extra safety: double-check that the middleware successfully set Astro.locals.adminEmail
 const adminEmail = Astro.locals.adminEmail;
@@ -41,74 +42,79 @@ type DashboardCounts = {
   resumeDownloads: number;
 };
 
-try {
-    const counts = await getOrSetCached<DashboardCounts>(
-      cacheKeyAdminCounts,
-      async () => {
-    const db = getFirebaseAdminDb();
-    
-    // Parallel asynchronous fetching of the collections' count metrics
-    const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, servicesSnap, volunteeringSnap, configSnap] = await Promise.all([
-      db.collection("projects").count().get(),
-      db.collection("experience").count().get(),
-      db.collection("designs").count().get(),
-      db.collection("certificates").count().get(),
-      db.collection("services").count().get(),
-      db.collection("volunteering").count().get(),
-      db.collection("configuration").doc("static_data").get(),
-    ]);
-
-    return {
-      projects: projectsSnap.data().count,
-      experience: experienceSnap.data().count,
-      designs: designsSnap.data().count,
-      certificates: certificatesSnap.data().count,
-      services: servicesSnap.data().count,
-      volunteering: volunteeringSnap.data().count,
-      resumeDownloads: configSnap.exists ? (configSnap.data()?.resumeDownloads || 0) : 0,
-    };
-      },
-      CACHE_TTL_MS.ADMIN_DATA,
-    );
-    projectsCount = counts.projects;
-    experienceCount = counts.experience;
-    designsCount = counts.designs;
-    certificatesCount = counts.certificates;
-    servicesCount = counts.services;
-    volunteeringCount = counts.volunteering;
-    resumeDownloadsCount = counts.resumeDownloads;
-  } catch (error) {
-    console.warn("Firestore access degraded or unconfigured. Falling back to mock dashboard metrics.", error);
-    systemStatus = "Degraded (Mock Stats)";
-    
-    // Clean mock statistics matching user's collections structure
-    projectsCount = -1;
-    experienceCount = -1;
-    designsCount = -1;
-    certificatesCount = -1;
-    servicesCount = -1;
-    volunteeringCount = -1;
-}
-
-import { getSystemLogs } from "../../lib/server/system-logs";
-
 let initialAcceptedEmails: any[] = [];
 let initialTasks: any[] = [];
 let initialLogs: any[] = [];
 
-try {
-  const db = getFirebaseAdminDb();
-  const [emailsSnap, tasksSnap, logsList] = await Promise.all([
-    db.collection('accepted_admin_emails').orderBy('addedAt', 'asc').get(),
-    db.collection('admin_todos').orderBy('createdAt', 'desc').get(),
-    getSystemLogs(50),
-  ]);
+// Concurrently fetch aggregate counts and panel datasets
+const [countsResult, prefetchResult] = await Promise.allSettled([
+  getOrSetCached<DashboardCounts>(
+    cacheKeyAdminCounts,
+    async () => {
+      const db = getFirebaseAdminDb();
+      const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, servicesSnap, volunteeringSnap, configSnap] = await Promise.all([
+        db.collection("projects").count().get(),
+        db.collection("experience").count().get(),
+        db.collection("designs").count().get(),
+        db.collection("certificates").count().get(),
+        db.collection("services").count().get(),
+        db.collection("volunteering").count().get(),
+        db.collection("configuration").doc("static_data").get(),
+      ]);
 
-  initialAcceptedEmails = emailsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  initialTasks = tasksSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  initialLogs = logsList;
-} catch (err) {
-  console.warn('Could not pre-fetch admin emails/tasks/logs in frontmatter:', err);
+      return {
+        projects: projectsSnap.data().count,
+        experience: experienceSnap.data().count,
+        designs: designsSnap.data().count,
+        certificates: certificatesSnap.data().count,
+        services: servicesSnap.data().count,
+        volunteering: volunteeringSnap.data().count,
+        resumeDownloads: configSnap.exists ? (configSnap.data()?.resumeDownloads || 0) : 0,
+      };
+    },
+    CACHE_TTL_MS.ADMIN_DATA,
+  ),
+  (async () => {
+    const db = getFirebaseAdminDb();
+    const [emailsSnap, tasksSnap, logsList] = await Promise.all([
+      db.collection('accepted_admin_emails').orderBy('addedAt', 'asc').get(),
+      db.collection('admin_todos').orderBy('createdAt', 'desc').get(),
+      getSystemLogs(50),
+    ]);
+    return {
+      acceptedEmails: emailsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })),
+      tasks: tasksSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })),
+      logs: logsList,
+    };
+  })(),
+]);
+
+if (countsResult.status === 'fulfilled') {
+  const counts = countsResult.value;
+  projectsCount = counts.projects;
+  experienceCount = counts.experience;
+  designsCount = counts.designs;
+  certificatesCount = counts.certificates;
+  servicesCount = counts.services;
+  volunteeringCount = counts.volunteering;
+  resumeDownloadsCount = counts.resumeDownloads;
+} else {
+  console.warn("Firestore access degraded or unconfigured. Falling back to mock dashboard metrics.", countsResult.reason);
+  systemStatus = "Degraded (Mock Stats)";
+  projectsCount = -1;
+  experienceCount = -1;
+  designsCount = -1;
+  certificatesCount = -1;
+  servicesCount = -1;
+  volunteeringCount = -1;
+}
+
+if (prefetchResult.status === 'fulfilled') {
+  initialAcceptedEmails = prefetchResult.value.acceptedEmails;
+  initialTasks = prefetchResult.value.tasks;
+  initialLogs = prefetchResult.value.logs;
+} else {
+  console.warn('Could not pre-fetch admin emails/tasks/logs in frontmatter:', prefetchResult.reason);
 }
 
 const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();

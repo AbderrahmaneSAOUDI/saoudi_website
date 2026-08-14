@@ -175,7 +175,7 @@ const typeColors = {
 						</div>
 					</a>
 					{certType && (
-						<span class={`absolute top-2.5 right-2.5 z-20 px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase border backdrop-blur-md shadow-sm pointer-events-none select-none ${typeColors[certType as keyof typeof typeColors] || ''}`}>
+						<span class={`absolute top-2.5 right-2.5 z-20 px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase border pointer-events-none select-none ${typeColors[certType as keyof typeof typeColors] || ''}`}>
 							{certType}
 						</span>
 					)}
@@ -327,24 +327,4 @@ const typeColors = {
 	</article>
 ) : null}
 
-<script>
-	// Cleanup any skeletons for images that finish loading
-	const removeSkeletons = () => {
-		document.querySelectorAll('.skeleton + img').forEach((img) => {
-			if (img instanceof HTMLImageElement && img.complete) {
-				const skeleton = img.previousElementSibling;
-				if (skeleton && skeleton.classList.contains('skeleton')) {
-					skeleton.remove();
-				}
-			}
-		});
-	};
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', removeSkeletons, { once: true });
-	} else {
-		removeSkeletons();
-	}
-	window.addEventListener('load', removeSkeletons, { once: true });
-</script>
 

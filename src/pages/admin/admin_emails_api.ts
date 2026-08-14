@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
-import { clearCache } from '../../lib/server/cache';
+import { clearCache, clearCacheByPrefix } from '../../lib/server/cache';
 import { getErrorMessage, getFormString, jsonResponse } from '../../lib/server/http';
 import { getEnv } from '../../lib/server/env';
 import { z } from 'zod';
@@ -104,6 +104,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			}
 
 			clearCache('admin_accepted_emails');
+			clearCacheByPrefix('auth_secondary_');
 
 			await safeSystemLog({
 				type: 'system',
@@ -140,6 +141,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 			await docRef.set(newRecord, { merge: true });
 			clearCache('admin_accepted_emails');
+			clearCacheByPrefix('auth_secondary_');
 
 			await safeSystemLog({
 				type: 'system',

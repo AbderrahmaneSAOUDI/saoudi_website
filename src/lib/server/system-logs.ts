@@ -168,12 +168,16 @@ export async function purgeExpiredSystemLogs(): Promise<{ success: boolean; dele
 			}
 		}
 
-		// 2. Query legacy logs without expiresAt field and check against retention matrix
-		const allLogsSnap = await db.collection('system_logs').get();
-		if (!allLogsSnap.empty) {
+		// 2. Query legacy logs with a batch limit to avoid unbounded collection scan
+		const legacySnap = await db.collection('system_logs')
+			.orderBy('timestamp', 'asc')
+			.limit(200)
+			.get();
+
+		if (!legacySnap.empty) {
 			const legacyRefs: FirebaseFirestore.DocumentReference[] = [];
 
-			allLogsSnap.docs.forEach(doc => {
+			legacySnap.docs.forEach(doc => {
 				const data = doc.data();
 				if (!data.expiresAt && data.timestamp) {
 					const type: LogType = data.type || 'system';
@@ -204,17 +208,43 @@ export async function purgeExpiredSystemLogs(): Promise<{ success: boolean; dele
 
 /**
  * Fetches latest system activity logs from Firestore.
+ * Includes resilience fallback if Firestore composite index is missing.
  */
 export async function getSystemLogs(limitCount: number = 50, typeFilter?: string): Promise<SystemLog[]> {
 	try {
 		const db = getFirebaseAdminDb();
-		let query: FirebaseFirestore.Query = db.collection('system_logs');
+		let snap: FirebaseFirestore.QuerySnapshot;
 
-		if (typeFilter && typeFilter !== 'all') {
-			query = query.where('type', '==', typeFilter);
+		try {
+			let query: FirebaseFirestore.Query = db.collection('system_logs');
+			if (typeFilter && typeFilter !== 'all') {
+				query = query.where('type', '==', typeFilter);
+			}
+			snap = await query.orderBy('timestamp', 'desc').limit(limitCount).get();
+		} catch (queryErr: any) {
+			// Fallback: If composite index is missing for where + orderBy, fetch by timestamp and filter in memory
+			if (typeFilter && typeFilter !== 'all') {
+				const fallbackSnap = await db.collection('system_logs')
+					.orderBy('timestamp', 'desc')
+					.limit(limitCount * 4)
+					.get();
+				const filteredDocs = fallbackSnap.docs.filter(d => (d.data().type || 'system') === typeFilter).slice(0, limitCount);
+				return filteredDocs.map(doc => {
+					const data = doc.data();
+					return {
+						...data,
+						id: doc.id,
+						type: typeof data.type === 'string' ? data.type : 'system',
+						severity: typeof data.severity === 'string' ? data.severity : 'info',
+						action: typeof data.action === 'string' ? data.action : 'SYSTEM_ERROR',
+						title: typeof data.title === 'string' ? data.title : 'Untitled system event',
+						details: typeof data.details === 'string' ? data.details : '',
+						userEmail: typeof data.userEmail === 'string' ? data.userEmail : 'system',
+					} as SystemLog;
+				});
+			}
+			throw queryErr;
 		}
-
-		const snap = await query.orderBy('timestamp', 'desc').limit(limitCount).get();
 		
 		return snap.docs.map(doc => {
 			const data = doc.data();

@@ -363,17 +363,15 @@ select option:checked {
 ::-webkit-scrollbar-thumb {
   background: var(--color-primary);
   border-radius: 999px;
-  box-shadow: 0 0 6px rgba(66, 133, 244, 0.4);
-  transition: background 0.25s ease, box-shadow 0.25s ease;
+  transition: background 0.25s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #57CAFF; /* Glowing light Google blue */
+  background: #57CAFF; /* Light Google blue */
 }
 
 ::-webkit-scrollbar-thumb:active {
   background: var(--color-primary);
-  box-shadow: 0 0 12px rgba(66, 133, 244, 0.9);
 }
 
 /* Firefox */

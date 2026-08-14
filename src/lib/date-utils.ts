@@ -2,6 +2,11 @@
  * Shared date formatting and manipulation utilities for public pages and admin panel.
  */
 
+const SHORT_MONTHS = [
+	'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+	'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+] as const;
+
 /**
  * Formats a YYYY-MM-DD or YYYY-MM date string into a human-readable format.
  * Examples:
@@ -14,15 +19,16 @@ export function formatAdminDate(dateStr?: string | null): string {
 		const parts = dateStr.split('-');
 		if (parts.length >= 2) {
 			const year = parseInt(parts[0], 10);
-			const month = parseInt(parts[1], 10) - 1;
-			const day = parts.length >= 3 ? parseInt(parts[2], 10) : 1;
-			const date = new Date(year, month, day);
-			if (!isNaN(date.getTime())) {
-				const options: Intl.DateTimeFormatOptions =
-					parts.length >= 3
-						? { month: 'short', day: 'numeric', year: 'numeric' }
-						: { month: 'short', year: 'numeric' };
-				return date.toLocaleDateString('en-US', options);
+			const monthIdx = parseInt(parts[1], 10) - 1;
+			if (monthIdx >= 0 && monthIdx < 12 && !isNaN(year)) {
+				const monthName = SHORT_MONTHS[monthIdx];
+				if (parts.length >= 3) {
+					const day = parseInt(parts[2], 10);
+					if (!isNaN(day)) {
+						return `${monthName} ${day}, ${year}`;
+					}
+				}
+				return `${monthName} ${year}`;
 			}
 		}
 		const date = new Date(dateStr);

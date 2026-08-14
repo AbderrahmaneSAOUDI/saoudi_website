@@ -20,7 +20,7 @@ const { href, isActive = false, label } = Astro.props;
 	aria-current={isActive ? 'page' : undefined}
 	class={`group h-11 min-h-[44px] min-w-[44px] flex items-center justify-center gap-2 px-2.5 min-[1000px]:px-4 rounded-full font-medium text-sm whitespace-nowrap origin-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-95 focus-visible:ring-2 focus-visible:ring-primary ${
 		isActive
-			? 'bg-primary text-white shadow-[0_4px_12px_rgba(66,133,244,0.35),inset_0_1px_1px_rgba(255,255,255,0.25)] scale-[1.02]'
+			? 'bg-primary text-white scale-[1.02]'
 			: 'text-white/70 hover:text-white hover:bg-white/15 hover:scale-[1.06] border border-transparent hover:border-white/20'
 	}`}
 >

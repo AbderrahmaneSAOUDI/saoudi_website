@@ -677,7 +677,10 @@ try {
 				return;
 			}
 
-			if (!confirm('Are you sure you want to delete this service offering?')) return;
+			const confirmed = typeof (window as any).showConfirmDialog === 'function'
+				? await (window as any).showConfirmDialog('Delete Service', 'Are you sure you want to delete this service offering?')
+				: confirm('Are you sure you want to delete this service offering?');
+			if (!confirmed) return;
 
 			const formData = new FormData();
 			formData.append('action', 'delete');
