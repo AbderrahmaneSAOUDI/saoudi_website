@@ -33,7 +33,7 @@ Personal portfolio & admin CMS for Abderrahmane SAOUDI built with Astro SSR, Typ
 - **Mandatory Lifecycle Automation:**
   1. Verify with `pnpm run check` and `pnpm run build`.
   2. Silently increment patch version in `package.json` (`version-increment.md`).
-  3. Git sync: `git add . && git commit -m "updated project version: <summary>" && git push`.
+  3. Git sync: `git add . && git commit -m "<version> - <summary>" && git push` (where `<version>` is the exact version in `package.json`, e.g. `git commit -m "1.74.349 - fix: description here"`).
 
 ## Progressive Disclosure Links
 
