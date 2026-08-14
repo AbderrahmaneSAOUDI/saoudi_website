@@ -1,4 +1,11 @@
 ---
+/**
+ * AdminNavDock Component
+ * 
+ * Floating bottom navigation dock for the protected admin workspace.
+ * Mirrors the exact design, geometry, and CSS-only animations of PublicHeader navbar,
+ * while preserving admin workflow features, keyboard shortcuts (1-9), and disabled state toasts.
+ */
 import Icon from '../Icon.astro';
 
 interface Props {
@@ -6,6 +13,10 @@ interface Props {
 }
 
 const { currentPath = '/admin' } = Astro.props;
+
+// Normalize path for active route resolution
+const rawPathname = currentPath.toLowerCase();
+const pathname = rawPathname === '/' ? '/' : rawPathname.replace(/\/+$/, '');
 
 const navItems = [
 	{ label: 'Overview', path: '/admin', iconName: 'home', shortcutKey: '1' },
@@ -22,50 +33,55 @@ const navItems = [
 
 <div
 	id="admin-nav-dock"
-	class="admin-dock-wrapper bottom-0 left-1/2 z-50 fixed -translate-x-1/2 w-full px-0"
+	class="admin-dock-wrapper fixed bottom-4 md:bottom-6 left-1/2 z-50 -translate-x-1/2 max-w-[calc(100vw-1.5rem)] px-1 sm:px-0 flex justify-center pointer-events-none"
 >
-	<!-- Floating Navigation Dock -->
-	<div
-		class="admin-dock-inner flex items-center gap-2 bg-[#211F26]/90 backdrop-blur-xl px-3 py-2 border border-white/10 rounded-t-2xl justify-center overflow-hidden"
+	<!-- Floating Pill Navigation Dock matching PublicHeader design -->
+	<nav
+		aria-label="Admin workspace navigation"
+		class="admin-dock-inner pointer-events-auto flex items-center gap-1.5 sm:gap-2 h-11 bg-surface/60 backdrop-blur-xl border border-white/10 hover:border-white/20 rounded-full p-1 sm:px-1.5 transition-all duration-300 max-w-full overflow-x-auto overflow-y-hidden scrollbar-hide select-none"
 	>
-		<!-- Center Slot: Navigation Links -->
-		<nav class="flex items-center gap-0.5 overflow-x-auto overflow-y-hidden scrollbar-hide py-1.5 px-1 max-w-full">
-			{
-				navItems.map((item) => {
-					const isActive =
-						item.path === '/admin'
-							? currentPath === '/admin' || currentPath === '/admin/'
-							: currentPath === item.path;
+		{
+			navItems.map((item) => {
+				const isActive =
+					item.path === '/admin'
+						? pathname === '/admin' || pathname === '/admin/'
+						: pathname === item.path || pathname.startsWith(item.path + '/');
 
-					return (
-						<a
-							href={item.disabled ? '#' : item.path}
-							data-disabled={item.disabled ? 'true' : undefined}
-							data-label={item.label}
-							class={`admin-nav-item group flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-sm font-medium origin-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-95 shrink-0 ${
-								item.disabled
-									? 'text-white/30 cursor-not-allowed'
-									: isActive
-									? 'bg-primary text-white scale-[1.02]'
-									: 'text-white/70 hover:text-white hover:bg-white/15 hover:scale-[1.04] border border-transparent hover:border-white/20'
-							}`}
-							aria-label={item.label}
-						>
-							<span class="admin-nav-icon transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110">
-								<Icon name={item.iconName} size={16} class="w-4 h-4" />
-							</span>
-							<span class="admin-nav-label">{item.label}</span>
-							{item.shortcutKey && (
-								<kbd class={`hidden md:inline-flex items-center justify-center px-1.5 py-0.2 text-[9px] font-mono rounded border ${isActive ? 'bg-white/20 text-white border-white/30' : item.disabled ? 'bg-white/5 text-white/20 border-white/5' : 'bg-white/10 text-white/40 border-white/10'}`}>
-									{item.shortcutKey}
-								</kbd>
-							)}
-						</a>
-					);
-				})
-			}
-		</nav>
-	</div>
+				return (
+					<a
+						href={item.disabled ? '#' : item.path}
+						data-disabled={item.disabled ? 'true' : undefined}
+						data-label={item.label}
+						class={`admin-nav-item group h-11 min-h-[44px] min-w-[44px] flex items-center justify-center gap-2 px-2.5 min-[920px]:px-4 rounded-full font-medium text-sm whitespace-nowrap origin-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shrink-0 ${
+							item.disabled
+								? 'text-white/30 cursor-not-allowed border border-transparent hover:bg-white/5'
+								: isActive
+								? 'bg-primary text-white scale-[1.02]'
+								: 'text-white/70 hover:text-white hover:bg-white/15 hover:scale-[1.06] border border-transparent hover:border-white/20'
+						}`}
+						aria-label={item.label}
+						aria-current={isActive ? 'page' : undefined}
+					>
+						<span class="admin-nav-icon transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110 shrink-0">
+							<Icon name={item.iconName} filled={isActive} size={18} />
+						</span>
+						<span class="admin-nav-label">{item.label}</span>
+						{item.shortcutKey && (
+							<kbd class={`hidden md:inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-mono font-semibold rounded border transition-all duration-300 ${
+								isActive
+									? 'bg-white/20 text-white border-white/30'
+									: item.disabled
+									? 'bg-white/5 text-white/20 border-white/5'
+									: 'bg-white/10 text-white/50 border-white/10 group-hover:border-white/20 group-hover:text-white/80'
+							}`}>
+								{item.shortcutKey}
+							</kbd>
+						)}
+					</a>
+				);
+			})
+		}
+	</nav>
 </div>
 
 <script>
@@ -112,8 +128,8 @@ const navItems = [
 					(window as any).showToast(`${route.label} page is still not ready yet.`, 'info');
 				}
 			} else {
-				const currentPath = window.location.pathname;
-				if (currentPath !== route.path && currentPath !== route.path + '/') {
+				const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+				if (currentPath !== route.path) {
 					window.location.href = route.path;
 				}
 			}
