@@ -1,40 +1,43 @@
-# saoudi.online Codex Instructions
+# saoudi.online — Agent Operational Guide
 
-These instructions apply to every Codex task in this repository.
+Personal portfolio & admin CMS for Abderrahmane SAOUDI built with Astro SSR, TypeScript, Tailwind CSS v4, Firebase Admin SDK, and Vercel.
 
-## Source of truth
+## Directory Map
 
-- Read `.agents/agents.md` for project identity, architecture, environment variables, and current conventions.
-- Before modifying files, read every Markdown file in `.agents/rules/`. Those rules are always on and are authoritative.
-- Also read rules in `.trae/rules/` and `.devin/rules/` that relate to the task. The `.trae` rules mostly mirror `.agents`; `.devin/rules/rules.md` supplies additional constraints.
-- Resolve conflicts in this order: `.agents/rules/` (canonical), then `.trae/rules/`, then `.devin/rules/`. In particular, increment versions at the end as required by `.agents/rules/version-increment.md`, and use the canonical Google colors from `.agents/rules/design-system.md`.
-- Use the relevant skill in `.agents/skills/` when a task matches its description.
-- Consult `.agents/sidecars/` when the task touches the file map, known issues, or roadmap status.
-- Native Codex command policies live in `.codex/rules/default.rules`.
-- Native Codex lifecycle guards live in `.codex/hooks.json` and `.codex/hooks/`.
+- `src/pages/` — Public zero-JS SSR pages (`/`, `/projects`, `/experience`, `/designs`, `/certifications`, `/services`, `/volunteering`, `/resume`).
+- `src/pages/admin/` — Protected admin pages & API endpoints (strictly prefixed with `admin_`).
+- `src/components/` — Astro components, Server Islands (`*Island.astro`), and admin panels (`src/components/admin/`).
+- `src/lib/server/` — Server-only singletons (`firebase-admin.ts`, `session.ts`, `admin-authorization.ts`, `cache.ts`, `system-logs.ts`, `storage.ts`).
+- `src/lib/` — Shared client/rendering utilities (`colors.ts`, `media.ts`, `images.ts`, `date-utils.ts`).
+- `src/styles/` — Global styling (`global.css`, `background_animation.css`).
+- `src/types.ts` — Single authoritative schema (Zod schemas + TypeScript interfaces).
+- `docs/` — Progressive disclosure architecture, invariants, and data model documentation.
+- `.agents/skills/` — On-demand procedural playbooks and workflows.
 
-## Non-negotiable project constraints
+## Key Commands
 
-- Use `pnpm` exclusively; never use npm or Yarn.
-- Keep Astro in SSR mode with `output: 'server'` and the Vercel adapter.
-- Public routes must remain zero-JavaScript Astro pages. Do not add client directives, browser data fetching, or the Firebase Client SDK to public routes.
-- Client-side JavaScript and React islands are allowed only under `/admin`.
-- Keep admin routes under `src/pages/admin/` with the `admin_` filename prefix.
-- Keep Firebase credentials and server-only environment variables out of client code and committed files.
-- Use Tailwind CSS v4 tokens in `src/styles/global.css`; do not introduce a color-oriented `tailwind.config.js`.
-- Do not add animation, masonry, or public-route client data-fetching libraries prohibited by `.agents/rules/architecture.md`.
-- Preserve the Material 3 dark-mode and Google-brand design constraints in `.agents/rules/design-system.md`.
-- Give dynamic images and media explicit aspect ratios to prevent layout shifts.
-- Use solid Material 3 surface-container tonal elevations; do not introduce transparent blurred content surfaces.
-- Never use visual shadows of any kind, including CSS `box-shadow`, `text-shadow`, `filter: drop-shadow()`, SVG `<feDropShadow>`, or shadow-producing Tailwind utilities. Use solid surfaces, borders, rings, color changes, or transforms instead.
-- Obfuscate public Email, Telegram, and WhatsApp contact values with Base64 and decode them only on direct user intent.
-- Preserve the delete-before-upload lifecycle when replacing resume or other Storage assets.
-- Do not introduce new Firestore collections or entry-type literals without reconciling the requested change with `.devin/rules/rules.md` and the repository's existing multi-collection schema.
-- Preserve existing comments and docstrings unless the surrounding code is directly changed.
+- `pnpm dev` — Start local dev server (auto-authenticates admin in DEV mode at `http://localhost:4321`).
+- `pnpm check` — Static Astro & TypeScript typecheck (`astro check`).
+- `pnpm build` — Production build (`astro check && astro build`).
+- `pnpm preview` — Preview local SSR production build.
 
-## Verification & Git Automation
+## Hard Constraints & Invariants
 
-- Run `pnpm run check` after code changes when practical.
-- Run `pnpm run build` for changes that can affect production output.
-- Before finishing any task, follow `.agents/rules/version-increment.md` exactly and silently.
-- After finishing each task/prompt, stage, commit, and push all changes (`git add .`, `git commit -m "updated project version: <concise description of changes>"`, `git push`) per `.agents/rules/git-workflow.md`. Every commit message MUST start with `updated project version`.
+- **Package Manager:** Use `pnpm` exclusively (never `npm` or `yarn`).
+- **Zero-JS Public Pages:** Never add client scripts, client frameworks, or client Firebase SDK to public routes. Keep public pages pure SSR HTML with pure CSS motion (why: speed & 0 KB visitor payload).
+- **Absolute Shadow Ban:** Never use CSS/SVG/Tailwind visual shadows (`box-shadow`, `drop-shadow`, `shadow-*`). Use solid M3 surface container tones (`#121212`, `#1E1E1E`, `#2D2D2D`), borders, rings, or transforms (why: strict design system consistency).
+- **Google Brand Palette:** Accent colors strictly limited to Google Blue (`#8AB4F8`/`#4285F4`), Green (`#81C784`/`#0F9D58`), Yellow (`#FDD663`/`#F9AB00`), and Red (`#F28B82`/`#EA4335`).
+- **Admin File Prefix:** All admin pages and API handlers inside `src/pages/admin/` must start with `admin_` (why: middleware route matching and security isolation).
+- **Storage Lifecycle:** Delete old Storage files before uploading replacements (why: atomic consistency & quota management).
+- **Contact Obfuscation:** Obfuscate public contact values with Base64 / RTL CSS (why: automated scraper protection).
+- **Mandatory Lifecycle Automation:**
+  1. Verify with `pnpm run check` and `pnpm run build`.
+  2. Silently increment patch version in `package.json` (`version-increment.md`).
+  3. Git sync: `git add . && git commit -m "updated project version: <summary>" && git push`.
+
+## Progressive Disclosure Links
+
+- System Architecture & Data Flow: [docs/architecture.md](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/docs/architecture.md)
+- Core System Invariants & Rules: [docs/invariants.md](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/docs/invariants.md)
+- Multi-Collection Data Model: [docs/data-model.md](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/docs/data-model.md)
+- Workflows & Procedural Playbooks: [.agents/skills/](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/.agents/skills)
