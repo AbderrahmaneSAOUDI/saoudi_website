@@ -1,7 +1,7 @@
 {
   "name": "saoudi_website",
   "type": "module",
-  "version": "1.74.355",
+  "version": "1.74.356",
   "packageManager": "pnpm@11.21.0",
   "engines": {
     "node": ">=22.12.0"

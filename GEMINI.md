@@ -42,6 +42,7 @@
   - Optimize all raster images to WebP (<50 KB) and compress SVGs.
   - Enforce explicit aspect ratios on media containers (`aspect-video`, `aspect-square`) to prevent Cumulative Layout Shift (CLS).
 - **Contact Link Obfuscation:** Encode emails, phone numbers, and messaging links using Base64 or RTL CSS (`unicode-bidi: bidi-override; direction: rtl;`) to block scrapers.
+- **Mobile Overview Sync Contract:** Any changes affecting admin overview collections (`accepted_admin_emails`, `system_logs`, `admin_todos`, `configuration/static_data`) or their schemas/business logic must be recorded in `docs/mobile_sync_contract.md` with versioned changelog entries for the standalone Flutter app.
 - **Silent Version Bump & Git Push Lifecycle:**
   - Calculate minor version as elapsed days since `2026-06-01`: `floor((Current Date - 2026-06-01) in days)`.
   - Increment patch version silently in `package.json` at the end of every prompt turn (do not announce in chat).

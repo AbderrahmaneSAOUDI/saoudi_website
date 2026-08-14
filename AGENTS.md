@@ -30,6 +30,7 @@ Personal portfolio & admin CMS for Abderrahmane SAOUDI built with Astro SSR, Typ
 - **Admin File Prefix:** All admin pages and API handlers inside `src/pages/admin/` must start with `admin_` (why: middleware route matching and security isolation).
 - **Storage Lifecycle:** Delete old Storage files before uploading replacements (why: atomic consistency & quota management).
 - **Contact Obfuscation:** Obfuscate public contact values with Base64 / RTL CSS (why: automated scraper protection).
+- **Mobile Overview Sync Contract:** When modifying admin overview collections (`accepted_admin_emails`, `system_logs`, `admin_todos`, `configuration/static_data`) or their business logic, update `docs/mobile_sync_contract.md` with versioned changelog entries for the standalone Flutter app.
 - **Mandatory Lifecycle Automation:**
   1. Verify with `pnpm run check` and `pnpm run build`.
   2. Silently increment patch version in `package.json` (`version-increment.md`).
@@ -40,4 +41,5 @@ Personal portfolio & admin CMS for Abderrahmane SAOUDI built with Astro SSR, Typ
 - System Architecture & Data Flow: [docs/architecture.md](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/docs/architecture.md)
 - Core System Invariants & Rules: [docs/invariants.md](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/docs/invariants.md)
 - Multi-Collection Data Model: [docs/data-model.md](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/docs/data-model.md)
+- Mobile App Sync Contract: [docs/mobile_sync_contract.md](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/docs/mobile_sync_contract.md)
 - Workflows & Procedural Playbooks: [.agents/skills/](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/.agents/skills)
