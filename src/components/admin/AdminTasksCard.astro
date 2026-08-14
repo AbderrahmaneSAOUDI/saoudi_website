@@ -1,0 +1,750 @@
+---
+import Icon from '../Icon.astro';
+import type { AdminTask } from '../../types';
+import { getEnv } from '../../lib/server/env';
+
+interface Props {
+	initialTasks?: AdminTask[];
+	isPrimaryAdmin?: boolean;
+}
+
+const primaryEmail = (getEnv('ADMIN_EMAIL') || '').toLowerCase().trim();
+const userEmail = (Astro.locals.adminEmail || '').toLowerCase().trim();
+const { initialTasks = [], isPrimaryAdmin = (userEmail === primaryEmail && primaryEmail !== '') } = Astro.props;
+---
+
+<div id="admin-tasks-card" class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-[380px] lg:h-[calc(90vh-420px)] min-h-[360px] relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.2,0,0.2,1)]">
+	<!-- Card Header & Navigation Tabs -->
+	<div id="tasks-card-header" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#2B2930]/80 pb-4 shrink-0 transition-all duration-300">
+		<!-- Header Title Button (Collapse / Expand Trigger) -->
+		<button
+			type="button"
+			id="btn-header-toggle-tasks"
+			class="flex items-center gap-3 text-left cursor-pointer group/header select-none focus:outline-none"
+			title="Click to collapse / expand Tasks"
+		>
+			<div class="w-10 h-10 rounded-2xl bg-[#F4B400]/10 text-[#F4B400] border border-[#F4B400]/20 flex items-center justify-center shrink-0 transition-transform duration-200 group-hover/header:scale-105">
+				<Icon name="design" size={20} class="w-5 h-5 flex items-center justify-center" />
+			</div>
+			<div class="flex items-center gap-2">
+				<h2 class="text-lg font-bold text-white tracking-tight group-hover/header:text-[#F4B400] transition-colors">Tasks</h2>
+				<span id="task-total-count-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#F4B400]/15 text-[#F4B400] border border-[#F4B400]/30">
+					{initialTasks.filter(t => t.status === 'active').length}
+				</span>
+			</div>
+		</button>
+
+		<!-- Status Tabs & Add Button -->
+		<div id="tasks-header-actions" class="flex items-center gap-2 self-start sm:self-auto shrink-0 flex-wrap transition-all duration-300 ease-out opacity-100 visible">
+			<div class="flex items-center bg-[#211F26] p-1 rounded-2xl border border-[#2B2930] text-xs font-medium">
+				<button
+					type="button"
+					data-tab="active"
+					class="task-tab-btn px-2.5 py-1.5 rounded-xl bg-primary text-white font-bold transition-all cursor-pointer flex items-center gap-1.5"
+					title="Active Tasks"
+				>
+					<Icon name="task_active" size={16} class="w-4 h-4" />
+					<span id="tab-count-active" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white">0</span>
+				</button>
+				<button
+					type="button"
+					data-tab="completed"
+					class="task-tab-btn px-2.5 py-1.5 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
+					title="Completed Tasks"
+				>
+					<Icon name="task_done" size={16} class="w-4 h-4" />
+					<span id="tab-count-completed" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/10 text-white/70">0</span>
+				</button>
+				<button
+					type="button"
+					data-tab="archived"
+					class="task-tab-btn px-2.5 py-1.5 rounded-xl text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
+					title="Archived Tasks"
+				>
+					<Icon name="task_archive" size={16} class="w-4 h-4" />
+					<span id="tab-count-archived" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/10 text-white/70">0</span>
+				</button>
+			</div>
+
+			<!-- Add Task Toggle Button [+] -->
+			<button
+				type="button"
+				id="btn-toggle-add-task"
+				class="p-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs transition-all duration-200 flex items-center justify-center cursor-pointer shrink-0"
+				title="Add Task"
+				aria-label="Add Task"
+			>
+				<Icon name="plus" size={16} class="w-4 h-4" />
+			</button>
+		</div>
+	</div>
+
+	<!-- Collapsible Content Wrapper -->
+	<div id="tasks-card-content" class="flex-1 min-h-0 flex flex-col transition-all duration-300 ease-out opacity-100 translate-y-0">
+		<!-- Smooth Collapsible Add Task Drawer -->
+		<div
+			id="add-task-drawer-wrapper"
+			class="grid transition-all duration-300 ease-[cubic-bezier(0.2,0,0.2,1)] shrink-0 overflow-hidden"
+			style="grid-template-rows: 0fr; opacity: 0; pointer-events: none;"
+		>
+			<div class="min-h-0 overflow-hidden">
+				<div class="pt-4">
+					<div class="p-4 rounded-2xl bg-[#211F26] border border-[#2B2930] space-y-3">
+						<div class="flex items-center justify-between">
+							<h3 class="text-xs font-bold text-white uppercase tracking-wider">Create New Task</h3>
+							<button type="button" id="btn-close-add-task" class="group p-1 rounded-lg text-[#E6E1E5]/50 hover:text-white hover:bg-white/5 transition-all cursor-pointer" title="Close">
+								<Icon name="close" size={16} class="w-4 h-4 group-hover:!hidden" />
+								<Icon name="close_filled" size={16} class="w-4 h-4 !hidden group-hover:!inline-flex" />
+							</button>
+						</div>
+
+						<form id="add-task-form" class="space-y-3">
+							<div>
+								<label class="block text-[11px] font-medium text-[#E6E1E5]/70 mb-1">Task Title *</label>
+								<input
+									type="text"
+									id="task-title-input"
+									required
+									placeholder="Brainstorm a task or idea..."
+									class="w-full px-3.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-xs focus:outline-none focus:border-primary transition-colors placeholder-[#E6E1E5]/40"
+								/>
+							</div>
+
+							<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+								<div>
+									<label class="block text-[11px] font-medium text-[#E6E1E5]/70 mb-1">Category</label>
+									<select
+										id="task-category-select"
+										class="w-full px-2.5 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-xs focus:outline-none focus:border-primary cursor-pointer"
+									>
+										<option value="Feature">Feature</option>
+										<option value="Bug">Bug</option>
+										<option value="Refactor">Refactor</option>
+										<option value="Idea">Idea</option>
+										<option value="Content">Content</option>
+										<option value="General" selected>General</option>
+									</select>
+								</div>
+
+								<div>
+									<label class="block text-[11px] font-medium text-[#E6E1E5]/70 mb-1">Priority</label>
+									<input type="hidden" id="task-priority-input" name="priority" value="" />
+									<button
+										type="button"
+										id="task-priority-toggle"
+										class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-[#E6E1E5]/60 hover:text-white transition-all cursor-pointer flex items-center justify-between text-xs"
+										title="Click to cycle priority: None -> Low -> Medium -> High"
+									>
+										<div class="flex items-center gap-1.5">
+											<span id="priority-flag-icon" class="text-[#E6E1E5]/40 transition-colors">
+												<Icon name="priority" size={16} class="w-4 h-4" />
+											</span>
+											<span id="priority-label-text" class="font-medium text-xs">None</span>
+										</div>
+										<span class="text-[10px] text-[#E6E1E5]/40 font-mono">Cycle</span>
+									</button>
+								</div>
+							</div>
+
+							<div class="flex justify-end gap-2 pt-1">
+								<button
+									type="button"
+									id="btn-cancel-task"
+									class="px-3 py-1.5 rounded-xl border border-[#2B2930] hover:bg-[#211F26] text-[#E6E1E5]/70 text-xs transition-colors cursor-pointer"
+								>
+									Cancel
+								</button>
+								<button
+									type="submit"
+									class="px-4 py-1.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs transition-all duration-300 flex items-center gap-1.5 cursor-pointer"
+								>
+									<Icon name="check" size={14} class="w-3.5 h-3.5" />
+									<span>Add Task</span>
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Scrollable Body for Task Items -->
+		<div class="flex-1 min-h-0 pt-3 overflow-hidden flex flex-col">
+			<!-- Task Items Container -->
+			<div id="tasks-list-container" class="space-y-2.5 overflow-y-auto flex-1 scrollbar-hide pr-1">
+				<!-- Rendered via JS -->
+			</div>
+
+			<!-- Empty State -->
+			<div id="tasks-empty-state" class="hidden my-auto py-8 text-center text-[#E6E1E5]/40 bg-[#211F26]/50 rounded-2xl border border-dashed border-[#2B2930]">
+				<p id="empty-state-title" class="text-xs font-semibold text-white">No tasks found</p>
+				<p id="empty-state-subtitle" class="text-[11px] mt-0.5">Use the [+] button above to add a new task to your brainstorming list.</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script is:inline define:vars={{ initialTasksData: initialTasks, isPrimaryAdminUser: isPrimaryAdmin, currentAdminEmail: userEmail, primaryAdminEmail: primaryEmail }}>
+	Object.assign(window, { 
+		initialAdminTasks: initialTasksData || [],
+		isPrimaryAdminUser: Boolean(isPrimaryAdminUser),
+		currentAdminEmail: currentAdminEmail || '',
+		primaryAdminEmail: primaryAdminEmail || ''
+	});
+</script>
+
+<script>
+	import { escapeAttribute, escapeHtml } from '../../lib/client-safety';
+
+	document.addEventListener('DOMContentLoaded', () => {
+		const listContainer = document.getElementById('tasks-list-container') as HTMLDivElement;
+		const emptyState = document.getElementById('tasks-empty-state') as HTMLDivElement;
+		const emptyStateTitle = document.getElementById('empty-state-title') as HTMLParagraphElement;
+		const emptyStateSubtitle = document.getElementById('empty-state-subtitle') as HTMLParagraphElement;
+		const totalCountBadge = document.getElementById('task-total-count-badge') as HTMLSpanElement;
+
+		const countActive = document.getElementById('tab-count-active') as HTMLSpanElement;
+		const countCompleted = document.getElementById('tab-count-completed') as HTMLSpanElement;
+		const countArchived = document.getElementById('tab-count-archived') as HTMLSpanElement;
+
+		const btnToggleAdd = document.getElementById('btn-toggle-add-task') as HTMLButtonElement;
+		const drawerWrapper = document.getElementById('add-task-drawer-wrapper') as HTMLDivElement;
+		const btnCloseAdd = document.getElementById('btn-close-add-task') as HTMLButtonElement;
+		const btnCancel = document.getElementById('btn-cancel-task') as HTMLButtonElement;
+		const addTaskForm = document.getElementById('add-task-form') as HTMLFormElement;
+		const titleInput = document.getElementById('task-title-input') as HTMLInputElement;
+		const categorySelect = document.getElementById('task-category-select') as HTMLSelectElement;
+		const priorityInput = document.getElementById('task-priority-input') as HTMLInputElement;
+		const priorityToggle = document.getElementById('task-priority-toggle') as HTMLButtonElement;
+		const priorityFlagIcon = document.getElementById('priority-flag-icon') as HTMLSpanElement;
+		const priorityLabelText = document.getElementById('priority-label-text') as HTMLSpanElement;
+
+		const btnHeaderToggle = document.getElementById('btn-header-toggle-tasks') as HTMLButtonElement;
+		const cardElem = document.getElementById('admin-tasks-card') as HTMLDivElement;
+		const cardContent = document.getElementById('tasks-card-content') as HTMLDivElement;
+		const cardHeader = document.getElementById('tasks-card-header') as HTMLDivElement;
+		const headerActions = document.getElementById('tasks-header-actions') as HTMLDivElement;
+
+		const tabButtons = document.querySelectorAll('.task-tab-btn') as NodeListOf<HTMLButtonElement>;
+
+		let isDrawerOpen = false;
+
+		function setDrawerState(open: boolean) {
+			isDrawerOpen = open;
+			if (drawerWrapper) {
+				drawerWrapper.style.gridTemplateRows = open ? '1fr' : '0fr';
+				drawerWrapper.style.opacity = open ? '1' : '0';
+				drawerWrapper.style.pointerEvents = open ? 'auto' : 'none';
+			}
+			if (open) {
+				setTimeout(() => titleInput?.focus(), 150);
+			}
+		}
+
+		if (btnToggleAdd) {
+			btnToggleAdd.addEventListener('click', (e) => {
+				e.stopPropagation();
+				setDrawerState(!isDrawerOpen);
+			});
+		}
+
+		if (btnCloseAdd) {
+			btnCloseAdd.addEventListener('click', () => setDrawerState(false));
+		}
+
+		if (btnCancel) {
+			btnCancel.addEventListener('click', () => setDrawerState(false));
+		}
+
+		const STORAGE_KEY = 'admin_tasks_collapsed';
+		let isCollapsed = localStorage.getItem(STORAGE_KEY) === 'true';
+
+		function setCollapsedState(collapsed: boolean) {
+			isCollapsed = collapsed;
+			if (collapsed) {
+				cardElem?.classList.remove('h-[380px]', 'lg:h-[calc(90vh-420px)]', 'min-h-[360px]');
+				cardElem?.classList.add('h-[88px]', 'min-h-[88px]');
+				cardContent?.classList.add('opacity-0', 'pointer-events-none', '-translate-y-2');
+				cardContent?.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+				headerActions?.classList.add('opacity-0', 'pointer-events-none', 'invisible');
+				headerActions?.classList.remove('opacity-100', 'pointer-events-auto', 'visible');
+				cardHeader?.classList.remove('border-[#2B2930]/80', 'pb-4');
+				cardHeader?.classList.add('border-transparent', 'pb-0');
+				btnHeaderToggle?.setAttribute('aria-expanded', 'false');
+			} else {
+				cardElem?.classList.add('h-[380px]', 'lg:h-[calc(90vh-420px)]', 'min-h-[360px]');
+				cardElem?.classList.remove('h-[88px]', 'min-h-[88px]');
+				cardContent?.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-2');
+				cardContent?.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+				headerActions?.classList.remove('opacity-0', 'pointer-events-none', 'invisible');
+				headerActions?.classList.add('opacity-100', 'pointer-events-auto', 'visible');
+				cardHeader?.classList.add('border-[#2B2930]/80', 'pb-4');
+				cardHeader?.classList.remove('border-transparent', 'pb-0');
+				btnHeaderToggle?.setAttribute('aria-expanded', 'true');
+			}
+		}
+
+		setCollapsedState(isCollapsed);
+
+		if (btnHeaderToggle) {
+			btnHeaderToggle.addEventListener('click', (e) => {
+				e.preventDefault();
+				const nextState = !isCollapsed;
+				localStorage.setItem(STORAGE_KEY, String(nextState));
+				setCollapsedState(nextState);
+			});
+		}
+
+		let currentTab: 'active' | 'completed' | 'archived' = 'active';
+		let tasks: any[] = (window as any).initialAdminTasks || [];
+
+		function formatEmailLabel(email: string): string {
+			if (!email || typeof email !== 'string') return '';
+			const primaryOwner = ((window as any).primaryAdminEmail || '').toLowerCase().trim();
+			const cleanEmail = email.toLowerCase().trim();
+
+			if (primaryOwner && cleanEmail === primaryOwner) {
+				return 'Owner';
+			}
+
+			if (cleanEmail.endsWith('@gmail.com')) {
+				return cleanEmail.slice(0, -10);
+			}
+
+			return email;
+		}
+
+		function showStatus(msg: string, type: 'success' | 'error') {
+			if (typeof (window as any).showToast === 'function') {
+				(window as any).showToast(msg, type);
+			}
+		}
+
+		function getPriorityStyle(priority?: string) {
+			switch (priority) {
+				case 'High':
+					return {
+						flagColor: '#EA4335',
+						textClass: 'text-[#EA4335]',
+						badgeClass: 'bg-[#EA4335]/15 text-[#EA4335] border-[#EA4335]/30 font-bold',
+						label: 'High Priority',
+					};
+				case 'Medium':
+					return {
+						flagColor: '#F9AB00',
+						textClass: 'text-[#F9AB00]',
+						badgeClass: 'bg-[#F9AB00]/15 text-[#F9AB00] border-[#F9AB00]/30 font-bold',
+						label: 'Medium Priority',
+					};
+				case 'Low':
+					return {
+						flagColor: '#34A853',
+						textClass: 'text-[#34A853]',
+						badgeClass: 'bg-[#34A853]/15 text-[#34A853] border-[#34A853]/30 font-medium',
+						label: 'Low Priority',
+					};
+				default:
+					return {
+						flagColor: '#E6E1E5',
+						textClass: 'text-[#E6E1E5]/40',
+						badgeClass: 'bg-white/5 text-[#E6E1E5]/50 border-[#2B2930]',
+						label: 'No Priority',
+					};
+			}
+		}
+
+		function updatePriorityToggleUI() {
+			if (!priorityInput || !priorityToggle || !priorityFlagIcon || !priorityLabelText) return;
+			const currentVal = priorityInput.value;
+			const style = getPriorityStyle(currentVal);
+
+			priorityLabelText.textContent = currentVal || 'None';
+			priorityLabelText.className = `font-medium text-xs ${style.textClass}`;
+			priorityFlagIcon.style.color = currentVal ? style.flagColor : '';
+			priorityFlagIcon.className = `transition-colors ${currentVal ? style.textClass : 'text-[#E6E1E5]/40'}`;
+			priorityToggle.setAttribute('title', `Priority: ${currentVal || 'None'} (Click to cycle)`);
+		}
+
+		if (priorityToggle && priorityInput) {
+			priorityToggle.addEventListener('click', (e) => {
+				e.preventDefault();
+				const current = priorityInput.value;
+				let next = '';
+				if (!current) next = 'Low';
+				else if (current === 'Low') next = 'Medium';
+				else if (current === 'Medium') next = 'High';
+				else next = '';
+
+				priorityInput.value = next;
+				updatePriorityToggleUI();
+			});
+		}
+
+		// Initial render
+		updatePriorityToggleUI();
+		renderTasks();
+
+		// Fetch latest tasks periodically while visible
+		setInterval(() => {
+			if (!document.hidden) fetchTasks();
+		}, 25000);
+
+		async function fetchTasks() {
+			try {
+				const res = await fetch(`/admin/admin_tasks_api?t=${Date.now()}`);
+				if (res.ok) {
+					const data = await res.json();
+					if (data.success && Array.isArray(data.tasks || data.todos)) {
+						tasks = data.tasks || data.todos;
+						renderTasks();
+					}
+				}
+			} catch (err) {
+				console.warn('Could not fetch latest tasks:', err);
+			}
+		}
+
+		function renderTasks() {
+			const isPrimary = (window as any).isPrimaryAdminUser;
+			const currentEmail = ((window as any).currentAdminEmail || '').toLowerCase().trim();
+			const primaryOwner = ((window as any).primaryAdminEmail || '').toLowerCase().trim();
+
+			const userTasks = isPrimary
+				? tasks
+				: tasks.filter(t => String(t.createdBy || primaryOwner).toLowerCase().trim() === currentEmail);
+
+			const activeTasks = userTasks.filter(t => t.status === 'active' || !t.status);
+			const completedTasks = userTasks.filter(t => t.status === 'completed');
+			const archivedTasks = userTasks.filter(t => t.status === 'archived');
+
+			if (countActive) countActive.textContent = String(activeTasks.length);
+			if (countCompleted) countCompleted.textContent = String(completedTasks.length);
+			if (countArchived) countArchived.textContent = String(archivedTasks.length);
+			if (totalCountBadge) totalCountBadge.textContent = String(activeTasks.length);
+
+			let displayedTasks = activeTasks;
+			if (currentTab === 'completed') displayedTasks = completedTasks;
+			if (currentTab === 'archived') displayedTasks = archivedTasks;
+
+			listContainer.innerHTML = '';
+
+			if (displayedTasks.length === 0) {
+				emptyState.classList.remove('hidden');
+				listContainer.classList.add('hidden');
+
+				if (currentTab === 'active') {
+					emptyStateTitle.textContent = 'No active tasks';
+					emptyStateSubtitle.textContent = 'Use the [+] button above to add a new task to your brainstorming list.';
+				} else if (currentTab === 'completed') {
+					emptyStateTitle.textContent = 'No completed tasks';
+					emptyStateSubtitle.textContent = 'Finished tasks will appear here once checked off.';
+				} else {
+					emptyStateTitle.textContent = 'No archived tasks';
+					emptyStateSubtitle.textContent = 'Archived tasks will be stored here for future reference.';
+				}
+				return;
+			}
+
+			emptyState.classList.add('hidden');
+			listContainer.classList.remove('hidden');
+
+			displayedTasks.forEach(task => {
+				const isCompleted = task.status === 'completed';
+				const isArchived = task.status === 'archived';
+				const creatorLabel = formatEmailLabel(task.createdBy);
+				const priorityStyle = getPriorityStyle(task.priority);
+
+				const card = document.createElement('div');
+				card.className = `p-3 rounded-2xl bg-[#211F26] border border-[#2B2930] hover:border-white/20 transition-all flex flex-col gap-2 group ${isCompleted ? 'opacity-70 bg-[#1A181E]' : ''}`;
+
+				const safeTitle = escapeHtml(task.title || '');
+				const safeTitleAttr = escapeAttribute(task.title || '');
+				const safeId = escapeAttribute(task.id || '');
+				const safeCategory = escapeHtml(task.category || 'General');
+
+				card.innerHTML = `
+					<div class="flex items-start justify-between gap-2.5">
+						<div class="flex items-start gap-2.5 min-w-0 flex-1">
+							<!-- Checkbox Button -->
+							<button
+								type="button"
+								class="btn-toggle-complete mt-0.5 w-5 h-5 rounded-lg border flex items-center justify-center transition-all cursor-pointer shrink-0 ${isCompleted ? 'bg-[#0F9D58] border-[#0F9D58] text-white' : 'border-[#2B2930] bg-[#141218] hover:border-primary text-transparent'}"
+								data-id="${safeId}"
+								title="${isCompleted ? 'Mark as active' : 'Mark as completed'}"
+							>
+								<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+							</button>
+
+							<div class="min-w-0 flex-1">
+								<p class="text-xs font-semibold text-white truncate ${isCompleted ? 'line-through text-[#E6E1E5]/60' : ''}" title="${safeTitleAttr}">${safeTitle}</p>
+								
+								<div class="flex items-center gap-2 mt-1 flex-wrap">
+									<!-- Category Badge -->
+									<span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-white/5 text-[#E6E1E5]/70 border border-[#2B2930]">
+										${safeCategory}
+									</span>
+
+									<!-- Priority Flag Badge (Colored) -->
+									${task.priority ? `
+										<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold border flex items-center gap-1 ${priorityStyle.badgeClass}">
+											<svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" style="color: ${priorityStyle.flagColor}" viewBox="0 0 24 24" fill="currentColor"><path d="M4 2v20h2V14h11l-1-4 1-4H6V2H4z"/></svg>
+											<span>${escapeHtml(task.priority)}</span>
+										</span>
+									` : ''}
+
+									${creatorLabel && isPrimary ? `
+										<span class="text-[10px] text-[#E6E1E5]/40 font-mono">
+											by ${escapeHtml(creatorLabel)}
+										</span>
+									` : ''}
+								</div>
+							</div>
+						</div>
+
+						<!-- Task Item Actions -->
+						<div class="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+							${!isArchived ? `
+								<button
+									type="button"
+									class="btn-archive-task p-1.5 rounded-lg text-[#E6E1E5]/40 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+									data-id="${safeId}"
+									title="Archive task"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+								</button>
+							` : `
+								<button
+									type="button"
+									class="btn-restore-task p-1.5 rounded-lg text-[#E6E1E5]/40 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+									data-id="${safeId}"
+									title="Restore task to active"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+								</button>
+							`}
+
+							${isPrimary ? `
+								<button
+									type="button"
+									class="btn-delete-task p-1.5 rounded-lg text-[#EA4335]/70 hover:text-[#EA4335] hover:bg-[#EA4335]/10 transition-colors cursor-pointer"
+									data-id="${safeId}"
+									title="Delete task permanently"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+								</button>
+							` : ''}
+						</div>
+					</div>
+				`;
+
+				listContainer.appendChild(card);
+			});
+
+			attachItemActions();
+		}
+
+		function attachItemActions() {
+			// Toggle completion
+			listContainer.querySelectorAll('.btn-toggle-complete').forEach(btn => {
+				btn.addEventListener('click', async () => {
+					const id = btn.getAttribute('data-id');
+					if (!id) return;
+
+					try {
+						const formData = new FormData();
+						formData.append('action', 'toggle_complete');
+						formData.append('id', id);
+
+						const res = await fetch('/admin/admin_tasks_api', {
+							method: 'POST',
+							body: formData,
+						});
+						const data = await res.json();
+						if (res.ok && data.success) {
+							const item = tasks.find(t => t.id === id);
+							if (item) {
+								item.status = data.status;
+								item.completedAt = data.completedAt;
+							}
+							renderTasks();
+						} else {
+							showStatus(data.error || 'Failed to update task status.', 'error');
+						}
+					} catch (err) {
+						showStatus('Error updating task.', 'error');
+					}
+				});
+			});
+
+			// Archive task
+			listContainer.querySelectorAll('.btn-archive-task').forEach(btn => {
+				btn.addEventListener('click', async () => {
+					const id = btn.getAttribute('data-id');
+					if (!id) return;
+
+					try {
+						const formData = new FormData();
+						formData.append('action', 'archive');
+						formData.append('id', id);
+
+						const res = await fetch('/admin/admin_tasks_api', {
+							method: 'POST',
+							body: formData,
+						});
+						const data = await res.json();
+						if (res.ok && data.success) {
+							const item = tasks.find(t => t.id === id);
+							if (item) {
+								item.status = 'archived';
+								item.archivedAt = data.archivedAt;
+							}
+							renderTasks();
+							showStatus('Task moved to archive.', 'success');
+						} else {
+							showStatus(data.error || 'Failed to archive task.', 'error');
+						}
+					} catch (err) {
+						showStatus('Error archiving task.', 'error');
+					}
+				});
+			});
+
+			// Restore task
+			listContainer.querySelectorAll('.btn-restore-task').forEach(btn => {
+				btn.addEventListener('click', async () => {
+					const id = btn.getAttribute('data-id');
+					if (!id) return;
+
+					try {
+						const formData = new FormData();
+						formData.append('action', 'restore');
+						formData.append('id', id);
+
+						const res = await fetch('/admin/admin_tasks_api', {
+							method: 'POST',
+							body: formData,
+						});
+						const data = await res.json();
+						if (res.ok && data.success) {
+							const item = tasks.find(t => t.id === id);
+							if (item) {
+								item.status = 'active';
+								item.archivedAt = null;
+							}
+							renderTasks();
+							showStatus('Task restored to active list.', 'success');
+						} else {
+							showStatus(data.error || 'Failed to restore task.', 'error');
+						}
+					} catch (err) {
+						showStatus('Error restoring task.', 'error');
+					}
+				});
+			});
+
+			// Delete task permanently
+			listContainer.querySelectorAll('.btn-delete-task').forEach(btn => {
+				btn.addEventListener('click', async () => {
+					const id = btn.getAttribute('data-id');
+					if (!id) return;
+
+					const confirmed = typeof (window as any).showConfirmDialog === 'function'
+						? await (window as any).showConfirmDialog('Delete Task', 'Are you sure you want to permanently delete this task? This action cannot be undone.')
+						: confirm('Are you sure you want to permanently delete this task?');
+
+					if (confirmed) {
+						try {
+							const formData = new FormData();
+							formData.append('action', 'delete');
+							formData.append('id', id);
+
+							const res = await fetch('/admin/admin_tasks_api', {
+								method: 'POST',
+								body: formData,
+							});
+							const data = await res.json();
+							if (res.ok && data.success) {
+								tasks = tasks.filter(t => t.id !== id);
+								renderTasks();
+								showStatus('Task permanently deleted.', 'success');
+							} else {
+								showStatus(data.error || 'Failed to delete task.', 'error');
+							}
+						} catch (err) {
+							showStatus('Error deleting task.', 'error');
+						}
+					}
+				});
+			});
+		}
+
+		// Tab switching
+		tabButtons.forEach(btn => {
+			btn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				tabButtons.forEach(b => {
+					b.classList.remove('bg-primary', 'text-white', 'font-bold');
+					b.classList.add('text-[#E6E1E5]/60');
+				});
+				btn.classList.add('bg-primary', 'text-white', 'font-bold');
+				btn.classList.remove('text-[#E6E1E5]/60');
+
+				currentTab = btn.getAttribute('data-tab') as any;
+				renderTasks();
+			});
+		});
+
+		// Submit new task
+		addTaskForm.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const title = titleInput.value.trim();
+			const category = categorySelect.value;
+			const priority = priorityInput ? priorityInput.value : '';
+
+			if (!title) return;
+
+			try {
+				const formData = new FormData();
+				formData.append('action', 'create');
+				formData.append('title', title);
+				formData.append('category', category);
+				formData.append('priority', priority);
+
+				const res = await fetch('/admin/admin_tasks_api', {
+					method: 'POST',
+					body: formData,
+				});
+
+				const data = await res.json();
+				if (res.ok && data.success) {
+					titleInput.value = '';
+					if (priorityInput) priorityInput.value = '';
+					updatePriorityToggleUI();
+					setDrawerState(false);
+					showStatus('New task added! 🚀', 'success');
+
+					const newTask = data.task || data.todo;
+					if (newTask) {
+						tasks = [newTask, ...tasks.filter(t => t.id !== newTask.id)];
+					}
+
+					currentTab = 'active';
+					tabButtons.forEach(b => {
+						const isAct = b.getAttribute('data-tab') === 'active';
+						b.classList.toggle('bg-primary', isAct);
+						b.classList.toggle('text-white', isAct);
+						b.classList.toggle('font-bold', isAct);
+						b.classList.toggle('text-[#E6E1E5]/60', !isAct);
+					});
+
+					renderTasks();
+					fetchTasks();
+				} else {
+					showStatus(data.error || 'Failed to add task.', 'error');
+				}
+			} catch (err) {
+				showStatus('Error submitting task.', 'error');
+			}
+		});
+	});
+</script>

@@ -32,8 +32,9 @@ These instructions apply to every Codex task in this repository.
 - Do not introduce new Firestore collections or entry-type literals without reconciling the requested change with `.devin/rules/rules.md` and the repository's existing multi-collection schema.
 - Preserve existing comments and docstrings unless the surrounding code is directly changed.
 
-## Verification
+## Verification & Git Automation
 
 - Run `pnpm run check` after code changes when practical.
 - Run `pnpm run build` for changes that can affect production output.
 - Before finishing any task, follow `.agents/rules/version-increment.md` exactly and silently.
+- After finishing each task/prompt, stage, commit, and push all changes (`git add .`, `git commit -m "<concise description of changes>"`, `git push`) per `.agents/rules/git-workflow.md`.

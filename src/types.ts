@@ -251,26 +251,26 @@ export const acceptedAdminEmailSchema = z.object({
 	notes: z.string().optional(),
 });
 
-// ─── Collection: admin_todos ──────────────────────────────────────────────
+// ─── Collection: admin_todos (Admin Tasks) ──────────────────────────────────
 
-export type TodoCategory = 'Feature' | 'Bug' | 'Refactor' | 'Idea' | 'Content' | 'General';
-export type TodoPriority = 'High' | 'Medium' | 'Low' | '' | undefined;
-export type TodoStatus = 'active' | 'completed' | 'archived';
+export type TaskCategory = 'Feature' | 'Bug' | 'Refactor' | 'Idea' | 'Content' | 'General';
+export type TaskPriority = 'High' | 'Medium' | 'Low' | '' | undefined;
+export type TaskStatus = 'active' | 'completed' | 'archived';
 
-export interface AdminTodo {
+export interface AdminTask {
 	id: string;
 	title: string;
 	description?: string;
-	category: TodoCategory;
-	priority?: TodoPriority;
-	status: TodoStatus;
+	category: TaskCategory;
+	priority?: TaskPriority;
+	status: TaskStatus;
 	createdAt: string; // ISO 8601
 	completedAt?: string | null;
 	archivedAt?: string | null;
 	createdBy?: string;
 }
 
-export const adminTodoSchema = z.object({
+export const adminTaskSchema = z.object({
 	id: z.string().min(1),
 	title: z.string().min(1),
 	description: z.string().optional(),
@@ -282,6 +282,13 @@ export const adminTodoSchema = z.object({
 	archivedAt: z.string().nullable().optional(),
 	createdBy: z.string().optional(),
 });
+
+// Backward-compatibility aliases
+export type TodoCategory = TaskCategory;
+export type TodoPriority = TaskPriority;
+export type TodoStatus = TaskStatus;
+export type AdminTodo = AdminTask;
+export const adminTodoSchema = adminTaskSchema;
 
 // ─── Collection: system_logs ───────────────────────────────────────────────
 
@@ -336,6 +343,12 @@ export type LogAction =
 	| 'ADMIN_DOWNLOADS_EXCLUSION_TOGGLED'
 	| 'ADMIN_DOWNLOADS_RESET'
 	// Task management
+	| 'TASK_CREATED'
+	| 'TASK_COMPLETED'
+	| 'TASK_UNCOMPLETED'
+	| 'TASK_ARCHIVED'
+	| 'TASK_RESTORED'
+	| 'TASK_DELETED'
 	| 'TODO_CREATED'
 	| 'TODO_COMPLETED'
 	| 'TODO_UNCOMPLETED'
@@ -470,9 +483,11 @@ export const parseAcceptedAdminEmail = (data: unknown): AcceptedAdminEmail => {
 	return acceptedAdminEmailSchema.parse(data);
 };
 
-export const parseAdminTodo = (data: unknown): AdminTodo => {
-	return adminTodoSchema.parse(data);
+export const parseAdminTask = (data: unknown): AdminTask => {
+	return adminTaskSchema.parse(data);
 };
+
+export const parseAdminTodo = parseAdminTask;
 
 export const parseSystemLog = (data: unknown): SystemLog => {
 	return systemLogSchema.parse(data);
