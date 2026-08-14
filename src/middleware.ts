@@ -23,7 +23,6 @@ const PUBLIC_PAGE_PATHS = new Set([
   '/experience',
   '/resume',
   '/services',
-  '/volunteering',
 ]);
 
 /**

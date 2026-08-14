@@ -112,7 +112,7 @@ graph TD
 
 - **Astro SSR Output Mode:** Public routes are server-rendered HTML with zero client-side Firebase SDK usage.
 - **Isolated Admin Workspace:** `/admin` contains the interactive content-management scripts and is gated by server-rendered middleware checks.
-- **Decoupled Multi-Collection Schema:** Content is split across individual Firestore collections (`experience`, `projects`, `designs`, `certifications`, `volunteering`) and configuration documents.
+- **Decoupled Multi-Collection Schema:** Content is split across individual Firestore collections (`experience`, `projects`, `designs`, `certifications`, `services`) and configuration documents.
 - **Zero-JS Obfuscation:** Public pages hide contact emails and phones using CSS reversed text order (`unicode-bidi: bidi-override; direction: rtl;`) or data attributes styled in pseudo-elements, ensuring crawlers cannot parse details without running JS.
 
 ---
@@ -138,7 +138,7 @@ The public site is server-rendered and styled with CSS and Tailwind utilities. T
 
 ## Features
 
-- Public pages for home, projects, experience, volunteering, certifications, designs, and resume.
+- Public pages for home, projects, experience, services, certifications, designs, and resume.
 - SSR output with Astro and a Vercel adapter.
 - Animated public UI built with CSS keyframes and Tailwind transitions.
 - Protected admin routes guarded by `src/middleware.ts`.
@@ -152,7 +152,7 @@ Public pages:
 - `/`
 - `/projects`
 - `/experience`
-- `/volunteering`
+- `/services`
 - `/certifications`
 - `/designs`
 - `/resume`
@@ -167,7 +167,7 @@ Admin pages and endpoints:
 - `/admin/admin_projects`
 - `/admin/admin_designs`
 - `/admin/admin_certifications`
-- `/admin/admin_volunteering`
+- `/admin/admin_services`
 - `/admin/admin_resume`
 - `/admin/admin_resume_upload`
 - `/admin/admin_designs_api`

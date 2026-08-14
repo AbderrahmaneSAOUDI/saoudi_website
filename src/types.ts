@@ -10,7 +10,7 @@ import { z } from 'zod';
  *   - projects       → Project documents
  *   - designs        → Design documents
  *   - certificates   → Certificate documents
- *   - volunteering   → Volunteering documents
+ *   - services       → Service documents
  *
  * See README.md for the single-authoritative schema.
  */
@@ -181,30 +181,6 @@ export const certificateSchema = z.object({
 	type: z.enum(['Online', 'In-Person', 'Hybrid']),
 	credentialUrl: z.string().nullable().optional(),
 	imageUrl: z.string().nullable().optional(),
-});
-
-// ─── Collection: volunteering ─────────────────────────────────────────────
-
-export interface Volunteering {
-	id: string;
-	order: number;
-	role: string;
-	organization: string;
-	date: string; // ISO 8601
-	period: string;
-	description: string;
-	impactMetric?: string;
-}
-
-export const volunteeringSchema = z.object({
-	id: z.string().min(1),
-	order: z.number().int(),
-	role: z.string().min(1),
-	organization: z.string().min(1),
-	date: z.string().min(1),
-	period: z.string().min(1),
-	description: z.string().min(1),
-	impactMetric: z.string().min(1).optional(),
 });
 
 // ─── Collection: services ──────────────────────────────────────────────────
@@ -465,10 +441,6 @@ export const parseDesign = (data: unknown): Design => {
 
 export const parseCertificate = (data: unknown): Certificate => {
 	return certificateSchema.parse(data);
-};
-
-export const parseVolunteering = (data: unknown): Volunteering => {
-	return volunteeringSchema.parse(data);
 };
 
 export const parseService = (data: unknown): Service => {

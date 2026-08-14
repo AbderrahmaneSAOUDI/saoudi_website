@@ -4,7 +4,7 @@ Personal portfolio & admin CMS for Abderrahmane SAOUDI built with Astro SSR, Typ
 
 ## Directory Map
 
-- `src/pages/` — Public zero-JS SSR pages (`/`, `/projects`, `/experience`, `/designs`, `/certifications`, `/services`, `/volunteering`, `/resume`).
+- `src/pages/` — Public zero-JS SSR pages (`/`, `/projects`, `/experience`, `/designs`, `/certifications`, `/services`, `/resume`).
 - `src/pages/admin/` — Protected admin pages & API endpoints (strictly prefixed with `admin_`).
 - `src/components/` — Astro components, Server Islands (`*Island.astro`), and admin panels (`src/components/admin/`).
 - `src/lib/server/` — Server-only singletons (`firebase-admin.ts`, `session.ts`, `admin-authorization.ts`, `cache.ts`, `system-logs.ts`, `storage.ts`).

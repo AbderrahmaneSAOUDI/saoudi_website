@@ -11,9 +11,9 @@ import { CACHE_TTL_MS, getOrSetCached } from '../lib/server/cache';
 
 interface Props {}
 
-type CountsData = { projects: number; experience: number; designs: number; certificates: number; volunteering: number; };
+type CountsData = { projects: number; experience: number; designs: number; certificates: number; };
 
-const defaultCounts: CountsData = { projects: 0, experience: 0, designs: 0, certificates: 0, volunteering: 0 };
+const defaultCounts: CountsData = { projects: 0, experience: 0, designs: 0, certificates: 0 };
 const cacheKeyCounts = 'public_dashboard_counts';
 let counts: CountsData = defaultCounts;
 
@@ -22,12 +22,11 @@ try {
 		cacheKeyCounts,
 		async () => {
 		const db = getFirebaseAdminDb();
-		const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, volunteeringSnap] = await Promise.all([
+		const [projectsSnap, experienceSnap, designsSnap, certificatesSnap] = await Promise.all([
 			db.collection("projects").count().get(),
 			db.collection("experience").count().get(),
 			db.collection("designs").count().get(),
 			db.collection("certificates").count().get(),
-			db.collection("volunteering").count().get(),
 		]);
 
 		return {
@@ -35,7 +34,6 @@ try {
 			experience: experienceSnap.data().count,
 			designs: designsSnap.data().count,
 			certificates: certificatesSnap.data().count,
-			volunteering: volunteeringSnap.data().count,
 		};
 		},
 		CACHE_TTL_MS.PUBLIC_DATA,
@@ -55,11 +53,10 @@ const statCards = [
 	{ label: 'Experience', rawValue: counts.experience, value: formatStatCount(counts.experience), icon: 'experience', color: 'secondary', href: '/experience', disabled: false },
 	{ label: 'Designs', rawValue: counts.designs, value: formatStatCount(counts.designs), icon: 'design', color: 'tertiary', href: '/designs', disabled: false },
 	{ label: 'Certificates', rawValue: counts.certificates, value: formatStatCount(counts.certificates), icon: 'certifications', color: 'primary', href: '/certifications', disabled: false },
-	{ label: 'Volunteering', rawValue: counts.volunteering, value: formatStatCount(counts.volunteering), icon: 'business', color: 'secondary', href: '#', disabled: true },
 ];
 ---
 
-<div id="home-counts-island" class="relative grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+<div id="home-counts-island" class="relative grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 	{statCards.map(({ label, rawValue, value, icon, color, href, disabled }) => 
 		disabled ? (
 			<button

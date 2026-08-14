@@ -4,7 +4,7 @@
  * 
  * Floating bottom navigation dock for the protected admin workspace.
  * Mirrors the exact design, geometry, and CSS-only animations of PublicHeader navbar,
- * while preserving admin workflow features, keyboard shortcuts (1-9), and disabled state toasts.
+ * with overflow-visible hover scaling, flush edge alignment, and keyboard shortcuts (1-7).
  */
 import Icon from '../Icon.astro';
 
@@ -25,20 +25,18 @@ const navItems = [
 	{ label: 'Designs', path: '/admin/admin_designs', iconName: 'design', shortcutKey: '4' },
 	{ label: 'Certifications', path: '/admin/admin_certifications', iconName: 'certifications', shortcutKey: '5' },
 	{ label: 'Services', path: '/admin/admin_services', iconName: 'service', shortcutKey: '6' },
-	{ label: 'Volunteering', path: '/admin/admin_volunteering', iconName: 'business', disabled: true, shortcutKey: '7' },
-	{ label: 'Resume', path: '/admin/admin_resume', iconName: 'document', shortcutKey: '8' },
-	{ label: 'Timeline', path: '/admin/admin_timeline', iconName: 'calendar', disabled: true, shortcutKey: '9' },
+	{ label: 'Resume', path: '/admin/admin_resume', iconName: 'document', shortcutKey: '7' },
 ];
 ---
 
 <div
 	id="admin-nav-dock"
-	class="admin-dock-wrapper fixed bottom-4 md:bottom-6 left-1/2 z-50 -translate-x-1/2 max-w-[calc(100vw-1.5rem)] px-1 sm:px-0 flex justify-center pointer-events-none"
+	class="admin-dock-wrapper fixed bottom-4 md:bottom-6 left-1/2 z-50 -translate-x-1/2 max-w-[calc(100vw-1.5rem)] flex justify-center pointer-events-none"
 >
 	<!-- Floating Pill Navigation Dock matching PublicHeader design -->
 	<nav
 		aria-label="Admin workspace navigation"
-		class="admin-dock-inner pointer-events-auto flex items-center gap-1.5 sm:gap-2 h-11 bg-surface/60 backdrop-blur-xl border border-white/10 hover:border-white/20 rounded-full p-1 sm:px-1.5 transition-all duration-300 max-w-full overflow-x-auto overflow-y-hidden scrollbar-hide select-none"
+		class="admin-dock-inner pointer-events-auto flex items-center gap-1.5 sm:gap-2 h-11 bg-surface/60 backdrop-blur-xl border border-white/10 hover:border-white/20 rounded-full p-0 transition-all duration-300 max-w-full overflow-visible select-none"
 	>
 		{
 			navItems.map((item) => {
@@ -49,13 +47,10 @@ const navItems = [
 
 				return (
 					<a
-						href={item.disabled ? '#' : item.path}
-						data-disabled={item.disabled ? 'true' : undefined}
+						href={item.path}
 						data-label={item.label}
-						class={`admin-nav-item group h-11 min-h-[44px] min-w-[44px] flex items-center justify-center gap-2 px-2.5 min-[920px]:px-4 rounded-full font-medium text-sm whitespace-nowrap origin-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shrink-0 ${
-							item.disabled
-								? 'text-white/30 cursor-not-allowed border border-transparent hover:bg-white/5'
-								: isActive
+						class={`admin-nav-item group h-11 min-h-[44px] min-w-[44px] flex items-center justify-center gap-2 px-2.5 min-[920px]:px-4 rounded-full font-medium text-sm whitespace-nowrap origin-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary shrink-0 first:ml-0 last:mr-0 ${
+							isActive
 								? 'bg-primary text-white scale-[1.02]'
 								: 'text-white/70 hover:text-white hover:bg-white/15 hover:scale-[1.06] border border-transparent hover:border-white/20'
 						}`}
@@ -70,8 +65,6 @@ const navItems = [
 							<kbd class={`hidden md:inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-mono font-semibold rounded border transition-all duration-300 ${
 								isActive
 									? 'bg-white/20 text-white border-white/30'
-									: item.disabled
-									? 'bg-white/5 text-white/20 border-white/5'
 									: 'bg-white/10 text-white/50 border-white/10 group-hover:border-white/20 group-hover:text-white/80'
 							}`}>
 								{item.shortcutKey}
@@ -85,19 +78,6 @@ const navItems = [
 </div>
 
 <script>
-	document.addEventListener('DOMContentLoaded', () => {
-		// Attach click listener for disabled nav dock items
-		document.querySelectorAll('.admin-nav-item[data-disabled="true"]').forEach((link) => {
-			link.addEventListener('click', (e) => {
-				e.preventDefault();
-				const label = link.getAttribute('data-label') || 'This section';
-				if (typeof (window as any).showToast === 'function') {
-					(window as any).showToast(`${label} page is still not ready yet.`, 'info');
-				}
-			});
-		});
-	});
-
 	document.addEventListener('keydown', (e: KeyboardEvent) => {
 		const activeEl = document.activeElement as HTMLElement | null;
 		const isEditingText = activeEl && (
@@ -107,31 +87,23 @@ const navItems = [
 
 		if (isEditingText) return;
 
-		// Number shortcuts to switch workspace or show notification
-		const workspaceRoutes: Record<string, { path: string; label: string; disabled?: boolean }> = {
+		// Number shortcuts to switch workspace
+		const workspaceRoutes: Record<string, { path: string; label: string }> = {
 			'1': { path: '/admin', label: 'Overview' },
 			'2': { path: '/admin/admin_experience', label: 'Experience' },
 			'3': { path: '/admin/admin_projects', label: 'Projects' },
 			'4': { path: '/admin/admin_designs', label: 'Designs' },
 			'5': { path: '/admin/admin_certifications', label: 'Certifications' },
 			'6': { path: '/admin/admin_services', label: 'Services' },
-			'7': { path: '/admin/admin_volunteering', label: 'Volunteering', disabled: true },
-			'8': { path: '/admin/admin_resume', label: 'Resume' },
-			'9': { path: '/admin/admin_timeline', label: 'Timeline', disabled: true },
+			'7': { path: '/admin/admin_resume', label: 'Resume' },
 		};
 
 		const route = workspaceRoutes[e.key];
 		if (route) {
 			e.preventDefault();
-			if (route.disabled) {
-				if (typeof (window as any).showToast === 'function') {
-					(window as any).showToast(`${route.label} page is still not ready yet.`, 'info');
-				}
-			} else {
-				const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
-				if (currentPath !== route.path) {
-					window.location.href = route.path;
-				}
+			const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+			if (currentPath !== route.path) {
+				window.location.href = route.path;
 			}
 		}
 	});

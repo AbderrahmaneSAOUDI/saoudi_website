@@ -13,7 +13,7 @@
 - **Package Manager:** `pnpm` exclusively (v11+).
 
 ## Architecture & Structure
-- **Zero-JS Public Pages (`src/pages/*.astro`):** Server-rendered Astro pages (`/`, `/projects`, `/experience`, `/designs`, `/certifications`, `/services`, `/volunteering`, `/resume`). Public data is fetched exclusively in Astro frontmatter via `firebase-admin` and in-memory caching (`src/lib/server/cache.ts`). Renders zero client-side JavaScript to visitors.
+- **Zero-JS Public Pages (`src/pages/*.astro`):** Server-rendered Astro pages (`/`, `/projects`, `/experience`, `/designs`, `/certifications`, `/services`, `/resume`). Public data is fetched exclusively in Astro frontmatter via `firebase-admin` and in-memory caching (`src/lib/server/cache.ts`). Renders zero client-side JavaScript to visitors.
 - **Astro Server Islands (`server:defer`):** Heavy portfolio sections use deferred Server Islands with `<SkeletonCardGrid slot="fallback" />` to stream initial HTML instantly.
 - **Protected Admin Area (`src/pages/admin/admin_*.astro`):** Isolated admin workspace following a 66%/33% Master-Detail UI layout (`AdminLayout.astro`, `AdminNavDock.astro`, `AdminHeader.astro`). Guarded by `src/middleware.ts`.
 - **Server Utilities (`src/lib/server/`):**
@@ -22,7 +22,7 @@
   - `api-guards.ts` & `http.ts`: Standardized admin API authentication guards and JSON response helpers.
   - `cache.ts`: In-memory TTL caching layer for Firestore queries.
   - `storage.ts` & `system-logs.ts`: Atomic asset management and structured audit logging into Firestore.
-- **Data Model (`src/types.ts`):** Multi-collection schema (`projects`, `experience`, `designs`, `certificates`, `services`, `volunteering`, `accepted_admin_emails`, `admin_todos`, `system_logs`, and singleton `configuration/static_data`).
+- **Data Model (`src/types.ts`):** Multi-collection schema (`projects`, `experience`, `designs`, `certificates`, `services`, `accepted_admin_emails`, `admin_todos`, `system_logs`, and singleton `configuration/static_data`).
 
 ## Key Commands
 - `pnpm dev` — Start local dev server at `http://localhost:4321` (auto-authenticates admin in DEV mode).

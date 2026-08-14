@@ -4,7 +4,7 @@
  * 
  * Main entry point for the protected admin area. 
  * Connects to Firebase Firestore to fetch aggregate statistics 
- * (counts of projects, experience, designs, certificates, volunteering).
+ * (counts of projects, experience, designs, certificates, services).
  * Requires the user to be authenticated (enforced via middleware).
  */
 
@@ -26,7 +26,6 @@ let experienceCount = 0;
 let designsCount = 0;
 let certificatesCount = 0;
 let servicesCount = 0;
-let volunteeringCount = 0;
 let resumeDownloadsCount = 0;
 let systemStatus = "Connected";
 
@@ -38,7 +37,6 @@ type DashboardCounts = {
   designs: number;
   certificates: number;
   services: number;
-  volunteering: number;
   resumeDownloads: number;
 };
 
@@ -52,13 +50,12 @@ const [countsResult, prefetchResult] = await Promise.allSettled([
     cacheKeyAdminCounts,
     async () => {
       const db = getFirebaseAdminDb();
-      const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, servicesSnap, volunteeringSnap, configSnap] = await Promise.all([
+      const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, servicesSnap, configSnap] = await Promise.all([
         db.collection("projects").count().get(),
         db.collection("experience").count().get(),
         db.collection("designs").count().get(),
         db.collection("certificates").count().get(),
         db.collection("services").count().get(),
-        db.collection("volunteering").count().get(),
         db.collection("configuration").doc("static_data").get(),
       ]);
 
@@ -68,7 +65,6 @@ const [countsResult, prefetchResult] = await Promise.allSettled([
         designs: designsSnap.data().count,
         certificates: certificatesSnap.data().count,
         services: servicesSnap.data().count,
-        volunteering: volunteeringSnap.data().count,
         resumeDownloads: configSnap.exists ? (configSnap.data()?.resumeDownloads || 0) : 0,
       };
     },
@@ -96,7 +92,6 @@ if (countsResult.status === 'fulfilled') {
   designsCount = counts.designs;
   certificatesCount = counts.certificates;
   servicesCount = counts.services;
-  volunteeringCount = counts.volunteering;
   resumeDownloadsCount = counts.resumeDownloads;
 } else {
   console.warn("Firestore access degraded or unconfigured. Falling back to mock dashboard metrics.", countsResult.reason);
@@ -106,7 +101,6 @@ if (countsResult.status === 'fulfilled') {
   designsCount = -1;
   certificatesCount = -1;
   servicesCount = -1;
-  volunteeringCount = -1;
 }
 
 if (prefetchResult.status === 'fulfilled') {
@@ -148,7 +142,6 @@ const metrics = {
     designs: designsCount,
     certificates: certificatesCount,
     services: servicesCount,
-    volunteering: volunteeringCount,
     resumeDownloads: resumeDownloadsCount,
   },
   systemStatus: systemStatus,

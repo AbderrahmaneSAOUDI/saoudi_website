@@ -14,12 +14,11 @@ export const GET: APIRoute = async ({ locals }) => {
 
 	try {
 		const db = getFirebaseAdminDb();
-		const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, volunteeringSnap, configSnap] = await Promise.all([
+		const [projectsSnap, experienceSnap, designsSnap, certificatesSnap, configSnap] = await Promise.all([
 			db.collection('projects').count().get(),
 			db.collection('experience').count().get(),
 			db.collection('designs').count().get(),
 			db.collection('certificates').count().get(),
-			db.collection('volunteering').count().get(),
 			db.collection('configuration').doc('static_data').get(),
 		]);
 
@@ -28,7 +27,6 @@ export const GET: APIRoute = async ({ locals }) => {
 			experience: experienceSnap.data().count,
 			designs: designsSnap.data().count,
 			certificates: certificatesSnap.data().count,
-			volunteering: volunteeringSnap.data().count,
 			resumeDownloads: configSnap.exists ? (configSnap.data()?.resumeDownloads || 0) : 0,
 			excludeAdminDownloads: configSnap.exists ? (configSnap.data()?.excludeAdminDownloads ?? true) : true,
 		};
