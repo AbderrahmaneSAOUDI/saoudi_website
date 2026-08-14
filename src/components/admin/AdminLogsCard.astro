@@ -36,7 +36,7 @@ const cleanLogs = initialLogs.filter(
 const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrimaryAdmin));
 ---
 
-<div id="admin-logs-card" class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-[380px] lg:h-[calc(90vh-420px)] min-h-[360px] relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.2,0,0.2,1)]">
+<div id="admin-logs-card" class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-95 lg:h-[calc(90vh-420px)] min-h-90 relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.2,0,0.2,1)]">
 	<!-- Card Header & Title -->
 	<div id="logs-card-header" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#2B2930]/80 pb-4 shrink-0 transition-all duration-300">
 		<!-- Header Title Button (Collapse / Expand Trigger) -->
@@ -145,7 +145,7 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 				<div class="relative shrink-0">
 					<select
 						id="log-email-filter"
-						class="px-2.5 py-1.5 rounded-xl bg-[#211F26] border border-[#2B2930] text-xs text-[#E6E1E5]/80 focus:outline-none focus:border-primary/50 transition-all cursor-pointer max-w-[150px] truncate"
+						class="px-2.5 py-1.5 rounded-xl bg-[#211F26] border border-[#2B2930] text-xs text-[#E6E1E5]/80 focus:outline-none focus:border-primary/50 transition-all cursor-pointer max-w-37.5 truncate"
 						title="Filter by admin email"
 					>
 						<option value="all">All Emails</option>
@@ -204,7 +204,7 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 		function setCollapsedState(collapsed: boolean) {
 			isCollapsed = collapsed;
 			if (collapsed) {
-				cardElem?.classList.remove('h-[380px]', 'lg:h-[calc(90vh-420px)]', 'min-h-[360px]');
+				cardElem?.classList.remove('h-95', 'lg:h-[calc(90vh-420px)]', 'min-h-90');
 				cardElem?.classList.add('h-[88px]', 'min-h-[88px]');
 				cardContent?.classList.add('opacity-0', 'pointer-events-none', '-translate-y-2');
 				cardContent?.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
@@ -214,7 +214,7 @@ const filteredLogs = cleanLogs.filter(l => canUserAccessLog(l, userEmail, isPrim
 				cardHeader?.classList.add('border-transparent', 'pb-0');
 				btnHeaderToggle?.setAttribute('aria-expanded', 'false');
 			} else {
-				cardElem?.classList.add('h-[380px]', 'lg:h-[calc(90vh-420px)]', 'min-h-[360px]');
+				cardElem?.classList.add('h-95', 'lg:h-[calc(90vh-420px)]', 'min-h-90');
 				cardElem?.classList.remove('h-[88px]', 'min-h-[88px]');
 				cardContent?.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-2');
 				cardContent?.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');

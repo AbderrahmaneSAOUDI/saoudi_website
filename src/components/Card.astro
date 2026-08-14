@@ -57,7 +57,7 @@ const typeColors = {
 {isLoading ? (
 	<article class="border border-white/10 rounded-3xl p-4 bg-surface-container flex flex-col justify-between h-full">
 		<div>
-			<div class="aspect-[16/10] rounded-2xl mb-4 skeleton" style="aspect-ratio: 16 / 10;"></div>
+			<div class="aspect-16/10 rounded-2xl mb-4 skeleton" style="aspect-ratio: 16 / 10;"></div>
 			<div class="skeleton h-6 w-3/4 mb-2"></div>
 			<div class="flex gap-1.5 mt-2">
 				<div class="skeleton h-5 w-16"></div>
@@ -89,7 +89,7 @@ const typeColors = {
 				data-lightbox-src={design.imageUrl}
 				data-lightbox-title={design.title || design.company}
 				data-lightbox-subtitle={design.title ? design.company : undefined}
-				class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-0 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block bg-[#1D1B20]"
+				class="relative aspect-16/10 rounded-2xl overflow-hidden mb-0 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger bg-[#1D1B20]"
 				style="aspect-ratio: 16 / 10;"
 			>
 				<div class="absolute inset-0 skeleton"></div>
@@ -106,9 +106,9 @@ const typeColors = {
 					fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 					decoding="async"
 					onload="this.previousElementSibling?.remove();"
-					onerror="this.style.display='none'; this.previousElementSibling?.remove(); this.nextElementSibling?.classList.remove('hidden');"
+					onerror="this.style.display='none'; this.previousElementSibling?.remove(); this.nextElementSibling?.style?.removeProperty('display');"
 				/>
-				<div class="hidden flex flex-col items-center justify-center p-4 text-center z-10">
+				<div style="display: none;" class="flex flex-col items-center justify-center p-4 text-center z-10">
 					<Icon name="design" size={32} class="text-primary/60 mb-1" />
 					<span class="text-[11px] text-white/50">{design.title || design.company}</span>
 				</div>
@@ -150,7 +150,7 @@ const typeColors = {
 						data-lightbox-src={certificate.imageUrl}
 						data-lightbox-title={certificate.title}
 						data-lightbox-subtitle={certificate.issuer}
-						class="relative aspect-[16/10] rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block bg-[#1D1B20]"
+						class="relative aspect-16/10 rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger bg-[#1D1B20]"
 						style="aspect-ratio: 16 / 10;"
 					>
 						<div class="absolute inset-0 skeleton"></div>
@@ -167,9 +167,9 @@ const typeColors = {
 							fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 							decoding="async"
 							onload="this.previousElementSibling?.remove();"
-							onerror="this.style.display='none'; this.previousElementSibling?.remove(); this.nextElementSibling?.classList.remove('hidden');"
+							onerror="this.style.display='none'; this.previousElementSibling?.remove(); this.nextElementSibling?.style?.removeProperty('display');"
 						/>
-						<div class="hidden flex flex-col items-center justify-center p-4 text-center z-10">
+						<div style="display: none;" class="flex flex-col items-center justify-center p-4 text-center z-10">
 							<Icon name="certifications" size={32} class="text-secondary/60 mb-1" />
 							<span class="text-[11px] text-white/50">{certificate.title}</span>
 						</div>
@@ -248,7 +248,7 @@ const typeColors = {
 						data-lightbox-src={project.imageUrl}
 						data-lightbox-title={project.title}
 						data-lightbox-subtitle={project.tagline || ''}
-						class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger block bg-[#1D1B20]"
+						class="relative aspect-16/10 rounded-2xl overflow-hidden mb-3 border border-white/10 flex items-center justify-center cursor-pointer image-zoom-trigger bg-[#1D1B20]"
 						style="aspect-ratio: 16 / 10;"
 					>
 						<div class="absolute inset-0 skeleton"></div>
@@ -265,15 +265,15 @@ const typeColors = {
 							fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 							decoding="async"
 							onload="this.previousElementSibling?.remove();"
-							onerror="this.style.display='none'; this.previousElementSibling?.remove(); this.nextElementSibling?.classList.remove('hidden');"
+							onerror="this.style.display='none'; this.previousElementSibling?.remove(); this.nextElementSibling?.style?.removeProperty('display');"
 						/>
-						<div class="hidden flex flex-col items-center justify-center p-4 text-center z-10">
+						<div style="display: none;" class="flex flex-col items-center justify-center p-4 text-center z-10">
 							<Icon name="projects" size={32} class="text-primary/60 mb-1" />
 							<span class="text-[11px] text-white/50">{project.title}</span>
 						</div>
 					</a>
 				) : (
-					<div class="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 border border-white/10 flex items-center justify-center bg-[#1D1B20]" style="aspect-ratio: 16 / 10;">
+					<div class="relative aspect-16/10 rounded-2xl overflow-hidden mb-3 border border-white/10 flex items-center justify-center bg-[#1D1B20]" style="aspect-ratio: 16 / 10;">
 						<div class="absolute inset-0 skeleton"></div>
 						<img
 							src={getThumbnailUrl(project.imageUrl, 800)}
@@ -288,9 +288,9 @@ const typeColors = {
 							fetchpriority={fetchpriority !== 'auto' ? fetchpriority : undefined}
 							decoding="async"
 							onload="this.previousElementSibling?.remove();"
-							onerror="this.style.display='none'; this.previousElementSibling?.remove(); this.nextElementSibling?.classList.remove('hidden');"
+							onerror="this.style.display='none'; this.previousElementSibling?.remove(); this.nextElementSibling?.style?.removeProperty('display');"
 						/>
-						<div class="hidden flex flex-col items-center justify-center p-4 text-center z-10">
+						<div style="display: none;" class="flex flex-col items-center justify-center p-4 text-center z-10">
 							<Icon name="projects" size={32} class="text-primary/60 mb-1" />
 							<span class="text-[11px] text-white/50">{project.title}</span>
 						</div>
@@ -315,11 +315,11 @@ const typeColors = {
 				</span>
 			) : <span />}
 			{project.field ? (
-				<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary line-clamp-1 max-w-[140px]">
+				<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary line-clamp-1 max-w-35">
 					{project.field}
 				</span>
 			) : project.technologies && project.technologies.length > 0 ? (
-				<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary line-clamp-1 max-w-[140px]">
+				<span class="company-pill px-2.5 py-0.5 rounded-lg text-[10px] font-bold tracking-wide uppercase bg-primary/10 border border-primary/20 text-primary line-clamp-1 max-w-35">
 					{project.technologies.slice(0, 2).join(', ')}
 				</span>
 			) : null}

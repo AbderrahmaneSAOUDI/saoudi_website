@@ -13,7 +13,7 @@ const userEmail = (Astro.locals.adminEmail || '').toLowerCase().trim();
 const { initialEmails = [], isPrimaryAdmin = (userEmail === primaryEmail && primaryEmail !== '') } = Astro.props;
 ---
 
-<div id="accepted-emails-card" class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-[380px] lg:h-[calc(90vh-420px)] min-h-[360px] relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.2,0,0.2,1)]">
+<div id="accepted-emails-card" class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-95 lg:h-[calc(90vh-420px)] min-h-90 relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.2,0,0.2,1)]">
 	<!-- Card Header -->
 	<div id="emails-card-header" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#2B2930]/80 pb-4 shrink-0 transition-all duration-300">
 		<!-- Header Title Button (Collapse / Expand Trigger) -->
@@ -24,8 +24,8 @@ const { initialEmails = [], isPrimaryAdmin = (userEmail === primaryEmail && prim
 			title="Click to collapse / expand Admin Emails"
 		>
 			<div class="w-10 h-10 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shrink-0 transition-transform duration-200 group-hover/header:scale-105 group/shield">
-				<Icon name="shield_protected" size={20} class="w-5 h-5 flex items-center justify-center group-hover/shield:!hidden" />
-				<Icon name="shield_protected_filled" size={20} class="w-5 h-5 !hidden group-hover/shield:!inline-flex items-center justify-center" />
+				<Icon name="shield_protected" size={20} class="w-5 h-5 flex items-center justify-center group-hover/shield:hidden!" />
+				<Icon name="shield_protected_filled" size={20} class="w-5 h-5 hidden! group-hover/shield:inline-flex! items-center justify-center" />
 			</div>
 			<div class="flex items-center gap-2">
 				<h2 class="text-lg font-bold text-white tracking-tight group-hover/header:text-primary transition-colors">Admin Emails</h2>
@@ -64,8 +64,8 @@ const { initialEmails = [], isPrimaryAdmin = (userEmail === primaryEmail && prim
 						<div class="flex items-center justify-between">
 							<h3 class="text-xs font-bold text-white uppercase tracking-wider">Grant Admin Access</h3>
 							<button type="button" id="btn-close-add-email" class="group p-1 rounded-lg text-[#E6E1E5]/50 hover:text-white hover:bg-white/5 transition-all cursor-pointer" title="Close">
-								<Icon name="close" size={16} class="w-4 h-4 group-hover:!hidden" />
-								<Icon name="close_filled" size={16} class="w-4 h-4 !hidden group-hover:!inline-flex" />
+								<Icon name="close" size={16} class="w-4 h-4 group-hover:hidden!" />
+								<Icon name="close_filled" size={16} class="w-4 h-4 hidden! group-hover:inline-flex!" />
 							</button>
 						</div>
 						<form id="add-email-form" class="space-y-3">
@@ -179,7 +179,7 @@ const { initialEmails = [], isPrimaryAdmin = (userEmail === primaryEmail && prim
 		function setCollapsedState(collapsed: boolean) {
 			isCollapsed = collapsed;
 			if (collapsed) {
-				cardElem?.classList.remove('h-[380px]', 'lg:h-[calc(90vh-420px)]', 'min-h-[360px]');
+				cardElem?.classList.remove('h-95', 'lg:h-[calc(90vh-420px)]', 'min-h-90');
 				cardElem?.classList.add('h-[88px]', 'min-h-[88px]');
 				cardContent?.classList.add('opacity-0', 'pointer-events-none', '-translate-y-2');
 				cardContent?.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
@@ -189,7 +189,7 @@ const { initialEmails = [], isPrimaryAdmin = (userEmail === primaryEmail && prim
 				cardHeader?.classList.add('border-transparent', 'pb-0');
 				btnHeaderToggle?.setAttribute('aria-expanded', 'false');
 			} else {
-				cardElem?.classList.add('h-[380px]', 'lg:h-[calc(90vh-420px)]', 'min-h-[360px]');
+				cardElem?.classList.add('h-95', 'lg:h-[calc(90vh-420px)]', 'min-h-90');
 				cardElem?.classList.remove('h-[88px]', 'min-h-[88px]');
 				cardContent?.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-2');
 				cardContent?.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');

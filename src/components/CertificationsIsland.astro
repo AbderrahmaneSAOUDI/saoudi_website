@@ -87,13 +87,6 @@ certificates.forEach(cert => {
 
 // Sort years descending
 const activeYears = Object.keys(certificatesByYear).sort((a, b) => b.localeCompare(a));
-
-let runningCount = 0;
-const groupOffsets = activeYears.map(year => {
-	const currentOffset = runningCount;
-	runningCount += certificatesByYear[year].length;
-	return currentOffset;
-});
 ---
 
 {errorMsg && (
@@ -106,7 +99,6 @@ const groupOffsets = activeYears.map(year => {
 <div class="space-y-12">
 	{activeYears.map((year, groupIndex) => {
 		const groupCerts = certificatesByYear[year];
-		const groupOffset = groupOffsets[groupIndex];
 		const toggleId = `toggle-year-${year}`;
 		const isFirstGroup = groupIndex === 0;
 		return (

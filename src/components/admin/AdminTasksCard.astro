@@ -13,7 +13,7 @@ const userEmail = (Astro.locals.adminEmail || '').toLowerCase().trim();
 const { initialTasks = [], isPrimaryAdmin = (userEmail === primaryEmail && primaryEmail !== '') } = Astro.props;
 ---
 
-<div id="admin-tasks-card" class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-[380px] lg:h-[calc(90vh-420px)] min-h-[360px] relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.2,0,0.2,1)]">
+<div id="admin-tasks-card" class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-95 lg:h-[calc(90vh-420px)] min-h-90 relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.2,0,0.2,1)]">
 	<!-- Card Header & Navigation Tabs -->
 	<div id="tasks-card-header" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#2B2930]/80 pb-4 shrink-0 transition-all duration-300">
 		<!-- Header Title Button (Collapse / Expand Trigger) -->
@@ -93,8 +93,8 @@ const { initialTasks = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 						<div class="flex items-center justify-between">
 							<h3 class="text-xs font-bold text-white uppercase tracking-wider">Create New Task</h3>
 							<button type="button" id="btn-close-add-task" class="group p-1 rounded-lg text-[#E6E1E5]/50 hover:text-white hover:bg-white/5 transition-all cursor-pointer" title="Close">
-								<Icon name="close" size={16} class="w-4 h-4 group-hover:!hidden" />
-								<Icon name="close_filled" size={16} class="w-4 h-4 !hidden group-hover:!inline-flex" />
+								<Icon name="close" size={16} class="w-4 h-4 group-hover:hidden!" />
+								<Icon name="close_filled" size={16} class="w-4 h-4 hidden! group-hover:inline-flex!" />
 							</button>
 						</div>
 
@@ -262,7 +262,7 @@ const { initialTasks = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 		function setCollapsedState(collapsed: boolean) {
 			isCollapsed = collapsed;
 			if (collapsed) {
-				cardElem?.classList.remove('h-[380px]', 'lg:h-[calc(90vh-420px)]', 'min-h-[360px]');
+				cardElem?.classList.remove('h-95', 'lg:h-[calc(90vh-420px)]', 'min-h-90');
 				cardElem?.classList.add('h-[88px]', 'min-h-[88px]');
 				cardContent?.classList.add('opacity-0', 'pointer-events-none', '-translate-y-2');
 				cardContent?.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
@@ -272,7 +272,7 @@ const { initialTasks = [], isPrimaryAdmin = (userEmail === primaryEmail && prima
 				cardHeader?.classList.add('border-transparent', 'pb-0');
 				btnHeaderToggle?.setAttribute('aria-expanded', 'false');
 			} else {
-				cardElem?.classList.add('h-[380px]', 'lg:h-[calc(90vh-420px)]', 'min-h-[360px]');
+				cardElem?.classList.add('h-95', 'lg:h-[calc(90vh-420px)]', 'min-h-90');
 				cardElem?.classList.remove('h-[88px]', 'min-h-[88px]');
 				cardContent?.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-2');
 				cardContent?.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');

@@ -61,22 +61,22 @@ function formatDate(dateStr: string | null): string {
 )}
 
 <div class="relative max-w-4xl mx-auto py-8 px-2 sm:px-6">
-	<div class="space-y-6 sm:space-y-[-1rem] relative">
+	<div class="space-y-6 sm:-space-y-4 relative">
 		<!-- Animated Center Vertical Timeline Spine Line -->
 		{experiences.length > 0 && (
 			<>
 				<!-- Desktop Center Animated Spine Line -->
 				<div 
-					class="absolute left-1/2 top-6 bottom-32 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-primary -translate-x-1/2 hidden sm:block rounded-full timeline-line-animated z-0"
+					class="absolute left-1/2 top-6 bottom-32 w-0.5 bg-linear-to-b from-primary via-primary/50 to-primary -translate-x-1/2 hidden sm:block rounded-full timeline-line-animated z-0"
 				>
-					<div class="absolute inset-x-0 w-full h-24 bg-gradient-to-b from-transparent via-white to-transparent opacity-80 timeline-pulse-beam"></div>
+					<div class="absolute inset-x-0 w-full h-24 bg-linear-to-b from-transparent via-white to-transparent opacity-80 timeline-pulse-beam"></div>
 				</div>
 
 				<!-- Mobile Animated Spine Line -->
 				<div 
-					class="absolute left-6 top-6 bottom-32 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-primary -translate-x-1/2 sm:hidden rounded-full timeline-line-animated z-0"
+					class="absolute left-6 top-6 bottom-32 w-0.5 bg-linear-to-b from-primary via-primary/50 to-primary -translate-x-1/2 sm:hidden rounded-full timeline-line-animated z-0"
 				>
-					<div class="absolute inset-x-0 w-full h-24 bg-gradient-to-b from-transparent via-white to-transparent opacity-80 timeline-pulse-beam"></div>
+					<div class="absolute inset-x-0 w-full h-24 bg-linear-to-b from-transparent via-white to-transparent opacity-80 timeline-pulse-beam"></div>
 				</div>
 			</>
 		)}
@@ -121,13 +121,13 @@ function formatDate(dateStr: string | null): string {
 												onerror="this.style.display='none'; this.nextElementSibling?.classList.remove('hidden');"
 											/>
 											<div class="hidden relative items-center justify-center">
-												<Icon name="business" size={24} class="text-white/40 group-hover:!hidden" />
-												<Icon name="business" filled size={24} class="text-primary !hidden group-hover:!inline-flex" />
+												<Icon name="business" size={24} class="text-white/40 group-hover:hidden!" />
+												<Icon name="business" filled size={24} class="text-primary hidden! group-hover:inline-flex!" />
 											</div>
 										) : (
 											<div class="relative flex items-center justify-center">
-												<Icon name="business" size={24} class="text-white/40 group-hover:!hidden" />
-												<Icon name="business" filled size={24} class="text-primary !hidden group-hover:!inline-flex" />
+												<Icon name="business" size={24} class="text-white/40 group-hover:hidden!" />
+												<Icon name="business" filled size={24} class="text-primary hidden! group-hover:inline-flex!" />
 											</div>
 										)}
 									</div>

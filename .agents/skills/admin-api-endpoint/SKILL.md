@@ -11,9 +11,11 @@ triggers:
 # Admin API Endpoint Playbook
 
 ## When to Use
+
 Use when creating or updating any server-side API endpoint under `src/pages/admin/` (e.g. `src/pages/admin/admin_<resource>_api.ts`).
 
 ## Rules & Standards
+
 1. **Filename Convention:** File MUST be named `admin_<resource>_api.ts` under `src/pages/admin/`.
 2. **Session Guard:** Always enforce authentication using `requireAdminSession(context)` from `src/lib/server/api-guards.ts`.
 3. **Response Formatting:** Always return responses using `jsonResponse()` from `src/lib/server/http.ts`.

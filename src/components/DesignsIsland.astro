@@ -87,13 +87,6 @@ const activeGroups = Object.keys(designsByCompany)
 		if (indexA !== -1 && indexB !== -1) return indexA - indexB;
 		return a.localeCompare(b);
 	});
-
-let runningCount = 0;
-const groupOffsets = activeGroups.map(co => {
-	const currentOffset = runningCount;
-	runningCount += designsByCompany[co].length;
-	return currentOffset;
-});
 ---
 
 {errorMsg && (
@@ -106,7 +99,6 @@ const groupOffsets = activeGroups.map(co => {
 <div class="space-y-12">
 	{activeGroups.map((companyName, groupIndex) => {
 		const groupDesigns = designsByCompany[companyName];
-		const groupOffset = groupOffsets[groupIndex];
 		const toggleId = `toggle-company-${groupIndex}`;
 		const isFirstGroup = groupIndex === 0;
 		return (

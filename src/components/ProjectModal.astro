@@ -21,12 +21,12 @@ const { projects = [] } = Astro.props;
 	aria-labelledby="project-modal-title"
 	aria-hidden="true"
 	inert
-	class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-[100] items-center justify-center p-4 sm:p-6 overflow-y-auto no-scrollbar"
+	class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-100 items-center justify-center p-4 sm:p-6 overflow-y-auto no-scrollbar"
 >
 	<!-- Backdrop Click to Close -->
 	<div id="project-modal-backdrop" class="fixed inset-0 cursor-default"></div>
 
-	<div class="relative w-full max-w-3xl bg-[#1D1B20] border border-[#2B2930] rounded-3xl shadow-2xl z-10 my-auto p-5 sm:p-7 space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar animate-page-slide-up">
+	<div class="relative w-full max-w-3xl bg-[#1D1B20] border border-[#2B2930] rounded-3xl z-10 my-auto p-5 sm:p-7 space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar animate-page-slide-up">
 		<button
 			type="button"
 			id="project-modal-close"

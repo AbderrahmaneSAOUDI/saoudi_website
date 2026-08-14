@@ -97,13 +97,6 @@ projects.forEach(project => {
 
 // Sort years descending
 const activeYears = Object.keys(projectsByYear).sort((a, b) => b.localeCompare(a));
-
-let runningCount = 0;
-const groupOffsets = activeYears.map(year => {
-	const currentOffset = runningCount;
-	runningCount += projectsByYear[year].length;
-	return currentOffset;
-});
 ---
 
 {errorMsg && (
@@ -116,7 +109,6 @@ const groupOffsets = activeYears.map(year => {
 <div class="space-y-12">
 	{activeYears.map((year, groupIndex) => {
 		const groupProjects = projectsByYear[year];
-		const groupOffset = groupOffsets[groupIndex];
 		const toggleId = `toggle-year-${year}`;
 		const isFirstGroup = groupIndex === 0;
 		return (

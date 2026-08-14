@@ -247,10 +247,6 @@ export function compressImageToWebpUnderTargetKB(
 	});
 }
 
-function dataUrlToByteLength(dataUrl: string): number {
-	return Math.round((dataUrl.length * 3) / 4);
-}
-
 function baseFileName(file: File): string {
 	return file.name.includes('.') ? file.name.slice(0, file.name.lastIndexOf('.')) : file.name;
 }

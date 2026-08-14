@@ -13,12 +13,12 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 		<section class="animate-fade-in flex items-center pb-2">
 			<div class="relative w-full">
 				<div
-					class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-secondary/5 blur-3xl"
+					class="absolute inset-0 bg-linear-to-tr from-primary/5 via-transparent to-secondary/5 blur-3xl"
 				>
 				</div>
 
 				<div
-					class="relative bg-surface-container border border-white/10 rounded-3xl p-6 md:p-8 lg:p-10 shadow-2xl hover-card-border hover:border-primary/80 transition-all duration-300"
+					class="relative bg-surface-container border border-white/10 rounded-3xl p-6 md:p-8 lg:p-10 hover-card-border hover:border-primary/80 transition-all duration-300"
 				>
 					<div
 						class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10 items-center"
@@ -30,21 +30,21 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 							<div class="relative">
 								<!-- Animated Glow Under Photo -->
 								<div
-									class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-gradient-to-r from-primary/0 via-primary/50 to-primary/0 blur-xl animate-glow-pulse"
+									class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-linear-to-r from-primary/0 via-primary/50 to-primary/0 blur-xl animate-glow-pulse"
 								>
 								</div>
 								<div
-									class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1/2 h-4 bg-gradient-to-r from-secondary/0 via-secondary/40 to-secondary/0 blur-lg animate-glow-pulse"
+									class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1/2 h-4 bg-linear-to-r from-secondary/0 via-secondary/40 to-secondary/0 blur-lg animate-glow-pulse"
 									style="animation-delay: 0.5s;"
 								>
 								</div>
 
 								<div
-									class="absolute inset-0 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-full blur-2xl animate-orb-pulse"
+									class="absolute inset-0 bg-linear-to-br from-primary/30 to-secondary/30 rounded-full blur-2xl animate-orb-pulse"
 								>
 								</div>
 								<div
-									class="relative w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full border-4 border-primary/40 shadow-2xl shadow-primary/20 overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10"
+									class="relative w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full border-4 border-primary/40 overflow-hidden bg-linear-to-br from-primary/10 to-secondary/10"
 								>
 									<img
 										src="/profile.webp"
@@ -164,11 +164,11 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 			<section class="animate-fade-in" style="animation-delay: 0.2s;">
 				<div class="relative h-full">
 					<div
-						class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 blur-3xl"
+						class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-primary/5 blur-3xl"
 					>
 					</div>
 					<div
-						class="relative bg-surface-container border border-white/10 rounded-3xl overflow-hidden shadow-2xl hover-card-border hover:border-primary/80 transition-all duration-300 h-full flex flex-col"
+						class="relative bg-surface-container border border-white/10 rounded-3xl overflow-hidden hover-card-border hover:border-primary/80 transition-all duration-300 h-full flex flex-col"
 					>
 						<img
 							src="/cover.webp"
@@ -209,11 +209,11 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 			<section class="animate-fade-in" style="animation-delay: 0.3s;">
 				<div class="relative h-full">
 					<div
-						class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"
+						class="absolute inset-0 bg-linear-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"
 					>
 					</div>
 					<div
-						class="relative bg-surface-container border border-white/10 rounded-3xl p-8 shadow-2xl hover-card-border hover:border-primary/80 transition-all duration-300 h-full"
+						class="relative bg-surface-container border border-white/10 rounded-3xl p-8 hover-card-border hover:border-primary/80 transition-all duration-300 h-full"
 					>
 						<h2
 							class="text-3xl font-bold text-primary mb-6 flex items-center gap-3"
@@ -223,7 +223,7 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 						<div class="relative">
 							<!-- Timeline Line -->
 							<div
-								class="absolute left-[18px] top-0 bottom-0 w-0.5 bg-primary/35 overflow-hidden"
+								class="absolute left-4.5 top-0 bottom-0 w-0.5 bg-primary/35 overflow-hidden"
 							>
 								<!-- Animated Gradient Line -->
 								<div
@@ -232,16 +232,16 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 								</div>
 								<!-- Electricity Dots -->
 								<div
-									class="electric-dot w-2 h-2 bg-primary rounded-full shadow-lg shadow-primary/60 absolute left-1/2 -translate-x-1/2"
+									class="electric-dot w-2 h-2 bg-primary rounded-full absolute left-1/2 -translate-x-1/2"
 								>
 								</div>
 								<div
-									class="electric-dot w-1.5 h-1.5 bg-secondary rounded-full shadow-lg shadow-secondary/60 absolute left-1/2 -translate-x-1/2"
+									class="electric-dot w-1.5 h-1.5 bg-secondary rounded-full absolute left-1/2 -translate-x-1/2"
 									style="animation-delay: 0.6s;"
 								>
 								</div>
 								<div
-									class="electric-dot w-1 h-1 bg-tertiary rounded-full shadow-lg shadow-tertiary/60 absolute left-1/2 -translate-x-1/2"
+									class="electric-dot w-1 h-1 bg-tertiary rounded-full absolute left-1/2 -translate-x-1/2"
 									style="animation-delay: 1.2s;"
 								>
 								</div>
@@ -251,7 +251,7 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 								<!-- Item 1 -->
 								<div class="relative">
 									<div
-										class="absolute -left-[33px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary border-4 border-surface z-20 shadow-lg shadow-primary/30 animate-dot-pulse"
+										class="absolute -left-8.25 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary border-4 border-surface z-20 animate-dot-pulse"
 									>
 									</div>
 									<div
@@ -275,7 +275,7 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 								<!-- Item 2 -->
 								<div class="relative">
 									<div
-										class="absolute -left-[33px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-secondary border-4 border-surface z-20 shadow-lg shadow-secondary/30 animate-dot-pulse"
+										class="absolute -left-8.25 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-secondary border-4 border-surface z-20 animate-dot-pulse"
 										style="animation-delay: 0.3s;"
 									>
 									</div>
@@ -299,7 +299,7 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 								<!-- Item 3 -->
 								<div class="relative">
 									<div
-										class="absolute -left-[33px] top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-tertiary border-4 border-surface z-20 shadow-lg shadow-tertiary/30 animate-dot-pulse"
+										class="absolute -left-8.25 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-tertiary border-4 border-surface z-20 animate-dot-pulse"
 										style="animation-delay: 0.6s;"
 									>
 									</div>
@@ -331,7 +331,7 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 			<div class="relative">
 				<!-- Ambient Glow -->
 				<div
-					class="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5 blur-3xl rounded-3xl"
+					class="absolute inset-0 bg-linear-to-r from-primary/5 via-transparent to-secondary/5 blur-3xl rounded-3xl"
 				>
 				</div>
 
@@ -345,11 +345,11 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 		<section class="mt-6 animate-fade-in" style="animation-delay: 0.5s;">
 			<div class="relative">
 				<div
-					class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"
+					class="absolute inset-0 bg-linear-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"
 				>
 				</div>
 				<div
-					class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover-card-border hover:border-primary/80 transition-all duration-300 overflow-hidden"
+					class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 hover-card-border hover:border-primary/80 transition-all duration-300 overflow-hidden"
 				>
 					<div
 						class="absolute -top-20 right-0 w-56 h-56 bg-secondary/10 blur-3xl rounded-full"
@@ -383,8 +383,8 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 										Development
 									</h3>
 									<div class="relative flex items-center justify-center">
-										<Icon name="projects" size={28} class="group-hover:!hidden text-secondary" />
-										<Icon name="projects" filled size={28} class="!hidden group-hover:!inline-flex text-secondary" />
+										<Icon name="projects" size={28} class="group-hover:hidden! text-secondary" />
+										<Icon name="projects" filled size={28} class="hidden! group-hover:inline-flex! text-secondary" />
 									</div>
 								</div>
 								<div class="flex flex-wrap gap-2.5">
@@ -418,8 +418,8 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 											Automation
 										</h3>
 										<div class="relative flex items-center justify-center">
-											<Icon name="automation" size={24} class="group-hover:!hidden text-primary" />
-											<Icon name="automation" filled size={24} class="!hidden group-hover:!inline-flex text-primary" />
+											<Icon name="automation" size={24} class="group-hover:hidden! text-primary" />
+											<Icon name="automation" filled size={24} class="hidden! group-hover:inline-flex! text-primary" />
 										</div>
 									</div>
 									<div class="flex flex-wrap gap-2">
@@ -450,8 +450,8 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 											Design
 										</h3>
 										<div class="relative flex items-center justify-center">
-											<Icon name="design" size={24} class="group-hover:!hidden text-tertiary" />
-											<Icon name="design" filled size={24} class="!hidden group-hover:!inline-flex text-tertiary" />
+											<Icon name="design" size={24} class="group-hover:hidden! text-tertiary" />
+											<Icon name="design" filled size={24} class="hidden! group-hover:inline-flex! text-tertiary" />
 										</div>
 									</div>
 									<div class="flex flex-wrap gap-2">
@@ -486,8 +486,8 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 											Business
 										</h3>
 										<div class="relative flex items-center justify-center">
-											<Icon name="business" size={24} class="text-error group-hover:!hidden" />
-											<Icon name="business" filled size={24} class="text-error !hidden group-hover:!inline-flex" />
+											<Icon name="business" size={24} class="text-error group-hover:hidden!" />
+											<Icon name="business" filled size={24} class="text-error hidden! group-hover:inline-flex!" />
 										</div>
 									</div>
 									<div class="flex flex-wrap gap-2">
@@ -522,8 +522,8 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 											Tools
 										</h3>
 										<div class="relative flex items-center justify-center">
-											<Icon name="windows" size={24} class="group-hover:!hidden text-primary" />
-											<Icon name="windows" filled size={24} class="!hidden group-hover:!inline-flex text-primary" />
+											<Icon name="windows" size={24} class="group-hover:hidden! text-primary" />
+											<Icon name="windows" filled size={24} class="hidden! group-hover:inline-flex! text-primary" />
 										</div>
 									</div>
 									<div class="flex flex-wrap gap-2">
@@ -553,11 +553,11 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 				<div class="relative h-full">
 					<div
-						class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 blur-3xl"
+						class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-primary/5 blur-3xl"
 					>
 					</div>
 					<div
-						class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover-card-border hover:border-primary/80 transition-all duration-300 h-full"
+						class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 hover-card-border hover:border-primary/80 transition-all duration-300 h-full"
 					>
 						<h2
 							class="text-3xl font-bold text-primary mb-6 flex items-center gap-3"
@@ -595,11 +595,11 @@ import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 
 				<div class="relative h-full">
 					<div
-						class="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"
+						class="absolute inset-0 bg-linear-to-br from-secondary/5 via-transparent to-secondary/5 blur-3xl"
 					>
 					</div>
 					<div
-						class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl hover-card-border hover:border-primary/80 transition-all duration-300 h-full"
+						class="relative bg-surface-container border border-white/10 rounded-3xl p-8 md:p-12 hover-card-border hover:border-primary/80 transition-all duration-300 h-full"
 					>
 						<h2
 							class="text-3xl font-bold text-primary mb-6 flex items-center gap-3"
