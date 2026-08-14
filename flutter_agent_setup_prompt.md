@@ -1,19 +1,27 @@
-# Prompt & Scaffolding Guide: Initialize AI Agent Rules, Skills & Invariants for the Flutter Project
+# Prompt & Scaffolding Guide: Initialize AI Agent Rules, Skills & Invariants for `saoudi_app`
 
-> **How to Use This Prompt**: Copy and paste the prompt below into the AI assistant (Antigravity, Cursor, Claude, Trae, Devin, Copilot, etc.) inside your **new/empty Flutter project repository**. It will automatically scaffold all the **Agent Operational Rules**, **Invariants**, **Skills**, **Design System Constraints**, and **Git Workflows** adapted specifically for Flutter.
+> **How to Use This Prompt**: Copy and paste the markdown prompt below into your AI assistant (Antigravity, Cursor, Claude, Trae, Devin, Copilot, etc.) inside your **new/empty Flutter project repository (`saoudi_app`)**.
+> 
+> **Scope**: It instructs the AI assistant to **strictly initialize only the agentic infrastructure** (`.agents/`, `AGENTS.md`, `GEMINI.md`, rules, skills, and root configuration files). It explicitly **prohibits creating `lib/` source code** for now, establishing rock-solid rules and operational discipline first.
 
 ---
 
 ```markdown
-# Agent Initialization Prompt: `saoudi_appi`
+# Agent Initialization Prompt: `saoudi_app`
 
-You are an expert Flutter engineer, systems architect, and agentic assistant. You are setting up and developing the **`saoudi_app`** project — the standalone mobile companion application for **`saoudi.online`**.
-
-Your task is to initialize the project's agentic framework, rules, design system, skills, and configuration files to ensure the highest standards of code quality, absolute design consistency, and lifecycle automation.
+You are an expert Flutter engineer, systems architect, and agentic assistant. You are setting up the operational environment for the **`saoudi_app`** project — the standalone mobile companion application for **`saoudi.online`**.
 
 ---
 
-## 🎯 Project Overview & Mission
+## 🎯 Primary Objective & Strict Scope Constraint
+
+> **CRITICAL SCOPE CONSTRAINT**: 
+> In this initialization phase, you must **ONLY** scaffold and create the **Agentic Infrastructure** (`.agents/`, `.agents/rules/`, `.agents/skills/`, `AGENTS.md`, `GEMINI.md`, `analysis_options.yaml`, and `pubspec.yaml`).
+> **DO NOT** create any application code, UI screens, widgets, or files inside `lib/` or `test/` for now. Focus 100% on defining the rules, invariants, design tokens, skills, and automation workflows.
+
+---
+
+## 📱 Project Overview & Mission
 
 - **App Name**: `saoudi_app`
 - **Platform**: Flutter (Android & iOS)
@@ -27,44 +35,36 @@ Your task is to initialize the project's agentic framework, rules, design system
 
 ---
 
-## 📁 Required Directory Map & Structure
+## 📁 Required Directory Map & Structure (Agent Infrastructure Only)
 
-Create and adhere strictly to the following directory structure:
+Create and scaffold the following agent files and rule hierarchy:
 
 ```
 saoudi_app/
 ├── .agents/
 │   ├── rules/
-│   │   ├── architecture.md           # Clean architecture, state management & direct Firebase rules
-│   │   ├── coding-standards.md       # Dart conventions, immutability, lints & model validation
+│   │   ├── architecture.md           # Clean architecture, Riverpod state & direct Firebase rules
+│   │   ├── coding-standards.md       # Dart formatting, immutability, lints & model validation
 │   │   ├── design-system.md          # Material 3 Dark theme, Google palette & Absolute Shadow Ban
 │   │   ├── firebase-security.md      # Firebase Auth, client role-gating & access control
 │   │   ├── git-workflow.md           # Mandatory end-of-prompt verification, commit format & push
 │   │   └── version-increment.md      # Automated minor (elapsed days) and patch version bump in pubspec.yaml
 │   └── skills/
 │       ├── flutter-m3-theming/       # Playbook for zero-shadow M3 Dark theme tokens
+│       │   └── SKILL.md
 │       ├── firestore-streams/        # Real-time Stream and query management playbook
+│       │   └── SKILL.md
+│       ├── mobile-sync-contract/     # Cross-project schema sync & changelog adherence
+│       │   └── SKILL.md
 │       └── verification-and-release/ # Verification, static analysis, tests & silent release lifecycle
+│           └── SKILL.md
 ├── AGENTS.md                         # Primary agent operational guide and directory map
 ├── GEMINI.md                         # Detailed system invariants and architectural rules
 ├── analysis_options.yaml             # Strict Dart & Flutter analysis rules
-├── pubspec.yaml                      # Project dependencies and version tracking (1.X.Y)
-├── lib/
-│   ├── core/
-│   │   ├── constants/                # App constants, collections names & route paths
-│   │   ├── theme/                    # AppTheme, GoogleColors, SurfaceTones & Shadow-ban rules
-│   │   └── utils/                    # Date formatting, relative time, error handling
-│   ├── data/
-│   │   ├── models/                   # AdminTask, SystemLog, AcceptedAdminEmail, DashboardMetrics
-│   │   ├── repositories/             # TasksRepository, LogsRepository, EmailsRepository
-│   │   └── services/                 # FirebaseAuthService, FirestoreService
-│   ├── presentation/
-│   │   ├── providers/                # Riverpod state providers (auth, tasks, logs, emails, metrics)
-│   │   ├── screens/                  # DashboardScreen, TasksScreen, LogsScreen, EmailsScreen, LoginScreen
-│   │   └── widgets/                  # BottomNavDock, BentoMetricCard, TaskItemCard, LogItemCard, Drawers
-│   └── main.dart                     # App entry point
-└── test/                             # Unit, widget, and integration tests
+└── pubspec.yaml                      # Project metadata, dependencies, and version tracking (1.X.Y)
 ```
+
+*(Note: `lib/` and `test/` will be generated in subsequent development steps after this agent foundation is established).*
 
 ---
 
@@ -75,30 +75,21 @@ saoudi_app/
 - **Surface Elevation Expression**: Express all depth, hierarchy, and focus exclusively via:
   1. **Solid Surface Container Tones**: `#121212` canvas vs `#1D1B20` card container vs `#211F26` high container / input background.
   2. **Borders & Outlines**: `Border.all(color: Color(0xFF2B2930), width: 1.0)`.
-  3. **Accent Rings & Focus**: Border highlights (e.g. `Color(0xFF8AB4F8)`).
+  3. **Accent Rings & Focus**: Border highlights (e.g. `Color(0xFF8AB4F8)` / `Color(0x668AB4F8)`).
   4. **Smooth Micro-Transforms**: Scale (`0.98` on press) and opacity transitions.
 
 ### 2. Google Brand Color Palette (M3 Dark Compliant)
-```dart
-class GoogleColors {
-  // Google Brand Accents
-  static const Color blue = Color(0xFF8AB4F8);       // Primary (#8AB4F8 / #4285F4)
-  static const Color green = Color(0xFF81C784);      // Secondary / Success (#81C784 / #0F9D58)
-  static const Color yellow = Color(0xFFFDD663);     // Tertiary / Warning (#FDD663 / #F9AB00)
-  static const Color red = Color(0xFFF28B82);        // Error / Destructive (#F28B82 / #EA4335)
-
-  // Material 3 Dark Surface Containers
-  static const Color surface = Color(0xFF121212);           // Scaffold background
-  static const Color surfaceContainer = Color(0xFF1D1B20);  // Cards & Bento panels
-  static const Color surfaceContainerHigh = Color(0xFF211F26); // Inputs, active drawers & modal sheets
-  static const Color border = Color(0xFF2B2930);            // Outlines and dividers
-
-  // Typography Tones
-  static const Color onSurface = Color(0xFFFFFFFF);         // Primary text
-  static const Color onSurfaceVariant = Color(0xB3E6E1E5);  // Secondary text (70% opacity)
-  static const Color onSurfaceMuted = Color(0x66E6E1E5);    // Subtle / placeholder (40% opacity)
-}
-```
+- **Primary Accent (Google Blue)**: `#8AB4F8` / `#4285F4`
+- **Secondary Accent (Google Green)**: `#81C784` / `#0F9D58`
+- **Tertiary Accent (Google Yellow)**: `#FDD663` / `#F9AB00`
+- **Error / Alert (Google Red)**: `#F28B82` / `#EA4335`
+- **Canvas / Scaffold**: `#121212`
+- **Surface Container (Cards)**: `#1D1B20` / `#1E1E1E`
+- **Surface Container High (Inputs/Drawers)**: `#211F26` / `#2D2D2D`
+- **Borders & Dividers**: `#2B2930`
+- **Text Primary**: `#FFFFFF`
+- **Text Secondary (Muted)**: `#E6E1E5` (70% opacity)
+- **Text Subtle**: `#E6E1E5` (40% opacity)
 
 ### 3. Geometry Tokens
 - **Bento Panels & Cards**: `BorderRadius.circular(24.0)` (M3 `rounded-3xl`)
@@ -106,9 +97,9 @@ class GoogleColors {
 - **Pills, Badges, Status Counters, Nav Dock**: `BorderRadius.circular(999.0)` / `const StadiumBorder()`
 
 ### 4. No Light Mode or Theme Toggles
-- Dark Mode only (`#121212` background). Do not implement light theme toggles.
+- Dark Mode only (`#121212` background). Do not implement light theme toggles or light color schemes.
 
-### 5. Mobile Sync Contract Adherence
+### 5. Cross-Project Synchronization
 - The data schemas and business rules must strictly follow `docs/mobile_sync_contract.md` from the web project.
 - **Role Isolation**:
   - Primary Admin (`ADMIN_EMAIL`): Full CRUD, can purge expired logs and manage secondary admins.
@@ -184,18 +175,25 @@ dev_dependencies:
 
 ---
 
-## 🚀 Execution Steps: Scaffold the Agentic Environment
+## 🚀 Execution Steps: Scaffold the Agentic Infrastructure Only
 
-Now, generate the following configuration and rule files inside this project:
+Proceed to generate all the agent configuration and rule files inside this project:
 
-1. **`AGENTS.md`**: Primary agent operational guide with directory map, key commands, and constraints.
-2. **`GEMINI.md`**: Complete system architecture, M3 theme specifications, and invariants.
-3. **`.agents/rules/design-system.md`**: Detailed tokens, Google brand colors, and the Absolute Shadow Ban rules.
-4. **`.agents/rules/architecture.md`**: Clean architecture patterns, Riverpod providers, and direct Firestore streams.
-5. **`.agents/rules/coding-standards.md`**: Dart formatting, immutability, typed models, and linter rules.
-6. **`.agents/rules/firebase-security.md`**: Firebase Auth, role gating, and security rules.
-7. **`.agents/rules/git-workflow.md`**: Commit format (`<version> - <description>`) and automated verification.
-8. **`.agents/rules/version-increment.md`**: Automated minor (elapsed days) and patch version bump logic for `pubspec.yaml`.
-9. **`analysis_options.yaml`**: Strict linting rules.
-10. **`lib/` core files**: `main.dart`, `core/theme/app_theme.dart`, `core/constants/colors.dart`, models, and Riverpod repositories for Tasks, Logs, Emails, and Dashboard Metrics.
+1. **`AGENTS.md`**: Primary operational guide containing directory map, key commands, constraints, and link references.
+2. **`GEMINI.md`**: Complete system invariants, architectural principles, and M3 dark theme rules.
+3. **`.agents/rules/architecture.md`**: Rules on clean architecture, Riverpod state, and direct Firestore streams.
+4. **`.agents/rules/design-system.md`**: Full color token map, geometry rules, and the strict Absolute Shadow Ban.
+5. **`.agents/rules/coding-standards.md`**: Dart conventions, immutability, typed models, and lint standards.
+6. **`.agents/rules/firebase-security.md`**: Client-side role gating, Firebase Auth, and Firestore rules.
+7. **`.agents/rules/git-workflow.md`**: Version-prefixed commit messages (`<version> - <summary>`) and automated verification.
+8. **`.agents/rules/version-increment.md`**: Automated minor (elapsed days) and patch version incrementing in `pubspec.yaml`.
+9. **`.agents/skills/` playbooks**:
+   - `flutter-m3-theming/SKILL.md`
+   - `firestore-streams/SKILL.md`
+   - `mobile-sync-contract/SKILL.md`
+   - `verification-and-release/SKILL.md`
+10. **`analysis_options.yaml`**: Strict lint rules.
+11. **`pubspec.yaml`**: Initial package configuration with the dependencies above.
+
+*(Remember: DO NOT create any `lib/` files or app screens yet!)*
 ```
