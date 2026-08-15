@@ -1,1288 +1,325 @@
-# 🚀 Beginner-Friendly Flutter Roadmap & Implementation Guide (`saoudi_app`)
+# 🗺️ `saoudi_app`: Step-by-Step Architecture Roadmap & Learning Plan
 
-> **Who is this guide for?**
-> This guide is crafted for developers who are new to Flutter. It explains every concept in plain English, provides clean, copy-paste-ready code snippets with line-by-line comments, and guides you step-by-step through building **`saoudi_app`** (the standalone mobile companion for `saoudi.online`).
-
----
-
-## 📚 Core Flutter Concepts Explained Simply
-
-Before writing code, here are the 4 main Flutter concepts you need to know:
-
-1. **Everything is a Widget**: In Flutter, buttons, text, padding, cards, and even the whole screen are called **Widgets**. You compose widgets inside other widgets like LEGO bricks.
-2. **`StatelessWidget` vs `StatefulWidget`**:
-   - `StatelessWidget`: A widget that **never changes** on its own (like a static icon, a label, or a card).
-   - `StatefulWidget`: A widget that **can change over time** (like an input field, an animation controller, or a screen where user taps toggle values).
-3. **`BuildContext`**: Think of `context` as a map location. It tells Flutter *where* a widget lives inside the widget tree so it can look up themes, screen sizes, or navigation routers.
-4. **`StreamBuilder`**: A widget that listens to a real-time stream (like Cloud Firestore updates). Whenever data changes in the database, `StreamBuilder` automatically redraws your screen with the fresh data!
+> **Purpose of this Roadmap**:
+> This document is your complete, step-by-step master plan for building **`saoudi_app`** (the standalone Flutter companion app for `saoudi.online`).
+> It focuses on **architecture, logic, widget choices, and progression milestones** rather than raw code, so you can follow each step at your own pace and understand the exact mechanics of building a production-grade Flutter app.
 
 ---
 
-## 🛠️ Prerequisites & Setup
+## 🧭 Milestone Flowchart
 
-### Step 0.1: Install Dependencies (`pubspec.yaml`)
-In your Flutter project root, open `pubspec.yaml` and make sure you have these dependencies:
-
-```yaml
-name: saoudi_app
-description: "Standalone Material 3 Dark Admin app for saoudi.online"
-publish_to: 'none'
-version: 1.0.0+1
-
-environment:
-  sdk: '>=3.3.0 <4.0.0'
-  flutter: ">=3.19.0"
-
-dependencies:
-  flutter:
-    sdk: flutter
-
-  # Firebase SDKs
-  firebase_core: ^3.12.1
-  firebase_auth: ^5.5.1
-  cloud_firestore: ^5.6.5
-  google_sign_in: ^6.2.2
-
-  # State & Storage
-  flutter_riverpod: ^2.6.1
-  flutter_secure_storage: ^9.2.4
-
-  # Fonts & Utilities
-  google_fonts: ^6.2.1
-  intl: ^0.20.2
-  share_plus: ^10.1.4
-  uuid: ^4.5.1
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^5.0.0
-
-flutter:
-  uses-material-design: true
-  assets:
-    - assets/icons/
-    - assets/images/
 ```
-
-Run in your terminal:
-```bash
-flutter pub get
+Phase 0: Environment, Dependencies & Firebase Setup
+   ↓
+Phase 1: Visual Design System & Theme Foundation (Zero Shadows)
+   ↓
+Phase 2: Authentication & Role-Based Access Control (Google Sign-In)
+   ↓
+Phase 3: Core Navigation Shell & Floating Nav Dock
+   ↓
+Phase 4: Dashboard & Live Aggregate Telemetry (Bento Grid)
+   ↓
+Phase 5: Admin Tasks & Todos Hub (admin_todos Stream & Actions)
+   ↓
+Phase 6: System Audit Logs & Telemetry (system_logs Stream & Filters)
+   ↓
+Phase 7: Admin Emails Access Control (accepted_admin_emails Management)
+   ↓
+Phase 8: Offline Persistence, Polish & Release Verification
 ```
 
 ---
 
-## 🗺️ Step-by-Step Build Order
+## 📦 Phase 0: Environment, Dependencies & Firebase Setup
 
-```
-Step 1: Color Palette & Zero-Shadow Theme Tokens
-Step 2: Ambient Background Motion Animation
-Step 3: Firebase Auth Service & Role Gating Logic
-Step 4: Pixel-Perfect Login Screen
-Step 5: Auto-Login & Splash Route Guard
-Step 6: Floating Navigation Dock & App Shell
-Step 7: Dashboard Overview Screen (Live Metrics)
-Step 8: Admin Tasks & Todos Screen (admin_todos)
-Step 9: System Audit Logs Screen (system_logs)
-Step 10: Admin Emails Screen (accepted_admin_emails)
-Step 11: Verification & Running on Device
-```
+### Step 0.1: Project Setup & Package Dependencies
+- **Goal**: Configure your Flutter environment with the exact packages needed for Firebase, state management, secure storage, and Google fonts.
+- **File to modify**: `pubspec.yaml`
+- **Key packages to include**:
+  - `firebase_core`, `firebase_auth`, `cloud_firestore`, `google_sign_in`
+  - `flutter_riverpod` (or chosen state management)
+  - `flutter_secure_storage`
+  - `google_fonts`, `intl`, `share_plus`, `uuid`
+- **What to do**:
+  1. Add the dependencies to `pubspec.yaml`.
+  2. Declare the `assets/icons/` and `assets/images/` folders under the `flutter:` assets section.
+  3. Run `flutter pub get` in your terminal to download and link all packages.
 
----
-
-## 🎨 Step 1: Color Palette & Zero-Shadow Theme
-
-### Why is this important?
-The website has an **Absolute Shadow Ban** (no blurry drop shadows). Elevation is expressed purely through solid Material 3 dark surface colors and border strokes.
-
-### Create: `lib/core/theme/colors.dart`
-```dart
-import 'package:flutter/material.dart';
-
-/// Central Google Brand Color Palette & Material 3 Dark Surface Colors
-class AppColors {
-  // Google Brand Accents
-  static const Color googleBlue = Color(0xFF8AB4F8);    // Primary (#8AB4F8 / #4285F4)
-  static const Color googleGreen = Color(0xFF81C784);   // Secondary / Success (#81C784 / #0F9D58)
-  static const Color googleYellow = Color(0xFFFDD663);  // Tertiary / Warning (#FDD663 / #F9AB00)
-  static const Color googleRed = Color(0xFFF28B82);     // Error / Destructive (#F28B82 / #EA4335)
-
-  // Material 3 Dark Surface Layers (Strictly Dark Mode)
-  static const Color surfaceCanvas = Color(0xFF121212);           // Main scaffold background
-  static const Color surfaceContainer = Color(0xFF1D1B20);        // Card containers
-  static const Color surfaceContainerHigh = Color(0xFF211F26);    // Inputs, active sheets & modal dialogs
-  static const Color border = Color(0xFF2B2930);                  // Clean border outlines
-
-  // Typography Colors
-  static const Color textPrimary = Color(0xFFFFFFFF);             // 100% White text
-  static const Color textSecondary = Color(0xB3E6E1E5);           // 70% Muted white text
-  static const Color textMuted = Color(0x66E6E1E5);               // 40% Subtle placeholder text
-}
-```
-
-### Create: `lib/core/theme/app_theme.dart`
-```dart
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'colors.dart';
-
-/// Configures the entire Flutter app theme with ZERO visual shadows
-class AppTheme {
-  static ThemeData get darkTheme {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      scaffoldBackgroundColor: AppColors.surfaceCanvas,
-      
-      // Zero elevation across all surfaces
-      cardTheme: const CardThemeData(
-        elevation: 0,
-        color: AppColors.surfaceContainer,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(24)),
-          side: BorderSide(color: AppColors.border, width: 1),
-        ),
-      ),
-
-      appBarTheme: const AppBarTheme(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        scrolledUnderElevation: 0,
-        centerTitle: false,
-      ),
-
-      // Input / TextField styling
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: AppColors.surfaceContainerHigh,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.googleBlue, width: 1.5),
-        ),
-      ),
-
-      // Global Font Family
-      textTheme: GoogleFonts.interTextTheme(
-        ThemeData(brightness: Brightness.dark).textTheme,
-      ),
-    );
-  }
-}
-```
+### Step 0.2: Firebase Project Configuration
+- **Goal**: Connect your Flutter app directly to the shared Firebase project.
+- **What to do**:
+  1. For Android: Place `google-services.json` into `android/app/`.
+  2. For iOS: Place `GoogleService-Info.plist` into `ios/Runner/`.
+  3. Ensure your Google Sign-In SHA-1 / SHA-256 fingerprints are registered in the Firebase Console.
 
 ---
 
-## ✨ Step 2: Ambient Background Motion Animation
+## 🎨 Phase 1: Visual Design System & Theme Foundation
 
-### Why is this important?
-The website has a moving star/dot ambient background. In Flutter, we use `CustomPainter` combined with an `AnimationController` to smoothly draw and move these particles with 60 FPS performance without lagging the phone.
-
-### Create: `lib/presentation/common/ambient_background.dart`
-```dart
-import 'dart:math' as math;
-import 'package:flutter/material.dart';
-import '../../core/theme/colors.dart';
-
-/// Wraps any screen with the signature floating Google-color dots & star grid animation
-class AmbientBackground extends StatefulWidget {
-  final Widget child;
-  const AmbientBackground({super.key, required this.child});
-
-  @override
-  State<AmbientBackground> createState() => _AmbientBackgroundState();
-}
-
-class _AmbientBackgroundState extends State<AmbientBackground> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    // Smooth 30-second continuous looping animation
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 30),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // 1. Solid Canvas Background
-        Container(color: AppColors.surfaceCanvas),
-
-        // 2. Animated Custom Paint Layer
-        Positioned.fill(
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, _) {
-              return CustomPaint(
-                painter: _AmbientPainter(progress: _controller.value),
-              );
-            },
-          ),
-        ),
-
-        // 3. Main Screen Content on Top
-        Positioned.fill(child: widget.child),
-      ],
-    );
-  }
-}
-
-class _AmbientPainter extends CustomPainter {
-  final double progress;
-  _AmbientPainter({required this.progress});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Math angles for gentle floating movement
-    final double angle = progress * 2 * math.pi;
-    final double offsetX = math.sin(angle) * 30;
-    final double offsetY = math.cos(angle) * 20;
-
-    // 1. Draw Google Brand Color Radial Accent Points
-    _drawColoredDot(canvas, Offset(size.width * 0.15 + offsetX, size.height * 0.2 + offsetY), AppColors.googleBlue, 2.5);
-    _drawColoredDot(canvas, Offset(size.width * 0.85 - offsetX, size.height * 0.35 + offsetY), AppColors.googleGreen, 2.2);
-    _drawColoredDot(canvas, Offset(size.width * 0.3 + offsetX, size.height * 0.7 - offsetY), AppColors.googleYellow, 2.0);
-    _drawColoredDot(canvas, Offset(size.width * 0.75 - offsetX, size.height * 0.8 + offsetY), AppColors.googleRed, 2.3);
-
-    // 2. Draw Subtle Star Grid Points
-    final Paint starPaint = Paint()..color = Colors.white.withValues(alpha: 0.12);
-    const double step = 60.0;
-    for (double x = 20; x < size.width; x += step) {
-      for (double y = 20; y < size.height; y += step) {
-        canvas.drawCircle(Offset(x, y), 0.75, starPaint);
-      }
-    }
-  }
-
-  void _drawColoredDot(Canvas canvas, Offset center, Color color, double radius) {
-    final paint = Paint()
-      ..color = color.withValues(alpha: 0.6)
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(center, radius, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _AmbientPainter oldDelegate) => oldDelegate.progress != progress;
-}
-```
+### Step 1.1: Material 3 Dark Palette & Theme Tokens
+- **Goal**: Define the app's visual identity with zero shadows and strict Google brand colors.
+- **Files to create**: `lib/core/theme/colors.dart`, `lib/core/theme/app_theme.dart`
+- **Design Invariants to Enforce**:
+  - **Absolute Shadow Ban**: Enforce `elevation: 0` across all cards, appbars, dialogs, and sheets. Never use `BoxShadow`.
+  - **Color Palette**:
+    - Background canvas: `#121212`
+    - Card container: `#1D1B20`
+    - Input & active sheet container: `#211F26`
+    - Border strokes: `#2B2930`
+    - Accents: Google Blue (`#8AB4F8`), Google Green (`#81C784`), Google Yellow (`#FDD663`), Google Red (`#F28B82`)
+  - **Typography**: Configure `GoogleFonts.interTextTheme()` (or Google Sans) for high-legibility dark mode text.
+- **Expected Outcome**: A centralized `AppTheme.darkTheme` that automatically styles all standard Flutter widgets to match `saoudi.online`.
 
 ---
 
-## 🔐 Step 3: Firebase Auth & Role-Gating Logic
-
-### How it works:
-1. User logs in with Google.
-2. We check if their email matches `PRIMARY_ADMIN_EMAIL`.
-3. If not primary, we check if their email document exists in the `/accepted_admin_emails` Firestore collection.
-4. If neither, we kick them out (sign out) and show an error message.
-
-### Create: `lib/data/services/auth_service.dart`
-```dart
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-
-enum AdminRole { owner, secondary, unauthorized }
-
-class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  // Replace with your primary email
-  static const String primaryAdminEmail = 'saoudi.abderrahmane26@gmail.com';
-
-  /// Stream of current authenticated user
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
-
-  User? get currentUser => _auth.currentUser;
-
-  /// Sign in with Google and evaluate role
-  Future<AdminRole> signInWithGoogle() async {
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return AdminRole.unauthorized; // User cancelled
-
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final OAuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
-      final String email = (userCredential.user?.email ?? '').toLowerCase().trim();
-
-      // 1. Check if Primary Owner
-      if (email == primaryAdminEmail.toLowerCase()) {
-        return AdminRole.owner;
-      }
-
-      // 2. Check if Secondary Admin in Firestore
-      final docSnap = await _firestore.collection('accepted_admin_emails').doc(email).get();
-      if (docSnap.exists) {
-        return AdminRole.secondary;
-      }
-
-      // 3. Not authorized -> Sign out immediately
-      await signOut();
-      return AdminRole.unauthorized;
-    } catch (e) {
-      await signOut();
-      return AdminRole.unauthorized;
-    }
-  }
-
-  /// Sign out
-  Future<void> signOut() async {
-    await _googleSignIn.signOut();
-    await _auth.signOut();
-  }
-
-  /// Check current user's role
-  Future<AdminRole> checkCurrentRole() async {
-    final user = _auth.currentUser;
-    if (user == null) return AdminRole.unauthorized;
-
-    final email = (user.email ?? '').toLowerCase().trim();
-    if (email == primaryAdminEmail.toLowerCase()) return AdminRole.owner;
-
-    final docSnap = await _firestore.collection('accepted_admin_emails').doc(email).get();
-    if (docSnap.exists) return AdminRole.secondary;
-
-    return AdminRole.unauthorized;
-  }
-}
-```
+### Step 1.2: Ambient Animated Particle Background
+- **Goal**: Replicate the website's signature floating Google-color dots and star grid background motion.
+- **File to create**: `lib/presentation/common/ambient_background.dart`
+- **Flutter Concepts to Learn/Use**:
+  - `CustomPainter`: A canvas drawing tool that lets you paint custom shapes, circles, and lines.
+  - `AnimationController` with `SingleTickerProviderStateMixin`: Drives a smooth, continuous 60 FPS looping timer.
+  - `AnimatedBuilder`: Repaints the canvas smoothly on each frame without rebuilding heavy child widgets.
+- **Step-by-Step Breakdown**:
+  1. Create a `StatefulWidget` named `AmbientBackground` that accepts a `Widget child`.
+  2. In `initState()`, create an `AnimationController` with a continuous 30-second loop.
+  3. Create a `CustomPainter` that draws:
+     - 4 soft radial circles using Google Blue, Green, Yellow, and Red drifting gently based on sine/cosine math.
+     - A subtle repeating dot grid (stars) across the screen width and height.
+  4. Stack the canvas behind the `child` content using a `Stack` widget.
+- **Expected Outcome**: A reusable wrapper widget that gives any screen a lively ambient backdrop.
 
 ---
 
-## 📱 Step 4: Pixel-Perfect Login Screen
+## 🔐 Phase 2: Authentication & Role-Based Access Control
 
-### Create: `lib/presentation/auth/login_screen.dart`
-```dart
-import 'package:flutter/material.dart';
-import '../../core/theme/colors.dart';
-import '../../data/services/auth_service.dart';
-import '../common/ambient_background.dart';
-
-class LoginScreen extends StatefulWidget {
-  final VoidCallback onLoginSuccess;
-  const LoginScreen({super.key, required this.onLoginSuccess});
-
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final AuthService _authService = AuthService();
-  bool _isLoading = false;
-  String? _errorMessage;
-
-  Future<void> _handleGoogleSignIn() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    final role = await _authService.signInWithGoogle();
-
-    if (!mounted) return;
-
-    if (role == AdminRole.owner || role == AdminRole.secondary) {
-      widget.onLoginSuccess();
-    } else {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = 'Access denied. Your email is not an authorized admin.';
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: AmbientBackground(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 400),
-              child: Container(
-                padding: const EdgeInsets.all(28),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceContainer,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: AppColors.border, width: 1),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // App Logo Icon
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: AppColors.googleBlue.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.googleBlue.withValues(alpha: 0.3)),
-                      ),
-                      child: const Icon(
-                        Icons.shield_rounded,
-                        color: AppColors.googleBlue,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Heading
-                    const Text(
-                      'saoudi.online',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      'Admin Telemetry & Management',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-
-                    // Error Banner if unauthorized
-                    if (_errorMessage != null) ...[
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.googleRed.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.googleRed.withValues(alpha: 0.3)),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.error_outline_rounded, color: AppColors.googleRed, size: 18),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                _errorMessage!,
-                                style: const TextStyle(fontSize: 12, color: AppColors.googleRed),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-
-                    // Google Sign-In Pill Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: OutlinedButton(
-                        onPressed: _isLoading ? null : _handleGoogleSignIn,
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: AppColors.surfaceContainerHigh,
-                          side: const BorderSide(color: AppColors.border),
-                          shape: const StadiumBorder(),
-                        ),
-                        child: _isLoading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.googleBlue),
-                              )
-                            : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
-                                  Icon(Icons.g_mobiledata_rounded, size: 28, color: AppColors.googleBlue),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Continue with Google',
-                                    style: TextStyle(
-                                      color: AppColors.textPrimary,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-```
+### Step 2.1: Google Sign-In & Firebase Auth Service
+- **Goal**: Provide a clean authentication service that handles signing in with Google and obtaining Firebase User credentials.
+- **File to create**: `lib/data/services/auth_service.dart`
+- **Step-by-Step Breakdown**:
+  1. Initialize `FirebaseAuth` and `GoogleSignIn` instances.
+  2. Implement `signInWithGoogle()`: Trigger Google prompt, get authentication tokens, and pass them to Firebase `signInWithCredential()`.
+  3. Expose a stream `authStateChanges` so the app can react whenever the user logs in or logs out.
 
 ---
 
-## 🚪 Step 5: Splash Screen & Auto-Login Guard
-
-### Create: `lib/presentation/auth/splash_screen.dart`
-```dart
-import 'package:flutter/material.dart';
-import '../../data/services/auth_service.dart';
-import '../navigation/app_shell.dart';
-import 'login_screen.dart';
-
-/// Checks if user is already logged in and routes them to AppShell or LoginScreen
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  final AuthService _authService = AuthService();
-
-  @override
-  void initState() {
-    super.initState();
-    _checkAuth();
-  }
-
-  Future<void> _checkAuth() async {
-    await Future.delayed(const Duration(milliseconds: 500)); // Small smooth splash delay
-    final role = await _authService.checkCurrentRole();
-
-    if (!mounted) return;
-
-    if (role == AdminRole.owner || role == AdminRole.secondary) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => AppShell(isOwner: role == AdminRole.owner)),
-      );
-    } else {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => LoginScreen(
-            onLoginSuccess: () => _checkAuth(),
-          ),
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(color: Color(0xFF8AB4F8)),
-      ),
-    );
-  }
-}
-```
+### Step 2.2: Access Control & Role Gating Logic
+- **Goal**: Protect the app by verifying whether the authenticated user is an authorized administrator.
+- **Logic to Implement**:
+  1. Define an enum `AdminRole`: `owner`, `secondary`, `unauthorized`.
+  2. **Primary Check**: Compare `user.email` with the hardcoded primary owner email (`PRIMARY_ADMIN_EMAIL`). If it matches → Assign `AdminRole.owner`.
+  3. **Secondary Check**: If not owner, query Cloud Firestore collection `accepted_admin_emails/{user.email}`. If document exists → Assign `AdminRole.secondary`.
+  4. **Rejection**: If neither condition is met → Immediately sign the user out and assign `AdminRole.unauthorized`.
+- **Audit Logging**: If unauthorized, record an audit event into `system_logs` for security tracking.
 
 ---
 
-## ⚓ Step 6: Floating Pill Navigation Dock & App Shell
-
-### Create: `lib/presentation/navigation/app_shell.dart`
-```dart
-import 'package:flutter/material.dart';
-import '../../core/theme/colors.dart';
-import '../dashboard/dashboard_screen.dart';
-import '../tasks/tasks_screen.dart';
-import '../logs/logs_screen.dart';
-import '../emails/emails_screen.dart';
-
-class AppShell extends StatefulWidget {
-  final bool isOwner;
-  const AppShell({super.key, required this.isOwner});
-
-  @override
-  State<AppShell> createState() => _AppShellState();
-}
-
-class _AppShellState extends State<AppShell> {
-  int _currentIndex = 0;
-
-  late final List<Widget> _screens = [
-    const DashboardScreen(),
-    const TasksScreen(),
-    const LogsScreen(),
-    EmailsScreen(isOwner: widget.isOwner),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      // IndexedStack preserves scroll positions of tabs when switching
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-
-      // Floating Stadium Bottom Navigation Dock
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          child: Container(
-            height: 60,
-            decoration: BoxDecoration(
-              color: AppColors.surfaceContainer,
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: AppColors.border, width: 1),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildNavItem(0, Icons.dashboard_rounded, 'Overview'),
-                _buildNavItem(1, Icons.task_alt_rounded, 'Tasks'),
-                _buildNavItem(2, Icons.receipt_long_rounded, 'Logs'),
-                _buildNavItem(3, Icons.admin_panel_settings_rounded, 'Admins'),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(int index, IconData icon, String label) {
-    final bool isSelected = _currentIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _currentIndex = index),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.googleBlue.withValues(alpha: 0.15) : Colors.transparent,
-          borderRadius: BorderRadius.circular(999),
-          border: isSelected ? Border.all(color: AppColors.googleBlue.withValues(alpha: 0.3)) : null,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 20,
-              color: isSelected ? AppColors.googleBlue : AppColors.textSecondary,
-            ),
-            if (isSelected) ...[
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: AppColors.googleBlue,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-```
+### Step 2.3: Pixel-Perfect Login Screen Design
+- **Goal**: Create a login screen matching the visual aesthetics of the web admin login page.
+- **File to create**: `lib/presentation/auth/login_screen.dart`
+- **UI Elements to Build**:
+  - Wrap screen in `AmbientBackground`.
+  - Centered card with `#1D1B20` surface background, `#2B2930` border, and `24px` rounded corners.
+  - App shield/logo icon with Google Blue accent.
+  - Bold title "saoudi.online" with subtitle "Admin Telemetry & Management".
+  - Full-width pill-shaped Google Sign-In button (`StadiumBorder()`).
+  - Error banner widget that displays error feedback if an unauthorized user attempts to sign in.
 
 ---
 
-## 📊 Step 7: Dashboard Overview Screen (Live Metrics)
-
-### Create: `lib/presentation/dashboard/dashboard_screen.dart`
-```dart
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import '../../core/theme/colors.dart';
-import '../common/ambient_background.dart';
-
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
-
-  Future<Map<String, int>> _fetchCounts() async {
-    final db = FirebaseFirestore.instance;
-    final results = await Future.wait([
-      db.collection('projects').count().get(),
-      db.collection('experience').count().get(),
-      db.collection('designs').count().get(),
-      db.collection('certificates').count().get(),
-      db.collection('admin_todos').where('status', isEqualTo: 'active').count().get(),
-    ]);
-
-    return {
-      'projects': results[0].count ?? 0,
-      'experience': results[1].count ?? 0,
-      'designs': results[2].count ?? 0,
-      'certificates': results[3].count ?? 0,
-      'activeTasks': results[4].count ?? 0,
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard Overview', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-      ),
-      body: AmbientBackground(
-        child: FutureBuilder<Map<String, int>>(
-          future: _fetchCounts(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.googleBlue));
-            }
-            final counts = snapshot.data ?? {};
-
-            return ListView(
-              padding: const EdgeInsets.all(20),
-              children: [
-                // Bento Metrics 2x2 Grid
-                GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisSpacing: 14,
-                  mainAxisSpacing: 14,
-                  childAspectRatio: 1.3,
-                  children: [
-                    _buildStatCard('Active Tasks', counts['activeTasks'] ?? 0, Icons.task_alt_rounded, AppColors.googleYellow),
-                    _buildStatCard('Projects', counts['projects'] ?? 0, Icons.code_rounded, AppColors.googleBlue),
-                    _buildStatCard('Experience', counts['experience'] ?? 0, Icons.work_outline_rounded, AppColors.googleGreen),
-                    _buildStatCard('Designs', counts['designs'] ?? 0, Icons.brush_rounded, AppColors.googleRed),
-                  ],
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard(String title, int count, IconData icon, Color accent) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Icon(icon, color: accent, size: 22),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                count.toString(),
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: accent),
-              ),
-              Text(title, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-```
+### Step 2.4: Persistent Auto-Login & Splash Route Guard
+- **Goal**: Avoid forcing the admin to log in every time they open the app.
+- **File to create**: `lib/presentation/auth/splash_screen.dart`
+- **Step-by-Step Breakdown**:
+  1. Show a brief, smooth loading splash state.
+  2. Inspect `FirebaseAuth.instance.currentUser` and evaluate their role.
+  3. If already authorized (Owner or Secondary) → Navigate directly to `AppShell` (Dashboard).
+  4. If not logged in or invalid → Navigate to `LoginScreen`.
 
 ---
 
-## 📋 Step 8: Admin Tasks & Todos Screen (`admin_todos`)
+## ⚓ Phase 3: Core Navigation Shell & Floating Nav Dock
 
-### Create: `lib/presentation/tasks/tasks_screen.dart`
-```dart
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import '../../core/theme/colors.dart';
-import '../common/ambient_background.dart';
-
-class TasksScreen extends StatefulWidget {
-  const TasksScreen({super.key});
-
-  @override
-  State<TasksScreen> createState() => _TasksScreenState();
-}
-
-class _TasksScreenState extends State<TasksScreen> {
-  String _selectedTab = 'active'; // 'active' | 'completed' | 'archived'
-
-  void _showCreateTaskSheet() {
-    final titleController = TextEditingController();
-    String category = 'General';
-    String priority = 'Medium';
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.surfaceContainerHigh,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Create New Task', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 14),
-              TextField(
-                controller: titleController,
-                autofocus: true,
-                decoration: const InputDecoration(hintText: 'Task title...'),
-              ),
-              const SizedBox(height: 18),
-              SizedBox(
-                width: double.infinity,
-                height: 46,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.googleGreen,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  onPressed: () async {
-                    if (titleController.text.trim().isEmpty) return;
-                    await FirebaseFirestore.instance.collection('admin_todos').add({
-                      'title': titleController.text.trim(),
-                      'category': category,
-                      'priority': priority,
-                      'status': 'active',
-                      'createdAt': DateTime.now().toUtc().toIso8601String(),
-                    });
-                    if (context.mounted) Navigator.pop(context);
-                  },
-                  child: const Text('Add Task', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tasks & Todos', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        actions: [
-          IconButton(
-            onPressed: _showCreateTaskSheet,
-            icon: const Icon(Icons.add_rounded, color: AppColors.googleBlue),
-          ),
-        ],
-      ),
-      body: AmbientBackground(
-        child: Column(
-          children: [
-            // Segmented Tabs
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              child: Row(
-                children: ['active', 'completed', 'archived'].map((tab) {
-                  final isSelected = _selectedTab == tab;
-                  return Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => _selectedTab = tab),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        decoration: BoxDecoration(
-                          color: isSelected ? AppColors.googleBlue : AppColors.surfaceContainer,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Text(
-                            tab[0].toUpperCase() + tab.substring(1),
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: isSelected ? Colors.white : AppColors.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-
-            // Live Tasks Stream
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('admin_todos')
-                    .where('status', isEqualTo: _selectedTab)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(color: AppColors.googleBlue));
-                  }
-                  final docs = snapshot.data?.docs ?? [];
-                  if (docs.isEmpty) {
-                    return const Center(
-                      child: Text('No tasks in this tab', style: TextStyle(color: AppColors.textMuted)),
-                    );
-                  }
-
-                  return ListView.builder(
-                    padding: const EdgeInsets.all(20),
-                    itemCount: docs.length,
-                    itemBuilder: (context, index) {
-                      final data = docs[index].data() as Map<String, dynamic>;
-                      final id = docs[index].id;
-                      final isDone = data['status'] == 'completed';
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceContainer,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppColors.border),
-                        ),
-                        child: Row(
-                          children: [
-                            Checkbox(
-                              value: isDone,
-                              activeColor: AppColors.googleGreen,
-                              onChanged: (val) {
-                                docs[index].reference.update({
-                                  'status': val == true ? 'completed' : 'active',
-                                });
-                              },
-                            ),
-                            Expanded(
-                              child: Text(
-                                data['title'] ?? '',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.textPrimary,
-                                  decoration: isDone ? TextDecoration.lineThrough : null,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.archive_outlined, size: 18, color: AppColors.textSecondary),
-                              onPressed: () => docs[index].reference.update({'status': 'archived'}),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-```
+### Step 3.1: Floating Pill Navigation Dock (`NavDock`)
+- **Goal**: Build the floating bottom navigation bar that matches `AdminNavDock.astro`.
+- **File to create**: `lib/presentation/navigation/nav_dock.dart`
+- **Specifications & Layout**:
+  - A floating stadium-pill container (`BorderRadius.circular(32)` or `999`).
+  - Color: `#1D1B20` container with a `#2B2930` border outline.
+  - Items:
+    1. **Overview / Dashboard** (`Icons.dashboard_rounded`)
+    2. **Tasks** (`Icons.task_alt_rounded` with active task count badge)
+    3. **Logs** (`Icons.receipt_long_rounded` with red indicator for unhandled errors)
+    4. **Admin Emails** (`Icons.admin_panel_settings_rounded`)
+  - Active item indicator: Highlight active tab with Google Blue container tint and smooth width expansion.
 
 ---
 
-## 📜 Step 9: System Audit Logs Screen (`system_logs`)
-
-### Create: `lib/presentation/logs/logs_screen.dart`
-```dart
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import '../../core/theme/colors.dart';
-import '../common/ambient_background.dart';
-
-class LogsScreen extends StatelessWidget {
-  const LogsScreen({super.key});
-
-  Color _getSeverityColor(String severity) {
-    switch (severity.toLowerCase()) {
-      case 'error':
-      case 'critical':
-        return AppColors.googleRed;
-      case 'warn':
-        return AppColors.googleYellow;
-      default:
-        return AppColors.googleBlue;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('System Audit Logs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-      ),
-      body: AmbientBackground(
-        child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('system_logs')
-              .orderBy('timestamp', descending: true)
-              .limit(50)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.googleBlue));
-            }
-            final docs = snapshot.data?.docs ?? [];
-            if (docs.isEmpty) {
-              return const Center(child: Text('No logs available', style: TextStyle(color: AppColors.textMuted)));
-            }
-
-            return ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: docs.length,
-              itemBuilder: (context, index) {
-                final data = docs[index].data() as Map<String, dynamic>;
-                final severity = data['severity'] ?? 'info';
-                final accentColor = _getSeverityColor(severity);
-
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceContainer,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Severity Dot Indicator
-                      Container(
-                        width: 10,
-                        height: 10,
-                        margin: const EdgeInsets.only(top: 4, right: 12),
-                        decoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
-                      ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              data['title'] ?? 'Log Event',
-                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.textPrimary),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              data['userEmail'] ?? 'system',
-                              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-```
+### Step 3.2: App Shell Scaffold
+- **Goal**: Coordinate top-level navigation between tabs without losing screen state or scroll position.
+- **File to create**: `lib/presentation/navigation/app_shell.dart`
+- **Flutter Concept to Learn/Use**:
+  - `IndexedStack`: Keeps all 4 main tab screens alive in memory so switching tabs doesn't trigger unnecessary re-renders or reset scroll offsets.
+- **Step-by-Step Breakdown**:
+  1. Create a `StatefulWidget` holding the current tab index `_currentIndex`.
+  2. Use `Scaffold` with `extendBody: true` to let screen content flow behind the floating navigation bar.
+  3. Place `IndexedStack` in `body` and your custom `NavDock` in `bottomNavigationBar`.
 
 ---
 
-## 📧 Step 10: Admin Emails Screen (`accepted_admin_emails`)
+## 📊 Phase 4: Dashboard & Live Aggregate Telemetry
 
-### Create: `lib/presentation/emails/emails_screen.dart`
-```dart
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import '../../core/theme/colors.dart';
-import '../common/ambient_background.dart';
-
-class EmailsScreen extends StatelessWidget {
-  final bool isOwner;
-  const EmailsScreen({super.key, required this.isOwner});
-
-  void _showAddEmailDialog(BuildContext context) {
-    final emailController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surfaceContainerHigh,
-        title: const Text('Grant Admin Access', style: TextStyle(fontSize: 16)),
-        content: TextField(
-          controller: emailController,
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(hintText: 'admin@example.com'),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.googleGreen),
-            onPressed: () async {
-              final email = emailController.text.trim().toLowerCase();
-              if (email.isEmpty) return;
-
-              await FirebaseFirestore.instance.collection('accepted_admin_emails').doc(email).set({
-                'email': email,
-                'addedAt': DateTime.now().toUtc().toIso8601String(),
-                'isPrimary': false,
-              });
-
-              if (context.mounted) Navigator.pop(context);
-            },
-            child: const Text('Grant Access', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Authorized Admins', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        actions: [
-          if (isOwner)
-            IconButton(
-              icon: const Icon(Icons.person_add_alt_1_rounded, color: AppColors.googleBlue),
-              onPressed: () => _showAddEmailDialog(context),
-            ),
-        ],
-      ),
-      body: AmbientBackground(
-        child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('accepted_admin_emails').snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.googleBlue));
-            }
-            final docs = snapshot.data?.docs ?? [];
-
-            return ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: docs.length,
-              itemBuilder: (context, index) {
-                final data = docs[index].data() as Map<String, dynamic>;
-                final email = data['email'] ?? docs[index].id;
-                final isPrimary = data['isPrimary'] == true;
-
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceContainer,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        isPrimary ? Icons.shield_rounded : Icons.person_rounded,
-                        color: isPrimary ? AppColors.googleBlue : AppColors.googleGreen,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          email,
-                          style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
-                        ),
-                      ),
-                      if (isOwner && !isPrimary)
-                        IconButton(
-                          icon: const Icon(Icons.delete_outline_rounded, color: AppColors.googleRed, size: 18),
-                          onPressed: () => docs[index].reference.delete(),
-                        ),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-```
+### Step 4.1: Live Aggregate Metric Counts (Bento Grid)
+- **Goal**: Display real-time overview counts of all portfolio collections in a 2x2 Bento Grid.
+- **File to create**: `lib/presentation/dashboard/dashboard_screen.dart`
+- **Data to Query**:
+  - Execute concurrent Firestore count queries (`db.collection('...').count().get()`):
+    - `projects`, `experience`, `designs`, `certificates`, and active `admin_todos`.
+- **UI Structure**:
+  - 2-column `GridView` with aspect ratio `1.3`.
+  - Stat cards styled with rounded `20px` corners, solid surface `#1D1B20`, and specific Google accent colors per card (e.g., Tasks=Yellow, Projects=Blue, Experience=Green, Designs=Red).
 
 ---
 
-## 🚀 Step 11: Main App Entrypoint & Run
-
-### Create: `lib/main.dart`
-```dart
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'core/theme/app_theme.dart';
-import 'presentation/auth/splash_screen.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Connects to your Firebase project
-  runApp(const SaoudiApp());
-}
-
-class SaoudiApp extends StatelessWidget {
-  const SaoudiApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Saoudi Admin',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
-      home: const SplashScreen(),
-    );
-  }
-}
-```
+### Step 4.2: Quick Telemetry & Status Indicators
+- **Goal**: Provide high-level system telemetry at a glance.
+- **Elements to Include**:
+  - Active connection status pill ("Connected" in Google Green).
+  - High-priority task alert badge.
+  - Pull-to-refresh (`RefreshIndicator`) to instantly re-fetch counts.
 
 ---
 
-## ⚡ How to Run on Device / Emulator
+## 📋 Phase 5: Admin Tasks & Todos Hub (`admin_todos`)
 
-1. Connect your Android device or start an emulator.
-2. Run:
-   ```bash
-   flutter run
-   ```
-3. Test static code quality anytime:
-   ```bash
-   flutter analyze
-   ```
+### Step 5.1: Real-Time Stream & Status Segmented Tabs
+- **Goal**: Listen to real-time task changes in Firestore and filter them by lifecycle status.
+- **File to create**: `lib/presentation/tasks/tasks_screen.dart`
+- **Firestore Stream Logic**:
+  - Listen to `collection('admin_todos')` ordered by `createdAt desc`.
+  - Filter stream data based on the active tab:
+    - **Active**: `status == 'active'`
+    - **Completed**: `status == 'completed'`
+    - **Archived**: `status == 'archived'`
+  - **Secondary Admin Filter**: If user is a secondary admin, only show tasks where `createdBy == user.email`.
+
+---
+
+### Step 5.2: Task Item Card UI & Badges
+- **File to create**: `lib/presentation/tasks/widgets/task_card.dart`
+- **Visual Specifications**:
+  - Card container `#1D1B20` with `#2B2930` border.
+  - Interactive Checkbox: Tapping toggles task status between `active` and `completed` directly in Firestore.
+  - Strike-through text animation when task is marked complete.
+  - Category Badge Pill: Color-coded (Feature=Blue, Bug=Red, Refactor=Yellow, Idea=Green, Content=Purple, General=Gray).
+  - Priority Dot: High (Red), Medium (Yellow), Low (Green).
+  - Action buttons: Archive, Restore, Delete (Delete restricted to Owner only).
+
+---
+
+### Step 5.3: Create Task Modal Bottom Sheet
+- **File to create**: `lib/presentation/tasks/widgets/create_task_sheet.dart`
+- **User Flow**:
+  1. Admin taps the floating `+` button in the AppBar.
+  2. Smooth modal bottom sheet opens (`showModalBottomSheet` with `#211F26` surface).
+  3. Form inputs: Task Title, optional Description, Category selector chips, and Priority segmented control.
+  4. On submit: Generate a unique ID (`task_UUID`), write to Firestore `/admin_todos/{id}`, and dismiss sheet.
+
+---
+
+## 📜 Phase 6: System Audit Logs & Telemetry (`system_logs`)
+
+### Step 6.1: Live Telemetry Stream & Category Filters
+- **Goal**: Provide real-time streaming of website security events, authentication logs, and content modifications.
+- **File to create**: `lib/presentation/logs/logs_screen.dart`
+- **Filter Tabs**:
+  - Horizontal scrolling filter chips: `All`, `Auth`, `Content`, `Admin`, `Security`, `Visitor`, `Task`, `Storage`, `System` (or `My Activity` for secondary admins).
+  - Role check: Secondary admins only see `content`, `visitor`, `storage`, and their own `auth`/`task` events.
+
+---
+
+### Step 6.2: Search Bar & Severity Visual Indicators
+- **UI Elements**:
+  - Expanding animated search input filtering logs by title, action, user email, or IP address.
+  - Severity indicator dot / strip:
+    - `info` → Google Blue
+    - `warn` → Google Yellow
+    - `error` / `critical` → Google Red
+  - Relative timestamp formatting (e.g., "Just now", "5m ago", "2h ago") using `intl` package.
+
+---
+
+### Step 6.3: Expandable Log Detail Modal
+- **File to create**: `lib/presentation/logs/widgets/log_detail_sheet.dart`
+- **User Flow**:
+  - Tapping any log item opens an inspector sheet displaying:
+    - Event Action Code (e.g. `AUTH_LOGIN_PRIMARY`, `TASK_CREATED`)
+    - Client IP address & User-Agent
+    - Target collection and document ID
+    - Structured JSON change diff / metadata
+
+---
+
+### Step 6.4: Retention Purge Action (Owner Only)
+- **Goal**: Allow the primary admin to purge expired logs according to the system retention policy.
+- **Action**: Query logs where `expiresAt <= now` and execute a Firestore batched delete.
+
+---
+
+## 📧 Phase 7: Admin Emails Access Control (`accepted_admin_emails`)
+
+### Step 7.1: Live Authorized Admin List Stream
+- **Goal**: View all administrator accounts with access to the system.
+- **File to create**: `lib/presentation/emails/emails_screen.dart`
+- **Stream Logic**:
+  - Stream `/accepted_admin_emails` collection.
+  - Guarantee the primary owner email is displayed at the top with an "Owner" badge.
+
+---
+
+### Step 7.2: Grant Access & Revoke Access Modal Dialogs
+- **File to create**: `lib/presentation/emails/widgets/grant_email_dialog.dart`
+- **User Flow**:
+  1. **Grant Access**: Owner taps `+` → Dialog prompts for email & optional notes → Writes document to `/accepted_admin_emails/{email}`.
+  2. **Revoke Access**: Owner taps delete icon next to a secondary admin → Confirmation dialog appears → On confirm, deletes Firestore document.
+  3. **Safety Protection**: The primary owner email cannot be deleted or revoked.
+
+---
+
+## 🚀 Phase 8: Offline Persistence, Polish & Release Verification
+
+### Step 8.1: Firestore Offline Persistence
+- Enable offline disk caching in Firestore initialization so the app continues to display data when internet connectivity drops.
+
+### Step 8.2: Haptic Feedback & Transitions
+- Add subtle tactile feedback (`HapticFeedback.lightImpact()`) when completing tasks, tapping navigation tabs, or triggering modal actions.
+
+### Step 8.3: Verification & Quality Assurance
+- Run static analysis in your terminal:
+  ```bash
+  flutter analyze
+  ```
+- Run automated unit and widget tests:
+  ```bash
+  flutter test
+  ```
+- Build production APK:
+  ```bash
+  flutter build apk --release
+  ```
+
+---
+
+## ✅ Progress Checklist
+
+Track your progress step-by-step as you build:
+
+- [ ] **Phase 0**: Dependencies installed & Firebase connected.
+- [ ] **Phase 1.1**: Colors, tokens & zero-shadow `AppTheme` configured.
+- [ ] **Phase 1.2**: Ambient animated particle background running smoothly.
+- [ ] **Phase 2.1 - 2.4**: Google Sign-In, role gating & auto-login functional.
+- [ ] **Phase 3.1 - 3.2**: Floating navigation dock & app shell completed.
+- [ ] **Phase 4.1 - 4.2**: Dashboard Bento metrics live from Firestore.
+- [ ] **Phase 5.1 - 5.3**: Admin tasks streaming, toggling & creation sheet working.
+- [ ] **Phase 6.1 - 6.4**: System logs streaming, filters & detail sheet active.
+- [ ] **Phase 7.1 - 7.2**: Admin emails list, grant access & revoke functional.
+- [ ] **Phase 8.1 - 8.3**: Offline caching, haptics & static analysis clean.
