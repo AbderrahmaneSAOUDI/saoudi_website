@@ -170,6 +170,15 @@ const gsiHtml = `
   };
 <\/script>
 `;
+
+const isLocalhost =
+  Astro.url.hostname === 'localhost' ||
+  Astro.url.hostname === '127.0.0.1' ||
+  Astro.url.hostname === '0.0.0.0' ||
+  Astro.url.hostname.endsWith('.localhost') ||
+  import.meta.env.DEV;
+
+const adminLogoSrc = isLocalhost ? '/favicon-admin-dev.svg' : '/favicon-admin.svg';
 ---
 
 <BackgroundBaseLayout title={title}>
@@ -177,7 +186,7 @@ const gsiHtml = `
     <section class="max-w-md w-full px-4" aria-labelledby="login-heading">
       <div class="p-6 rounded-3xl border border-[var(--color-surface-container)]" style="background:var(--color-surface-container); color:var(--color-google-white);">
         <header class="mb-6 text-center flex flex-col items-center">
-          <img src="/favicon.svg" alt="saoudi.online logo" class="w-12 h-12 mb-3 object-contain" width="48" height="48" />
+          <img src={adminLogoSrc} alt="saoudi.online logo" class="w-12 h-12 mb-3 object-contain" width="48" height="48" />
           <h1 id="login-heading" class="text-2xl font-bold tracking-tight text-[#FFFFFF]">saoudi.online</h1>
         </header>
 
