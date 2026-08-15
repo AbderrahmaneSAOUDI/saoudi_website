@@ -122,7 +122,7 @@ if (Astro.request.method === 'POST') {
 
 const title = "Admin — Login";
 const gsiHtml = `
-<script src="https://accounts.google.com/gsi/client" async defer><\/script>
+<script src="https://accounts.google.com/gsi/client?hl=en" async defer><\/script>
 <script>
   function handleCredentialResponse(response) {
     fetch('/admin/admin_login', {
@@ -165,6 +165,7 @@ const gsiHtml = `
         width: '100%',
         shape: 'pill',
         text: 'continue_with',
+        locale: 'en',
       }
     );
   };
@@ -188,7 +189,7 @@ const gsiHtml = `
           data-client_id={GOOGLE_CLIENT_ID}
           data-callback="handleCredentialResponse">
         </div>
-        <div class="w-full flex justify-center rounded-3xl" id="g_id_signin" data-type="standard" data-size="medium" data-theme="dark"></div>
+        <div class="w-full flex justify-center rounded-3xl" id="g_id_signin" data-type="standard" data-size="medium" data-theme="dark" data-text="continue_with" data-locale="en"></div>
 
         <div set:html={gsiHtml}></div>
       </div>
