@@ -1,534 +1,461 @@
-# 🗺️ `saoudi_app`: Step-by-Step Granular Architecture Roadmap
+# 🗺️ `saoudi_app`: The Complete 30-Phase Architecture Roadmap
 
-> **How to use this Roadmap:**
-> This roadmap breaks down the construction of **`saoudi_app`** into **16 focused, single-task phases**. 
-> Each phase does **one thing at a time**, explains the core concepts in plain English, tells you which files to touch, and gives you a concrete test to verify your progress before moving to the next step.
-
----
-
-## 🧭 Master Phase Flowchart
-
-```
-[Phase 1] Project Dependencies & Manifest Setup
-   ↓
-[Phase 2] Firebase Platform Configuration (Android & iOS)
-   ↓
-[Phase 3] Design Tokens & Zero-Shadow Theme
-   ↓
-[Phase 4] Ambient Animated Particle Background
-   ↓
-[Phase 5] Google Authentication Service
-   ↓
-[Phase 6] Admin Role Evaluation & Gating Logic
-   ↓
-[Phase 7] Pixel-Perfect Login Screen UI
-   ↓
-[Phase 8] Splash Screen & Persistent Auto-Login Guard
-   ↓
-[Phase 9] Floating Pill Navigation Dock (NavDock) & App Shell
-   ↓
-[Phase 10] Overview Dashboard (Live Metrics Bento Grid)
-   ↓
-[Phase 11] Admin Tasks Hub: Data Model & Live Stream
-   ↓
-[Phase 12] Admin Tasks Hub: Card UI, Checkbox & Creation Sheet
-   ↓
-[Phase 13] System Audit Logs: Telemetry Stream & Category Filters
-   ↓
-[Phase 14] System Audit Logs: Search Bar, Inspector Sheet & Purge
-   ↓
-[Phase 15] Admin Emails Access Control: Stream, Grant & Revoke
-   ↓
-[Phase 16] Offline Persistence, Haptics & Final Release Build
-```
+> **How to use this Master Roadmap:**
+> This roadmap divides the entire creation of **`saoudi_app`** into **30 granular, single-focus phases**. 
+> Each phase represents one clear, bite-sized milestone with no combined tasks. You can follow them one by one, verify each milestone independently, and understand how every single piece of a professional Flutter app fits together.
 
 ---
 
-## 📦 Phase 1: Project Dependencies & Manifest Setup
+## 🧭 Master Phase Index (1 to 30)
 
-### Step 1.1: Configure `pubspec.yaml`
-- **🎯 Goal**: Declare all required Flutter packages and set up asset folders.
+| # | Phase Title | Focus Area |
+| :--- | :--- | :--- |
+| **01** | Package Manifest & Dependencies | `pubspec.yaml` configuration & downloads |
+| **02** | Assets Directory & Vector Icons Layout | `assets/icons/` & `assets/images/` organization |
+| **03** | Android Firebase Native Configuration | `google-services.json` & gradle linking |
+| **04** | iOS Firebase Native Configuration | `GoogleService-Info.plist` & iOS runner setup |
+| **05** | Flutter Engine & Firebase App Init | `main.dart` asynchronous startup binding |
+| **06** | Google Brand Color Tokens & Hex Palette | `colors.dart` centralized palette tokens |
+| **07** | Material 3 Dark Theme & Shadow Ban | `app_theme.dart` global zero-shadow rules |
+| **08** | Typography & Google Fonts Setup | `GoogleFonts.inter` dark mode typography |
+| **09** | Ambient Particle Canvas Math & Painter | `ambient_painter.dart` custom particle canvas |
+| **10** | Ambient Looping Controller & Wrapper Widget | `ambient_background.dart` 30s animation wrapper |
+| **11** | Google Sign-In Native Service Integration | `GoogleSignIn` OAuth prompt integration |
+| **12** | Firebase Auth Credential Exchange | `FirebaseAuth` credential sign-in pipe |
+| **13** | Admin Roles & Primary Owner Check | `AdminRole` enum & primary email verification |
+| **14** | Secondary Admin Firestore Verification | Query `/accepted_admin_emails/{email}` |
+| **15** | Unauthorized Session Rejection & Audit Log | Force sign-out & record security event |
+| **16** | Login Screen Card Container & Logo Header | Centered `#1D1B20` card with shield logo |
+| **17** | Google Sign-In Pill Button & Progress State | Stadium-pill button with loading indicator |
+| **18** | Login Error Banner & Feedback UI | Contextual red error alert display |
+| **19** | Startup Route Guard & Auto-Login Logic | `splash_screen.dart` auto-navigation check |
+| **20** | Floating Navigation Dock Container & Layout | Floating stadium-pill dock geometry |
+| **21** | Nav Dock Active Tab Expansion & Transitions | Animated tab width expansion & blue tint |
+| **22** | App Shell Scaffold & `IndexedStack` Manager | Multi-screen state preservation shell |
+| **23** | Overview Dashboard Server-Side Count Service | Firestore concurrent `.count().get()` queries |
+| **24** | Dashboard 2x2 Bento Metric Grid Screen | Responsive Bento metric cards layout |
+| **25** | Admin Tasks Data Model & Firestore Stream | `AdminTask` model & real-time collection pipe |
+| **26** | Admin Tasks Segmented Tabs & Task Item Card | Active/Done/Archive tabs & strike-through UI |
+| **27** | Task Creation Bottom Sheet & Context Menu | Modal bottom sheet form & task actions |
+| **28** | System Audit Logs Stream & Category Filters | `system_logs` real-time feed & filter chips |
+| **29** | Log Severity Indicators, Search & Purge | Blue/Yellow/Red dots, search bar & purge |
+| **30** | Admin Emails Access Control Management | Pinned primary owner, grant & revoke modals |
+
+---
+
+## 📦 Milestone 1: Setup & Design System (Phases 1 – 10)
+
+---
+
+### Phase 01: Package Manifest & Dependencies
+- **🎯 Goal**: Configure the package manifest with all required Firebase, UI, and utility libraries.
 - **📂 File**: `pubspec.yaml`
-- **💡 Concept to Understand**:
-  - `pubspec.yaml` is the package manager file for Flutter (like `package.json` in web development). It tells Flutter which libraries and assets to download and link.
+- **💡 Concept to Understand**: `pubspec.yaml` is the dependency configuration file for Flutter. Adding a package here makes its Dart classes available in your project.
 - **📝 What to do**:
-  1. Add Firebase SDKs: `firebase_core`, `firebase_auth`, `cloud_firestore`, `google_sign_in`.
-  2. Add utility packages: `google_fonts`, `intl`, `share_plus`, `uuid`, `flutter_secure_storage`.
-  3. Under the `flutter:` section, declare the asset directories:
-     ```yaml
-     flutter:
-       uses-material-design: true
-       assets:
-         - assets/icons/
-         - assets/images/
-     ```
-- **🔍 How to Verify**: Run `flutter pub get` in your terminal. It should complete with exit code `0` and create a `.dart_tool` folder.
+  1. Add Firebase libraries: `firebase_core`, `firebase_auth`, `cloud_firestore`, `google_sign_in`.
+  2. Add UI & Utility libraries: `google_fonts`, `intl`, `share_plus`, `uuid`, `flutter_secure_storage`.
+  3. Register asset paths under `flutter: assets:`.
+- **🔍 How to Verify**: Run `flutter pub get` in your terminal. Ensure it exits with code `0`.
 
 ---
 
-### Step 1.2: Create Asset Folders & Place Icons
-- **🎯 Goal**: Create the required local asset directories and copy vector icons.
+### Phase 02: Assets Directory & Vector Icons Layout
+- **🎯 Goal**: Create asset folders and place the app icon, branding shield logo, and vector icons.
 - **📂 Folders**: `assets/icons/`, `assets/images/`
-- **💡 Concept to Understand**:
-  - Flutter apps package their local images and icons inside the app bundle so they work instantly offline without network loading.
+- **💡 Concept to Understand**: Local assets are bundled into the compiled binary so images and icons render instantly without internet access.
 - **📝 What to do**:
-  1. Create the `assets/icons/` and `assets/images/` folders in your project root.
-  2. Place your logo image (`assets/images/logo.png`) and vector icons.
-- **🔍 How to Verify**: Check that `assets/images/logo.png` exists on your filesystem.
+  1. Create `assets/icons/` and `assets/images/`.
+  2. Copy `logo.png` into `assets/images/` and vector SVGs into `assets/icons/`.
+- **🔍 How to Verify**: Verify the files exist on disk at `assets/images/logo.png`.
 
 ---
 
-## 🔥 Phase 2: Firebase Platform Configuration
-
-### Step 2.1: Android Firebase Configuration
-- **🎯 Goal**: Connect the Android build engine to your Firebase Project.
-- **📂 Files**: `android/app/google-services.json`, `android/build.gradle`, `android/app/build.gradle`
-- **💡 Concept to Understand**:
-  - Android requires a Google Services JSON file that provides project API keys and project IDs to the native Android OS.
+### Phase 03: Android Firebase Native Configuration
+- **🎯 Goal**: Connect the native Android engine to your Firebase Project.
+- **📂 Files**: `android/app/google-services.json`, `android/app/build.gradle`
+- **💡 Concept to Understand**: Android native code needs `google-services.json` to register Google OAuth client IDs and Firestore project settings.
 - **📝 What to do**:
-  1. Download `google-services.json` from your Firebase Console.
-  2. Place `google-services.json` inside the `android/app/` folder.
-  3. Ensure `minSdkVersion` in `android/app/build.gradle` is set to at least `21` (or `23`).
-- **🔍 How to Verify**: Ensure `google-services.json` is located precisely at `android/app/google-services.json`.
+  1. Download `google-services.json` from the Firebase Console.
+  2. Place it in `android/app/google-services.json`.
+  3. Set `minSdkVersion` in `android/app/build.gradle` to at least `21`.
+- **🔍 How to Verify**: Confirm `android/app/google-services.json` is in place.
 
 ---
 
-### Step 2.2: iOS Firebase Configuration
-- **🎯 Goal**: Connect the iOS build engine to your Firebase Project.
+### Phase 04: iOS Firebase Native Configuration
+- **🎯 Goal**: Connect the native iOS Apple engine to your Firebase Project.
 - **📂 File**: `ios/Runner/GoogleService-Info.plist`
-- **💡 Concept to Understand**:
-  - iOS uses an Apple Property List (`.plist`) file to configure Firebase native libraries.
+- **💡 Concept to Understand**: iOS apps require a Property List (`.plist`) containing project keys.
 - **📝 What to do**:
-  1. Download `GoogleService-Info.plist` from your Firebase Console.
-  2. Place `GoogleService-Info.plist` inside `ios/Runner/`.
-- **🔍 How to Verify**: Verify that the file `ios/Runner/GoogleService-Info.plist` is present.
+  1. Download `GoogleService-Info.plist` from the Firebase Console.
+  2. Place it in `ios/Runner/GoogleService-Info.plist`.
+- **🔍 How to Verify**: Confirm `ios/Runner/GoogleService-Info.plist` is in place.
 
 ---
 
-### Step 2.3: Initialize Firebase in `main.dart`
-- **🎯 Goal**: Initialize Firebase services before the app runs any UI widgets.
+### Phase 05: Flutter Engine & Firebase App Initialization
+- **🎯 Goal**: Initialize the Flutter framework and Firebase core before running the widget tree.
 - **📂 File**: `lib/main.dart`
-- **💡 Concept to Understand**:
-  - `WidgetsFlutterBinding.ensureInitialized()`: Ensures the native engine bridge is alive before asynchronous operations run.
-  - `Firebase.initializeApp()`: Asynchronously starts Firebase and prepares Auth and Firestore.
+- **💡 Concept to Understand**: `WidgetsFlutterBinding.ensureInitialized()` initializes the C++ communication bridge between Flutter and the native device OS.
 - **📝 What to do**:
-  1. In `main()`, call `WidgetsFlutterBinding.ensureInitialized()`.
-  2. Call `await Firebase.initializeApp()`.
-  3. Call `runApp(const SaoudiApp())`.
-- **🔍 How to Verify**: Run `flutter run`. The app should launch on your device/emulator with a blank screen and no Firebase initialization crashes in the debug console.
+  1. Make `main()` an `async` function.
+  2. Call `WidgetsFlutterBinding.ensureInitialized()`.
+  3. Call `await Firebase.initializeApp()`.
+  4. Call `runApp(...)`.
+- **🔍 How to Verify**: Run `flutter run`. The app should start without crashing on startup.
 
 ---
 
-## 🎨 Phase 3: Design Tokens & Zero-Shadow Theme
-
-### Step 3.1: Define Google Brand & Surface Colors
-- **🎯 Goal**: Create a single file storing all official Google brand colors and Material 3 dark surface tones.
+### Phase 06: Google Brand Color Tokens & Hex Palette
+- **🎯 Goal**: Centralize all Google brand accents and Material 3 Dark surface container colors.
 - **📂 File**: `lib/core/theme/colors.dart`
-- **💡 Concept to Understand**:
-  - In Flutter, `Color(0xFF8AB4F8)` defines an ARGB hex color (`FF` is 100% alpha opacity, followed by the RGB hex `8AB4F8`).
+- **💡 Concept to Understand**: `Color(0xFF8AB4F8)` represents an ARGB hex color code in Dart.
 - **📝 What to do**:
   1. Define Google accents: Blue (`#8AB4F8`), Green (`#81C784`), Yellow (`#FDD663`), Red (`#F28B82`).
-  2. Define surface container levels: Canvas (`#121212`), Surface Container (`#1D1B20`), High Container (`#211F26`), Border (`#2B2930`).
-  3. Define typography colors: Primary text (`#FFFFFF`), Secondary text (`#E6E1E5` at 70%), Muted text (`#E6E1E5` at 40%).
-- **🔍 How to Verify**: You can reference `AppColors.googleBlue` and `AppColors.surfaceCanvas` throughout your Dart files without compile errors.
+  2. Define Dark surfaces: Canvas (`#121212`), Container (`#1D1B20`), High Container (`#211F26`), Border (`#2B2930`).
+  3. Define text tones: Primary (`#FFFFFF`), Secondary (`#E6E1E5` 70%), Muted (`#E6E1E5` 40%).
+- **🔍 How to Verify**: Check that `AppColors.googleBlue` compiles without syntax errors.
 
 ---
 
-### Step 3.2: Configure the Global Zero-Shadow `ThemeData`
-- **🎯 Goal**: Enforce the **Absolute Shadow Ban** across the entire Flutter framework.
+### Phase 07: Material 3 Dark Theme & Absolute Shadow Ban
+- **🎯 Goal**: Enforce the **Absolute Shadow Ban** (`elevation: 0`) globally across the theme.
 - **📂 File**: `lib/core/theme/app_theme.dart`
-- **💡 Concept to Understand**:
-  - `ThemeData`: The master design sheet for your app. Setting global properties here automatically styles Cards, AppBars, Buttons, and Inputs without writing repetitive styles.
+- **💡 Concept to Understand**: `ThemeData` is Flutter's master style system. Overriding `CardThemeData.elevation` to `0` eliminates shadows app-wide.
 - **📝 What to do**:
-  1. Create a class `AppTheme` with a static getter `darkTheme`.
-  2. Set `useMaterial3: true` and `brightness: Brightness.dark`.
-  3. Set `scaffoldBackgroundColor: AppColors.surfaceCanvas`.
-  4. Configure `CardThemeData` with `elevation: 0`, `color: AppColors.surfaceContainer`, and rounded borders (`24px` radius with `#2B2930` border outline).
-  5. Configure `AppBarTheme` with `elevation: 0` and `scrolledUnderElevation: 0`.
-  6. Configure `InputDecorationTheme` with filled background `#211F26` and `12px` rounded borders.
-  7. Apply Google Fonts (`GoogleFonts.interTextTheme()`).
-- **🔍 How to Verify**: Set `theme: AppTheme.darkTheme` in `MaterialApp` inside `main.dart`. Notice that the background automatically turns `#121212` dark.
+  1. Create `AppTheme.darkTheme` with `useMaterial3: true`.
+  2. Set `scaffoldBackgroundColor` to `#121212`.
+  3. Configure cards with `elevation: 0`, `#1D1B20` background, and `24px` rounded borders with `#2B2930` outlines.
+  4. Configure AppBars with `elevation: 0` and `scrolledUnderElevation: 0`.
+- **🔍 How to Verify**: Pass `theme: AppTheme.darkTheme` into `MaterialApp`. The screen background turns dark `#121212`.
 
 ---
 
-## ✨ Phase 4: Ambient Animated Particle Background
+### Phase 08: Typography & Google Fonts Setup
+- **🎯 Goal**: Apply Google Sans / Inter typography to all headings and body copy.
+- **📂 File**: Update `lib/core/theme/app_theme.dart`
+- **💡 Concept to Understand**: `GoogleFonts.interTextTheme()` dynamically applies clean typography across all `Text` widgets.
+- **📝 What to do**:
+  1. Import `google_fonts`.
+  2. Set `textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme)`.
+- **🔍 How to Verify**: Render a `Text("saoudi.online")` widget. Verify the custom modern font applies cleanly.
 
-### Step 4.1: Build the Custom Canvas Painter
-- **🎯 Goal**: Write a custom drawing layer that renders floating colored accent dots and a subtle star grid.
+---
+
+### Phase 09: Ambient Particle Canvas Math & Painter
+- **🎯 Goal**: Build the mathematical custom drawing layer for the floating background animation.
 - **📂 File**: `lib/presentation/common/ambient_painter.dart`
-- **💡 Concept to Understand**:
-  - `CustomPainter`: A low-level drawing interface where you use `canvas.drawCircle()` to place shapes precisely at `(x, y)` coordinates.
+- **💡 Concept to Understand**: `CustomPainter` allows direct 2D drawing on the screen using `canvas.drawCircle(Offset(x, y), radius, paint)`.
 - **📝 What to do**:
-  1. Subclass `CustomPainter`.
-  2. In `paint(Canvas canvas, Size size)`, calculate animated offsets using `sin(progress)` and `cos(progress)`.
-  3. Draw 4 soft Google-color accent circles (Blue, Green, Yellow, Red) drifting smoothly across the screen corners.
-  4. Use a nested loop to draw a subtle dot grid (star constellation) across the screen dimensions with faint opacity (`0.12`).
-  5. In `shouldRepaint()`, return `true` whenever the progress value changes.
-- **🔍 How to Verify**: The painter compiles without errors.
+  1. Create `AmbientPainter` extending `CustomPainter`.
+  2. Use trigonometric math (`sin` and `cos` of animation progress) to calculate drifting offsets.
+  3. Draw 4 soft Google-colored radial circles drifting across screen quadrants.
+  4. Draw a repeating subtle star grid of micro-dots across the full width and height.
+- **🔍 How to Verify**: Painter class compiles cleanly with null-safety.
 
 ---
 
-### Step 4.2: Build the Animated Wrapper Widget
-- **🎯 Goal**: Create a reusable widget that runs a 30-second smooth looping animation controller behind any screen content.
+### Phase 10: Ambient Looping Controller & Wrapper Widget
+- **🎯 Goal**: Create the reusable 30-second looping background animation widget.
 - **📂 File**: `lib/presentation/common/ambient_background.dart`
-- **💡 Concept to Understand**:
-  - `AnimationController`: Generates numbers from `0.0` to `1.0` over a specified duration (`30 seconds`), then repeats infinitely using `..repeat()`.
-  - `Stack`: Layers widgets on top of each other (Background canvas on bottom, screen widgets on top).
+- **💡 Concept to Understand**: `AnimationController` with `..repeat()` runs a continuous animation loop on the GPU. `Stack` puts the animation behind child widgets.
 - **📝 What to do**:
-  1. Create a `StatefulWidget` named `AmbientBackground` that takes a `Widget child`.
+  1. Create a `StatefulWidget` named `AmbientBackground(child: child)`.
   2. In `initState()`, create an `AnimationController` with `duration: Duration(seconds: 30)` and call `.repeat()`.
-  3. In `dispose()`, call `controller.dispose()` to prevent memory leaks.
-  4. In `build()`, return a `Stack` containing:
-     - The solid `#121212` canvas container.
-     - `AnimatedBuilder` running `CustomPaint(painter: AmbientPainter(progress: controller.value))`.
-     - The `widget.child` positioned above the background.
-- **🔍 How to Verify**: Wrap your initial test screen in `AmbientBackground(child: Center(child: Text("Hello")))`. Run the app and watch the subtle Google-colored particles gently float in the background.
+  3. In `dispose()`, dispose of the controller to free GPU resources.
+  4. Return a `Stack` with the `#121212` background, `CustomPaint`, and `widget.child`.
+- **🔍 How to Verify**: Wrap a simple `Scaffold` in `AmbientBackground`. Run the app and watch the particles drift smoothly.
 
 ---
 
-## 🔐 Phase 5: Google Authentication Service
+## 🔐 Milestone 2: Authentication & Navigation (Phases 11 – 22)
 
-### Step 5.1: Build the Google Sign-In & Auth Service
-- **🎯 Goal**: Handle the OAuth prompt and exchange credentials with Firebase Auth.
+---
+
+### Phase 11: Google Sign-In Native Service Integration
+- **🎯 Goal**: Trigger the native Google Account selector and obtain authentication tokens.
 - **📂 File**: `lib/data/services/auth_service.dart`
-- **💡 Concept to Understand**:
-  - `GoogleSignIn`: Opens the Google Account selection popup on Android/iOS.
-  - `OAuthCredential`: An authentication token generated by Google that Firebase Auth converts into an authenticated session.
+- **💡 Concept to Understand**: `GoogleSignIn.signIn()` opens the system Google dialog on Android/iOS.
 - **📝 What to do**:
-  1. Instantiate `FirebaseAuth` and `GoogleSignIn`.
-  2. Implement `signInWithGoogle()`:
-     - Call `GoogleSignIn.signIn()` to get the Google user account.
-     - Obtain `authentication.accessToken` and `authentication.idToken`.
-     - Pass the tokens to `GoogleAuthProvider.credential()`.
-     - Call `FirebaseAuth.instance.signInWithCredential()`.
-  3. Implement `signOut()`: Signs out of both `GoogleSignIn` and `FirebaseAuth`.
-  4. Expose a stream `authStateChanges` to observe login/logout events.
-- **🔍 How to Verify**: Call `signInWithGoogle()` in a test button. You should see the standard Google Account picker on your phone/emulator.
+  1. Instantiate `GoogleSignIn`.
+  2. Call `await _googleSignIn.signIn()`.
+  3. Retrieve `accessToken` and `idToken` from `account.authentication`.
+- **🔍 How to Verify**: Trigger the method in a test button. Verify the Google Account picker dialog appears.
 
 ---
 
-## 🛡️ Phase 6: Admin Role Evaluation & Gating Logic
-
-### Step 6.1: Define Roles & Primary Admin Check
-- **🎯 Goal**: Determine if a signed-in user is the Primary Owner or a regular visitor.
-- **📂 File**: `lib/core/constants/roles.dart`
-- **💡 Concept to Understand**:
-  - An `enum AdminRole { owner, secondary, unauthorized }` makes your permission checks clean and type-safe across the app.
-- **📝 What to do**:
-  1. Define `AdminRole` enum with 3 states: `owner`, `secondary`, `unauthorized`.
-  2. Define the constant string `PRIMARY_ADMIN_EMAIL` (matching your primary Google email).
-  3. When a user signs in, compare `user.email.toLowerCase()` with `PRIMARY_ADMIN_EMAIL`. If they match → Return `AdminRole.owner`.
-- **🔍 How to Verify**: Log in with your primary email. Confirm your app identifies your role as `AdminRole.owner`.
-
----
-
-### Step 6.2: Query Secondary Admin in Firestore
-- **🎯 Goal**: If the user is not the primary owner, check if their email was authorized in Firestore.
+### Phase 12: Firebase Auth Credential Exchange
+- **🎯 Goal**: Exchange the Google ID token for an authenticated Firebase User session.
 - **📂 File**: Update `lib/data/services/auth_service.dart`
-- **💡 Concept to Understand**:
-  - `FirebaseFirestore.instance.collection('accepted_admin_emails').doc(email).get()` checks for the existence of an admin record in real-time.
+- **💡 Concept to Understand**: `FirebaseAuth.instance.signInWithCredential()` validates the Google token with Firebase Auth.
 - **📝 What to do**:
-  1. If email is not primary, fetch document `/accepted_admin_emails/{user.email}`.
-  2. If `doc.exists == true` → Return `AdminRole.secondary`.
-  3. If `doc.exists == false` → Call `signOut()` immediately and return `AdminRole.unauthorized`.
-- **🔍 How to Verify**: Add a secondary email into your Firestore database under `accepted_admin_emails/test@gmail.com`. Log in with that email and verify it receives `AdminRole.secondary`.
+  1. Convert Google tokens into `GoogleAuthProvider.credential(...)`.
+  2. Call `FirebaseAuth.instance.signInWithCredential(credential)`.
+  3. Return the authenticated `User` object.
+- **🔍 How to Verify**: Complete Google sign-in. Verify `FirebaseAuth.instance.currentUser` is no longer null.
 
 ---
 
-## 📱 Phase 7: Pixel-Perfect Login Screen UI
+### Phase 13: Admin Roles & Primary Owner Check
+- **🎯 Goal**: Check if the signed-in user is the Primary System Owner.
+- **📂 File**: `lib/core/constants/roles.dart`
+- **💡 Concept to Understand**: Comparing `user.email` with `PRIMARY_ADMIN_EMAIL` instantly grants root privileges.
+- **📝 What to do**:
+  1. Define `enum AdminRole { owner, secondary, unauthorized }`.
+  2. Define `PRIMARY_ADMIN_EMAIL` constant.
+  3. If `user.email.toLowerCase() == PRIMARY_ADMIN_EMAIL` → Return `AdminRole.owner`.
+- **🔍 How to Verify**: Log in with your primary email. Confirm `AdminRole.owner` is returned.
 
-### Step 7.1: Build the Login Card & Header
-- **🎯 Goal**: Create the visual container and branding header matching `admin_login.astro`.
+---
+
+### Phase 14: Secondary Admin Firestore Verification
+- **🎯 Goal**: Check if non-owner users exist in the `accepted_admin_emails` Firestore collection.
+- **📂 File**: Update `lib/data/services/auth_service.dart`
+- **💡 Concept to Understand**: `FirebaseFirestore.instance.collection('accepted_admin_emails').doc(email).get()` verifies secondary admin access.
+- **📝 What to do**:
+  1. If email is not primary, query `/accepted_admin_emails/{email}`.
+  2. If document exists → Return `AdminRole.secondary`.
+  3. If document does not exist → Return `AdminRole.unauthorized`.
+- **🔍 How to Verify**: Add a test email document in Firestore. Log in with that email and verify it receives `AdminRole.secondary`.
+
+---
+
+### Phase 15: Unauthorized Access Rejection & Audit Log
+- **🎯 Goal**: Immediately kick out non-approved users and record a security log.
+- **📂 File**: Update `lib/data/services/auth_service.dart`
+- **💡 Concept to Understand**: Forcefully signing out unauthorized users prevents any data leaks.
+- **📝 What to do**:
+  1. When `AdminRole.unauthorized` occurs, call `await _auth.signOut()` and `await _googleSignIn.signOut()`.
+  2. Write a security log to Firestore collection `/system_logs` with action `AUTH_LOGIN_UNAUTHORIZED`.
+- **🔍 How to Verify**: Sign in with an unapproved Gmail account. Verify the session is rejected and an audit log appears in Firestore.
+
+---
+
+### Phase 16: Login Screen Card Container & Logo Header
+- **🎯 Goal**: Build the centered card and branding header matching `admin_login.astro`.
 - **📂 File**: `lib/presentation/auth/login_screen.dart`
-- **💡 Concept to Understand**:
-  - `ConstrainedBox(constraints: BoxConstraints(maxWidth: 400))` ensures your login box looks great on both compact phones and wide tablets.
-- **📝 What to do**:
-  1. Create `LoginScreen` wrapped in `AmbientBackground`.
-  2. Build a centered container with `#1D1B20` surface background, `#2B2930` border outline, and `24px` rounded corners.
-  3. Add the App Shield Icon Container (Google Blue background tint with a blue shield icon).
-  4. Add the title "saoudi.online" and subtitle "Admin Telemetry & Management".
-- **🔍 How to Verify**: Run the app and visually compare the card dimensions, colors, and typography with the website login page.
-
----
-
-### Step 7.2: Build the Google Sign-In Pill Button
-- **🎯 Goal**: Add the interactive Google Sign-In button with loading state.
-- **📂 File**: Update `lib/presentation/auth/login_screen.dart`
-- **💡 Concept to Understand**:
-  - `OutlinedButton` with `shape: StadiumBorder()` creates a pill-shaped button with rounded ends.
-- **📝 What to do**:
-  1. Add a button with `#211F26` surface container background and `StadiumBorder()`.
-  2. Include the Google G logo icon and text "Continue with Google".
-  3. When tapped, show a `CircularProgressIndicator` while `signInWithGoogle()` executes.
-  4. If login succeeds → Trigger navigation to dashboard.
-  5. If login fails or unauthorized → Display a red error feedback banner.
-- **🔍 How to Verify**: Tap the button with an unauthorized Google account. Verify that access is denied and a clear red error banner appears.
-
----
-
-## 🚪 Phase 8: Splash Screen & Persistent Auto-Login Guard
-
-### Step 8.1: Build the Startup Route Guard
-- **🎯 Goal**: Check if an admin is already logged in on app startup and skip the login screen.
-- **📂 File**: `lib/presentation/auth/splash_screen.dart`
-- **💡 Concept to Understand**:
-  - `Navigator.pushReplacement`: Replaces the current splash screen in the navigation stack so the user cannot press "Back" to return to the splash screen.
-- **📝 What to do**:
-  1. Create a `SplashScreen` that displays a brief loading indicator.
-  2. In `initState()`, check `FirebaseAuth.instance.currentUser`.
-  3. Evaluate the user's role with `authService.checkCurrentRole()`.
-  4. If role is `owner` or `secondary` → Navigate immediately to `AppShell`.
-  5. If role is `unauthorized` or `null` → Navigate to `LoginScreen`.
-- **🔍 How to Verify**: Log in once, close the app completely, and reopen it. The app should automatically open into the dashboard without showing the login screen.
-
----
-
-## ⚓ Phase 9: Floating Navigation Dock & App Shell
-
-### Step 9.1: Build the Floating Stadium Navigation Dock
-- **🎯 Goal**: Build the floating bottom bar matching `AdminNavDock.astro`.
-- **📂 File**: `lib/presentation/navigation/nav_dock.dart`
-- **💡 Concept to Understand**:
-  - `SafeArea`: Ensures your navigation bar doesn't overlap the Android gesture navigation bar or iPhone home indicator bar.
-- **📝 What to do**:
-  1. Create `NavDock` with a stadium-pill shape (`BorderRadius.circular(999)`), `#1D1B20` surface background, and `#2B2930` border.
-  2. Add 4 navigation items:
-     - Overview (`Icons.dashboard_rounded`)
-     - Tasks (`Icons.task_alt_rounded`)
-     - Logs (`Icons.receipt_long_rounded`)
-     - Admins (`Icons.admin_panel_settings_rounded`)
-  3. Highlight the active item with a subtle Google Blue background tint and animated label expansion.
-- **🔍 How to Verify**: Place `NavDock` on a test screen. Tap different items and verify the active tab highlights smoothly.
-
----
-
-### Step 9.2: Assemble the Main App Shell with `IndexedStack`
-- **🎯 Goal**: Coordinate top-level navigation between screens without losing state.
-- **📂 File**: `lib/presentation/navigation/app_shell.dart`
-- **💡 Concept to Understand**:
-  - `IndexedStack`: Keeps all 4 main tab screens in memory simultaneously. When you switch tabs, it changes visibility instantly without restarting Firestore streams or resetting scroll positions.
-- **📝 What to do**:
-  1. Create `AppShell` with a state variable `_currentIndex`.
-  2. Place an `IndexedStack` in `Scaffold.body` containing the 4 main screens.
-  3. Place `NavDock` in `Scaffold.bottomNavigationBar`.
-- **🔍 How to Verify**: Switch between tabs. Verify that navigation is instantaneous and smooth.
-
----
-
-## 📊 Phase 10: Overview Dashboard (Live Metrics Bento Grid)
-
-### Step 10.1: Build the Aggregate Count Service
-- **🎯 Goal**: Fetch live total counts for all portfolio collections from Firestore.
-- **📂 File**: `lib/data/services/metrics_service.dart`
-- **💡 Concept to Understand**:
-  - `db.collection('projects').count().get()`: Performs a lightweight server-side count aggregation query without downloading the entire document dataset (saving bandwidth and quota).
-- **📝 What to do**:
-  1. Execute concurrent count queries with `Future.wait([ ... ])`:
-     - `projects.count()`
-     - `experience.count()`
-     - `designs.count()`
-     - `certificates.count()`
-     - `admin_todos.where('status', isEqualTo: 'active').count()`
-  2. Return a map or data model containing all 5 integer counts.
-- **🔍 How to Verify**: Call the service in debug mode and print the resulting counts to the console.
-
----
-
-### Step 10.2: Build the 2x2 Bento Metric Card Grid
-- **🎯 Goal**: Present live metrics in a modern 2x2 Bento card layout.
-- **📂 File**: `lib/presentation/dashboard/dashboard_screen.dart`
-- **💡 Concept to Understand**:
-  - `FutureBuilder`: Waits for an asynchronous `Future` (like our count queries) and displays a loading spinner until the data arrives, then builds the UI.
+- **💡 Concept to Understand**: `ConstrainedBox(maxWidth: 400)` keeps the login card centered and proportional across all device sizes.
 - **📝 What to do**:
   1. Wrap screen in `AmbientBackground`.
-  2. In `FutureBuilder`, build a `GridView.count(crossAxisCount: 2)`.
-  3. Render 4 Bento Cards styled with `#1D1B20` surface container, `20px` corner radius, and dedicated Google accent colors:
-     - Active Tasks → Google Yellow (`#FDD663`)
-     - Projects → Google Blue (`#8AB4F8`)
-     - Experience → Google Green (`#81C784`)
-     - Designs → Google Red (`#F28B82`)
-- **🔍 How to Verify**: Open the Dashboard screen and verify that your live database counts render correctly inside the Bento cards.
+  2. Center a container with `#1D1B20` surface color, `#2B2930` border, and `24px` rounded corners.
+  3. Add the App Shield Logo with blue accent tint, title "saoudi.online", and subtitle "Admin Telemetry & Management".
+- **🔍 How to Verify**: Run the app and visually inspect the login card layout.
 
 ---
 
-## 📋 Phase 11: Admin Tasks Hub — Data Model & Live Stream
-
-### Step 11.1: Create the `AdminTask` Dart Model
-- **🎯 Goal**: Define the strongly typed data model for tasks.
-- **📂 File**: `lib/domain/models/admin_task.dart`
+### Phase 17: Google Sign-In Pill Button & Progress State
+- **🎯 Goal**: Build the interactive Google button with loading spinner state.
+- **📂 File**: Update `lib/presentation/auth/login_screen.dart`
+- **💡 Concept to Understand**: Setting `onPressed: _isLoading ? null : _signIn` automatically disables the button during network calls.
 - **📝 What to do**:
-  1. Define fields: `id`, `title`, `description`, `category`, `priority`, `status`, `createdAt`, `completedAt`, `createdBy`.
-  2. Implement `AdminTask.fromFirestore(DocumentSnapshot doc)`.
-  3. Implement `Map<String, dynamic> toMap()`.
-- **🔍 How to Verify**: Model compiles cleanly with zero null-safety warnings.
+  1. Add a stadium-shaped button with `#211F26` surface background.
+  2. Include the Google logo icon and text "Continue with Google".
+  3. Toggle `_isLoading = true` while signing in and show `CircularProgressIndicator`.
+- **🔍 How to Verify**: Tap the button. Verify the loading spinner appears while authentication is in flight.
 
 ---
 
-### Step 11.2: Build the Real-Time Firestore Tasks Stream
-- **🎯 Goal**: Listen to live updates from the `admin_todos` collection.
-- **📂 File**: `lib/data/repositories/tasks_repository.dart`
-- **💡 Concept to Understand**:
-  - `Stream<List<AdminTask>>`: A continuous real-time data pipe. Whenever a task is created or updated in Firestore, the stream automatically emits the updated list to your UI.
+### Phase 18: Login Error Banner & Feedback UI
+- **🎯 Goal**: Display clear error feedback if an unauthorized user attempts to sign in.
+- **📂 File**: Update `lib/presentation/auth/login_screen.dart`
+- **💡 Concept to Understand**: Conditionally rendering a widget with `if (_errorMessage != null)` provides clean visual feedback.
 - **📝 What to do**:
-  1. Create a query targeting `collection('admin_todos')` ordered by `createdAt desc`.
-  2. Convert snapshots into `List<AdminTask>`.
-  3. If user is a secondary admin, filter tasks where `createdBy == user.email`.
-- **🔍 How to Verify**: Listen to the stream in a simple `StreamBuilder` and verify items render in real-time.
+  1. Build a red warning container with `#F28B82` accent border and error icon.
+  2. Display "Access denied. Your email is not an authorized administrator."
+- **🔍 How to Verify**: Trigger an unauthorized login. Verify the red alert box appears cleanly below the header.
 
 ---
 
-## ✅ Phase 12: Admin Tasks Hub — Card UI, Checkbox & Creation Sheet
-
-### Step 12.1: Build the Task Item Card Widget
-- **🎯 Goal**: Display individual tasks with interactive completion toggles and badges.
-- **📂 File**: `lib/presentation/tasks/widgets/task_card.dart`
+### Phase 19: Startup Route Guard & Auto-Login Logic
+- **🎯 Goal**: Check if an admin is already signed in on startup and bypass the login screen.
+- **📂 File**: `lib/presentation/auth/splash_screen.dart`
+- **💡 Concept to Understand**: `Navigator.pushReplacement` transitions from splash to main content without leaving a back-button trail.
 - **📝 What to do**:
-  1. Build a card with `#1D1B20` surface background, `#2B2930` border, and `16px` rounded corners.
-  2. Add a `Checkbox` widget with Google Green active color.
-  3. When checkbox is toggled → Update Firestore document field `status: 'completed'` (or `'active'`).
-  4. Display the task title with a line-through strike when completed.
-  5. Add color-coded category pills (e.g. Bug=Red, Feature=Blue, Idea=Green).
-- **🔍 How to Verify**: Tap the checkbox on a task item. Verify that it updates instantly in both the UI and your Firestore database.
+  1. In `SplashScreen`, check `FirebaseAuth.instance.currentUser`.
+  2. If user exists and is authorized → Navigate immediately to `AppShell`.
+  3. If user is null or unauthorized → Navigate to `LoginScreen`.
+- **🔍 How to Verify**: Log in, kill the app process, and restart it. The app should launch straight into the main shell.
 
 ---
 
-### Step 12.2: Build the Task Creation Bottom Sheet
-- **🎯 Goal**: Provide an easy modal sheet to create new tasks.
+### Phase 20: Floating Navigation Dock Container & Layout
+- **🎯 Goal**: Build the floating bottom navigation bar matching `AdminNavDock.astro`.
+- **📂 File**: `lib/presentation/navigation/nav_dock.dart`
+- **💡 Concept to Understand**: Wrapping a floating container in `SafeArea` prevents overlaps with native device gesture bars.
+- **📝 What to do**:
+  1. Build a stadium-pill bar (`BorderRadius.circular(999)`), background `#1D1B20`, border `#2B2930`.
+  2. Add 4 navigation items: Overview, Tasks, Logs, Admins.
+- **🔍 How to Verify**: Check that the floating dock sits neatly centered at the bottom of the screen.
+
+---
+
+### Phase 21: Nav Dock Active Tab Expansion & Transitions
+- **🎯 Goal**: Highlight active tabs with smooth width expansion and Google Blue tint.
+- **📂 File**: Update `lib/presentation/navigation/nav_dock.dart`
+- **💡 Concept to Understand**: `AnimatedContainer` smoothly animates background color, padding, and size changes automatically.
+- **📝 What to do**:
+  1. When a tab is selected, apply a Google Blue background tint (`alpha: 0.15`) and blue border.
+  2. Animate the tab label into view when selected.
+- **🔍 How to Verify**: Tap between dock icons and verify smooth animated tab transitions.
+
+---
+
+### Phase 22: App Shell Scaffold & `IndexedStack` Manager
+- **🎯 Goal**: Coordinate top-level navigation between tabs without resetting state.
+- **📂 File**: `lib/presentation/navigation/app_shell.dart`
+- **💡 Concept to Understand**: `IndexedStack` keeps all 4 screens in memory so scroll positions and Firestore streams are never reset when switching tabs.
+- **📝 What to do**:
+  1. Create `AppShell` holding `_currentIndex`.
+  2. Place `IndexedStack` in `Scaffold.body` containing the 4 primary screens.
+  3. Place `NavDock` in `Scaffold.bottomNavigationBar`.
+- **🔍 How to Verify**: Scroll down on a tab, switch to another tab, and switch back. Verify your scroll position is preserved.
+
+---
+
+## 📊 Milestone 3: Overview & Tasks Systems (Phases 23 – 27)
+
+---
+
+### Phase 23: Overview Dashboard Count Service
+- **🎯 Goal**: Fetch server-side aggregate totals for portfolio collections.
+- **📂 File**: `lib/data/services/metrics_service.dart`
+- **💡 Concept to Understand**: `collection.count().get()` performs lightweight server aggregations without downloading document bodies.
+- **📝 What to do**:
+  1. Execute concurrent count queries with `Future.wait([ ... ])` for:
+     - `projects`, `experience`, `designs`, `certificates`, and active `admin_todos`.
+  2. Return the counts map.
+- **🔍 How to Verify**: Execute the service and verify integer counts are returned from Firestore.
+
+---
+
+### Phase 24: Dashboard 2x2 Bento Metric Grid Screen
+- **🎯 Goal**: Display live aggregate counts in a responsive 2x2 Bento grid.
+- **📂 File**: `lib/presentation/dashboard/dashboard_screen.dart`
+- **💡 Concept to Understand**: `GridView.count(crossAxisCount: 2)` renders items in a clean 2-column dashboard layout.
+- **📝 What to do**:
+  1. Use `FutureBuilder` to call `MetricsService`.
+  2. Render 4 Bento Cards with `#1D1B20` surface container, `20px` corners, and dedicated Google accents:
+     - Tasks → Yellow (`#FDD663`)
+     - Projects → Blue (`#8AB4F8`)
+     - Experience → Green (`#81C784`)
+     - Designs → Red (`#F28B82`)
+- **🔍 How to Verify**: Open the Dashboard tab. Verify the 4 Bento metric cards display live database counts.
+
+---
+
+### Phase 25: Admin Tasks Data Model & Firestore Stream
+- **🎯 Goal**: Define the `AdminTask` data model and live Firestore query pipe.
+- **📂 Files**: `lib/domain/models/admin_task.dart`, `lib/data/repositories/tasks_repository.dart`
+- **💡 Concept to Understand**: `collection('admin_todos').snapshots()` provides a real-time reactive stream that emits new lists whenever Firestore changes.
+- **📝 What to do**:
+  1. Create `AdminTask` with fields: `id`, `title`, `category`, `priority`, `status`, `createdAt`.
+  2. Create stream querying `/admin_todos` ordered by `createdAt desc`.
+  3. If secondary admin, filter tasks where `createdBy == user.email`.
+- **🔍 How to Verify**: Add a document manually in Firestore. Verify the stream immediately receives the new item.
+
+---
+
+### Phase 26: Admin Tasks Segmented Tabs & Task Item Card
+- **🎯 Goal**: Display tasks with status filter tabs (Active / Done / Archive) and interactive checkboxes.
+- **📂 File**: `lib/presentation/tasks/tasks_screen.dart`
+- **💡 Concept to Understand**: `StreamBuilder` automatically updates the UI whenever new stream events arrive.
+- **📝 What to do**:
+  1. Build segmented filter buttons: **Active**, **Completed**, **Archived**.
+  2. Build task item card with `#1D1B20` background, `#2B2930` border, and `16px` corners.
+  3. Add Google Green `Checkbox`. When tapped → Update Firestore document status to `completed` or `active`.
+  4. Render strike-through line on completed task titles.
+- **🔍 How to Verify**: Tap the checkbox on a task. Verify the task moves from Active to Completed tab instantly.
+
+---
+
+### Phase 27: Task Creation Bottom Sheet & Context Menu
+- **🎯 Goal**: Provide an easy modal sheet to add tasks and context actions to archive/delete.
 - **📂 File**: `lib/presentation/tasks/widgets/create_task_sheet.dart`
-- **💡 Concept to Understand**:
-  - `showModalBottomSheet`: Slides up a modal container from the bottom of the screen.
+- **💡 Concept to Understand**: `showModalBottomSheet` slides a modal up from the screen bottom with text inputs.
 - **📝 What to do**:
-  1. Add a floating `+` button in the AppBar.
-  2. When tapped, open a modal bottom sheet with `#211F26` surface background.
-  3. Add input fields for Task Title, Category chips, and Priority selector.
-  4. On submit → Generate a unique ID (`task_UUID`) and write the new task into `/admin_todos/{id}` in Firestore.
-- **🔍 How to Verify**: Create a new task through the sheet. Verify that it appears instantly at the top of your tasks list.
+  1. Add a `+` button in the AppBar.
+  2. Open a modal bottom sheet with `#211F26` surface container.
+  3. Include Title input, Category chips (Bug, Feature, Idea, General), and Priority segment.
+  4. On submit → Generate a `task_UUID` and save to `/admin_todos/{id}`.
+  5. Add Archive / Delete buttons on task items (Delete restricted to Owner).
+- **🔍 How to Verify**: Create a new task through the sheet. Verify it appears at the top of the list immediately.
 
 ---
 
-## 📜 Phase 13: System Audit Logs — Telemetry Stream & Category Filters
-
-### Step 13.1: Create the `SystemLog` Model & Live Stream
-- **🎯 Goal**: Stream real-time security events and audit records from `system_logs`.
-- **📂 Files**: `lib/domain/models/system_log.dart`, `lib/data/repositories/logs_repository.dart`
-- **📝 What to do**:
-  1. Define fields: `id`, `type`, `severity`, `action`, `title`, `details`, `userEmail`, `timestamp`, `ip`, `userAgent`.
-  2. Create a stream querying `/system_logs` ordered by `timestamp desc` with a limit of `50`.
-  3. Apply role isolation: Secondary admins only receive `content`, `visitor`, `storage`, and their own `auth`/`task` events.
-- **🔍 How to Verify**: Verify logs stream into your application in real-time.
+## 📜 Milestone 4: Logs, Admins & Release (Phases 28 – 30)
 
 ---
 
-### Step 13.2: Build Horizontal Category Filter Chips
-- **🎯 Goal**: Allow the admin to filter logs by event type.
+### Phase 28: System Audit Logs Stream & Category Filters
+- **🎯 Goal**: Stream real-time telemetry events with horizontal filter chips.
 - **📂 File**: `lib/presentation/logs/logs_screen.dart`
+- **💡 Concept to Understand**: Querying `/system_logs` ordered by `timestamp desc` provides an active security and audit log feed.
 - **📝 What to do**:
-  1. Build a horizontal scrollable row of filter chips: `All`, `Auth`, `Content`, `Admin`, `Security`, `Visitor`, `Task`, `Storage`, `System`.
-  2. Tapping a chip filters the active stream list in memory.
-  3. Highlight the active filter chip with Google Blue accent color.
-- **🔍 How to Verify**: Tap the "Auth" chip. Verify that only authentication events remain visible in the list.
+  1. Create `SystemLog` model with fields: `id`, `type`, `severity`, `action`, `title`, `userEmail`, `timestamp`.
+  2. Stream the collection with limit `50`.
+  3. Build horizontal filter chips: `All`, `Auth`, `Content`, `Admin`, `Security`, `Visitor`, `Task`, `Storage`, `System`.
+- **🔍 How to Verify**: Tap the "Auth" filter chip. Verify that only authentication events remain displayed.
 
 ---
 
-## 🔍 Phase 14: System Audit Logs — Search Bar, Inspector Sheet & Purge
-
-### Step 14.1: Build Log Cards with Severity Indicators
-- **🎯 Goal**: Display log records with instant visual severity feedback.
-- **📂 File**: `lib/presentation/logs/widgets/log_card.dart`
+### Phase 29: Log Severity Indicators, Search & Purge
+- **🎯 Goal**: Add color-coded severity dots, search filter, and retention purge action.
+- **📂 File**: Update `lib/presentation/logs/logs_screen.dart`
+- **💡 Concept to Understand**: Firestore batched deletes remove expired records atomically in a single network request.
 - **📝 What to do**:
-  1. Color-code severity dots:
+  1. Add colored severity indicator dots:
      - `info` → Google Blue (`#8AB4F8`)
      - `warn` → Google Yellow (`#FDD663`)
      - `error` / `critical` → Google Red (`#F28B82`)
-  2. Format timestamps using relative time (e.g. "Just now", "4m ago", "2h ago").
-  3. Show the event title and user email.
-- **🔍 How to Verify**: Check that error logs display with red indicator dots and formatted relative timestamps.
+  2. Format timestamps with relative time (e.g. "Just now", "5m ago").
+  3. Add search input filtering logs by title or email.
+  4. Add "Purge Expired" button (Owner only) deleting logs where `expiresAt <= now`.
+- **🔍 How to Verify**: Inspect log cards. Verify error logs display red dots and the search bar filters logs in real-time.
 
 ---
 
-### Step 14.2: Build Expandable Log Inspector Modal
-- **🎯 Goal**: Tap any log item to view its complete technical payload.
-- **📂 File**: `lib/presentation/logs/widgets/log_detail_sheet.dart`
-- **📝 What to do**:
-  1. When a log card is tapped, open a modal bottom sheet.
-  2. Display the Action Code, Client IP address, User-Agent, and target collection/document ID.
-- **🔍 How to Verify**: Tap a log card and verify that the full technical details sheet appears.
-
----
-
-### Step 14.3: Implement Retention Purge Action (Owner Only)
-- **🎯 Goal**: Allow the primary owner to delete expired logs.
-- **📂 File**: Update `lib/presentation/logs/logs_screen.dart`
-- **📝 What to do**:
-  1. If `isOwner == true`, show a "Purge Expired" button in the AppBar.
-  2. Query logs where `expiresAt <= DateTime.now()`.
-  3. Execute a Firestore batched write to delete expired documents.
-- **🔍 How to Verify**: Test the purge button with expired test logs. Verify that expired records are removed from Firestore.
-
----
-
-## 👥 Phase 15: Admin Emails Access Control (`accepted_admin_emails`)
-
-### Step 15.1: Build Live Admin Access Stream
-- **🎯 Goal**: Stream the list of authorized administrators.
+### Phase 30: Admin Emails Access Control Management
+- **🎯 Goal**: Stream authorized admin accounts and build grant/revoke modal dialogs.
 - **📂 File**: `lib/presentation/emails/emails_screen.dart`
+- **💡 Concept to Understand**: Managing documents in `/accepted_admin_emails` directly controls which Google accounts can access the system.
 - **📝 What to do**:
   1. Stream `/accepted_admin_emails` collection.
-  2. Always display the Primary Owner at the top of the list with a Google Blue Shield icon and "Primary Owner" badge.
-  3. Display secondary admin accounts with avatar, date added, and notes.
-- **🔍 How to Verify**: View the screen. Confirm that your primary admin email is prominently pinned at the top.
+  2. Pin the Primary Owner at the top of the list with a Google Blue Shield icon and "Owner" badge (locked from deletion).
+  3. **Grant Access Modal**: Dialog prompts for email and notes → Creates `/accepted_admin_emails/{email}`.
+  4. **Revoke Access**: Trash icon next to secondary admins prompts confirmation → Deletes Firestore document.
+- **🔍 How to Verify**: Grant access to a secondary test email. Verify the new admin appears in the list and can log into the app.
 
 ---
 
-### Step 15.2: Build Grant & Revoke Access Modal Dialogs
-- **🎯 Goal**: Allow the owner to grant or revoke admin access.
-- **📂 File**: `lib/presentation/emails/widgets/grant_email_dialog.dart`
-- **📝 What to do**:
-  1. **Grant Access**: Owner taps `+` → Dialog prompts for email and notes → Writes document to `/accepted_admin_emails/{email}`.
-  2. **Revoke Access**: Owner taps delete on a secondary admin → Confirmation dialog appears → On confirm, deletes Firestore document.
-  3. **Safety Rule**: The primary owner email cannot be deleted.
-- **🔍 How to Verify**: Grant access to a secondary test email. Verify the new email appears in the list and can log into the app.
+## 🏁 Final Progress Checklist (1 to 30)
 
----
-
-## 🚀 Phase 16: Offline Persistence, Haptics & Final Release Build
-
-### Step 16.1: Configure Firestore Offline Disk Persistence
-- **🎯 Goal**: Enable local caching so the app works seamlessly during poor network conditions.
-- **📂 File**: `lib/main.dart`
-- **📝 What to do**:
-  1. In `FirebaseFirestore.instance.settings`, ensure `persistenceEnabled: true` is configured.
-- **🔍 How to Verify**: Turn on Airplane Mode. Open the app and verify that previously loaded tasks and metrics are still visible from cache.
-
----
-
-### Step 16.2: Add Tactile Haptic Feedback
-- **🎯 Goal**: Give the app a premium, responsive feel with subtle vibrations.
-- **💡 Concept to Understand**:
-  - `HapticFeedback.lightImpact()`: Triggers a tiny, pleasant tactile vibration on iOS and Android devices.
-- **📝 What to do**:
-  1. Trigger `HapticFeedback.lightImpact()` when:
-     - A task checkbox is toggled.
-     - A bottom navigation dock tab is tapped.
-     - A modal bottom sheet is submitted.
-- **🔍 How to Verify**: Tap a task checkbox on a physical phone. Feel the gentle tactile response.
-
----
-
-### Step 16.3: Verification & Release Build
-- **🎯 Goal**: Ensure 100% clean code quality and generate the production APK.
-- **📝 Commands to Run**:
-  1. Run static analysis:
-     ```bash
-     flutter analyze
-     ```
-     *(Must return: `No issues found!`)*
-  2. Run automated tests:
-     ```bash
-     flutter test
-     ```
-  3. Build release APK:
-     ```bash
-     flutter build apk --release
-     ```
-- **🔍 How to Verify**: Install the release APK on your Android device and perform a full end-to-end walkthrough of all 4 tabs!
+- [ ] **Phase 01**: Dependencies added & `flutter pub get` clean
+- [ ] **Phase 02**: Asset folders & icons placed
+- [ ] **Phase 03**: Android `google-services.json` linked
+- [ ] **Phase 04**: iOS `GoogleService-Info.plist` linked
+- [ ] **Phase 05**: Firebase initialized in `main.dart`
+- [ ] **Phase 06**: Google brand color tokens defined
+- [ ] **Phase 07**: Zero-shadow `AppTheme.darkTheme` applied
+- [ ] **Phase 08**: Google Fonts typography active
+- [ ] **Phase 09**: Ambient particle canvas math written
+- [ ] **Phase 10**: Ambient background looping animation active
+- [ ] **Phase 11**: Google Sign-In service prompts account picker
+- [ ] **Phase 12**: Firebase Auth credential exchange functional
+- [ ] **Phase 13**: Primary owner email check working
+- [ ] **Phase 14**: Secondary admin Firestore check working
+- [ ] **Phase 15**: Unauthorized user rejection & audit logging active
+- [ ] **Phase 16**: Login screen card layout & branding rendered
+- [ ] **Phase 17**: Google Sign-In pill button & loading spinner working
+- [ ] **Phase 18**: Error feedback banner visible on unauthorized login
+- [ ] **Phase 19**: Splash screen auto-login route guard active
+- [ ] **Phase 20**: Floating stadium navigation dock rendered
+- [ ] **Phase 21**: Nav dock tab expansion & transitions working
+- [ ] **Phase 22**: App shell `IndexedStack` preserving tab states
+- [ ] **Phase 23**: Server-side aggregate count query service active
+- [ ] **Phase 24**: Dashboard 2x2 Bento metric grid displaying live counts
+- [ ] **Phase 25**: Admin tasks data model & real-time stream pipe ready
+- [ ] **Phase 26**: Tasks screen segmented tabs & checkbox toggling functional
+- [ ] **Phase 27**: Task creation modal bottom sheet saving to Firestore
+- [ ] **Phase 28**: System audit logs streaming with category filter chips
+- [ ] **Phase 29**: Log severity dots, search filter & purge active
+- [ ] **Phase 30**: Admin emails list, grant access & revoke dialogs complete
