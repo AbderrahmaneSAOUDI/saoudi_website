@@ -2,115 +2,114 @@
 import SlideHeader from '../_components/SlideHeader.astro';
 ---
 
-<section class="deck-slide slide-canvas relative justify-between" data-slide-index="4">
-  <div class="diagonal-bg-accent"></div>
+<section class="deck-slide justify-between relative overflow-hidden" data-slide-index="4">
+  <div class="light-brand-accent-1"></div>
 
-  <SlideHeader category="ANALYSE" topic="Le Syndrome du Fichier Final" theme="canvas" />
+  <SlideHeader category="Analyse" topic="Le Syndrome du Fichier Final" />
 
-  <div class="relative z-10 my-auto max-w-4xl w-full">
-    <div class="mb-4">
-      <span class="text-xs font-bold text-red-600 tracking-wider uppercase bg-red-50 px-2.5 py-1 rounded border border-red-200">
-        Anti-Pattern Classique
+  <div class="my-auto max-w-4xl w-full relative z-10">
+    <div class="mb-3">
+      <span class="text-xs font-bold text-[#D21034] tracking-wider uppercase bg-[#FDECEF] px-2.5 py-1 rounded border border-[#D21034]/20">
+        Anti-Pattern Fréquent
       </span>
-      <h2 class="title-h1 text-slate-900 mt-2">
+      <h2 class="title-h1 text-slate-900 mt-2 font-cairo">
         Le Chaos Numérique en 5 Étapes
       </h2>
-      <p class="text-sm text-slate-600 mt-1">
-        Comment un projet simple devient une crise de gestion de versions :
+      <p class="text-xs text-slate-600 mt-1">
+        Comment un travail collaboratif simple devient une crise de gestion de versions :
       </p>
     </div>
 
-    <!-- Interactive Stepper Simulator -->
-    <div class="card-777 bg-white p-5 mb-4 border-slate-300">
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-3 relative" id="chaos-steps">
+    <!-- Stepper Simulator -->
+    <div class="card-777 p-4 mb-3 border-slate-200">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-2.5 relative" id="chaos-steps">
         <!-- Step 1 -->
-        <div class="chaos-step p-3 rounded-lg border-2 border-slate-200 bg-slate-50 transition-all" data-step="1">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[10px] font-bold text-slate-500 uppercase">Étape 1</span>
+        <div class="chaos-step p-2.5 rounded-xl border-2 border-slate-200 bg-slate-50 transition-all" data-step="1">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[9px] font-bold text-slate-500 uppercase">Étape 1</span>
             <span class="text-xs">💬</span>
           </div>
-          <div class="font-bold text-xs text-slate-800">Groupe WhatsApp</div>
-          <p class="text-[11px] text-slate-500 mt-1">« Je viens d'envoyer le doc, regardez ! »</p>
-          <div class="mt-2 text-[10px] bg-white p-1 rounded border border-slate-200 text-slate-600 truncate font-mono">
+          <div class="font-bold text-xs text-slate-800 font-cairo">Groupe WhatsApp</div>
+          <p class="text-[10px] text-slate-500 mt-1">« Je viens d'envoyer le doc, regardez ! »</p>
+          <div class="mt-2 text-[9px] bg-white p-1 rounded border border-slate-200 text-slate-600 truncate font-mono">
             Rapport.docx
           </div>
         </div>
 
         <!-- Step 2 -->
-        <div class="chaos-step p-3 rounded-lg border-2 border-slate-200 bg-slate-50 opacity-40 transition-all" data-step="2">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[10px] font-bold text-slate-500 uppercase">Étape 2</span>
+        <div class="chaos-step p-2.5 rounded-xl border-2 border-slate-200 bg-slate-50 opacity-40 transition-all" data-step="2">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[9px] font-bold text-slate-500 uppercase">Étape 2</span>
             <span class="text-xs">💾</span>
           </div>
-          <div class="font-bold text-xs text-slate-800">Téléchargement</div>
-          <p class="text-[11px] text-slate-500 mt-1">Chaque membre télécharge en local sur son PC.</p>
-          <div class="mt-2 text-[10px] bg-white p-1 rounded border border-slate-200 text-slate-600 truncate font-mono">
+          <div class="font-bold text-xs text-slate-800 font-cairo">Téléchargement</div>
+          <p class="text-[10px] text-slate-500 mt-1">Chaque membre télécharge en local sur son PC.</p>
+          <div class="mt-2 text-[9px] bg-white p-1 rounded border border-slate-200 text-slate-600 truncate font-mono">
             Rapport (1).docx
           </div>
         </div>
 
         <!-- Step 3 -->
-        <div class="chaos-step p-3 rounded-lg border-2 border-slate-200 bg-slate-50 opacity-40 transition-all" data-step="3">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[10px] font-bold text-slate-500 uppercase">Étape 3</span>
+        <div class="chaos-step p-2.5 rounded-xl border-2 border-slate-200 bg-slate-50 opacity-40 transition-all" data-step="3">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[9px] font-bold text-slate-500 uppercase">Étape 3</span>
             <span class="text-xs">✏️</span>
           </div>
-          <div class="font-bold text-xs text-slate-800">Modifs Isolées</div>
-          <p class="text-[11px] text-slate-500 mt-1">3 personnes modifient des sections en même temps.</p>
-          <div class="mt-2 text-[10px] bg-white p-1 rounded border border-slate-200 text-slate-600 truncate font-mono">
+          <div class="font-bold text-xs text-slate-800 font-cairo">Modifs Isolées</div>
+          <p class="text-[10px] text-slate-500 mt-1">3 personnes modifient le texte en parallèle.</p>
+          <div class="mt-2 text-[9px] bg-white p-1 rounded border border-slate-200 text-slate-600 truncate font-mono">
             Rapport_modifie_AS.docx
           </div>
         </div>
 
         <!-- Step 4 -->
-        <div class="chaos-step p-3 rounded-lg border-2 border-slate-200 bg-slate-50 opacity-40 transition-all" data-step="4">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[10px] font-bold text-slate-500 uppercase">Étape 4</span>
+        <div class="chaos-step p-2.5 rounded-xl border-2 border-slate-200 bg-slate-50 opacity-40 transition-all" data-step="4">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[9px] font-bold text-slate-500 uppercase">Étape 4</span>
             <span class="text-xs">⚠️</span>
           </div>
-          <div class="font-bold text-xs text-slate-800">Conflit de Versions</div>
-          <p class="text-[11px] text-slate-500 mt-1">Qui fusionne les 3 fichiers ? Qui a la vraie vérité ?</p>
-          <div class="mt-2 text-[10px] bg-red-50 p-1 rounded border border-red-200 text-red-700 truncate font-mono font-bold">
+          <div class="font-bold text-xs text-slate-800 font-cairo">Conflit Total</div>
+          <p class="text-[10px] text-slate-500 mt-1">Qui a la vraie vérité ? Comment tout fusionner ?</p>
+          <div class="mt-2 text-[9px] bg-amber-50 p-1 rounded border border-amber-200 text-amber-800 truncate font-mono font-bold">
             Rapport_FINAL_v2_ok.docx
           </div>
         </div>
 
         <!-- Step 5 -->
-        <div class="chaos-step p-3 rounded-lg border-2 border-red-300 bg-red-50/50 opacity-40 transition-all" data-step="5">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[10px] font-bold text-red-600 uppercase">Étape 5</span>
+        <div class="chaos-step p-2.5 rounded-xl border-2 border-[#D21034]/30 bg-[#FDECEF]/60 opacity-40 transition-all" data-step="5">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[9px] font-bold text-[#D21034] uppercase">Étape 5</span>
             <span class="text-xs">🚨</span>
           </div>
-          <div class="font-bold text-xs text-red-900">Le Message Fatal</div>
-          <p class="text-[11px] text-red-700 mt-1">« Quelqu'un peut me renvoyer la dernière version ? »</p>
-          <div class="mt-2 text-[10px] bg-red-100 p-1 rounded border border-red-300 text-red-900 truncate font-mono font-bold">
+          <div class="font-bold text-xs text-slate-900 font-cairo">Le Message Fatal</div>
+          <p class="text-[10px] text-[#D21034] mt-1">« Quelqu'un peut renvoyer la dernière version ? »</p>
+          <div class="mt-2 text-[9px] bg-[#FDECEF] p-1 rounded border border-[#D21034]/30 text-[#D21034] truncate font-mono font-bold">
             Rapport_VRAIMENT_FINAL.docx
           </div>
         </div>
       </div>
 
       <!-- Controls for Step Animation -->
-      <div class="flex items-center justify-between mt-4 pt-3 border-t border-slate-200">
+      <div class="flex items-center justify-between mt-3 pt-2.5 border-t border-slate-100">
         <button type="button" id="play-chaos-btn" class="btn-777 btn-777-outline text-xs px-3 py-1.5 cursor-pointer">
           <span id="play-chaos-label">▶ Lancer la simulation</span>
         </button>
-        <div class="text-sm font-bold text-slate-800" id="chaos-status">
+        <div class="text-xs font-bold text-slate-800 font-cairo" id="chaos-status">
           Ça vous rappelle quelque chose ?
         </div>
       </div>
     </div>
   </div>
 
-  <div class="relative z-10 flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-200">
-    <span>Le problème n'est pas le document, c'est l'absence de système</span>
-    <button type="button" class="btn-777 btn-777-blue text-xs px-4 py-2 cursor-pointer" data-deck-next>
-      <span>DÉCOUVRIR LE DÉCLIC →</span>
+  <div class="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-100 relative z-10">
+    <span>Le problème n'est pas le fichier, c'est l'absence de workflow</span>
+    <button type="button" class="btn-777 btn-777-green text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>LE DÉCLIC : WORKFLOWS →</span>
     </button>
   </div>
 </section>
 
 <script>
-  // Slide 4 Chaos Animator
   let currentStep = 1;
   const maxSteps = 5;
   const chaosSteps = document.querySelectorAll('.chaos-step');
@@ -123,14 +122,14 @@ import SlideHeader from '../_components/SlideHeader.astro';
       const s = parseInt(el.getAttribute('data-step') || '1', 10);
       if (s <= step) {
         el.classList.remove('opacity-40');
-        el.classList.add('border-blue-600', 'bg-blue-50/20');
+        el.classList.add('border-[#0080C8]', 'bg-[#E8F5FD]/40');
         if (s === 5) {
-          el.classList.remove('border-blue-600', 'bg-blue-50/20');
-          el.classList.add('border-red-500', 'bg-red-50');
+          el.classList.remove('border-[#0080C8]', 'bg-[#E8F5FD]/40');
+          el.classList.add('border-[#D21034]', 'bg-[#FDECEF]');
         }
       } else {
         el.classList.add('opacity-40');
-        el.classList.remove('border-blue-600', 'bg-blue-50/20', 'border-red-500', 'bg-red-50');
+        el.classList.remove('border-[#0080C8]', 'bg-[#E8F5FD]/40', 'border-[#D21034]', 'bg-[#FDECEF]');
       }
     });
   }

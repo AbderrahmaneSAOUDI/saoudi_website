@@ -1,42 +1,26 @@
 ---
-import BrandLogo from './BrandLogo.astro';
-
 interface Props {
   category?: string;
   topic?: string;
-  theme?: 'dark' | 'canvas' | 'white';
 }
 
-const { 
-  category = "PRODUCTIVITÉ NUMÉRIQUE", 
-  topic = "Systèmes & Outils de Travail", 
-  theme = 'canvas' 
-} = Astro.props;
-
-const isDark = theme === 'dark';
+const { category = "7.77 Program", topic = "Digital Skills & Workflows" } = Astro.props;
 ---
 
-<header class="relative z-10 w-full flex items-center justify-between pb-3 mb-4 border-b border-slate-200 dark:border-slate-800">
-  <div class="flex items-center gap-3">
-    <BrandLogo variant={isDark ? 'dark' : 'light'} size="sm" showSubtitle={false} />
-    <span class="text-slate-300 dark:text-slate-700">/</span>
-    <span class={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md ${
-      isDark ? 'bg-slate-800 text-teal-300 border border-slate-700' : 'bg-blue-50 text-blue-700 border border-blue-200'
-    }`}>
-      {category}
+<header class="relative z-10 w-full flex items-center justify-between border-b border-slate-100 pb-4 mb-3 select-none">
+  <div class="flex items-center gap-2.5">
+    <span class="text-xs uppercase tracking-widest font-bold text-[#006233] bg-[#E6F4EA] px-3 py-1 rounded-lg border border-[#006233]/20">
+      7.77 Program
     </span>
-    <span class={`text-xs font-medium hidden sm:inline ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-      {topic}
+    <span class="text-xs uppercase tracking-wider font-semibold text-slate-400">
+      | {category}
     </span>
   </div>
 
-  <div class="flex items-center gap-2">
-    <span class={`text-[11px] font-semibold px-2 py-0.5 rounded border ${
-      isDark 
-        ? 'bg-navy-surface text-slate-300 border-slate-700' 
-        : 'bg-slate-100 text-slate-700 border-slate-200'
-    }`}>
-      SESSION 24–30 ANS
+  <div class="flex items-center gap-3">
+    <span class="text-xs font-medium text-slate-500 hidden sm:inline">{topic}</span>
+    <span class="text-xs font-mono font-bold text-[#006233] bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
+      777.mpt.gov.dz
     </span>
   </div>
 </header>

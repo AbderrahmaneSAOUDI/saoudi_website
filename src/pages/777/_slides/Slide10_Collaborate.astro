@@ -2,93 +2,93 @@
 import SlideHeader from '../_components/SlideHeader.astro';
 ---
 
-<section class="deck-slide slide-white relative justify-between" data-slide-index="10">
-  <div class="diagonal-bg-accent"></div>
+<section class="deck-slide justify-between relative overflow-hidden" data-slide-index="10">
+  <div class="light-brand-accent-1"></div>
 
-  <SlideHeader category="PILIER 04" topic="COLLABORATE : Du Fichier Isolé à la Source Unique de Vérité" theme="white" />
+  <SlideHeader category="Pilier 04" topic="COLLABORATE : Du Fichier Isolé à la Source Unique de Vérité" />
 
-  <div class="relative z-10 my-auto max-w-5xl w-full">
+  <div class="my-auto max-w-5xl w-full relative z-10">
     <div class="flex items-center justify-between mb-3">
       <div>
-        <span class="text-xs font-bold text-teal-700 tracking-wider uppercase bg-teal-50 px-2.5 py-1 rounded border border-teal-200">
+        <span class="text-xs font-bold text-[#006233] tracking-wider uppercase bg-[#E6F4EA] px-2.5 py-1 rounded border border-[#006233]/20">
           Collaboration Temps Réel
         </span>
-        <h2 class="title-h1 text-slate-900 mt-2">
+        <h2 class="title-h1 text-slate-900 mt-1 font-cairo">
           « Un seul document, zéro pièce jointe par email. »
         </h2>
       </div>
-      <button type="button" id="toggle-collab-mode-btn" class="btn-777 btn-777-orange text-xs px-4 py-2 cursor-pointer">
+      <button type="button" id="toggle-collab-mode-btn" class="btn-777 btn-777-green text-xs px-3.5 py-2 cursor-pointer">
         <span id="collab-btn-text">🔄 TRANSFORMER LE WORKFLOW</span>
       </button>
     </div>
 
     <!-- Transformation State Container -->
-    <div class="card-777 bg-white p-5 border-slate-300 min-h-[220px] flex items-center justify-center relative overflow-hidden" id="collab-canvas">
+    <div class="card-777 p-4 border-slate-200 min-h-[200px] flex items-center justify-center relative overflow-hidden" id="collab-canvas">
       <!-- State 1: Before (Chaotic Serial Workflow) -->
       <div id="collab-before-view" class="w-full flex flex-col items-center justify-center transition-all duration-300">
-        <div class="text-xs font-bold text-red-600 uppercase mb-3 bg-red-50 px-3 py-1 rounded-full border border-red-200">
+        <div class="text-xs font-bold text-[#D21034] uppercase mb-3 bg-[#FDECEF] px-3 py-1 rounded-full border border-[#D21034]/20 font-cairo">
           ❌ Workflow Sériel Ancien (Goulots d'étranglement)
         </div>
         <div class="flex items-center gap-2 sm:gap-4 max-w-2xl w-full justify-between">
-          <div class="text-center p-3 rounded-xl bg-slate-50 border border-slate-200">
-            <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm mx-auto mb-1">A</div>
-            <div class="font-bold text-xs">Membre A</div>
-            <div class="text-[10px] text-slate-400 font-mono mt-1">doc_v1.docx</div>
+          <div class="text-center p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="w-8 h-8 rounded-full bg-blue-100 text-[#0080C8] flex items-center justify-center font-bold text-xs mx-auto mb-1">A</div>
+            <div class="font-bold text-xs font-cairo">Membre A</div>
+            <div class="text-[9px] text-slate-400 font-mono mt-1">doc_v1.docx</div>
           </div>
-          <div class="text-slate-400 font-bold text-sm">➔ ✉️ ➔</div>
-          <div class="text-center p-3 rounded-xl bg-slate-50 border border-slate-200">
-            <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-sm mx-auto mb-1">B</div>
-            <div class="font-bold text-xs">Membre B</div>
-            <div class="text-[10px] text-slate-400 font-mono mt-1">doc_v2_mod.docx</div>
+          <div class="text-slate-400 font-bold text-xs">➔ ✉️ ➔</div>
+          <div class="text-center p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs mx-auto mb-1">B</div>
+            <div class="font-bold text-xs font-cairo">Membre B</div>
+            <div class="text-[9px] text-slate-400 font-mono mt-1">doc_v2_mod.docx</div>
           </div>
-          <div class="text-slate-400 font-bold text-sm">➔ ✉️ ➔</div>
-          <div class="text-center p-3 rounded-xl bg-slate-50 border border-slate-200">
-            <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm mx-auto mb-1">C</div>
-            <div class="font-bold text-xs">Membre C</div>
-            <div class="text-[10px] text-red-500 font-bold font-mono mt-1">doc_conflit.docx</div>
+          <div class="text-slate-400 font-bold text-xs">➔ ✉️ ➔</div>
+          <div class="text-center p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="w-8 h-8 rounded-full bg-emerald-100 text-[#006233] flex items-center justify-center font-bold text-xs mx-auto mb-1">C</div>
+            <div class="font-bold text-xs font-cairo">Membre C</div>
+            <div class="text-[9px] text-[#D21034] font-bold font-mono mt-1">doc_conflit.docx</div>
           </div>
         </div>
-        <p class="text-xs text-slate-500 mt-4 text-center">
-          Temps perdu moyen : 48 heures de délai pour fusionner 3 avis contradictoires.
+        <p class="text-xs text-slate-500 mt-3 text-center">
+          Délai moyen constaté : 48 heures de latence pour fusionner des avis contradictoires.
         </p>
       </div>
 
       <!-- State 2: After (Modern Live Google Workspace Hub) -->
       <div id="collab-after-view" class="hidden w-full transition-all duration-300">
-        <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-200">
+        <div class="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-100">
           <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+            <span class="text-xs font-bold text-[#006233] bg-[#E6F4EA] px-3 py-1 rounded-full border border-[#006233]/20 font-cairo">
               ✅ Source Unique de Vérité (Temps Réel)
             </span>
           </div>
           <!-- Real-time Active Avatars -->
           <div class="flex items-center gap-1.5">
-            <span class="text-[11px] text-slate-500 font-medium">3 personnes en direct :</span>
-            <span class="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-[10px] flex items-center justify-center ring-2 ring-blue-300">AS</span>
-            <span class="w-6 h-6 rounded-full bg-teal-600 text-white font-bold text-[10px] flex items-center justify-center ring-2 ring-teal-300">SB</span>
-            <span class="w-6 h-6 rounded-full bg-orange-500 text-white font-bold text-[10px] flex items-center justify-center ring-2 ring-orange-300">YM</span>
+            <span class="text-[10px] text-slate-500 font-medium">3 participants en direct :</span>
+            <span class="w-6 h-6 rounded-full bg-[#006233] text-white font-bold text-[9px] flex items-center justify-center ring-2 ring-[#006233]/30">AS</span>
+            <span class="w-6 h-6 rounded-full bg-[#0080C8] text-white font-bold text-[9px] flex items-center justify-center ring-2 ring-[#0080C8]/30">SB</span>
+            <span class="w-6 h-6 rounded-full bg-purple-600 text-white font-bold text-[9px] flex items-center justify-center ring-2 ring-purple-300">YM</span>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div class="p-3 bg-blue-50/50 rounded-lg border border-blue-200">
-            <div class="font-bold text-xs text-blue-900 mb-1">💬 Commentaires Ciblés (@)</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+          <div class="p-2.5 bg-[#E8F5FD]/50 rounded-xl border border-[#0080C8]/20">
+            <div class="font-bold text-xs text-[#0080C8] mb-1 font-cairo">💬 Commentaires Ciblés (@)</div>
             <p class="text-[11px] text-slate-600">
-              Assignez directement une tâche à un collègue avec <span class="font-mono text-blue-700 font-bold">@amina</span> sans jamais quitter le texte.
+              Assignez directement une tâche à un collègue avec <span class="font-mono text-[#0080C8] font-bold">@amina</span> sans quitter le document.
             </p>
           </div>
 
-          <div class="p-3 bg-teal-50/50 rounded-lg border border-teal-200">
-            <div class="font-bold text-xs text-teal-900 mb-1">✏️ Mode Suggestions</div>
+          <div class="p-2.5 bg-[#E6F4EA]/50 rounded-xl border border-[#006233]/20">
+            <div class="font-bold text-xs text-[#006233] mb-1 font-cairo">✏️ Mode Suggestions</div>
             <p class="text-[11px] text-slate-600">
-              Proposez des corrections visibles que l'auteur peut accepter ou refuser en un clic.
+              Proposez des modifications visibles que l'auteur valide en un seul clic.
             </p>
           </div>
 
-          <div class="p-3 bg-purple-50/50 rounded-lg border border-purple-200">
-            <div class="font-bold text-xs text-purple-900 mb-1">🕒 Historique des Versions</div>
+          <div class="p-2.5 bg-purple-50/50 rounded-xl border border-purple-200">
+            <div class="font-bold text-xs text-purple-900 mb-1 font-cairo">🕒 Historique des Versions</div>
             <p class="text-[11px] text-slate-600">
-              Restaurez n'importe quelle version passée à la seconde près. Aucune perte possible.
+              Restaurez n'importe quel état antérieur à la seconde près. Zéro perte.
             </p>
           </div>
         </div>
@@ -96,16 +96,15 @@ import SlideHeader from '../_components/SlideHeader.astro';
     </div>
   </div>
 
-  <div class="relative z-10 flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-200">
+  <div class="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-100 relative z-10">
     <span>La collaboration moderne élimine les réunions de relecture superflues</span>
-    <button type="button" class="btn-777 btn-777-blue text-xs px-4 py-2 cursor-pointer" data-deck-next>
-      <span>PILIER 05 : PLANIFICATION & AGENDA →</span>
+    <button type="button" class="btn-777 btn-777-green text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>PILIER 5 : GESTION DU TEMPS →</span>
     </button>
   </div>
 </section>
 
 <script>
-  // Slide 10 Collaboration Mode Toggle
   const toggleBtn = document.getElementById('toggle-collab-mode-btn');
   const btnText = document.getElementById('collab-btn-text');
   const beforeView = document.getElementById('collab-before-view');
@@ -119,14 +118,14 @@ import SlideHeader from '../_components/SlideHeader.astro';
       beforeView?.classList.add('hidden');
       afterView?.classList.remove('hidden');
       if (btnText) btnText.textContent = '⏪ VOIR LE MODE ANCIEN';
-      toggleBtn.classList.remove('btn-777-orange');
-      toggleBtn.classList.add('btn-777-teal');
+      toggleBtn.classList.remove('btn-777-green');
+      toggleBtn.classList.add('btn-777-blue');
     } else {
       afterView?.classList.add('hidden');
       beforeView?.classList.remove('hidden');
       if (btnText) btnText.textContent = '🔄 TRANSFORMER LE WORKFLOW';
-      toggleBtn.classList.remove('btn-777-teal');
-      toggleBtn.classList.add('btn-777-orange');
+      toggleBtn.classList.remove('btn-777-blue');
+      toggleBtn.classList.add('btn-777-green');
     }
   });
 </script>

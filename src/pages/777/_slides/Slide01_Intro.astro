@@ -2,90 +2,81 @@
 import BrandLogo from '../_components/BrandLogo.astro';
 ---
 
-<section class="deck-slide slide-dark relative justify-between" data-slide-index="1">
-  <!-- Diagonal 777 Background Accent -->
-  <div class="diagonal-bg-accent-dark"></div>
+<section class="deck-slide justify-between relative overflow-hidden" data-slide-index="1">
+  <!-- Subtle Background Brand Accents -->
+  <div class="light-brand-accent-1"></div>
+  <div class="light-brand-accent-2"></div>
 
-  <!-- Top Bar -->
-  <div class="relative z-10 flex items-center justify-between">
-    <BrandLogo variant="dark" size="md" />
-    <div class="flex items-center gap-2">
-      <span class="text-xs font-semibold px-3 py-1 rounded-full bg-teal-500/10 text-teal-300 border border-teal-500/30">
-        Algérie • Ministère de la Poste et des Télécommunications
-      </span>
-    </div>
-  </div>
+  <!-- Header Brand Bar -->
+  <BrandLogo size="md" showPartners={true} />
 
-  <!-- Main Hero Content -->
-  <div class="relative z-10 my-auto max-w-4xl">
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-600/20 text-blue-400 border border-blue-500/30 text-xs font-bold tracking-wider uppercase mb-4">
-      <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-      Session Speaker • Catégorie 24–30 Ans
+  <!-- Main Content -->
+  <div class="my-auto space-y-5 max-w-4xl relative z-10">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E6F4EA] border border-[#006233]/20 text-[#006233] text-xs font-bold tracking-wide">
+      <span class="w-2 h-2 rounded-full bg-[#006233] animate-pulse"></span>
+      <span>Programme National 7.77</span>
+      <span class="text-slate-300">|</span>
+      <span>Session : 24–30 ans</span>
     </div>
 
-    <h1 class="title-display text-white mb-4">
+    <h1 class="title-display font-black text-slate-900 tracking-tight leading-tight font-cairo">
       Productivité Numérique :<br />
-      <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-teal-300 to-amber-400">
-        Systèmes, Workflows & Outils
-      </span>
+      <span class="text-[#006233]">Systèmes, Workflows & Maîtrise des Outils</span>
     </h1>
 
-    <p class="body-lead-dark max-w-2xl text-slate-300 text-lg mb-8">
-      Comment passer du chaos des outils isolés à une méthode de travail structurée, fluide et collaborative pour les jeunes professionnels et étudiants.
+    <p class="text-lg text-slate-600 leading-relaxed font-normal max-w-3xl">
+      Comment passer du chaos des fichiers dispersés à une méthode de travail structurée, collaborative et automatisée avec l'écosystème numérique moderne.
     </p>
 
-    <!-- Speaker Bio & Action Bar -->
-    <div class="flex flex-wrap items-center gap-6 pt-4 border-t border-slate-800">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-white text-lg border border-blue-400">
-          AS
-        </div>
-        <div>
-          <h3 class="font-bold text-white text-base leading-tight">Abderrahmane SAOUDI</h3>
-          <p class="text-xs text-slate-400">Software Engineer & Tech Lead</p>
-        </div>
-      </div>
-
-      <div class="h-8 w-px bg-slate-800 hidden sm:block"></div>
-
-      <button type="button" class="btn-777 btn-777-orange text-base px-6 py-3 cursor-pointer" data-deck-next>
-        <span>C'EST PARTI</span>
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+    <!-- Action Buttons -->
+    <div class="flex items-center gap-4 pt-2">
+      <button type="button" class="btn-777 btn-777-green text-sm px-6 py-2.5 cursor-pointer" data-deck-next>
+        <span>COMMENCER LA PRÉSENTATION</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
       </button>
 
-      <button type="button" id="toggle-speaker-bio-btn" class="btn-777 btn-777-outline-dark text-xs px-3 py-2 cursor-pointer">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span>Bio & Objectifs</span>
+      <button type="button" id="toggle-speaker-bio-btn" class="btn-777 btn-777-outline text-xs px-3.5 py-2 cursor-pointer">
+        <svg class="w-4 h-4 text-[#006233]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Profil & Bio</span>
       </button>
     </div>
   </div>
 
   <!-- Interactive Popover for Speaker Details -->
-  <div id="speaker-bio-modal" class="hidden absolute bottom-20 left-16 z-30 max-w-lg card-777-dark border-teal-500/40 p-5">
+  <div id="speaker-bio-modal" class="hidden absolute bottom-20 left-16 z-30 max-w-lg card-777 border-[#006233]/30 p-5 bg-white">
     <div class="flex items-center justify-between mb-3">
-      <span class="text-xs font-bold text-teal-300 uppercase tracking-wider">Profil de l'Intervenant</span>
-      <button type="button" id="close-bio-btn" class="text-slate-400 hover:text-white text-sm">✕</button>
+      <span class="text-xs font-bold text-[#006233] uppercase tracking-wider">Profil de l'Intervenant</span>
+      <button type="button" id="close-bio-btn" class="text-slate-400 hover:text-slate-700 text-sm">✕</button>
     </div>
-    <p class="text-xs text-slate-300 mb-3 leading-relaxed">
-      Passionné d'ingénierie logicielle, d'automatisation et de structuration des flux de travail numériques pour les équipes et les projets d'envergure.
+    <p class="text-xs text-slate-600 mb-3 leading-relaxed">
+      Ingénieur logiciel et formateur technique, spécialisé dans les architectures logicielles, les flux de travail numériques et l'autonomie technologique des jeunes talents.
     </p>
-    <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-400">
-      <div class="p-2 bg-slate-900/60 rounded border border-slate-800">🎯 Google Workspace Ecosystem</div>
-      <div class="p-2 bg-slate-900/60 rounded border border-slate-800">⚡ Automatisation & Scripts</div>
-      <div class="p-2 bg-slate-900/60 rounded border border-slate-800">👥 Collaboration en temps réel</div>
-      <div class="p-2 bg-slate-900/60 rounded border border-slate-800">📊 Gestion de projets & Données</div>
+    <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-700">
+      <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">🎯 Google Workspace Ecosystem</div>
+      <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">⚡ Automatisation & Scripts</div>
+      <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">👥 Collaboration Temps Réel</div>
+      <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">📊 Gestion de Données & IA</div>
     </div>
   </div>
 
-  <!-- Bottom Bar Info -->
-  <div class="relative z-10 flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-800/80">
-    <span>Programme 777 — Ministère de la Poste et des Télécommunications</span>
-    <span>Utilisez les touches <kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-mono">ESPACE</kbd> ou <kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-mono">→</kbd></span>
+  <!-- Footer Speaker Info -->
+  <div class="flex items-center justify-between pt-4 border-t border-slate-100 text-sm relative z-10">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-[#006233] text-sm">
+        AS
+      </div>
+      <div>
+        <p class="font-bold text-slate-900 text-sm font-cairo">Abderrahmane SAOUDI</p>
+        <p class="text-xs text-slate-500 font-medium">Session Speaker & Tech Lead • <span class="font-mono text-[#006233]">saoudi.online</span></p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 font-mono text-[#006233] font-bold text-xs">
+      <span>🌐</span> 777.mpt.gov.dz
+    </div>
   </div>
 </section>
 
 <script>
-  // Slide 1 Bio Toggle
   const bioBtn = document.getElementById('toggle-speaker-bio-btn');
   const bioModal = document.getElementById('speaker-bio-modal');
   const closeBioBtn = document.getElementById('close-bio-btn');

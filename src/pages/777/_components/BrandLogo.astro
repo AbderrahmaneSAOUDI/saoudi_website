@@ -1,60 +1,37 @@
 ---
 interface Props {
-  variant?: 'light' | 'dark' | 'monochrome';
   size?: 'sm' | 'md' | 'lg';
-  showSubtitle?: boolean;
+  showPartners?: boolean;
 }
 
-const { variant = 'light', size = 'md', showSubtitle = true } = Astro.props;
-
-const sizes = {
-  sm: { height: 28, text: 'text-xs', sub: 'text-[9px]' },
-  md: { height: 38, text: 'text-sm', sub: 'text-[11px]' },
-  lg: { height: 54, text: 'text-lg', sub: 'text-xs' },
-};
-
-const currentSize = sizes[size];
-const isDark = variant === 'dark';
+const { size = 'md', showPartners = true } = Astro.props;
+const heightClass = size === 'sm' ? 'w-10 h-10' : size === 'lg' ? 'w-14 h-14' : 'w-12 h-12';
 ---
 
-<div class={`inline-flex items-center gap-3 select-none ${isDark ? 'text-white' : 'text-slate-900'}`}>
-  <!-- 777 Dynamic Geometric Mark (Exact 45°/60° Numeral 7 Cut) -->
-  <svg 
-    height={currentSize.height} 
-    viewBox="0 0 160 54" 
-    fill="none" 
-    xmlns="http://www.w3.org/2000/svg"
-    class="shrink-0"
-    aria-label="7.77 Djil & Djil Logo"
-  >
-    <!-- Background container with subtle border -->
-    <rect width="160" height="54" rx="8" fill={isDark ? "rgba(255,255,255,0.06)" : "rgba(11,37,69,0.04)"} stroke={isDark ? "#1E3E68" : "#CBD5E1"} stroke-width="1.5" />
-    
-    <!-- Primary Numeral 7 (Telecom Blue) -->
-    <path d="M16 12H44L30 42H18L30 18H16V12Z" fill="#0066CC" />
-    
-    <!-- Secondary Numeral 7 (Teal Accent) -->
-    <path d="M48 12H76L62 42H50L62 18H48V12Z" fill="#00A896" />
-    
-    <!-- Tertiary Numeral 7 (Energy Orange Accent) -->
-    <path d="M80 12H108L94 42H82L94 18H80V12Z" fill="#F26419" />
-    
-    <!-- Dot separator -->
-    <circle cx="118" cy="38" r="4" fill={isDark ? "#FFFFFF" : "#0B2545"} />
+<div class="flex items-center justify-between w-full border-b border-slate-100 pb-4 select-none">
+  <!-- Ministry Emblem & Name -->
+  <div class="flex items-center gap-3.5">
+    <div class={`${heightClass} rounded-full border-2 border-[#006233] flex flex-col items-center justify-center bg-white font-cairo font-bold text-[#D21034] text-xs leading-none`}>
+      <span class="text-[#006233] text-[9px] font-black">MPT</span>
+      <span class="text-[9px] font-black">🇩🇿</span>
+    </div>
+    <div>
+      <p class="font-cairo text-sm font-bold text-slate-900 leading-tight">وزارة البريد والمواصلات السلكية واللاسلكية</p>
+      <p class="text-[11px] text-slate-500 font-medium tracking-wide">Ministère de la Poste et des Télécommunications</p>
+    </div>
+  </div>
 
-    <!-- Djil text mark -->
-    <text x="126" y="24" fill={isDark ? "#FFFFFF" : "#0B2545"} font-family="Inter, sans-serif" font-weight="800" font-size="11">DJIL</text>
-    <text x="126" y="38" fill="#00A896" font-family="Cairo, sans-serif" font-weight="700" font-size="12">جيل</text>
-  </svg>
-
-  {showSubtitle && (
-    <div class="flex flex-col border-l border-slate-300 dark:border-slate-700 pl-3">
-      <span class={`font-bold tracking-tight uppercase ${currentSize.text} ${isDark ? 'text-white' : 'text-slate-900'}`}>
-        Programme 777
-      </span>
-      <span class={`font-medium ${currentSize.sub} ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-        Compétences Numériques • 24–30 ans
-      </span>
+  <!-- Partners & 7.77 Tag -->
+  {showPartners && (
+    <div class="flex items-center gap-3 text-xs font-semibold">
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#E8F5FD] text-[#0080C8] border border-[#0080C8]/20">
+        <span class="font-bold tracking-tight">Algérie Télécom</span>
+        <span class="text-[10px] font-cairo">إتصالات الجزائر</span>
+      </div>
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F2F8EA] text-[#72A92E] border border-[#72A92E]/20">
+        <span class="font-bold tracking-tight">Mobilis</span>
+        <span class="text-[10px] font-cairo">موبيليس</span>
+      </div>
     </div>
   )}
 </div>

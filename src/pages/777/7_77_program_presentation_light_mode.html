@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>7.77 Program Presentation Deck (Light Mode)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            cairo: ['Cairo', 'sans-serif'],
+          },
+          colors: {
+            dzGreen: '#006233',
+            dzGreenLight: '#E6F4EA',
+            dzRed: '#D21034',
+            dzRedLight: '#FDECEF',
+            atBlue: '#0080C8',
+            atBlueLight: '#E8F5FD',
+            mobGreen: '#72A92E',
+            brandDark: '#0F172A',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .slide {
+      width: 1920px;
+      height: 1080px;
+      max-width: 100%;
+      aspect-ratio: 16 / 9;
+    }
+    @media print {
+      body {
+        padding: 0;
+        background: transparent;
+      }
+      .slide {
+        page-break-after: always;
+        border: none;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900 flex flex-col items-center gap-12 p-6 md:p-12 font-sans antialiased">
+
+  <!-- SLIDE 1: Title & Session Cover -->
+  <section class="slide bg-white rounded-3xl border border-slate-200 shadow-xl p-16 flex flex-col justify-between relative overflow-hidden">
+    <!-- Subtle Background Brand Accents -->
+    <div class="absolute -top-32 -right-32 w-96 h-96 bg-emerald-50 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-rose-50 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Header Brand Bar -->
+    <div class="flex items-center justify-between border-b border-slate-100 pb-6 relative z-10">
+      <div class="flex items-center gap-4">
+        <!-- Ministry Emblem / Badge -->
+        <div class="w-14 h-14 rounded-full border-2 border-dzGreen flex flex-col items-center justify-center bg-white shadow-sm font-cairo font-bold text-dzRed text-xs leading-none">
+          <span class="text-dzGreen text-[10px]">MPT</span>
+          <span class="text-[9px] font-black">🇩🇿</span>
+        </div>
+        <div>
+          <p class="font-cairo text-base font-bold text-slate-900">وزارة البريد والمواصلات السلكية واللاسلكية</p>
+          <p class="text-xs text-slate-500 font-medium tracking-wide">Ministère de la Poste et des Télécommunications</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-6 text-sm font-semibold">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-atBlueLight text-atBlue">
+          <span class="font-bold tracking-tight">Algérie Télécom</span>
+          <span class="text-[10px] font-cairo">إتصالات الجزائر</span>
+        </div>
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 text-mobGreen">
+          <span class="font-bold tracking-tight">Mobilis</span>
+          <span class="text-[10px] font-cairo">موبيليس</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="my-auto space-y-6 max-w-4xl relative z-10">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-dzGreen text-sm font-semibold tracking-wide shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-dzGreen"></span>
+        <span>7.77 Program</span>
+        <span class="text-slate-300">|</span>
+        <span>Target: All Generations (7 to 77)</span>
+      </div>
+
+      <h1 class="text-6xl font-black text-slate-900 tracking-tight leading-tight font-cairo">
+        Digital Skills for Every Generation
+      </h1>
+
+      <p class="text-2xl text-slate-600 leading-relaxed font-light">
+        A national digital empowerment initiative driving practical technical literacy, AI readiness, and software innovation across Algeria.
+      </p>
+    </div>
+
+    <!-- Footer Speaker Info -->
+    <div class="flex items-center justify-between pt-6 border-t border-slate-100 text-sm relative z-10">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-dzGreen shadow-sm text-base">
+          AS
+        </div>
+        <div>
+          <p class="font-bold text-slate-900 text-base font-cairo">Abderrahmane SAOUDI</p>
+          <p class="text-xs text-slate-500 font-medium">Session Speaker & Technology Lead</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 font-mono text-dzGreen font-bold text-sm shadow-sm">
+        <span>🌐</span> 777.mpt.gov.dz
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: Speaker Bio & Connect -->
+  <section class="slide bg-white rounded-3xl border border-slate-200 shadow-xl p-16 flex flex-col justify-between relative overflow-hidden">
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-slate-100 pb-6">
+      <div class="flex items-center gap-2">
+        <span class="text-xs uppercase tracking-widest font-bold text-dzGreen bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+          7.77 Program
+        </span>
+        <span class="text-xs uppercase tracking-wider font-semibold text-slate-400">| Speaker Profile</span>
+      </div>
+      <span class="text-sm font-mono text-slate-400">Speaker's bio and contact</span>
+    </div>
+
+    <!-- Body -->
+    <div class="grid grid-cols-12 gap-12 my-auto items-center">
+      <!-- Profile Card -->
+      <div class="col-span-4 bg-slate-50 p-8 rounded-3xl border border-slate-200 text-center space-y-4 shadow-sm">
+        <div class="w-32 h-32 mx-auto rounded-full bg-gradient-to-tr from-dzGreen to-atBlue p-1 shadow-md">
+          <div class="w-full h-full rounded-full bg-white flex items-center justify-center text-4xl font-black text-slate-800">
+            AS
+          </div>
+        </div>
+        <div>
+          <h3 class="text-2xl font-bold text-slate-900 font-cairo">Abderrahmane SAOUDI</h3>
+          <p class="text-sm text-dzGreen font-semibold mt-1">Computer Science & AI Specialist</p>
+        </div>
+        <div class="text-xs text-slate-500 leading-relaxed border-t border-slate-200 pt-4">
+          Dedicated to building accessible developer communities, conducting applied tech workshops, and driving open digital skills.
+        </div>
+      </div>
+
+      <!-- Experience & Contact Info -->
+      <div class="col-span-8 space-y-6">
+        <div class="space-y-3">
+          <h2 class="text-3xl font-extrabold text-slate-900 font-cairo">About the Presenter</h2>
+          <p class="text-slate-600 leading-relaxed text-lg font-normal">
+            Specializing in modern software architectures, data intelligence, and national youth technical capacity building. Partnering with educational and ministerial programs to empower students and professionals nationwide.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 pt-2">
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider">Focus Areas</span>
+            <p class="text-slate-900 font-semibold mt-1 text-sm">Artificial Intelligence, Full-Stack & Cloud</p>
+          </div>
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider">Website / Portfolio</span>
+            <p class="text-dzGreen font-semibold mt-1 text-sm font-mono">saoudi.online</p>
+          </div>
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider">Initiative</span>
+            <p class="text-slate-900 font-semibold mt-1 text-sm">7.77 Digital Skills Nationwide</p>
+          </div>
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider">Official Portal</span>
+            <p class="text-atBlue font-semibold mt-1 text-sm font-mono">777.mpt.gov.dz</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex justify-between items-center text-xs text-slate-400 pt-6 border-t border-slate-100">
+      <span>وزارة البريد والمواصلات السلكية واللاسلكية</span>
+      <span class="font-medium text-slate-500">Algérie Télécom • Mobilis</span>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: Welcome & Vision -->
+  <section class="slide bg-white rounded-3xl border border-slate-200 shadow-xl p-16 flex flex-col justify-between relative overflow-hidden">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-6">
+      <div class="flex items-center gap-2">
+        <span class="text-xs uppercase tracking-widest font-bold text-dzGreen bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+          7.77 Program
+        </span>
+        <span class="text-xs uppercase tracking-wider font-semibold text-slate-400">| Introduction</span>
+      </div>
+      <span class="text-sm font-mono text-slate-400">Welcome Everyone</span>
+    </div>
+
+    <div class="my-auto text-center max-w-4xl mx-auto space-y-6">
+      <div class="w-24 h-24 mx-auto rounded-3xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-4xl font-black text-dzGreen shadow-inner font-mono">
+        7.77
+      </div>
+      <h2 class="text-6xl font-black text-slate-900 tracking-tight font-cairo">
+        Welcome Everyone
+      </h2>
+      <p class="text-2xl text-slate-600 leading-relaxed font-light max-w-3xl mx-auto">
+        "Strengthening national digital skills through accessible, hands-on, and future-ready training programs for citizens of all ages."
+      </p>
+    </div>
+
+    <div class="grid grid-cols-3 gap-6 pt-6 border-t border-slate-100 text-center">
+      <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+        <div class="text-dzGreen text-2xl font-black font-cairo">01. Inclusive</div>
+        <p class="text-xs text-slate-500 font-medium">Empowering citizens aged 7 to 77 across all technical backgrounds.</p>
+      </div>
+      <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+        <div class="text-dzRed text-2xl font-black font-cairo">02. Practical</div>
+        <p class="text-xs text-slate-500 font-medium">Hands-on workshops, real coding challenges, and project-based labs.</p>
+      </div>
+      <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm space-y-1">
+        <div class="text-atBlue text-2xl font-black font-cairo">03. Nationwide</div>
+        <p class="text-xs text-slate-500 font-medium">Deploys digital skill centers and workshops across Algerian wilayas.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: The 7.77 Initiative Metrics & Overview -->
+  <section class="slide bg-white rounded-3xl border border-slate-200 shadow-xl p-16 flex flex-col justify-between relative overflow-hidden">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-6">
+      <div class="flex items-center gap-2">
+        <span class="text-xs uppercase tracking-widest font-bold text-dzGreen bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+          7.77 Program
+        </span>
+        <span class="text-xs uppercase tracking-wider font-semibold text-slate-400">| National Initiative</span>
+      </div>
+      <span class="text-sm font-mono text-slate-400">777.mpt.gov.dz</span>
+    </div>
+
+    <div class="space-y-8 my-auto">
+      <div class="space-y-4">
+        <h2 class="text-4xl font-extrabold text-slate-900 font-cairo tracking-tight">
+          7.77 Digital Skills for Every Generation
+        </h2>
+        <p class="text-slate-600 text-lg max-w-5xl leading-relaxed">
+          A national digital empowerment initiative led by Algeria's Ministry of Post and Telecommunications, in partnership with <strong class="text-atBlue font-semibold">Algérie Télécom</strong> and <strong class="text-mobGreen font-semibold">Mobilis</strong>. It aims to strengthen digital skills for citizens aged 7 to 77 through practical, inclusive, and accessible training in areas such as artificial intelligence, cybersecurity, coding, data, cloud technologies, and digital entrepreneurship.
+        </p>
+      </div>
+
+      <!-- Highlight Stats Grid -->
+      <div class="grid grid-cols-2 gap-8">
+        <div class="bg-gradient-to-br from-emerald-50 to-white p-8 rounded-3xl border border-emerald-200 flex items-center gap-8 shadow-sm">
+          <div class="text-7xl font-black text-dzGreen font-mono tracking-tighter">7-77</div>
+          <div>
+            <h4 class="text-2xl font-bold text-slate-900 font-cairo">Age Range Covered</h4>
+            <p class="text-sm text-slate-500 mt-1 leading-relaxed">Continuous digital learning pathways tailored from young students (7) to lifelong senior learners (77).</p>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-rose-50 to-white p-8 rounded-3xl border border-rose-200 flex items-center gap-8 shadow-sm">
+          <div class="text-7xl font-black text-dzRed font-mono tracking-tighter">07</div>
+          <div>
+            <h4 class="text-2xl font-bold text-slate-900 font-cairo">Skill Centers</h4>
+            <p class="text-sm text-slate-500 mt-1 leading-relaxed">Core specialized technology and training hubs deployed across wilayas to deliver local training.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between pt-6 border-t border-slate-100 text-sm text-slate-500">
+      <span class="font-mono text-xs">Official Portal: <strong>777.mpt.gov.dz</strong></span>
+      <span class="text-xs">Ministry of Post and Telecommunications • Algérie Télécom • Mobilis</span>
+    </div>
+  </section>
+
+</body>
+</html>

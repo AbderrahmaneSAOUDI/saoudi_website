@@ -2,87 +2,86 @@
 import SlideHeader from '../_components/SlideHeader.astro';
 ---
 
-<section class="deck-slide slide-white relative justify-between" data-slide-index="6">
-  <div class="diagonal-bg-accent"></div>
+<section class="deck-slide justify-between relative overflow-hidden" data-slide-index="6">
+  <div class="light-brand-accent-1"></div>
 
-  <SlideHeader category="MÉTHODE" topic="Le Framework de Productivité 777" theme="white" />
+  <SlideHeader category="Méthode" topic="Le Framework de Productivité 7.77" />
 
-  <div class="relative z-10 my-auto max-w-5xl w-full">
-    <div class="mb-4">
-      <span class="text-xs font-bold text-teal-700 tracking-wider uppercase bg-teal-50 px-2.5 py-1 rounded border border-teal-200">
+  <div class="my-auto max-w-5xl w-full relative z-10">
+    <div class="mb-3">
+      <span class="text-xs font-bold text-[#006233] tracking-wider uppercase bg-[#E6F4EA] px-2.5 py-1 rounded border border-[#006233]/20">
         Architecture du Système
       </span>
-      <h2 class="title-h1 text-slate-900 mt-2">
+      <h2 class="title-h1 text-slate-900 mt-1 font-cairo">
         La Chaîne de Valeur Numérique en 6 Piliers
       </h2>
-      <p class="text-sm text-slate-600 mt-1">
+      <p class="text-xs text-slate-600 mt-0.5">
         Cliquez sur chaque étape du cycle pour comprendre son rôle précis :
       </p>
     </div>
 
     <!-- 6 Interactive Framework Stages -->
-    <div class="grid grid-cols-2 md:grid-cols-6 gap-2 my-4" id="framework-pills">
-      <button type="button" class="fw-pill card-777 p-3 text-left border-2 border-blue-600 bg-blue-50/40 cursor-pointer transition-all" data-title="1. CAPTURER" data-desc="Transformer l'information brute ou dispersée en données structurées et exploitables dès la première seconde." data-tools="Google Forms, Google Keep, Notion Quick Capture">
-        <div class="text-[10px] font-bold text-blue-700 uppercase">Étape 01</div>
-        <div class="font-extrabold text-sm text-slate-900 mt-1">CAPTURE</div>
-        <div class="text-[11px] text-slate-500 mt-1">Forms / Entrées</div>
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-2 my-3" id="framework-pills">
+      <button type="button" class="fw-pill card-777 p-2.5 text-left border-2 border-[#006233] bg-[#E6F4EA]/40 cursor-pointer transition-all" data-title="1. CAPTURER" data-desc="Transformer l'information brute ou dispersée en données structurées dès la première seconde." data-tools="Google Forms, Google Keep, Notion">
+        <div class="text-[9px] font-bold text-[#006233] uppercase">Étape 01</div>
+        <div class="font-black text-xs text-slate-900 mt-0.5 font-cairo">CAPTURE</div>
+        <div class="text-[10px] text-slate-500 mt-0.5">Forms / Entrées</div>
       </button>
 
-      <button type="button" class="fw-pill card-777 p-3 text-left border-2 border-slate-200 hover:border-slate-400 cursor-pointer transition-all" data-title="2. ORGANISER" data-desc="Structurer les répertoires, les conventions de nommage et les droits d'accès pour ne jamais rien perdre." data-tools="Google Drive partagés, Arborescence standardisée">
-        <div class="text-[10px] font-bold text-slate-500 uppercase">Étape 02</div>
-        <div class="font-extrabold text-sm text-slate-900 mt-1">ORGANIZE</div>
-        <div class="text-[11px] text-slate-500 mt-1">Drive / Arborescence</div>
+      <button type="button" class="fw-pill card-777 p-2.5 text-left border-2 border-slate-200 hover:border-slate-400 cursor-pointer transition-all" data-title="2. ORGANISER" data-desc="Structurer les répertoires, les conventions de nommage et les droits d'accès pour ne jamais rien perdre." data-tools="Google Drive partagés, Arborescence standardisée">
+        <div class="text-[9px] font-bold text-slate-500 uppercase">Étape 02</div>
+        <div class="font-black text-xs text-slate-900 mt-0.5 font-cairo">ORGANIZE</div>
+        <div class="text-[10px] text-slate-500 mt-0.5">Drive / Arborescence</div>
       </button>
 
-      <button type="button" class="fw-pill card-777 p-3 text-left border-2 border-slate-200 hover:border-slate-400 cursor-pointer transition-all" data-title="3. CRÉER" data-desc="Concevoir des livrables de haute qualité (documents, feuilles de calcul, présentations) basés sur des modèles éprouvés." data-tools="Google Docs, Sheets, Slides, Canva">
-        <div class="text-[10px] font-bold text-slate-500 uppercase">Étape 03</div>
-        <div class="font-extrabold text-sm text-slate-900 mt-1">CREATE</div>
-        <div class="text-[11px] text-slate-500 mt-1">Docs / Sheets / Slides</div>
+      <button type="button" class="fw-pill card-777 p-2.5 text-left border-2 border-slate-200 hover:border-slate-400 cursor-pointer transition-all" data-title="3. CRÉER" data-desc="Concevoir des livrables de haute qualité basés sur des modèles réutilisables et des puces intelligentes." data-tools="Google Docs, Sheets, Slides, Canva">
+        <div class="text-[9px] font-bold text-slate-500 uppercase">Étape 03</div>
+        <div class="font-black text-xs text-slate-900 mt-0.5 font-cairo">CREATE</div>
+        <div class="text-[10px] text-slate-500 mt-0.5">Docs / Sheets / Slides</div>
       </button>
 
-      <button type="button" class="fw-pill card-777 p-3 text-left border-2 border-slate-200 hover:border-slate-400 cursor-pointer transition-all" data-title="4. COLLABORER" data-desc="Travailler simultanément à plusieurs sur la même source de vérité avec commentaires et historique de versions." data-tools="Édition temps réel, Permissions, Commentaires @">
-        <div class="text-[10px] font-bold text-slate-500 uppercase">Étape 04</div>
-        <div class="font-extrabold text-sm text-slate-900 mt-1">COLLABORATE</div>
-        <div class="text-[11px] text-slate-500 mt-1">Temps réel / Avis</div>
+      <button type="button" class="fw-pill card-777 p-2.5 text-left border-2 border-slate-200 hover:border-slate-400 cursor-pointer transition-all" data-title="4. COLLABORER" data-desc="Travailler simultanément à plusieurs sur la même source de vérité avec commentaires ciblés et historique." data-tools="Édition temps réel, Permissions, @mentions">
+        <div class="text-[9px] font-bold text-slate-500 uppercase">Étape 04</div>
+        <div class="font-black text-xs text-slate-900 mt-0.5 font-cairo">COLLABORATE</div>
+        <div class="text-[10px] text-slate-500 mt-0.5">Temps réel / Avis</div>
       </button>
 
-      <button type="button" class="fw-pill card-777 p-3 text-left border-2 border-slate-200 hover:border-slate-400 cursor-pointer transition-all" data-title="5. AUTOMATISER" data-desc="Éliminer les tâches répétitives manuelles (envois d'emails de confirmation, génération de reçus, notifications)." data-tools="Google Apps Script, Make, Zapier, Webhooks">
-        <div class="text-[10px] font-bold text-slate-500 uppercase">Étape 05</div>
-        <div class="font-extrabold text-sm text-slate-900 mt-1">AUTOMATE</div>
-        <div class="text-[11px] text-slate-500 mt-1">Scripts / Triggers</div>
+      <button type="button" class="fw-pill card-777 p-2.5 text-left border-2 border-slate-200 hover:border-slate-400 cursor-pointer transition-all" data-title="5. AUTOMATISER" data-desc="Éliminer les tâches répétitives manuelles (envois d'emails de confirmation, génération de dossiers)." data-tools="Google Apps Script, Webhooks, Make">
+        <div class="text-[9px] font-bold text-slate-500 uppercase">Étape 05</div>
+        <div class="font-black text-xs text-slate-900 mt-0.5 font-cairo">AUTOMATE</div>
+        <div class="text-[10px] text-slate-500 mt-0.5">Scripts / Triggers</div>
       </button>
 
-      <button type="button" class="fw-pill card-777 p-3 text-left border-2 border-slate-200 hover:border-slate-400 cursor-pointer transition-all" data-title="6. PLANIFIER" data-desc="Associer chaque livrable au temps disponible (Time-Blocking) pour garantir l'exécution sans stress." data-tools="Google Calendar, Google Tasks, Time-blocking">
-        <div class="text-[10px] font-bold text-slate-500 uppercase">Étape 06</div>
-        <div class="font-extrabold text-sm text-slate-900 mt-1">SCHEDULE</div>
-        <div class="text-[11px] text-slate-500 mt-1">Calendar / Tâches</div>
+      <button type="button" class="fw-pill card-777 p-2.5 text-left border-2 border-slate-200 hover:border-slate-400 cursor-pointer transition-all" data-title="6. PLANIFIER" data-desc="Associer chaque livrable au temps disponible (Time-Blocking) pour garantir l'exécution sans stress." data-tools="Google Calendar, Google Tasks">
+        <div class="text-[9px] font-bold text-slate-500 uppercase">Étape 06</div>
+        <div class="font-black text-xs text-slate-900 mt-0.5 font-cairo">SCHEDULE</div>
+        <div class="text-[10px] text-slate-500 mt-0.5">Calendar / Tâches</div>
       </button>
     </div>
 
     <!-- Active Stage Detail View -->
-    <div id="stage-detail-card" class="card-777 bg-slate-50 border-slate-300 p-4">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-2">
-        <h3 id="stage-title" class="font-extrabold text-base text-blue-700">1. CAPTURER</h3>
-        <div class="text-xs px-2.5 py-1 bg-white rounded border border-slate-200 font-semibold text-slate-700" id="stage-tools">
+    <div id="stage-detail-card" class="card-777 bg-slate-50 border-slate-200 p-3.5">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-1.5">
+        <h3 id="stage-title" class="font-extrabold text-sm text-[#006233] font-cairo">1. CAPTURER</h3>
+        <div class="text-xs px-2.5 py-0.5 bg-white rounded border border-slate-200 font-semibold text-slate-700" id="stage-tools">
           Outils : Google Forms, Google Keep, Notion
         </div>
       </div>
-      <p id="stage-desc" class="text-xs sm:text-sm text-slate-700 leading-relaxed">
-        Transformer l'information brute ou dispersée en données structurées et exploitables dès la première seconde.
+      <p id="stage-desc" class="text-xs text-slate-700 leading-relaxed">
+        Transformer l'information brute ou dispersée en données structurées dès la première seconde.
       </p>
     </div>
   </div>
 
-  <div class="relative z-10 flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-200">
+  <div class="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-100 relative z-10">
     <span>Chaque pilier résout un problème précis du quotidien numérique</span>
-    <button type="button" class="btn-777 btn-777-blue text-xs px-4 py-2 cursor-pointer" data-deck-next>
-      <span>DÉCOUVRIR LE PILIER 1 : CAPTURE →</span>
+    <button type="button" class="btn-777 btn-777-green text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>PILIER 1 : CAPTURE →</span>
     </button>
   </div>
 </section>
 
 <script>
-  // Slide 6 Framework Inspector
   const pills = document.querySelectorAll('.fw-pill');
   const stageTitle = document.getElementById('stage-title');
   const stageDesc = document.getElementById('stage-desc');
@@ -90,8 +89,8 @@ import SlideHeader from '../_components/SlideHeader.astro';
 
   pills.forEach(pill => {
     pill.addEventListener('click', () => {
-      pills.forEach(p => p.classList.remove('border-blue-600', 'bg-blue-50/40'));
-      pill.classList.add('border-blue-600', 'bg-blue-50/40');
+      pills.forEach(p => p.classList.remove('border-[#006233]', 'bg-[#E6F4EA]/40'));
+      pill.classList.add('border-[#006233]', 'bg-[#E6F4EA]/40');
 
       const title = pill.getAttribute('data-title');
       const desc = pill.getAttribute('data-desc');
