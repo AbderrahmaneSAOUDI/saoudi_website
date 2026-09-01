@@ -1,0 +1,146 @@
+---
+import SlideHeader from '../_components/SlideHeader.astro';
+---
+
+<section class="deck-slide slide-canvas relative justify-between" data-slide-index="14">
+  <div class="diagonal-bg-accent"></div>
+
+  <SlideHeader category="ATELIER INTERACTIF" topic="Défi : Concevoir le Workflow Idéal" theme="canvas" />
+
+  <div class="relative z-10 my-auto max-w-5xl w-full">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <span class="text-xs font-bold text-orange-600 tracking-wider uppercase bg-orange-50 px-2.5 py-1 rounded border border-orange-200">
+          Scénario Réel 777
+        </span>
+        <h2 class="title-h1 text-slate-900 mt-2">
+          « Vous organisez un atelier pour 30 participants en 7 jours. »
+        </h2>
+      </div>
+      <button type="button" id="eval-workflow-btn" class="btn-777 btn-777-orange text-xs px-4 py-2 cursor-pointer">
+        <span>⚡ ÉVALUER MON WORKFLOW</span>
+      </button>
+    </div>
+
+    <!-- 4 Step Interactive Selector -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 my-3" id="challenge-options-grid">
+      <!-- Challenge Block 1: Inscriptions -->
+      <div class="card-777 bg-white p-3 border-slate-300">
+        <span class="text-[10px] font-bold text-blue-700 uppercase">1. Inscriptions</span>
+        <div class="mt-2 space-y-1.5">
+          <label class="flex items-center gap-2 text-xs p-1.5 rounded border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <input type="radio" name="ch-inscriptions" value="good" checked class="accent-blue-600" />
+            <span class="font-medium text-slate-800">Google Forms ➔ Sheets</span>
+          </label>
+          <label class="flex items-center gap-2 text-xs p-1.5 rounded border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <input type="radio" name="ch-inscriptions" value="bad" class="accent-blue-600" />
+            <span class="text-slate-600">Messages privés WhatsApp</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Challenge Block 2: Stockage -->
+      <div class="card-777 bg-white p-3 border-slate-300">
+        <span class="text-[10px] font-bold text-teal-700 uppercase">2. Fichiers & Visuels</span>
+        <div class="mt-2 space-y-1.5">
+          <label class="flex items-center gap-2 text-xs p-1.5 rounded border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <input type="radio" name="ch-files" value="good" checked class="accent-teal-600" />
+            <span class="font-medium text-slate-800">Drive Partagé avec 01_...</span>
+          </label>
+          <label class="flex items-center gap-2 text-xs p-1.5 rounded border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <input type="radio" name="ch-files" value="bad" class="accent-teal-600" />
+            <span class="text-slate-600">Clé USB et liens Telegram</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Challenge Block 3: Rédaction -->
+      <div class="card-777 bg-white p-3 border-slate-300">
+        <span class="text-[10px] font-bold text-purple-700 uppercase">3. Guide du Participant</span>
+        <div class="mt-2 space-y-1.5">
+          <label class="flex items-center gap-2 text-xs p-1.5 rounded border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <input type="radio" name="ch-docs" value="good" checked class="accent-purple-600" />
+            <span class="font-medium text-slate-800">Docs en direct + @mentions</span>
+          </label>
+          <label class="flex items-center gap-2 text-xs p-1.5 rounded border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <input type="radio" name="ch-docs" value="bad" class="accent-purple-600" />
+            <span class="text-slate-600">Fichiers Word par email</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Challenge Block 4: Confirmations -->
+      <div class="card-777 bg-white p-3 border-slate-300">
+        <span class="text-[10px] font-bold text-amber-700 uppercase">4. Envoi Convocations</span>
+        <div class="mt-2 space-y-1.5">
+          <label class="flex items-center gap-2 text-xs p-1.5 rounded border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <input type="radio" name="ch-auto" value="good" checked class="accent-amber-600" />
+            <span class="font-medium text-slate-800">Apps Script auto à 100%</span>
+          </label>
+          <label class="flex items-center gap-2 text-xs p-1.5 rounded border border-slate-200 hover:bg-slate-50 cursor-pointer">
+            <input type="radio" name="ch-auto" value="bad" class="accent-amber-600" />
+            <span class="text-slate-600">30 emails copiés à la main</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Diagnosis Result Panel -->
+    <div id="challenge-eval-result" class="p-3.5 rounded-xl bg-white border-2 border-emerald-500 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm" id="eval-icon">
+          ✓
+        </div>
+        <div>
+          <h4 class="font-bold text-xs text-slate-900" id="eval-title">Score de Fluidité : 100% — Système Optimal !</h4>
+          <p class="text-[11px] text-slate-600" id="eval-desc">
+            Votre équipe économisera au moins 14 heures de travail répétitif et évitera toute confusion avec les participants.
+          </p>
+        </div>
+      </div>
+      <span class="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200" id="eval-badge">
+        ZÉRO FRICTION
+      </span>
+    </div>
+  </div>
+
+  <div class="relative z-10 flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-200">
+    <span>L'organisation rigoureuse transforme n'importe quel défi en succès</span>
+    <button type="button" class="btn-777 btn-777-blue text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>PASSER À L'ACTION →</span>
+    </button>
+  </div>
+</section>
+
+<script>
+  // Slide 14 Challenge Evaluator
+  const evalBtn = document.getElementById('eval-workflow-btn');
+  const resultBox = document.getElementById('challenge-eval-result');
+  const evalTitle = document.getElementById('eval-title');
+  const evalDesc = document.getElementById('eval-desc');
+  const evalBadge = document.getElementById('eval-badge');
+  const evalIcon = document.getElementById('eval-icon');
+
+  evalBtn?.addEventListener('click', () => {
+    const radios = document.querySelectorAll('#challenge-options-grid input[type="radio"]:checked');
+    let badCount = 0;
+    radios.forEach((r: any) => {
+      if (r.value === 'bad') badCount++;
+    });
+
+    if (badCount === 0) {
+      if (resultBox) resultBox.className = 'p-3.5 rounded-xl bg-white border-2 border-emerald-500 flex items-center justify-between';
+      if (evalIcon) { evalIcon.textContent = '✓'; evalIcon.className = 'w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm'; }
+      if (evalTitle) evalTitle.textContent = 'Score de Fluidité : 100% — Système Parfait !';
+      if (evalDesc) evalDesc.textContent = 'Votre équipe économisera au moins 14 heures de travail répétitif et évitera toute confusion.';
+      if (evalBadge) { evalBadge.textContent = 'ZÉRO FRICTION'; evalBadge.className = 'text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200'; }
+    } else {
+      const score = Math.round(((4 - badCount) / 4) * 100);
+      if (resultBox) resultBox.className = 'p-3.5 rounded-xl bg-white border-2 border-orange-500 flex items-center justify-between';
+      if (evalIcon) { evalIcon.textContent = '⚠️'; evalIcon.className = 'w-8 h-8 rounded-full bg-orange-100 text-orange-800 flex items-center justify-center font-bold text-sm'; }
+      if (evalTitle) evalTitle.textContent = `Score de Fluidité : ${score}% — Attention aux Goulots !`;
+      if (evalDesc) evalDesc.textContent = `Vous avez ${badCount} point(s) de friction manuel(s) qui risquent de créer des retards importants.`;
+      if (evalBadge) { evalBadge.textContent = 'RISQUE DE RETARD'; evalBadge.className = 'text-xs font-mono font-bold text-orange-700 bg-orange-50 px-2.5 py-1 rounded border border-orange-200'; }
+    }
+  });
+</script>

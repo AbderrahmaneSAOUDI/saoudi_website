@@ -1,0 +1,60 @@
+---
+interface Props {
+  variant?: 'light' | 'dark' | 'monochrome';
+  size?: 'sm' | 'md' | 'lg';
+  showSubtitle?: boolean;
+}
+
+const { variant = 'light', size = 'md', showSubtitle = true } = Astro.props;
+
+const sizes = {
+  sm: { height: 28, text: 'text-xs', sub: 'text-[9px]' },
+  md: { height: 38, text: 'text-sm', sub: 'text-[11px]' },
+  lg: { height: 54, text: 'text-lg', sub: 'text-xs' },
+};
+
+const currentSize = sizes[size];
+const isDark = variant === 'dark';
+---
+
+<div class={`inline-flex items-center gap-3 select-none ${isDark ? 'text-white' : 'text-slate-900'}`}>
+  <!-- 777 Dynamic Geometric Mark (Exact 45°/60° Numeral 7 Cut) -->
+  <svg 
+    height={currentSize.height} 
+    viewBox="0 0 160 54" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    class="shrink-0"
+    aria-label="7.77 Djil & Djil Logo"
+  >
+    <!-- Background container with subtle border -->
+    <rect width="160" height="54" rx="8" fill={isDark ? "rgba(255,255,255,0.06)" : "rgba(11,37,69,0.04)"} stroke={isDark ? "#1E3E68" : "#CBD5E1"} stroke-width="1.5" />
+    
+    <!-- Primary Numeral 7 (Telecom Blue) -->
+    <path d="M16 12H44L30 42H18L30 18H16V12Z" fill="#0066CC" />
+    
+    <!-- Secondary Numeral 7 (Teal Accent) -->
+    <path d="M48 12H76L62 42H50L62 18H48V12Z" fill="#00A896" />
+    
+    <!-- Tertiary Numeral 7 (Energy Orange Accent) -->
+    <path d="M80 12H108L94 42H82L94 18H80V12Z" fill="#F26419" />
+    
+    <!-- Dot separator -->
+    <circle cx="118" cy="38" r="4" fill={isDark ? "#FFFFFF" : "#0B2545"} />
+
+    <!-- Djil text mark -->
+    <text x="126" y="24" fill={isDark ? "#FFFFFF" : "#0B2545"} font-family="Inter, sans-serif" font-weight="800" font-size="11">DJIL</text>
+    <text x="126" y="38" fill="#00A896" font-family="Cairo, sans-serif" font-weight="700" font-size="12">جيل</text>
+  </svg>
+
+  {showSubtitle && (
+    <div class="flex flex-col border-l border-slate-300 dark:border-slate-700 pl-3">
+      <span class={`font-bold tracking-tight uppercase ${currentSize.text} ${isDark ? 'text-white' : 'text-slate-900'}`}>
+        Programme 777
+      </span>
+      <span class={`font-medium ${currentSize.sub} ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+        Compétences Numériques • 24–30 ans
+      </span>
+    </div>
+  )}
+</div>

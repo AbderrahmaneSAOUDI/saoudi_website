@@ -1,0 +1,42 @@
+---
+import BrandLogo from './BrandLogo.astro';
+
+interface Props {
+  category?: string;
+  topic?: string;
+  theme?: 'dark' | 'canvas' | 'white';
+}
+
+const { 
+  category = "PRODUCTIVITÉ NUMÉRIQUE", 
+  topic = "Systèmes & Outils de Travail", 
+  theme = 'canvas' 
+} = Astro.props;
+
+const isDark = theme === 'dark';
+---
+
+<header class="relative z-10 w-full flex items-center justify-between pb-3 mb-4 border-b border-slate-200 dark:border-slate-800">
+  <div class="flex items-center gap-3">
+    <BrandLogo variant={isDark ? 'dark' : 'light'} size="sm" showSubtitle={false} />
+    <span class="text-slate-300 dark:text-slate-700">/</span>
+    <span class={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md ${
+      isDark ? 'bg-slate-800 text-teal-300 border border-slate-700' : 'bg-blue-50 text-blue-700 border border-blue-200'
+    }`}>
+      {category}
+    </span>
+    <span class={`text-xs font-medium hidden sm:inline ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+      {topic}
+    </span>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <span class={`text-[11px] font-semibold px-2 py-0.5 rounded border ${
+      isDark 
+        ? 'bg-navy-surface text-slate-300 border-slate-700' 
+        : 'bg-slate-100 text-slate-700 border-slate-200'
+    }`}>
+      SESSION 24–30 ANS
+    </span>
+  </div>
+</header>

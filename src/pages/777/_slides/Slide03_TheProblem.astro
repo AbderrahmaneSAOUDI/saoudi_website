@@ -1,0 +1,127 @@
+---
+import SlideHeader from '../_components/SlideHeader.astro';
+---
+
+<section class="deck-slide slide-white relative justify-between" data-slide-index="3">
+  <div class="diagonal-bg-accent"></div>
+
+  <SlideHeader category="LE CONSTAT" topic="La Surcharge d'Outils" theme="white" />
+
+  <div class="relative z-10 my-auto max-w-5xl w-full">
+    <div class="mb-4">
+      <span class="text-xs font-bold text-orange-600 tracking-wider uppercase bg-orange-50 px-2.5 py-1 rounded border border-orange-200">
+        Paradoxe Moderne
+      </span>
+      <h2 class="title-h1 text-slate-900 mt-2">
+        « Nous sommes entourés d'outils. »
+      </h2>
+      <p class="text-sm text-slate-600 mt-1">
+        Cliquez sur un outil pour voir ce qui se passe réellement dans notre quotidien :
+      </p>
+    </div>
+
+    <!-- Interactive Tool Cloud -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4" id="tool-grid">
+      <button type="button" class="tool-chip card-777 text-left p-3 hover:border-blue-500 cursor-pointer transition-all" data-impact="Vous passez 4 heures à fabriquer le template parfait sans jamais écrire une seule ligne de contenu.">
+        <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
+          <span class="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-xs">📝</span>
+          Notion
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1">Organisation & Notes</p>
+      </button>
+
+      <button type="button" class="tool-chip card-777 text-left p-3 hover:border-blue-500 cursor-pointer transition-all" data-impact="600 messages non lus pour fixer une réunion de 15 minutes. Les fichiers importants s'y perdent à jamais.">
+        <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
+          <span class="w-6 h-6 rounded bg-green-50 text-green-700 flex items-center justify-center text-xs">💬</span>
+          WhatsApp
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1">Communication Rapide</p>
+      </button>
+
+      <button type="button" class="tool-chip card-777 text-left p-3 hover:border-blue-500 cursor-pointer transition-all" data-impact="Des dizaines de « Dossier sans titre » et des fichiers orphelins introuvables lors des réunions urgentes.">
+        <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
+          <span class="w-6 h-6 rounded bg-blue-50 text-blue-700 flex items-center justify-center text-xs">📁</span>
+          Google Drive
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1">Stockage Cloud</p>
+      </button>
+
+      <button type="button" class="tool-chip card-777 text-left p-3 hover:border-blue-500 cursor-pointer transition-all" data-impact="Copier-coller 15 prompts différents sans méthode structurée pour intégrer les réponses dans le travail.">
+        <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
+          <span class="w-6 h-6 rounded bg-purple-50 text-purple-700 flex items-center justify-center text-xs">🤖</span>
+          ChatGPT / Gemini
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1">Intelligence Artificielle</p>
+      </button>
+
+      <button type="button" class="tool-chip card-777 text-left p-3 hover:border-blue-500 cursor-pointer transition-all" data-impact="Recevoir 5 feuilles de calcul différentes par email avec des totaux contradictoires.">
+        <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
+          <span class="w-6 h-6 rounded bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs">📊</span>
+          Google Sheets
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1">Tableaux & Données</p>
+      </button>
+
+      <button type="button" class="tool-chip card-777 text-left p-3 hover:border-blue-500 cursor-pointer transition-all" data-impact="Envoyer des pièces jointes en boucle avec l'objet : « Re: Re: Re: Modification urgente ».">
+        <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
+          <span class="w-6 h-6 rounded bg-red-50 text-red-700 flex items-center justify-center text-xs">✉️</span>
+          Gmail
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1">Messagerie Pro</p>
+      </button>
+
+      <button type="button" class="tool-chip card-777 text-left p-3 hover:border-blue-500 cursor-pointer transition-all" data-impact="Des dizaines de tableaux créés et abandonnés au bout de deux semaines par manque de rigueur d'équipe.">
+        <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
+          <span class="w-6 h-6 rounded bg-sky-50 text-sky-700 flex items-center justify-center text-xs">📋</span>
+          Trello / Asana
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1">Gestion de Tâches</p>
+      </button>
+
+      <button type="button" class="tool-chip card-777 text-left p-3 hover:border-blue-500 cursor-pointer transition-all" data-impact="Un agenda vide où tout le travail s'effectue dans l'urgence à la dernière minute.">
+        <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
+          <span class="w-6 h-6 rounded bg-blue-50 text-blue-700 flex items-center justify-center text-xs">📅</span>
+          Google Calendar
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1">Planification</p>
+      </button>
+    </div>
+
+    <!-- Dynamic Impact Box -->
+    <div id="tool-impact-box" class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-orange-600 font-bold text-xs uppercase px-2 py-0.5 rounded bg-orange-100">Le Constat :</span>
+        <span id="impact-text" class="text-xs font-semibold text-slate-800">
+          Cliquez sur un outil ci-dessus pour inspecter le piège classique.
+        </span>
+      </div>
+      <div class="text-xs font-bold text-blue-700">
+        Plus d'outils ≠ Plus de résultats
+      </div>
+    </div>
+  </div>
+
+  <div class="relative z-10 flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-200">
+    <span class="font-bold text-slate-900 text-sm">Mais sommes-nous réellement productifs ?</span>
+    <button type="button" class="btn-777 btn-777-orange text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>VOIR LE CHAOS NUMÉRIQUE →</span>
+    </button>
+  </div>
+</section>
+
+<script>
+  // Slide 3 Tool impact interactive reveal
+  const chips = document.querySelectorAll('.tool-chip');
+  const impactText = document.getElementById('impact-text');
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('border-blue-600', 'bg-blue-50/40'));
+      chip.classList.add('border-blue-600', 'bg-blue-50/40');
+      const impact = chip.getAttribute('data-impact');
+      if (impactText && impact) {
+        impactText.textContent = impact;
+      }
+    });
+  });
+</script>

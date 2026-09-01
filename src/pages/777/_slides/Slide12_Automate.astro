@@ -1,0 +1,110 @@
+---
+import SlideHeader from '../_components/SlideHeader.astro';
+---
+
+<section class="deck-slide slide-dark relative justify-between" data-slide-index="12">
+  <div class="diagonal-bg-accent-dark"></div>
+
+  <SlideHeader category="PILIER 06" topic="AUTOMATE : Google Apps Script & Déclencheurs" theme="dark" />
+
+  <div class="relative z-10 my-auto max-w-5xl w-full">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <span class="text-xs font-bold text-amber-400 tracking-wider uppercase bg-amber-500/20 px-2.5 py-1 rounded border border-amber-500/30">
+          Éliminer la Répétition
+        </span>
+        <h2 class="title-h1 text-white mt-2">
+          « Si vous le faites plus de 3 fois, automatisez-le. »
+        </h2>
+      </div>
+      <button type="button" id="trigger-auto-btn" class="btn-777 btn-777-orange text-xs px-4 py-2 cursor-pointer">
+        <span>⚡ SIMULER L'EXÉCUTION DU SCRIPT</span>
+      </button>
+    </div>
+
+    <!-- Animated Pipeline Flowchart -->
+    <div class="card-777-dark p-4 border-slate-700 bg-slate-900/80 mb-4">
+      <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 text-center text-xs" id="auto-pipeline">
+        <!-- Node 1 -->
+        <div class="auto-node p-3 rounded-xl bg-slate-800 border border-slate-700 transition-all" id="node-1">
+          <div class="text-[10px] font-bold text-slate-400 uppercase">1. Entrée</div>
+          <div class="font-bold text-white text-xs mt-1">Google Forms</div>
+          <div class="text-[10px] text-slate-400 mt-1">Nouvelle inscription</div>
+        </div>
+
+        <!-- Node 2 -->
+        <div class="auto-node p-3 rounded-xl bg-slate-800 border border-slate-700 transition-all" id="node-2">
+          <div class="text-[10px] font-bold text-slate-400 uppercase">2. Données</div>
+          <div class="font-bold text-emerald-400 text-xs mt-1">Google Sheets</div>
+          <div class="text-[10px] text-slate-400 mt-1">Ligne ajoutée</div>
+        </div>
+
+        <!-- Node 3 -->
+        <div class="auto-node p-3 rounded-xl bg-slate-800 border border-slate-700 transition-all" id="node-3">
+          <div class="text-[10px] font-bold text-slate-400 uppercase">3. Déclencheur</div>
+          <div class="font-bold text-amber-400 text-xs mt-1">Apps Script</div>
+          <div class="text-[10px] text-slate-400 mt-1">onFormSubmit()</div>
+        </div>
+
+        <!-- Node 4 -->
+        <div class="auto-node p-3 rounded-xl bg-slate-800 border border-slate-700 transition-all" id="node-4">
+          <div class="text-[10px] font-bold text-slate-400 uppercase">4. Action 1</div>
+          <div class="font-bold text-blue-400 text-xs mt-1">Gmail API</div>
+          <div class="text-[10px] text-slate-400 mt-1">Email confirmation</div>
+        </div>
+
+        <!-- Node 5 -->
+        <div class="auto-node p-3 rounded-xl bg-slate-800 border border-slate-700 transition-all" id="node-5">
+          <div class="text-[10px] font-bold text-slate-400 uppercase">5. Action 2</div>
+          <div class="font-bold text-teal-400 text-xs mt-1">Google Drive</div>
+          <div class="text-[10px] text-slate-400 mt-1">Dossier créé</div>
+        </div>
+      </div>
+
+      <!-- Real Code Snippet Preview -->
+      <div class="mt-3 p-3 rounded-lg bg-slate-950 border border-slate-800 font-mono text-[11px] text-slate-300 overflow-x-auto">
+        <span class="text-purple-400">function</span> <span class="text-blue-400">onFormSubmit</span>(e) &#123;<br />
+        &nbsp;&nbsp;<span class="text-slate-500">// 1. Récupération des données du candidat</span><br />
+        &nbsp;&nbsp;<span class="text-purple-400">const</span> candidateEmail = e.namedValues[<span class="text-amber-300">'Email'</span>][0];<br />
+        &nbsp;&nbsp;<span class="text-slate-500">// 2. Envoi automatique de la convocation personnalisée</span><br />
+        &nbsp;&nbsp;GmailApp.<span class="text-teal-300">sendEmail</span>(candidateEmail, <span class="text-amber-300">'Confirmation Atelier 777'</span>, <span class="text-amber-300">'Bienvenue au programme !'</span>);<br />
+        &#125;
+      </div>
+    </div>
+  </div>
+
+  <div class="relative z-10 flex items-center justify-between text-xs text-slate-400 pt-3 border-t border-slate-800">
+    <span>Votre temps a trop de valeur pour copier-coller des emails manuellement</span>
+    <button type="button" class="btn-777 btn-777-teal text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>AU-DELÀ DE GOOGLE : L'ÉCOSYSTÈME →</span>
+    </button>
+  </div>
+</section>
+
+<script>
+  // Slide 12 Automation Pipeline Animator
+  const triggerBtn = document.getElementById('trigger-auto-btn');
+  const nodes = [
+    document.getElementById('node-1'),
+    document.getElementById('node-2'),
+    document.getElementById('node-3'),
+    document.getElementById('node-4'),
+    document.getElementById('node-5')
+  ];
+
+  triggerBtn?.addEventListener('click', () => {
+    nodes.forEach(n => n?.classList.remove('border-amber-400', 'bg-amber-500/20', 'border-teal-400', 'bg-teal-500/20'));
+
+    nodes.forEach((node, idx) => {
+      setTimeout(() => {
+        if (node) {
+          node.classList.add('border-amber-400', 'bg-amber-500/30');
+          setTimeout(() => {
+            node.classList.remove('bg-amber-500/30');
+            node.classList.add('bg-teal-500/20', 'border-teal-400');
+          }, 400);
+        }
+      }, idx * 300);
+    });
+  });
+</script>

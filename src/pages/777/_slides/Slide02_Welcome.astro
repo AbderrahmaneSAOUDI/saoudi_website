@@ -1,0 +1,55 @@
+---
+import SlideHeader from '../_components/SlideHeader.astro';
+---
+
+<section class="deck-slide slide-canvas relative justify-between" data-slide-index="2">
+  <div class="diagonal-bg-accent"></div>
+
+  <SlideHeader category="INTRODUCTION" topic="Bienvenue & État des Lieux" theme="canvas" />
+
+  <div class="relative z-10 my-auto max-w-4xl">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-teal-50 text-teal-800 border border-teal-200 text-xs font-bold tracking-wider uppercase mb-4">
+      777 • DJIL & DJIL
+    </div>
+
+    <h2 class="title-display text-slate-900 mb-6">
+      BIENVENUE.<br />
+      <span class="text-blue-700">Parlons de notre manière de travailler.</span>
+    </h2>
+
+    <p class="body-lead text-slate-600 text-lg mb-8 max-w-2xl">
+      Dans nos études, nos projets associatifs ou notre vie professionnelle, nous passons des heures devant un écran. Mais travaillons-nous efficacement ?
+    </p>
+
+    <!-- 3 Provocative Questions Grid (Progressively revealable or interactive) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="card-777 bg-white border-slate-200 p-4 border-l-4 border-l-blue-600">
+        <span class="text-xs font-bold text-blue-700 uppercase">Question 01</span>
+        <p class="text-sm font-semibold text-slate-800 mt-2">
+          Combien de minutes par jour passez-vous à chercher un lien ou un document ?
+        </p>
+      </div>
+
+      <div class="card-777 bg-white border-slate-200 p-4 border-l-4 border-l-teal-600">
+        <span class="text-xs font-bold text-teal-700 uppercase">Question 02</span>
+        <p class="text-sm font-semibold text-slate-800 mt-2">
+          Combien de versions « final_v3_bon.docx » traînent dans vos groupes WhatsApp ?
+        </p>
+      </div>
+
+      <div class="card-777 bg-white border-slate-200 p-4 border-l-4 border-l-orange-500">
+        <span class="text-xs font-bold text-orange-700 uppercase">Question 03</span>
+        <p class="text-sm font-semibold text-slate-800 mt-2">
+          Vos outils travaillent-ils pour vous, ou travaillez-vous pour vos outils ?
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="relative z-10 flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-200">
+    <span>Comprendre l'état actuel de notre environnement numérique</span>
+    <button type="button" class="btn-777 btn-777-blue text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>DÉCOUVRIR LE PROBLÈME →</span>
+    </button>
+  </div>
+</section>

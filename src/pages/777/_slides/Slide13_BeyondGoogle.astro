@@ -1,0 +1,111 @@
+---
+import SlideHeader from '../_components/SlideHeader.astro';
+---
+
+<section class="deck-slide slide-white relative justify-between" data-slide-index="13">
+  <div class="diagonal-bg-accent"></div>
+
+  <SlideHeader category="ÉCOSYSTÈME" topic="Au-delà de Google : L'Éventail d'Outils" theme="white" />
+
+  <div class="relative z-10 my-auto max-w-5xl w-full">
+    <div class="mb-3">
+      <span class="text-xs font-bold text-blue-700 tracking-wider uppercase bg-blue-50 px-2.5 py-1 rounded border border-blue-200">
+        Matrice de Choix
+      </span>
+      <h2 class="title-h1 text-slate-900 mt-2">
+        « Il n'y a pas de meilleur outil universel. »
+      </h2>
+      <p class="text-xs text-slate-600 mt-1">
+        Chaque outil excelle dans un contexte précis. Choisissez selon vos besoins, pas la mode :
+      </p>
+    </div>
+
+    <!-- Multi-Column Category Matrix -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 my-2">
+      <!-- Category 1: Écriture & Docs -->
+      <div class="card-777 bg-slate-50/70 p-3 border-slate-200">
+        <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-200">
+          <span class="font-bold text-xs text-slate-800">✍️ RÉDACTION</span>
+          <span class="text-[10px] text-blue-700 font-semibold font-mono">Livrables</span>
+        </div>
+        <ul class="text-[11px] space-y-1 text-slate-700">
+          <li><strong>Google Docs :</strong> Idéal pour la collaboration temps réel</li>
+          <li><strong>Notion :</strong> Idéal pour les wikis et bases de doc internes</li>
+          <li><strong>Word :</strong> Idéal pour l'édition académique lourde</li>
+        </ul>
+      </div>
+
+      <!-- Category 2: Organisation & Fichiers -->
+      <div class="card-777 bg-slate-50/70 p-3 border-slate-200">
+        <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-200">
+          <span class="font-bold text-xs text-slate-800">📁 STOCKAGE</span>
+          <span class="text-[10px] text-teal-700 font-semibold font-mono">Cloud</span>
+        </div>
+        <ul class="text-[11px] space-y-1 text-slate-700">
+          <li><strong>Google Drive :</strong> Standard universel avec partages fins</li>
+          <li><strong>OneDrive :</strong> Intégration native avec Windows/Office</li>
+          <li><strong>Obsidian :</strong> Gestion de notes personnelles hors-ligne</li>
+        </ul>
+      </div>
+
+      <!-- Category 3: Design & Visuels -->
+      <div class="card-777 bg-slate-50/70 p-3 border-slate-200">
+        <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-200">
+          <span class="font-bold text-xs text-slate-800">🎨 DESIGN</span>
+          <span class="text-[10px] text-purple-700 font-semibold font-mono">Communication</span>
+        </div>
+        <ul class="text-[11px] space-y-1 text-slate-700">
+          <li><strong>Canva :</strong> Affiches et posts réseaux en 5 minutes</li>
+          <li><strong>Figma :</strong> Maquettage d'interfaces et design systems</li>
+          <li><strong>Google Slides :</strong> Présentations collaboratives légères</li>
+        </ul>
+      </div>
+
+      <!-- Category 4: Gestion de Projet -->
+      <div class="card-777 bg-slate-50/70 p-3 border-slate-200">
+        <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-200">
+          <span class="font-bold text-xs text-slate-800">📋 TÂCHES</span>
+          <span class="text-[10px] text-amber-700 font-semibold font-mono">Suivi</span>
+        </div>
+        <ul class="text-[11px] space-y-1 text-slate-700">
+          <li><strong>Google Tasks/Keep :</strong> Tâches simples et rapides</li>
+          <li><strong>Trello :</strong> Tableaux Kanban visuels pour équipes</li>
+          <li><strong>Asana / Jira :</strong> Gestion de projets complexes</li>
+        </ul>
+      </div>
+
+      <!-- Category 5: Automatisation -->
+      <div class="card-777 bg-slate-50/70 p-3 border-slate-200">
+        <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-200">
+          <span class="font-bold text-xs text-slate-800">⚡ AUTOMATION</span>
+          <span class="text-[10px] text-red-700 font-semibold font-mono">No-Code</span>
+        </div>
+        <ul class="text-[11px] space-y-1 text-slate-700">
+          <li><strong>Apps Script :</strong> 100% gratuit et intégré à Google</li>
+          <li><strong>Make / Zapier :</strong> Connecteurs multi-applications</li>
+          <li><strong>n8n :</strong> Automatisation open-source auto-hébergée</li>
+        </ul>
+      </div>
+
+      <!-- Category 6: Intelligence Artificielle -->
+      <div class="card-777 bg-slate-50/70 p-3 border-slate-200">
+        <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-200">
+          <span class="font-bold text-xs text-slate-800">🤖 ASSISTANCE IA</span>
+          <span class="text-[10px] text-emerald-700 font-semibold font-mono">Co-pilote</span>
+        </div>
+        <ul class="text-[11px] space-y-1 text-slate-700">
+          <li><strong>Gemini :</strong> Intégré directement dans Docs & Gmail</li>
+          <li><strong>ChatGPT :</strong> Brainstorming et synthèses rapides</li>
+          <li><strong>Claude :</strong> Rédaction longue et analyse de documents</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="relative z-10 flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-200">
+    <span>Le bon artisan choisit le bon outil pour le bon travail</span>
+    <button type="button" class="btn-777 btn-777-orange text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>DÉFI INTERACTIF : MONTEZ VOTRE WORKFLOW →</span>
+    </button>
+  </div>
+</section>

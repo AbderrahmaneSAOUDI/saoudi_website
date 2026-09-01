@@ -1,0 +1,166 @@
+---
+import SlideHeader from '../_components/SlideHeader.astro';
+---
+
+<section class="deck-slide slide-canvas relative justify-between" data-slide-index="9">
+  <div class="diagonal-bg-accent"></div>
+
+  <SlideHeader category="PILIER 03" topic="CREATE : Modèles Réutilisables & Composants Intelligents" theme="canvas" />
+
+  <div class="relative z-10 my-auto max-w-5xl w-full">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <span class="text-xs font-bold text-blue-700 tracking-wider uppercase bg-blue-50 px-2.5 py-1 rounded border border-blue-200">
+          Google Docs / Sheets / Slides
+        </span>
+        <h2 class="title-h1 text-slate-900 mt-2">
+          « Créer une fois. Améliorer continuellement. »
+        </h2>
+      </div>
+      <!-- Template Selector Tabs -->
+      <div class="flex items-center gap-1.5 p-1 bg-white rounded-lg border border-slate-200" id="doc-template-tabs">
+        <button type="button" class="tab-btn text-xs px-2.5 py-1 rounded-md font-bold text-blue-700 bg-blue-50 border border-blue-200 cursor-pointer" data-doc="report">
+          📄 Rapport Type
+        </button>
+        <button type="button" class="tab-btn text-xs px-2.5 py-1 rounded-md font-medium text-slate-600 hover:bg-slate-100 cursor-pointer" data-doc="budget">
+          📊 Budget Auto
+        </button>
+        <button type="button" class="tab-btn text-xs px-2.5 py-1 rounded-md font-medium text-slate-600 hover:bg-slate-100 cursor-pointer" data-doc="roadmap">
+          🎯 Plan d'Action
+        </button>
+      </div>
+    </div>
+
+    <!-- Interactive Mock Editor Canvas -->
+    <div class="card-777 bg-white p-4 border-slate-300">
+      <!-- Editor Toolbar -->
+      <div class="flex flex-wrap items-center justify-between pb-2 mb-3 border-b border-slate-200 gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-slate-800" id="doc-title-display">Rapport_Synthese_Projet_777</span>
+          <span class="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-200 font-semibold">Sauvegardé sur Drive</span>
+        </div>
+        
+        <!-- Smart Chips toolbar -->
+        <div class="flex items-center gap-1.5 text-xs">
+          <span class="text-[11px] text-slate-400">Puces Intelligentes :</span>
+          <span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-semibold">@Date: Aujourd'hui</span>
+          <span class="px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200 text-[10px] font-semibold">@Responsable: Saoudi</span>
+          <span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-semibold">@Statut: En Cours</span>
+        </div>
+      </div>
+
+      <!-- Editor Body Content -->
+      <div id="doc-content-area" class="min-h-[140px] p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs font-sans leading-relaxed text-slate-800">
+        <div class="font-bold text-sm text-slate-900 mb-1">1. Contexte & Objectifs du Programme 777</div>
+        <p class="text-slate-600 mb-2">
+          L'initiative nationale vise le développement des compétences numériques clés auprès de la jeunesse algérienne, en se focalisant sur l'autonomie technologique et la maîtrise des flux de travail modernes.
+        </p>
+        <div class="p-2 rounded bg-white border border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span class="font-semibold text-slate-700">Livrable 01 : Guide Pratique Workspace</span>
+          </div>
+          <span class="text-[11px] text-slate-500 font-mono">Échéance : 15 Septembre</span>
+        </div>
+      </div>
+
+      <!-- Footer Principles -->
+      <div class="grid grid-cols-3 gap-2 mt-3 pt-2 border-t border-slate-100 text-[11px]">
+        <div class="flex items-center gap-1.5 text-slate-600">
+          <span class="text-blue-600 font-bold">1.</span>
+          <span>Ne démarrez jamais d'une page blanche.</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-slate-600">
+          <span class="text-teal-600 font-bold">2.</span>
+          <span>Utilisez des styles de titres hiérarchiques.</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-slate-600">
+          <span class="text-orange-600 font-bold">3.</span>
+          <span>Intégrez des puces `@` pour lier vos fichiers.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="relative z-10 flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-200">
+    <span>Un document standardisé garantit une image professionnelle instantanée</span>
+    <button type="button" class="btn-777 btn-777-blue text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>PILIER 04 : COLLABORATION TEMPS RÉEL →</span>
+    </button>
+  </div>
+</section>
+
+<script>
+  // Slide 9 Document Template Switcher
+  const docData: Record<string, { title: string; html: string }> = {
+    report: {
+      title: "Rapport_Synthese_Projet_777",
+      html: `
+        <div class="font-bold text-sm text-slate-900 mb-1">1. Contexte & Objectifs du Programme 777</div>
+        <p class="text-slate-600 mb-2">
+          L'initiative nationale vise le développement des compétences numériques clés auprès de la jeunesse algérienne, en se focalisant sur l'autonomie technologique et la maîtrise des flux de travail modernes.
+        </p>
+        <div class="p-2 rounded bg-white border border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span class="font-semibold text-slate-700">Livrable 01 : Guide Pratique Workspace</span>
+          </div>
+          <span class="text-[11px] text-slate-500 font-mono">Échéance : 15 Septembre</span>
+        </div>
+      `
+    },
+    budget: {
+      title: "Budget_Previsionnel_Automatise_777",
+      html: `
+        <div class="font-bold text-sm text-slate-900 mb-2">Tableau des Dépenses & Formules Automatiques</div>
+        <div class="grid grid-cols-4 gap-2 text-[10px] font-mono mb-2 bg-white p-2 rounded border border-slate-200">
+          <div class="font-bold text-slate-700">Poste : Logistique</div>
+          <div>Quantité : 4</div>
+          <div>Prix U : 15 000 DZD</div>
+          <div class="font-bold text-emerald-600">=TOTAL: 60 000 DZD</div>
+        </div>
+        <p class="text-slate-500 text-[11px]">
+          ✓ Totaux calculés par formule =SUM(), 0 risque d'erreur manuelle lors des réunions de trésorerie.
+        </p>
+      `
+    },
+    roadmap: {
+      title: "Plan_Action_Hebdomadaire_Equipe",
+      html: `
+        <div class="font-bold text-sm text-slate-900 mb-1">🎯 Jalons Critiques du Projet</div>
+        <ul class="space-y-1.5 text-slate-700 text-xs">
+          <li class="flex items-center justify-between p-1.5 bg-white rounded border border-slate-200">
+            <span>✅ Semaine 1 : Clôture des inscriptions (Forms)</span>
+            <span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">Terminé</span>
+          </li>
+          <li class="flex items-center justify-between p-1.5 bg-white rounded border border-slate-200">
+            <span>⏳ Semaine 2 : Déploiement des ateliers & support</span>
+            <span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold">En Cours</span>
+          </li>
+        </ul>
+      `
+    }
+  };
+
+  const tabs = document.querySelectorAll('#doc-template-tabs .tab-btn');
+  const titleDisplay = document.getElementById('doc-title-display');
+  const contentArea = document.getElementById('doc-content-area');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => {
+        t.classList.remove('font-bold', 'text-blue-700', 'bg-blue-50', 'border', 'border-blue-200');
+        t.classList.add('font-medium', 'text-slate-600');
+      });
+      tab.classList.add('font-bold', 'text-blue-700', 'bg-blue-50', 'border', 'border-blue-200');
+      tab.classList.remove('font-medium', 'text-slate-600');
+
+      const key = tab.getAttribute('data-doc') || 'report';
+      const item = docData[key];
+      if (item && titleDisplay && contentArea) {
+        titleDisplay.textContent = item.title;
+        contentArea.innerHTML = item.html;
+      }
+    });
+  });
+</script>

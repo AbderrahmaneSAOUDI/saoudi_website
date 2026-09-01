@@ -1,0 +1,188 @@
+---
+import SlideHeader from '../_components/SlideHeader.astro';
+---
+
+<section class="deck-slide slide-white relative justify-between" data-slide-index="8">
+  <div class="diagonal-bg-accent"></div>
+
+  <SlideHeader category="PILIER 02" topic="ORGANIZE : Architecture & Hygiène de Google Drive" theme="white" />
+
+  <div class="relative z-10 my-auto max-w-5xl w-full">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <span class="text-xs font-bold text-teal-700 tracking-wider uppercase bg-teal-50 px-2.5 py-1 rounded border border-teal-200">
+          Système de Fichiers & Conventions
+        </span>
+        <h2 class="title-h1 text-slate-900 mt-2">
+          « Une arborescence claire élimine 90% du stress d'équipe. »
+        </h2>
+      </div>
+      <div class="hidden sm:block text-right">
+        <span class="text-xs font-semibold text-slate-500 font-mono bg-slate-100 px-2.5 py-1 rounded border border-slate-200">
+          Convention : [NUM]_[CATÉGORIE]
+        </span>
+      </div>
+    </div>
+
+    <!-- Interactive Fake Drive Workspace -->
+    <div class="card-777 bg-white p-0 border-slate-300 overflow-hidden flex flex-col md:flex-row h-72">
+      <!-- Drive Sidebar / Folder Tree (4 cols) -->
+      <div class="w-full md:w-5/12 bg-slate-50 border-r border-slate-200 p-3 overflow-y-auto">
+        <div class="flex items-center gap-2 pb-2 mb-2 border-b border-slate-200">
+          <div class="w-5 h-5 rounded bg-blue-600 flex items-center justify-center text-white text-xs font-bold">▲</div>
+          <span class="font-bold text-xs text-slate-800">Drive Partagé • Événement 777</span>
+        </div>
+
+        <div class="space-y-1" id="drive-folder-list">
+          <button type="button" class="drive-folder-item w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-blue-700 bg-blue-100/60 border border-blue-300 text-left cursor-pointer transition-all" data-folder="admin">
+            <span>📁</span>
+            <span>01_Administration & Budget</span>
+          </button>
+          
+          <button type="button" class="drive-folder-item w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 text-left cursor-pointer transition-all" data-folder="design">
+            <span>📁</span>
+            <span>02_Design & Identité Visuelle</span>
+          </button>
+
+          <button type="button" class="drive-folder-item w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 text-left cursor-pointer transition-all" data-folder="participants">
+            <span>📁</span>
+            <span>03_Participants & Inscriptions</span>
+          </button>
+
+          <button type="button" class="drive-folder-item w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 text-left cursor-pointer transition-all" data-folder="speakers">
+            <span>📁</span>
+            <span>04_Intervenants & Présentations</span>
+          </button>
+
+          <button type="button" class="drive-folder-item w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 text-left cursor-pointer transition-all" data-folder="reports">
+            <span>📁</span>
+            <span>05_Rapports & Clôture</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Drive File Explorer Content View (7 cols) -->
+      <div class="w-full md:w-7/12 p-4 flex flex-col justify-between bg-white overflow-y-auto" id="drive-file-viewer">
+        <div>
+          <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-200">
+            <span class="text-xs font-bold text-slate-800" id="current-folder-title">
+              📁 Contenu de : 01_Administration & Budget
+            </span>
+            <span class="text-[10px] text-slate-400">3 éléments</span>
+          </div>
+
+          <div class="space-y-2" id="folder-files-container">
+            <!-- Files injected by JS -->
+            <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+              <div class="flex items-center gap-2 font-medium text-slate-800">
+                <span class="text-emerald-600 font-bold">📊</span>
+                <span>2026_09_Budget_Previsionnel_v1.xlsx</span>
+              </div>
+              <span class="text-[10px] text-slate-400">Modifié il y a 2h</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+              <div class="flex items-center gap-2 font-medium text-slate-800">
+                <span class="text-blue-600 font-bold">📄</span>
+                <span>Convention_Partenariat_Signee.pdf</span>
+              </div>
+              <span class="text-[10px] text-slate-400">Hier</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+              <div class="flex items-center gap-2 font-medium text-slate-800">
+                <span class="text-blue-500 font-bold">📝</span>
+                <span>Ordre_du_Jour_Reunion_Cadrage.gdoc</span>
+              </div>
+              <span class="text-[10px] text-slate-400">28 Août</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 p-2 rounded bg-teal-50 border border-teal-200 flex items-center justify-between text-[11px] text-teal-900">
+          <span>💡 <strong>Bonne pratique :</strong> Préfixez toujours les dossiers par un numéro (01, 02) pour garder l'ordre logique.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="relative z-10 flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-200">
+    <span>Un dossier bien rangé fait gagner 30 minutes à chaque membre de l'équipe</span>
+    <button type="button" class="btn-777 btn-777-blue text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>PILIER 03 : CRÉER SANS REFAIRE →</span>
+    </button>
+  </div>
+</section>
+
+<script>
+  // Slide 8 Fake Drive folder navigation
+  const folderData: Record<string, { title: string; files: Array<{ icon: string; name: string; date: string }> }> = {
+    admin: {
+      title: "📁 Contenu de : 01_Administration & Budget",
+      files: [
+        { icon: "📊", name: "2026_09_Budget_Previsionnel_v1.xlsx", date: "Modifié il y a 2h" },
+        { icon: "📄", name: "Convention_Partenariat_Signee.pdf", date: "Hier" },
+        { icon: "📝", name: "Ordre_du_Jour_Reunion_Cadrage.gdoc", date: "28 Août" }
+      ]
+    },
+    design: {
+      title: "📁 Contenu de : 02_Design & Identité Visuelle",
+      files: [
+        { icon: "🎨", name: "777_Master_Logo_Vectoriel.svg", date: "22 Août" },
+        { icon: "🖼️", name: "Banniere_LinkedIn_1200x627.png", date: "24 Août" },
+        { icon: "🎨", name: "Palette_Couleurs_Tokens.pdf", date: "26 Août" }
+      ]
+    },
+    participants: {
+      title: "📁 Contenu de : 03_Participants & Inscriptions",
+      files: [
+        { icon: "📊", name: "Inscriptions_Atelier_Alger_LIVE.gsheet", date: "À l'instant" },
+        { icon: "🪪", name: "Generateur_Badges_Participants.gdoc", date: "Hier" },
+        { icon: "📋", name: "Feuille_Emargement_Matinale.pdf", date: "30 Août" }
+      ]
+    },
+    speakers: {
+      title: "📁 Contenu de : 04_Intervenants & Présentations",
+      files: [
+        { icon: "📽️", name: "Session_01_Productivite_Numerique.gslides", date: "Aujourd'hui" },
+        { icon: "👤", name: "Bio_Photos_HD_Saoudi.zip", date: "27 Août" },
+        { icon: "📝", name: "Questions_Reponses_Public.gdoc", date: "Hier" }
+      ]
+    },
+    reports: {
+      title: "📁 Contenu de : 05_Rapports & Clôture",
+      files: [
+        { icon: "📄", name: "Modele_Rapport_Activite_Final.gdoc", date: "20 Août" },
+        { icon: "📊", name: "Statistiques_Evaluation_Satisfaction.gsheet", date: "29 Août" }
+      ]
+    }
+  };
+
+  const folderBtns = document.querySelectorAll('.drive-folder-item');
+  const folderTitle = document.getElementById('current-folder-title');
+  const filesContainer = document.getElementById('folder-files-container');
+
+  folderBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      folderBtns.forEach(b => {
+        b.classList.remove('text-blue-700', 'bg-blue-100/60', 'border-blue-300', 'font-semibold');
+        b.classList.add('text-slate-700', 'font-medium');
+      });
+      btn.classList.add('text-blue-700', 'bg-blue-100/60', 'border-blue-300', 'font-semibold');
+      btn.classList.remove('text-slate-700', 'font-medium');
+
+      const folderKey = btn.getAttribute('data-folder') || 'admin';
+      const data = folderData[folderKey];
+      if (data && folderTitle && filesContainer) {
+        folderTitle.textContent = data.title;
+        filesContainer.innerHTML = data.files.map(f => `
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+            <div class="flex items-center gap-2 font-medium text-slate-800">
+              <span class="font-bold">${f.icon}</span>
+              <span>${f.name}</span>
+            </div>
+            <span class="text-[10px] text-slate-400">${f.date}</span>
+          </div>
+        `).join('');
+      }
+    });
+  });
+</script>

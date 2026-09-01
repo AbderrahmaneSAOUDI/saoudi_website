@@ -1,0 +1,161 @@
+---
+import SlideHeader from '../_components/SlideHeader.astro';
+---
+
+<section class="deck-slide slide-canvas relative justify-between" data-slide-index="4">
+  <div class="diagonal-bg-accent"></div>
+
+  <SlideHeader category="ANALYSE" topic="Le Syndrome du Fichier Final" theme="canvas" />
+
+  <div class="relative z-10 my-auto max-w-4xl w-full">
+    <div class="mb-4">
+      <span class="text-xs font-bold text-red-600 tracking-wider uppercase bg-red-50 px-2.5 py-1 rounded border border-red-200">
+        Anti-Pattern Classique
+      </span>
+      <h2 class="title-h1 text-slate-900 mt-2">
+        Le Chaos Numérique en 5 Étapes
+      </h2>
+      <p class="text-sm text-slate-600 mt-1">
+        Comment un projet simple devient une crise de gestion de versions :
+      </p>
+    </div>
+
+    <!-- Interactive Stepper Simulator -->
+    <div class="card-777 bg-white p-5 mb-4 border-slate-300">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-3 relative" id="chaos-steps">
+        <!-- Step 1 -->
+        <div class="chaos-step p-3 rounded-lg border-2 border-slate-200 bg-slate-50 transition-all" data-step="1">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] font-bold text-slate-500 uppercase">Étape 1</span>
+            <span class="text-xs">💬</span>
+          </div>
+          <div class="font-bold text-xs text-slate-800">Groupe WhatsApp</div>
+          <p class="text-[11px] text-slate-500 mt-1">« Je viens d'envoyer le doc, regardez ! »</p>
+          <div class="mt-2 text-[10px] bg-white p-1 rounded border border-slate-200 text-slate-600 truncate font-mono">
+            Rapport.docx
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="chaos-step p-3 rounded-lg border-2 border-slate-200 bg-slate-50 opacity-40 transition-all" data-step="2">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] font-bold text-slate-500 uppercase">Étape 2</span>
+            <span class="text-xs">💾</span>
+          </div>
+          <div class="font-bold text-xs text-slate-800">Téléchargement</div>
+          <p class="text-[11px] text-slate-500 mt-1">Chaque membre télécharge en local sur son PC.</p>
+          <div class="mt-2 text-[10px] bg-white p-1 rounded border border-slate-200 text-slate-600 truncate font-mono">
+            Rapport (1).docx
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="chaos-step p-3 rounded-lg border-2 border-slate-200 bg-slate-50 opacity-40 transition-all" data-step="3">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] font-bold text-slate-500 uppercase">Étape 3</span>
+            <span class="text-xs">✏️</span>
+          </div>
+          <div class="font-bold text-xs text-slate-800">Modifs Isolées</div>
+          <p class="text-[11px] text-slate-500 mt-1">3 personnes modifient des sections en même temps.</p>
+          <div class="mt-2 text-[10px] bg-white p-1 rounded border border-slate-200 text-slate-600 truncate font-mono">
+            Rapport_modifie_AS.docx
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="chaos-step p-3 rounded-lg border-2 border-slate-200 bg-slate-50 opacity-40 transition-all" data-step="4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] font-bold text-slate-500 uppercase">Étape 4</span>
+            <span class="text-xs">⚠️</span>
+          </div>
+          <div class="font-bold text-xs text-slate-800">Conflit de Versions</div>
+          <p class="text-[11px] text-slate-500 mt-1">Qui fusionne les 3 fichiers ? Qui a la vraie vérité ?</p>
+          <div class="mt-2 text-[10px] bg-red-50 p-1 rounded border border-red-200 text-red-700 truncate font-mono font-bold">
+            Rapport_FINAL_v2_ok.docx
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="chaos-step p-3 rounded-lg border-2 border-red-300 bg-red-50/50 opacity-40 transition-all" data-step="5">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] font-bold text-red-600 uppercase">Étape 5</span>
+            <span class="text-xs">🚨</span>
+          </div>
+          <div class="font-bold text-xs text-red-900">Le Message Fatal</div>
+          <p class="text-[11px] text-red-700 mt-1">« Quelqu'un peut me renvoyer la dernière version ? »</p>
+          <div class="mt-2 text-[10px] bg-red-100 p-1 rounded border border-red-300 text-red-900 truncate font-mono font-bold">
+            Rapport_VRAIMENT_FINAL.docx
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls for Step Animation -->
+      <div class="flex items-center justify-between mt-4 pt-3 border-t border-slate-200">
+        <button type="button" id="play-chaos-btn" class="btn-777 btn-777-outline text-xs px-3 py-1.5 cursor-pointer">
+          <span id="play-chaos-label">▶ Lancer la simulation</span>
+        </button>
+        <div class="text-sm font-bold text-slate-800" id="chaos-status">
+          Ça vous rappelle quelque chose ?
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="relative z-10 flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-200">
+    <span>Le problème n'est pas le document, c'est l'absence de système</span>
+    <button type="button" class="btn-777 btn-777-blue text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>DÉCOUVRIR LE DÉCLIC →</span>
+    </button>
+  </div>
+</section>
+
+<script>
+  // Slide 4 Chaos Animator
+  let currentStep = 1;
+  const maxSteps = 5;
+  const chaosSteps = document.querySelectorAll('.chaos-step');
+  const playBtn = document.getElementById('play-chaos-btn');
+  const playLabel = document.getElementById('play-chaos-label');
+  let intervalId: any = null;
+
+  function setStep(step: number) {
+    chaosSteps.forEach(el => {
+      const s = parseInt(el.getAttribute('data-step') || '1', 10);
+      if (s <= step) {
+        el.classList.remove('opacity-40');
+        el.classList.add('border-blue-600', 'bg-blue-50/20');
+        if (s === 5) {
+          el.classList.remove('border-blue-600', 'bg-blue-50/20');
+          el.classList.add('border-red-500', 'bg-red-50');
+        }
+      } else {
+        el.classList.add('opacity-40');
+        el.classList.remove('border-blue-600', 'bg-blue-50/20', 'border-red-500', 'bg-red-50');
+      }
+    });
+  }
+
+  playBtn?.addEventListener('click', () => {
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+      if (playLabel) playLabel.textContent = '▶ Recommencer';
+      return;
+    }
+
+    currentStep = 1;
+    setStep(1);
+    if (playLabel) playLabel.textContent = '⏸ Pause';
+
+    intervalId = setInterval(() => {
+      currentStep++;
+      if (currentStep > maxSteps) {
+        clearInterval(intervalId);
+        intervalId = null;
+        if (playLabel) playLabel.textContent = '🔄 Rejouer';
+      } else {
+        setStep(currentStep);
+      }
+    }, 750);
+  });
+</script>
