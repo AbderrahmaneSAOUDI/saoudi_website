@@ -3,163 +3,165 @@ import SlideHeader from '../_components/SlideHeader.astro';
 ---
 
 <section class="deck-slide justify-between relative overflow-hidden" data-slide-index="9">
-  <div class="light-brand-accent-2"></div>
+  <div class="m3-glow-green"></div>
 
-  <SlideHeader category="Pilier 03" topic="CREATE : Modèles Réutilisables & Composants Intelligents" />
+  <SlideHeader category="Pilier 01" topic="CAPTURE : De l'Information Brute à la Donnée Structurée" />
 
   <div class="my-auto max-w-5xl w-full relative z-10">
-    <div class="flex items-center justify-between mb-2.5">
+    <div class="flex items-center justify-between mb-3">
       <div>
-        <span class="text-xs font-bold text-[#006233] tracking-wider uppercase bg-[#E6F4EA] px-2.5 py-1 rounded border border-[#006233]/20">
-          Google Docs / Sheets / Slides
+        <span class="text-xs font-bold text-[#81C784] tracking-wider uppercase bg-[#81C784]/10 px-2.5 py-1 rounded-md border border-[#81C784]/30">
+          Google Forms ➔ Google Sheets
         </span>
-        <h2 class="title-h1 text-slate-900 mt-1 font-cairo">
-          « Créer une fois. Améliorer continuellement. »
+        <h2 class="title-h1 text-white mt-1">
+          Ne demandez plus « Envoyez vos noms par message »
         </h2>
       </div>
-      <!-- Template Selector Tabs -->
-      <div class="flex items-center gap-1.5 p-1 bg-slate-50 rounded-lg border border-slate-200" id="doc-template-tabs">
-        <button type="button" class="tab-btn text-xs px-2.5 py-1 rounded-md font-bold text-[#006233] bg-[#E6F4EA] border border-[#006233]/30 cursor-pointer" data-doc="report">
-          📄 Rapport Type
-        </button>
-        <button type="button" class="tab-btn text-xs px-2.5 py-1 rounded-md font-medium text-slate-600 hover:bg-slate-100 cursor-pointer" data-doc="budget">
-          📊 Budget Auto
-        </button>
-        <button type="button" class="tab-btn text-xs px-2.5 py-1 rounded-md font-medium text-slate-600 hover:bg-slate-100 cursor-pointer" data-doc="roadmap">
-          🎯 Plan d'Action
-        </button>
+      <div class="hidden sm:block text-right">
+        <span class="text-xs font-bold text-[#81C784] bg-[#81C784]/10 px-3 py-1 rounded-full border border-[#81C784]/30">
+          ⚡ Synchronisation Directe 100% Automatique
+        </span>
       </div>
     </div>
 
-    <!-- Interactive Mock Editor Canvas -->
-    <div class="card-777 p-3.5 border-slate-200">
-      <!-- Editor Toolbar -->
-      <div class="flex flex-wrap items-center justify-between pb-2 mb-2.5 border-b border-slate-100 gap-2">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-bold text-slate-800 font-cairo" id="doc-title-display">Rapport_Synthese_Projet_7.77</span>
-          <span class="text-[9px] bg-[#E6F4EA] text-[#006233] px-1.5 py-0.5 rounded border border-[#006233]/30 font-semibold">Sauvegardé sur Drive</span>
-        </div>
-        
-        <!-- Smart Chips toolbar -->
-        <div class="flex items-center gap-1.5 text-xs">
-          <span class="text-[10px] text-slate-400">Puces :</span>
-          <span class="px-2 py-0.5 rounded-full bg-[#E8F5FD] text-[#0080C8] border border-[#0080C8]/20 text-[9px] font-semibold">@Date: Aujourd'hui</span>
-          <span class="px-2 py-0.5 rounded-full bg-[#E6F4EA] text-[#006233] border border-[#006233]/20 text-[9px] font-semibold">@Lead: Saoudi</span>
-          <span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[9px] font-semibold">@Statut: Validé</span>
-        </div>
-      </div>
-
-      <!-- Editor Body Content -->
-      <div id="doc-content-area" class="min-h-[120px] p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs font-sans leading-relaxed text-slate-800">
-        <div class="font-bold text-xs text-slate-900 mb-1 font-cairo">1. Contexte & Objectifs du Programme 7.77</div>
-        <p class="text-slate-600 mb-2 text-[11px]">
-          L'initiative nationale vise le développement des compétences numériques clés auprès de la jeunesse algérienne, en se focalisant sur l'autonomie technologique et la maîtrise des flux de travail modernes.
-        </p>
-        <div class="p-2 rounded bg-white border border-slate-200 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-[#006233]"></span>
-            <span class="font-semibold text-slate-700 text-xs">Livrable 01 : Guide Pratique Workspace</span>
+    <!-- Live Interactive Demo Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5 my-2">
+      <!-- Mini Mock Form (5 cols) -->
+      <div class="md:col-span-5 card-m3 bg-surface-container p-3.5 border-white/10">
+        <div class="flex items-center gap-2 pb-2 mb-2.5 border-b border-white/10">
+          <div class="w-5 h-5 rounded bg-purple-600 text-white flex items-center justify-center font-bold text-[10px]">F</div>
+          <div>
+            <h4 class="font-bold text-xs text-white leading-tight">Formulaire Inscription 7.77</h4>
+            <span class="text-[10px] text-white/40">Atelier Numérique Wilayas</span>
           </div>
-          <span class="text-[10px] text-slate-500 font-mono">Échéance : 15 Septembre</span>
+        </div>
+
+        <form id="capture-mock-form" class="space-y-2">
+          <div>
+            <label class="block text-[10px] font-semibold text-white/70 mb-0.5">Nom & Prénom</label>
+            <input type="text" id="cap-name" value="Amina Benali" required class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-white/15 focus:border-[#8AB4F8] focus:outline-none bg-surface text-white" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] font-semibold text-white/70 mb-0.5">Wilaya</label>
+              <select id="cap-wilaya" class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-white/15 focus:border-[#8AB4F8] focus:outline-none bg-surface text-white">
+                <option value="16 - Alger">16 - Alger</option>
+                <option value="31 - Oran">31 - Oran</option>
+                <option value="25 - Constantine">25 - Constantine</option>
+                <option value="09 - Blida">09 - Blida</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold text-white/70 mb-0.5">Domaine</label>
+              <select id="cap-domain" class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-white/15 focus:border-[#8AB4F8] focus:outline-none bg-surface text-white">
+                <option value="Dev Web">Dev Web</option>
+                <option value="Data & IA">Data & IA</option>
+                <option value="Design UX">Design UX</option>
+                <option value="Management">Management</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full btn-m3 btn-m3-green text-xs py-1.5 mt-1.5 cursor-pointer">
+            <span>SOUMETTRE L'INSCRIPTION →</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Arrow Indicator (1 col) -->
+      <div class="hidden md:flex md:col-span-1 items-center justify-center">
+        <div class="w-7 h-7 rounded-full bg-surface-container-high text-[#8AB4F8] flex items-center justify-center font-bold text-xs border border-white/10">
+          ➔
         </div>
       </div>
 
-      <!-- Footer Principles -->
-      <div class="grid grid-cols-3 gap-2 mt-2.5 pt-2 border-t border-slate-100 text-[10px]">
-        <div class="flex items-center gap-1 text-slate-600">
-          <span class="text-[#006233] font-bold">1.</span>
-          <span>Ne démarrez jamais d'une page blanche.</span>
+      <!-- Live Mock Sheet (6 cols) -->
+      <div class="md:col-span-6 card-m3 bg-surface-container p-3.5 border-white/10 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-2 mb-2 border-b border-white/10">
+            <div class="flex items-center gap-2">
+              <div class="w-5 h-5 rounded bg-[#81C784] text-slate-900 flex items-center justify-center font-bold text-[10px]">S</div>
+              <div>
+                <h4 class="font-bold text-xs text-white leading-tight">Inscriptions_7.77 (Réponses)</h4>
+                <span class="text-[10px] text-[#81C784] font-semibold">● Connecté en direct</span>
+              </div>
+            </div>
+            <span class="text-[10px] bg-surface-container-high text-white/60 px-2 py-0.5 rounded font-mono border border-white/10">Google Sheets</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-[10px] text-left border-collapse" id="mock-sheets-table">
+              <thead>
+                <tr class="bg-surface-container-high text-white/70 border-b border-white/10 font-bold">
+                  <th class="p-1">Horodatage</th>
+                  <th class="p-1">Nom</th>
+                  <th class="p-1">Wilaya</th>
+                  <th class="p-1">Domaine</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/5 font-mono text-[10px]">
+                <tr class="text-white/80">
+                  <td class="p-1 text-white/40">10:14:02</td>
+                  <td class="p-1 font-sans font-medium text-white">Karim Meziane</td>
+                  <td class="p-1">16 - Alger</td>
+                  <td class="p-1 text-[#8AB4F8] font-semibold">Data & IA</td>
+                </tr>
+                <tr class="text-white/80">
+                  <td class="p-1 text-white/40">10:18:45</td>
+                  <td class="p-1 font-sans font-medium text-white">Sara Dahmani</td>
+                  <td class="p-1">31 - Oran</td>
+                  <td class="p-1 text-purple-300 font-semibold">Design UX</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="flex items-center gap-1 text-slate-600">
-          <span class="text-[#0080C8] font-bold">2.</span>
-          <span>Utilisez des styles de titres structurés.</span>
-        </div>
-        <div class="flex items-center gap-1 text-slate-600">
-          <span class="text-[#D21034] font-bold">3.</span>
-          <span>Intégrez des puces `@` pour lier vos fichiers.</span>
+
+        <div class="mt-2.5 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-white/50">
+          <span>0 saisie manuelle, 100% exploitable</span>
+          <span class="font-semibold text-[#81C784]">Filtres & TCD prêts</span>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-100 relative z-10">
-    <span>Un document standardisé garantit une image professionnelle instantanée</span>
-    <button type="button" class="btn-777 btn-777-green text-xs px-4 py-2 cursor-pointer" data-deck-next>
-      <span>PILIER 4 : COLLABORATION TEMPS RÉEL →</span>
+  <div class="flex items-center justify-between text-xs text-white/50 pt-3 border-t border-white/10 relative z-10">
+    <span>Règle d'or : Ne traitez jamais manuellement ce qu'un formulaire peut structurer</span>
+    <button type="button" class="btn-m3 btn-m3-green text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>PILIER 2 : ORGANISATION DRIVE →</span>
     </button>
   </div>
 </section>
 
 <script>
-  const docData: Record<string, { title: string; html: string }> = {
-    report: {
-      title: "Rapport_Synthese_Projet_7.77",
-      html: `
-        <div class="font-bold text-xs text-slate-900 mb-1 font-cairo">1. Contexte & Objectifs du Programme 7.77</div>
-        <p class="text-slate-600 mb-2 text-[11px]">
-          L'initiative nationale vise le développement des compétences numériques clés auprès de la jeunesse algérienne, en se focalisant sur l'autonomie technologique et la maîtrise des flux de travail modernes.
-        </p>
-        <div class="p-2 rounded bg-white border border-slate-200 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-[#006233]"></span>
-            <span class="font-semibold text-slate-700 text-xs">Livrable 01 : Guide Pratique Workspace</span>
-          </div>
-          <span class="text-[10px] text-slate-500 font-mono">Échéance : 15 Septembre</span>
-        </div>
-      `
-    },
-    budget: {
-      title: "Budget_Previsionnel_Automatise_7.77",
-      html: `
-        <div class="font-bold text-xs text-slate-900 mb-1 font-cairo">Tableau des Dépenses & Formules Automatiques</div>
-        <div class="grid grid-cols-4 gap-2 text-[10px] font-mono mb-2 bg-white p-2 rounded border border-slate-200">
-          <div class="font-bold text-slate-700">Poste : Logistique</div>
-          <div>Quantité : 4</div>
-          <div>Prix U : 15 000 DZD</div>
-          <div class="font-bold text-[#006233]">=TOTAL: 60 000 DZD</div>
-        </div>
-        <p class="text-slate-500 text-[10px]">
-          ✓ Totaux calculés par formule =SUM(), 0 risque d'erreur manuelle.
-        </p>
-      `
-    },
-    roadmap: {
-      title: "Plan_Action_Hebdomadaire_Equipe",
-      html: `
-        <div class="font-bold text-xs text-slate-900 mb-1 font-cairo">🎯 Jalons Critiques du Projet</div>
-        <ul class="space-y-1 text-slate-700 text-[11px]">
-          <li class="flex items-center justify-between p-1.5 bg-white rounded border border-slate-200">
-            <span>✅ Semaine 1 : Clôture des inscriptions (Forms)</span>
-            <span class="text-[9px] bg-[#E6F4EA] text-[#006233] px-1.5 py-0.5 rounded font-bold">Terminé</span>
-          </li>
-          <li class="flex items-center justify-between p-1.5 bg-white rounded border border-slate-200">
-            <span>⏳ Semaine 2 : Déploiement des ateliers & support</span>
-            <span class="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold">En Cours</span>
-          </li>
-        </ul>
-      `
-    }
-  };
+  const form = document.getElementById('capture-mock-form') as HTMLFormElement;
+  const tableBody = document.querySelector('#mock-sheets-table tbody');
 
-  const tabs = document.querySelectorAll('#doc-template-tabs .tab-btn');
-  const titleDisplay = document.getElementById('doc-title-display');
-  const contentArea = document.getElementById('doc-content-area');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nameInput = document.getElementById('cap-name') as HTMLInputElement;
+    const wilayaInput = document.getElementById('cap-wilaya') as HTMLSelectElement;
+    const domainInput = document.getElementById('cap-domain') as HTMLSelectElement;
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => {
-        t.classList.remove('font-bold', 'text-[#006233]', 'bg-[#E6F4EA]', 'border-[#006233]/30');
-        t.classList.add('font-medium', 'text-slate-600');
-      });
-      tab.classList.add('font-bold', 'text-[#006233]', 'bg-[#E6F4EA]', 'border-[#006233]/30');
-      tab.classList.remove('font-medium', 'text-slate-600');
+    if (!nameInput || !tableBody) return;
 
-      const key = tab.getAttribute('data-doc') || 'report';
-      const item = docData[key];
-      if (item && titleDisplay && contentArea) {
-        titleDisplay.textContent = item.title;
-        contentArea.innerHTML = item.html;
-      }
-    });
+    const now = new Date();
+    const timeStr = now.toTimeString().split(' ')[0];
+
+    const tr = document.createElement('tr');
+    tr.className = 'bg-[#81C784]/15 text-white font-bold transition-all';
+    tr.innerHTML = `
+      <td class="p-1 text-[#81C784]">${timeStr}</td>
+      <td class="p-1 font-sans">${nameInput.value}</td>
+      <td class="p-1">${wilayaInput.value}</td>
+      <td class="p-1 text-[#8AB4F8] font-semibold">${domainInput.value}</td>
+    `;
+
+    tableBody.prepend(tr);
+
+    const sampleNames = ['Yacine Kaci', 'Meriem Bouzid', 'Reda Zerrouki', 'Samia Tlemcani'];
+    const randomName = sampleNames[Math.floor(Math.random() * sampleNames.length)];
+    nameInput.value = randomName;
   });
 </script>

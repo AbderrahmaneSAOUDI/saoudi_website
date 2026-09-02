@@ -3,41 +3,63 @@ import SlideHeader from '../_components/SlideHeader.astro';
 ---
 
 <section class="deck-slide justify-between relative overflow-hidden" data-slide-index="2">
-  <div class="light-brand-accent-1"></div>
+  <div class="m3-glow-blue"></div>
 
-  <SlideHeader category="Introduction" topic="Welcome & Vision" />
+  <SlideHeader category="Speaker Profile" topic="Speaker's Bio and Contact" />
 
-  <div class="my-auto text-center max-w-4xl mx-auto space-y-4 relative z-10">
-    <div class="w-16 h-16 mx-auto rounded-2xl bg-[#E6F4EA] border border-[#006233]/20 flex items-center justify-center text-2xl font-black text-[#006233] font-mono">
-      7.77
+  <!-- Body -->
+  <div class="grid grid-cols-12 gap-8 my-auto items-center relative z-10">
+    <!-- Profile Card -->
+    <div class="col-span-12 md:col-span-4 card-m3 bg-surface-container text-center space-y-4">
+      <div class="w-28 h-28 mx-auto rounded-full bg-gradient-to-tr from-[#8AB4F8] to-[#81C784] p-0.5">
+        <div class="w-full h-full rounded-full bg-surface-container-high flex items-center justify-center text-3xl font-extrabold text-white">
+          AS
+        </div>
+      </div>
+      <div>
+        <h3 class="text-xl font-bold text-white font-sans">Abderrahmane SAOUDI</h3>
+        <p class="text-xs text-[#8AB4F8] font-semibold mt-1">Software Engineer & Technology Lead</p>
+      </div>
+      <div class="text-xs text-white/60 leading-relaxed border-t border-white/10 pt-3">
+        Passionné par l'architecture logicielle, la modélisation de workflows numériques et la formation pratique des développeurs.
+      </div>
     </div>
-    <h2 class="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight font-cairo">
-      Bienvenue au Programme 7.77
-    </h2>
-    <p class="text-lg text-slate-600 leading-relaxed font-normal max-w-2xl mx-auto">
-      « Renforcer les compétences numériques nationales à travers des ateliers pratiques, accessibles et orientés vers l'action pour les jeunes de 24 à 30 ans. »
-    </p>
+
+    <!-- Experience & Contact Info -->
+    <div class="col-span-12 md:col-span-8 space-y-4">
+      <div class="space-y-2">
+        <h2 class="text-2xl font-bold text-white font-sans">À propos du Speaker</h2>
+        <p class="text-white/70 leading-relaxed text-sm font-normal">
+          Spécialisé dans le développement d'applications web modernes, les architectures cloud et la structuration des processus de travail collaboratifs.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 pt-2">
+        <div class="card-m3 p-3.5 bg-surface-container">
+          <span class="text-[10px] text-white/40 font-bold block uppercase tracking-wider">Domaines Clés</span>
+          <p class="text-white font-semibold mt-1 text-xs">Cloud, Systèmes Web & Automatisation</p>
+        </div>
+        <div class="card-m3 p-3.5 bg-surface-container">
+          <span class="text-[10px] text-white/40 font-bold block uppercase tracking-wider">Site Web & Portfolio</span>
+          <p class="text-[#8AB4F8] font-semibold mt-1 text-xs font-mono">saoudi.online</p>
+        </div>
+        <div class="card-m3 p-3.5 bg-surface-container">
+          <span class="text-[10px] text-white/40 font-bold block uppercase tracking-wider">Programme National</span>
+          <p class="text-white font-semibold mt-1 text-xs">7.77 Digital Skills Initiative</p>
+        </div>
+        <div class="card-m3 p-3.5 bg-surface-container">
+          <span class="text-[10px] text-white/40 font-bold block uppercase tracking-wider">Contact Direct</span>
+          <p class="text-[#81C784] font-semibold mt-1 text-xs font-mono">saoudi26@gmail.com</p>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-100 text-center relative z-10">
-    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
-      <div class="text-[#006233] text-xl font-black font-cairo">01. Inclusif</div>
-      <p class="text-xs text-slate-500 font-medium">Accessible à tous les profils, des étudiants aux jeunes professionnels.</p>
-    </div>
-    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
-      <div class="text-[#D21034] text-xl font-black font-cairo">02. Pratique</div>
-      <p class="text-xs text-slate-500 font-medium">Workflows réels, manipulations en direct et zéro théorie inutile.</p>
-    </div>
-    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
-      <div class="text-[#0080C8] text-xl font-black font-cairo">03. Impact Direct</div>
-      <p class="text-xs text-slate-500 font-medium">Des méthodes applicables dès demain matin dans vos projets.</p>
-    </div>
-  </div>
-
-  <div class="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-100 relative z-10">
-    <span>Ministère de la Poste et des Télécommunications • Algérie Télécom • Mobilis</span>
-    <button type="button" class="btn-777 btn-777-green text-xs px-4 py-2 cursor-pointer" data-deck-next>
-      <span>LE CONSTAT DES OUTILS →</span>
+  <!-- Footer -->
+  <div class="flex justify-between items-center text-xs text-white/50 pt-3 border-t border-white/10 relative z-10">
+    <span>saoudi.online • Speaker & Developer Portfolio</span>
+    <button type="button" class="btn-m3 btn-m3-blue text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>WELCOME EVERYONE →</span>
     </button>
   </div>
 </section>

@@ -3,139 +3,107 @@ import SlideHeader from '../_components/SlideHeader.astro';
 ---
 
 <section class="deck-slide justify-between relative overflow-hidden" data-slide-index="14">
-  <div class="light-brand-accent-1"></div>
+  <div class="m3-glow-blue"></div>
 
-  <SlideHeader category="Atelier Interactif" topic="Défi : Concevoir le Workflow Idéal" />
+  <SlideHeader category="Pilier 06" topic="AUTOMATE : Google Apps Script & Déclencheurs" />
 
   <div class="my-auto max-w-5xl w-full relative z-10">
-    <div class="flex items-center justify-between mb-2.5">
+    <div class="flex items-center justify-between mb-3">
       <div>
-        <span class="text-xs font-bold text-[#006233] tracking-wider uppercase bg-[#E6F4EA] px-2.5 py-1 rounded border border-[#006233]/20">
-          Scénario Réel 7.77
+        <span class="text-xs font-bold text-[#FDD663] tracking-wider uppercase bg-[#FDD663]/10 px-2.5 py-1 rounded-md border border-[#FDD663]/30">
+          Éliminer la Répétition
         </span>
-        <h2 class="title-h1 text-slate-900 mt-1 font-cairo">
-          « Organiser un atelier pour 30 participants en 7 jours. »
+        <h2 class="title-h1 text-white mt-1">
+          « Si vous le faites plus de 3 fois, automatisez-le. »
         </h2>
       </div>
-      <button type="button" id="eval-workflow-btn" class="btn-777 btn-777-green text-xs px-3.5 py-2 cursor-pointer">
-        <span>⚡ ÉVALUER MON WORKFLOW</span>
+      <button type="button" id="trigger-auto-btn" class="btn-m3 btn-m3-yellow text-xs px-3.5 py-2 cursor-pointer">
+        <span>⚡ SIMULER L'AUTOMATISATION</span>
       </button>
     </div>
 
-    <!-- 4 Step Interactive Selector -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 my-2.5" id="challenge-options-grid">
-      <div class="card-777 p-2.5 border-slate-200">
-        <span class="text-[9px] font-bold text-[#006233] uppercase">1. Inscriptions</span>
-        <div class="mt-1.5 space-y-1">
-          <label class="flex items-center gap-1.5 text-xs p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <input type="radio" name="ch-inscriptions" value="good" checked class="accent-[#006233]" />
-            <span class="font-medium text-slate-800 text-[11px]">Forms ➔ Sheets</span>
-          </label>
-          <label class="flex items-center gap-1.5 text-xs p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <input type="radio" name="ch-inscriptions" value="bad" class="accent-[#006233]" />
-            <span class="text-slate-600 text-[11px]">Messages WhatsApp</span>
-          </label>
+    <!-- Pipeline Flowchart -->
+    <div class="card-m3 p-3.5 border-white/10 bg-surface-container mb-3">
+      <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 text-center text-xs" id="auto-pipeline">
+        <!-- Node 1 -->
+        <div class="auto-node p-2.5 rounded-xl bg-surface border border-white/10 transition-all" id="node-1">
+          <div class="text-[9px] font-bold text-white/40 uppercase">1. Entrée</div>
+          <div class="font-bold text-white text-xs mt-0.5">Google Forms</div>
+          <div class="text-[10px] text-white/50 mt-0.5">Nouvelle réponse</div>
+        </div>
+
+        <!-- Node 2 -->
+        <div class="auto-node p-2.5 rounded-xl bg-surface border border-white/10 transition-all" id="node-2">
+          <div class="text-[9px] font-bold text-white/40 uppercase">2. Données</div>
+          <div class="font-bold text-[#81C784] text-xs mt-0.5">Google Sheets</div>
+          <div class="text-[10px] text-white/50 mt-0.5">Ligne insérée</div>
+        </div>
+
+        <!-- Node 3 -->
+        <div class="auto-node p-2.5 rounded-xl bg-surface border border-white/10 transition-all" id="node-3">
+          <div class="text-[9px] font-bold text-white/40 uppercase">3. Déclencheur</div>
+          <div class="font-bold text-[#FDD663] text-xs mt-0.5">Apps Script</div>
+          <div class="text-[10px] text-white/50 mt-0.5">onFormSubmit()</div>
+        </div>
+
+        <!-- Node 4 -->
+        <div class="auto-node p-2.5 rounded-xl bg-surface border border-white/10 transition-all" id="node-4">
+          <div class="text-[9px] font-bold text-white/40 uppercase">4. Action 1</div>
+          <div class="font-bold text-[#8AB4F8] text-xs mt-0.5">Gmail API</div>
+          <div class="text-[10px] text-white/50 mt-0.5">Email confirmation</div>
+        </div>
+
+        <!-- Node 5 -->
+        <div class="auto-node p-2.5 rounded-xl bg-surface border border-white/10 transition-all" id="node-5">
+          <div class="text-[9px] font-bold text-white/40 uppercase">5. Action 2</div>
+          <div class="font-bold text-[#81C784] text-xs mt-0.5">Google Drive</div>
+          <div class="text-[10px] text-white/50 mt-0.5">Dossier créé</div>
         </div>
       </div>
 
-      <div class="card-777 p-2.5 border-slate-200">
-        <span class="text-[9px] font-bold text-[#0080C8] uppercase">2. Fichiers & Visuels</span>
-        <div class="mt-1.5 space-y-1">
-          <label class="flex items-center gap-1.5 text-xs p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <input type="radio" name="ch-files" value="good" checked class="accent-[#0080C8]" />
-            <span class="font-medium text-slate-800 text-[11px]">Drive Partagé (01_)</span>
-          </label>
-          <label class="flex items-center gap-1.5 text-xs p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <input type="radio" name="ch-files" value="bad" class="accent-[#0080C8]" />
-            <span class="text-slate-600 text-[11px]">Clé USB & Telegram</span>
-          </label>
-        </div>
+      <!-- Code Snippet Preview -->
+      <div class="mt-2.5 p-2.5 rounded-lg bg-surface border border-white/10 font-mono text-[10px] text-white/80 overflow-x-auto">
+        <span class="text-purple-400">function</span> <span class="text-[#8AB4F8]">onFormSubmit</span>(e) &#123;<br />
+        &nbsp;&nbsp;<span class="text-white/40">// Récupération des données du participant 7.77</span><br />
+        &nbsp;&nbsp;<span class="text-purple-400">const</span> candidateEmail = e.namedValues[<span class="text-[#FDD663]">'Email'</span>][0];<br />
+        &nbsp;&nbsp;<span class="text-white/40">// Envoi automatique de la confirmation personnalisée</span><br />
+        &nbsp;&nbsp;GmailApp.<span class="text-[#81C784]">sendEmail</span>(candidateEmail, <span class="text-[#FDD663]">'Confirmation Atelier 7.77'</span>, <span class="text-[#FDD663]">'Bienvenue !'</span>);<br />
+        &#125;
       </div>
-
-      <div class="card-777 p-2.5 border-slate-200">
-        <span class="text-[9px] font-bold text-purple-700 uppercase">3. Guide d'Atelier</span>
-        <div class="mt-1.5 space-y-1">
-          <label class="flex items-center gap-1.5 text-xs p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <input type="radio" name="ch-docs" value="good" checked class="accent-purple-600" />
-            <span class="font-medium text-slate-800 text-[11px]">Docs en direct + @</span>
-          </label>
-          <label class="flex items-center gap-1.5 text-xs p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <input type="radio" name="ch-docs" value="bad" class="accent-purple-600" />
-            <span class="text-slate-600 text-[11px]">Word par email</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="card-777 p-2.5 border-slate-200">
-        <span class="text-[9px] font-bold text-[#D21034] uppercase">4. Convocations</span>
-        <div class="mt-1.5 space-y-1">
-          <label class="flex items-center gap-1.5 text-xs p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <input type="radio" name="ch-auto" value="good" checked class="accent-[#D21034]" />
-            <span class="font-medium text-slate-800 text-[11px]">Apps Script auto</span>
-          </label>
-          <label class="flex items-center gap-1.5 text-xs p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
-            <input type="radio" name="ch-auto" value="bad" class="accent-[#D21034]" />
-            <span class="text-slate-600 text-[11px]">30 emails à la main</span>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- Live Diagnosis Result Panel -->
-    <div id="challenge-eval-result" class="p-3 rounded-xl bg-white border-2 border-[#006233] flex items-center justify-between">
-      <div class="flex items-center gap-2.5">
-        <div class="w-7 h-7 rounded-full bg-[#E6F4EA] text-[#006233] flex items-center justify-center font-bold text-xs" id="eval-icon">
-          ✓
-        </div>
-        <div>
-          <h4 class="font-bold text-xs text-slate-900 font-cairo" id="eval-title">Score de Fluidité : 100% — Système Optimal !</h4>
-          <p class="text-[10px] text-slate-600" id="eval-desc">
-            Votre équipe économisera au moins 14 heures de travail répétitif et évitera toute confusion.
-          </p>
-        </div>
-      </div>
-      <span class="text-[10px] font-mono font-bold text-[#006233] bg-[#E6F4EA] px-2.5 py-1 rounded border border-[#006233]/30" id="eval-badge">
-        ZÉRO FRICTION
-      </span>
     </div>
   </div>
 
-  <div class="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-100 relative z-10">
-    <span>L'organisation rigoureuse transforme n'importe quel défi en succès</span>
-    <button type="button" class="btn-777 btn-777-green text-xs px-4 py-2 cursor-pointer" data-deck-next>
-      <span>PLAN D'ACTION PRATIQUE →</span>
+  <div class="flex items-center justify-between text-xs text-white/50 pt-3 border-t border-white/10 relative z-10">
+    <span>Votre temps a trop de valeur pour copier-coller des emails manuellement</span>
+    <button type="button" class="btn-m3 btn-m3-green text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>AU-DELÀ DE GOOGLE : L'ÉCOSYSTÈME →</span>
     </button>
   </div>
 </section>
 
 <script>
-  const evalBtn = document.getElementById('eval-workflow-btn');
-  const resultBox = document.getElementById('challenge-eval-result');
-  const evalTitle = document.getElementById('eval-title');
-  const evalDesc = document.getElementById('eval-desc');
-  const evalBadge = document.getElementById('eval-badge');
-  const evalIcon = document.getElementById('eval-icon');
+  const triggerBtn = document.getElementById('trigger-auto-btn');
+  const nodes = [
+    document.getElementById('node-1'),
+    document.getElementById('node-2'),
+    document.getElementById('node-3'),
+    document.getElementById('node-4'),
+    document.getElementById('node-5')
+  ];
 
-  evalBtn?.addEventListener('click', () => {
-    const radios = document.querySelectorAll('#challenge-options-grid input[type="radio"]:checked');
-    let badCount = 0;
-    radios.forEach((r: any) => {
-      if (r.value === 'bad') badCount++;
+  triggerBtn?.addEventListener('click', () => {
+    nodes.forEach(n => n?.classList.remove('border-[#81C784]', 'bg-[#81C784]/15', 'border-[#8AB4F8]', 'bg-[#8AB4F8]/15'));
+
+    nodes.forEach((node, idx) => {
+      setTimeout(() => {
+        if (node) {
+          node.classList.add('border-[#8AB4F8]', 'bg-[#8AB4F8]/15');
+          setTimeout(() => {
+            node.classList.remove('bg-[#8AB4F8]/15');
+            node.classList.add('bg-[#81C784]/15', 'border-[#81C784]');
+          }, 350);
+        }
+      }, idx * 250);
     });
-
-    if (badCount === 0) {
-      if (resultBox) resultBox.className = 'p-3 rounded-xl bg-white border-2 border-[#006233] flex items-center justify-between';
-      if (evalIcon) { evalIcon.textContent = '✓'; evalIcon.className = 'w-7 h-7 rounded-full bg-[#E6F4EA] text-[#006233] flex items-center justify-center font-bold text-xs'; }
-      if (evalTitle) evalTitle.textContent = 'Score de Fluidité : 100% — Système Parfait !';
-      if (evalDesc) evalDesc.textContent = 'Votre équipe économisera au moins 14 heures de travail répétitif et évitera toute confusion.';
-      if (evalBadge) { evalBadge.textContent = 'ZÉRO FRICTION'; evalBadge.className = 'text-[10px] font-mono font-bold text-[#006233] bg-[#E6F4EA] px-2.5 py-1 rounded border border-[#006233]/30'; }
-    } else {
-      const score = Math.round(((4 - badCount) / 4) * 100);
-      if (resultBox) resultBox.className = 'p-3 rounded-xl bg-white border-2 border-[#D21034] flex items-center justify-between';
-      if (evalIcon) { evalIcon.textContent = '⚠️'; evalIcon.className = 'w-7 h-7 rounded-full bg-[#FDECEF] text-[#D21034] flex items-center justify-center font-bold text-xs'; }
-      if (evalTitle) evalTitle.textContent = `Score de Fluidité : ${score}% — Risque de Goulots !`;
-      if (evalDesc) evalDesc.textContent = `Vous avez ${badCount} point(s) de friction manuel(s) qui risquent de créer des retards.`;
-      if (evalBadge) { evalBadge.textContent = 'RISQUE DE RETARD'; evalBadge.className = 'text-[10px] font-mono font-bold text-[#D21034] bg-[#FDECEF] px-2.5 py-1 rounded border border-[#D21034]/30'; }
-    }
   });
 </script>

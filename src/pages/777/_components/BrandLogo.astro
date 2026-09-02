@@ -1,37 +1,36 @@
 ---
 interface Props {
-  size?: 'sm' | 'md' | 'lg';
-  showPartners?: boolean;
+  showTag?: boolean;
 }
 
-const { size = 'md', showPartners = true } = Astro.props;
-const heightClass = size === 'sm' ? 'w-10 h-10' : size === 'lg' ? 'w-14 h-14' : 'w-12 h-12';
+const { showTag = true } = Astro.props;
 ---
 
-<div class="flex items-center justify-between w-full border-b border-slate-100 pb-4 select-none">
-  <!-- Ministry Emblem & Name -->
-  <div class="flex items-center gap-3.5">
-    <div class={`${heightClass} rounded-full border-2 border-[#006233] flex flex-col items-center justify-center bg-white font-cairo font-bold text-[#D21034] text-xs leading-none`}>
-      <span class="text-[#006233] text-[9px] font-black">MPT</span>
-      <span class="text-[9px] font-black">🇩🇿</span>
+<div class="flex items-center justify-between w-full border-b border-white/10 pb-4 select-none">
+  <!-- Brand Logo & Domain -->
+  <div class="flex items-center gap-3">
+    <!-- Google 4-color dot icon -->
+    <div class="w-10 h-10 rounded-2xl bg-surface-container-high border border-white/15 flex items-center justify-center gap-1">
+      <span class="w-2 h-2 rounded-full bg-[#8AB4F8]"></span>
+      <span class="w-2 h-2 rounded-full bg-[#81C784]"></span>
+      <span class="w-2 h-2 rounded-full bg-[#FDD663]"></span>
+      <span class="w-2 h-2 rounded-full bg-[#F28B82]"></span>
     </div>
     <div>
-      <p class="font-cairo text-sm font-bold text-slate-900 leading-tight">وزارة البريد والمواصلات السلكية واللاسلكية</p>
-      <p class="text-[11px] text-slate-500 font-medium tracking-wide">Ministère de la Poste et des Télécommunications</p>
+      <div class="flex items-center gap-2">
+        <span class="font-extrabold text-sm text-white tracking-tight font-sans">saoudi.online</span>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-white/10 text-slate-300 font-mono text-[10px]">7.77</span>
+      </div>
+      <p class="text-[11px] text-white/60 font-medium">Digital Productivity & Workflows</p>
     </div>
   </div>
 
-  <!-- Partners & 7.77 Tag -->
-  {showPartners && (
-    <div class="flex items-center gap-3 text-xs font-semibold">
-      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#E8F5FD] text-[#0080C8] border border-[#0080C8]/20">
-        <span class="font-bold tracking-tight">Algérie Télécom</span>
-        <span class="text-[10px] font-cairo">إتصالات الجزائر</span>
-      </div>
-      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F2F8EA] text-[#72A92E] border border-[#72A92E]/20">
-        <span class="font-bold tracking-tight">Mobilis</span>
-        <span class="text-[10px] font-cairo">موبيليس</span>
-      </div>
+  <!-- Program Badge -->
+  {showTag && (
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-semibold px-3 py-1 rounded-full bg-[#8AB4F8]/10 text-[#8AB4F8] border border-[#8AB4F8]/30">
+        Programme National 7.77 • 24–30 ans
+      </span>
     </div>
   )}
 </div>

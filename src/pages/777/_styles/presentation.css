@@ -1,23 +1,30 @@
-/* 7.77 Program Light-Theme Presentation Deck Styling & 16:9 Viewport System */
+/* saoudi.online Design System — 7.77 Keynote Presentation Styling */
 :root {
-  --dz-green: #006233;
-  --dz-green-light: #E6F4EA;
-  --dz-red: #D21034;
-  --dz-red-light: #FDECEF;
-  --at-blue: #0080C8;
-  --at-blue-light: #E8F5FD;
-  --mob-green: #72A92E;
-  --mob-green-light: #F2F8EA;
-  --brand-dark: #0F172A;
-  --text-muted: #64748B;
-  --border: #E2E8F0;
-  --border-strong: #CBD5E1;
-  --canvas: #F8FAFC;
-  --canvas-outer: #EDF2F7;
-  --white: #FFFFFF;
+  /* Google Brand Colors */
+  --color-google-blue: #8AB4F8;
+  --color-google-light-blue: #AECBFA;
+  --color-google-red: #F28B82;
+  --color-google-yellow: #FDD663;
+  --color-google-green: #81C784;
 
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-cairo: 'Cairo', 'Tajawal', 'IBM Plex Sans Arabic', sans-serif;
+  --color-primary: var(--color-google-blue);
+  --color-secondary: var(--color-google-green);
+  --color-tertiary: var(--color-google-yellow);
+  --color-error: var(--color-google-red);
+
+  /* Material 3 Dark Theme Baseline */
+  --color-surface: #121212;
+  --color-surface-container: #1E1E1E;
+  --color-surface-container-high: #2D2D2D;
+  --color-surface-border: rgba(255, 255, 255, 0.1);
+  --color-surface-border-strong: rgba(255, 255, 255, 0.18);
+
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #E6E1E5;
+  --color-text-muted: rgba(255, 255, 255, 0.6);
+
+  --font-sans: 'Google Sans', Inter, system-ui, sans-serif;
+  --font-cairo: 'Cairo', 'Tajawal', sans-serif;
 }
 
 /* Zero page scrolling & reset */
@@ -28,21 +35,21 @@ body.deck-mode {
   width: 100vw;
   height: 100vh;
   overflow: hidden !important;
-  background-color: var(--canvas-outer);
+  background-color: #0E0E0E;
   font-family: var(--font-sans);
-  color: var(--brand-dark);
+  color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Presentation Stage: Locked 16:9 composition centered in viewport */
+/* Presentation Stage: Locked 16:9 aspect ratio centered in viewport */
 .deck-stage-wrapper {
   position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--canvas-outer);
+  background-color: #0A0A0A;
   overflow: hidden;
   z-index: 10;
 }
@@ -50,15 +57,15 @@ body.deck-mode {
 .deck-stage {
   position: relative;
   width: 100vw;
-  height: 56.25vw; /* 16:9 aspect ratio */
+  height: 56.25vw; /* 16:9 ratio */
   max-height: 100vh;
-  max-width: 177.78vh; /* 16:9 aspect ratio */
-  background-color: var(--white);
+  max-width: 177.78vh; /* 16:9 ratio */
+  background-color: var(--color-surface);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border-left: 1px solid var(--border);
-  border-right: 1px solid var(--border);
+  border-left: 1px solid var(--color-surface-border);
+  border-right: 1px solid var(--color-surface-border);
 }
 
 /* Slide Base Styling */
@@ -79,8 +86,8 @@ body.deck-mode {
               transform 0.35s cubic-bezier(0.2, 0, 0.2, 1),
               visibility 0.35s cubic-bezier(0.2, 0, 0.2, 1);
   overflow: hidden;
-  background-color: var(--white);
-  color: var(--brand-dark);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
 }
 
 .deck-slide.active {
@@ -95,35 +102,31 @@ body.deck-mode {
   transform: translateX(-40px);
 }
 
-/* Subtle Light-Theme Brand Accents */
-.light-brand-accent-1 {
+/* Ambient Glow Accents (Material 3 Dark) */
+.m3-glow-blue {
   position: absolute;
-  top: -8rem;
-  right: -8rem;
-  width: 28rem;
-  height: 28rem;
-  background-color: var(--dz-green-light);
-  border-radius: 9999px;
+  top: -10rem;
+  right: -10rem;
+  width: 32rem;
+  height: 32rem;
+  background: radial-gradient(circle, rgba(138, 180, 248, 0.12) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
-  opacity: 0.6;
 }
 
-.light-brand-accent-2 {
+.m3-glow-green {
   position: absolute;
-  bottom: -8rem;
-  left: -8rem;
-  width: 28rem;
-  height: 28rem;
-  background-color: var(--at-blue-light);
-  border-radius: 9999px;
+  bottom: -10rem;
+  left: -10rem;
+  width: 32rem;
+  height: 32rem;
+  background: radial-gradient(circle, rgba(129, 199, 132, 0.1) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
-  opacity: 0.6;
 }
 
-/* 7.77 Buttons & Interactive Tokens (Strict Zero Shadows) */
-.btn-777 {
+/* Buttons (Strict Zero Shadow Rule) */
+.btn-m3 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -131,8 +134,8 @@ body.deck-mode {
   font-weight: 700;
   font-size: 0.9rem;
   letter-spacing: -0.01em;
-  padding: 0.6rem 1.25rem;
-  border-radius: 10px;
+  padding: 0.65rem 1.35rem;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.2, 0, 0.2, 1);
   border: 1px solid transparent;
@@ -140,73 +143,78 @@ body.deck-mode {
   text-decoration: none;
 }
 
-.btn-777:hover {
+.btn-m3:hover {
   transform: translateY(-2px);
 }
 
-.btn-777:active {
+.btn-m3:active {
   transform: translateY(0);
 }
 
-.btn-777-green {
-  background-color: var(--dz-green);
-  color: var(--white);
-  border-color: #004D28;
+.btn-m3-blue {
+  background-color: var(--color-google-blue);
+  color: #0F172A;
+  border-color: #8AB4F8;
 }
-.btn-777-green:hover {
-  background-color: #004D28;
-}
-
-.btn-777-blue {
-  background-color: var(--at-blue);
-  color: var(--white);
-  border-color: #0068A3;
-}
-.btn-777-blue:hover {
-  background-color: #0068A3;
+.btn-m3-blue:hover {
+  background-color: #AECBFA;
 }
 
-.btn-777-red {
-  background-color: var(--dz-red);
-  color: var(--white);
-  border-color: #B00D2B;
+.btn-m3-green {
+  background-color: var(--color-google-green);
+  color: #0F172A;
+  border-color: #81C784;
 }
-.btn-777-red:hover {
-  background-color: #B00D2B;
-}
-
-.btn-777-outline {
-  background-color: var(--white);
-  color: var(--brand-dark);
-  border-color: var(--border-strong);
-}
-.btn-777-outline:hover {
-  background-color: var(--canvas);
-  border-color: var(--at-blue);
-  color: var(--at-blue);
+.btn-m3-green:hover {
+  background-color: #A5D6A7;
 }
 
-/* 7.77 Cards & Containers */
-.card-777 {
-  background-color: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 1.25rem;
+.btn-m3-yellow {
+  background-color: var(--color-google-yellow);
+  color: #0F172A;
+  border-color: #FDD663;
+}
+.btn-m3-yellow:hover {
+  background-color: #FDE293;
+}
+
+.btn-m3-red {
+  background-color: var(--color-google-red);
+  color: #0F172A;
+  border-color: #F28B82;
+}
+.btn-m3-red:hover {
+  background-color: #F6AEA9;
+}
+
+.btn-m3-outline {
+  background-color: var(--color-surface-container);
+  color: var(--color-text-primary);
+  border-color: var(--color-surface-border);
+}
+.btn-m3-outline:hover {
+  background-color: var(--color-surface-container-high);
+  border-color: var(--color-google-blue);
+  color: var(--color-google-blue);
+}
+
+/* Material 3 Cards */
+.card-m3 {
+  background-color: var(--color-surface-container);
+  border: 1px solid var(--color-surface-border);
+  border-radius: 20px;
+  padding: 1.35rem;
   transition: border-color 0.2s, transform 0.2s;
 }
 
-.card-777-muted {
-  background-color: var(--canvas);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 1.25rem;
+.card-m3-high {
+  background-color: var(--color-surface-container-high);
+  border: 1px solid var(--color-surface-border-strong);
+  border-radius: 20px;
+  padding: 1.35rem;
 }
 
 /* Typography Helpers */
-.font-cairo {
-  font-family: var(--font-cairo);
-}
-
 .title-display {
   font-size: clamp(2rem, 3.5vw, 3.2rem);
   font-weight: 800;
@@ -221,7 +229,7 @@ body.deck-mode {
   letter-spacing: -0.01em;
 }
 
-/* Floating Navigation Dock (Light Mode) */
+/* Floating Navigation Dock (saoudi.online M3 Dark) */
 .deck-dock {
   position: absolute;
   bottom: 1.2rem;
@@ -231,8 +239,8 @@ body.deck-mode {
   align-items: center;
   gap: 0.75rem;
   padding: 0.35rem 0.75rem;
-  background-color: rgba(255, 255, 255, 0.96);
-  border: 1px solid var(--border-strong);
+  background-color: rgba(30, 30, 30, 0.95);
+  border: 1px solid var(--color-surface-border-strong);
   border-radius: 9999px;
   z-index: 50;
   user-select: none;
@@ -246,20 +254,20 @@ body.deck-mode {
   height: 32px;
   border-radius: 9999px;
   background: transparent;
-  color: var(--brand-dark);
+  color: var(--color-text-secondary);
   border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .deck-dock button:hover {
-  background-color: var(--canvas);
-  color: var(--dz-green);
-  border-color: var(--border-strong);
+  background-color: var(--color-surface-container-high);
+  color: var(--color-google-blue);
+  border-color: var(--color-google-blue);
 }
 
 .deck-dock button:disabled {
-  opacity: 0.3;
+  opacity: 0.25;
   cursor: not-allowed;
   border-color: transparent !important;
   background: transparent !important;
@@ -268,7 +276,7 @@ body.deck-mode {
 .deck-counter {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--brand-dark);
+  color: var(--color-text-primary);
   padding: 0 0.5rem;
   letter-spacing: 0.05em;
   font-variant-numeric: tabular-nums;
@@ -281,22 +289,22 @@ body.deck-mode {
   left: 0;
   width: 100%;
   height: 4px;
-  background-color: rgba(226, 232, 240, 0.6);
+  background-color: rgba(255, 255, 255, 0.08);
   z-index: 40;
 }
 
 .deck-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--dz-green) 0%, var(--at-blue) 60%, var(--dz-red) 100%);
+  background: linear-gradient(90deg, var(--color-google-blue) 0%, var(--color-google-green) 40%, var(--color-google-yellow) 75%, var(--color-google-red) 100%);
   width: 0%;
   transition: width 0.3s cubic-bezier(0.2, 0, 0.2, 1);
 }
 
-/* Slide Overview Drawer / Grid (Light Mode) */
+/* Slide Overview Drawer / Grid */
 .deck-overview-drawer {
   position: absolute;
   inset: 0;
-  background-color: rgba(255, 255, 255, 0.98);
+  background-color: rgba(18, 18, 18, 0.98);
   z-index: 100;
   display: flex;
   flex-direction: column;
@@ -324,35 +332,35 @@ body.deck-mode {
 
 .overview-thumbnail {
   aspect-ratio: 16/9;
-  background-color: var(--canvas);
-  border: 2px solid var(--border);
-  border-radius: 12px;
+  background-color: var(--color-surface-container);
+  border: 2px solid var(--color-surface-border);
+  border-radius: 14px;
   padding: 0.85rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
   transition: all 0.2s;
-  color: var(--brand-dark);
+  color: var(--color-text-primary);
   text-align: left;
 }
 
 .overview-thumbnail:hover {
-  border-color: var(--dz-green);
-  background-color: var(--dz-green-light);
+  border-color: var(--color-google-blue);
+  background-color: var(--color-surface-container-high);
   transform: translateY(-2px);
 }
 
 .overview-thumbnail.active-thumb {
-  border-color: var(--at-blue);
-  background-color: var(--at-blue-light);
+  border-color: var(--color-google-yellow);
+  background-color: var(--color-surface-container-high);
 }
 
-/* Reduced Motion Mode */
+/* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   .deck-slide,
-  .btn-777,
-  .card-777,
+  .btn-m3,
+  .card-m3,
   .deck-progress-fill {
     transition: none !important;
     animation: none !important;

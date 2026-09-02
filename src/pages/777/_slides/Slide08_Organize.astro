@@ -3,184 +3,102 @@ import SlideHeader from '../_components/SlideHeader.astro';
 ---
 
 <section class="deck-slide justify-between relative overflow-hidden" data-slide-index="8">
-  <div class="light-brand-accent-1"></div>
+  <div class="m3-glow-blue"></div>
 
-  <SlideHeader category="Pilier 02" topic="ORGANIZE : Architecture & Hygiène de Google Drive" />
+  <SlideHeader category="Méthode" topic="Le Framework de Productivité 7.77" />
 
   <div class="my-auto max-w-5xl w-full relative z-10">
-    <div class="flex items-center justify-between mb-3">
-      <div>
-        <span class="text-xs font-bold text-[#0080C8] tracking-wider uppercase bg-[#E8F5FD] px-2.5 py-1 rounded border border-[#0080C8]/20">
-          Système de Fichiers & Conventions
-        </span>
-        <h2 class="title-h1 text-slate-900 mt-1 font-cairo">
-          « Une arborescence claire élimine 90% du stress d'équipe. »
-        </h2>
-      </div>
-      <div class="hidden sm:block text-right">
-        <span class="text-xs font-semibold text-slate-600 font-mono bg-slate-100 px-2.5 py-1 rounded border border-slate-200">
-          Convention : [NUM]_[CATÉGORIE]
-        </span>
-      </div>
+    <div class="mb-3">
+      <span class="text-xs font-bold text-[#8AB4F8] tracking-wider uppercase bg-[#8AB4F8]/10 px-2.5 py-1 rounded-md border border-[#8AB4F8]/30">
+        Architecture du Système
+      </span>
+      <h2 class="title-h1 text-white mt-1">
+        La Chaîne de Valeur Numérique en 6 Piliers
+      </h2>
+      <p class="text-xs text-white/60 mt-0.5">
+        Cliquez sur chaque étape du cycle pour comprendre son rôle précis :
+      </p>
     </div>
 
-    <!-- Interactive Fake Drive Workspace -->
-    <div class="card-777 p-0 border-slate-200 overflow-hidden flex flex-col md:flex-row h-64">
-      <!-- Drive Sidebar (5 cols) -->
-      <div class="w-full md:w-5/12 bg-slate-50 border-r border-slate-200 p-3 overflow-y-auto">
-        <div class="flex items-center gap-2 pb-2 mb-2 border-b border-slate-200">
-          <div class="w-4 h-4 rounded bg-[#0080C8] flex items-center justify-center text-white text-[10px] font-bold">▲</div>
-          <span class="font-bold text-xs text-slate-800 font-cairo">Drive Partagé • Atelier 7.77</span>
-        </div>
+    <!-- 6 Interactive Framework Stages -->
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-2 my-3" id="framework-pills">
+      <button type="button" class="fw-pill card-m3 bg-surface-container p-2.5 text-left border-2 border-[#8AB4F8] bg-[#8AB4F8]/10 cursor-pointer transition-all" data-title="1. CAPTURER" data-desc="Transformer l'information brute ou dispersée en données structurées dès la première seconde." data-tools="Google Forms, Google Keep, Notion">
+        <div class="text-[9px] font-bold text-[#8AB4F8] uppercase">Étape 01</div>
+        <div class="font-black text-xs text-white mt-0.5">CAPTURE</div>
+        <div class="text-[10px] text-white/50 mt-0.5">Forms / Entrées</div>
+      </button>
 
-        <div class="space-y-1" id="drive-folder-list">
-          <button type="button" class="drive-folder-item w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[#006233] bg-[#E6F4EA] border border-[#006233]/30 text-left cursor-pointer transition-all" data-folder="admin">
-            <span>📁</span>
-            <span>01_Administration & Budget</span>
-          </button>
-          
-          <button type="button" class="drive-folder-item w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 text-left cursor-pointer transition-all" data-folder="design">
-            <span>📁</span>
-            <span>02_Design & Identité Visuelle</span>
-          </button>
+      <button type="button" class="fw-pill card-m3 bg-surface-container p-2.5 text-left border-2 border-white/10 hover:border-white/30 cursor-pointer transition-all" data-title="2. ORGANISER" data-desc="Structurer les répertoires, les conventions de nommage et les droits d'accès pour ne jamais rien perdre." data-tools="Google Drive partagés, Arborescence standardisée">
+        <div class="text-[9px] font-bold text-white/40 uppercase">Étape 02</div>
+        <div class="font-black text-xs text-white mt-0.5">ORGANIZE</div>
+        <div class="text-[10px] text-white/50 mt-0.5">Drive / Arborescence</div>
+      </button>
 
-          <button type="button" class="drive-folder-item w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 text-left cursor-pointer transition-all" data-folder="participants">
-            <span>📁</span>
-            <span>03_Participants & Inscriptions</span>
-          </button>
+      <button type="button" class="fw-pill card-m3 bg-surface-container p-2.5 text-left border-2 border-white/10 hover:border-white/30 cursor-pointer transition-all" data-title="3. CRÉER" data-desc="Concevoir des livrables de haute qualité basés sur des modèles réutilisables et des puces intelligentes." data-tools="Google Docs, Sheets, Slides, Canva">
+        <div class="text-[9px] font-bold text-white/40 uppercase">Étape 03</div>
+        <div class="font-black text-xs text-white mt-0.5">CREATE</div>
+        <div class="text-[10px] text-white/50 mt-0.5">Docs / Sheets / Slides</div>
+      </button>
 
-          <button type="button" class="drive-folder-item w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 text-left cursor-pointer transition-all" data-folder="speakers">
-            <span>📁</span>
-            <span>04_Intervenants & Présentations</span>
-          </button>
+      <button type="button" class="fw-pill card-m3 bg-surface-container p-2.5 text-left border-2 border-white/10 hover:border-white/30 cursor-pointer transition-all" data-title="4. COLLABORER" data-desc="Travailler simultanément à plusieurs sur la même source de vérité avec commentaires ciblés et historique." data-tools="Édition temps réel, Permissions, @mentions">
+        <div class="text-[9px] font-bold text-white/40 uppercase">Étape 04</div>
+        <div class="font-black text-xs text-white mt-0.5">COLLABORATE</div>
+        <div class="text-[10px] text-white/50 mt-0.5">Temps réel / Avis</div>
+      </button>
 
-          <button type="button" class="drive-folder-item w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 text-left cursor-pointer transition-all" data-folder="reports">
-            <span>📁</span>
-            <span>05_Rapports & Clôture</span>
-          </button>
-        </div>
-      </div>
+      <button type="button" class="fw-pill card-m3 bg-surface-container p-2.5 text-left border-2 border-white/10 hover:border-white/30 cursor-pointer transition-all" data-title="5. AUTOMATISER" data-desc="Éliminer les tâches répétitives manuelles (envois d'emails de confirmation, génération de dossiers)." data-tools="Google Apps Script, Webhooks, Make">
+        <div class="text-[9px] font-bold text-white/40 uppercase">Étape 05</div>
+        <div class="font-black text-xs text-white mt-0.5">AUTOMATE</div>
+        <div class="text-[10px] text-white/50 mt-0.5">Scripts / Triggers</div>
+      </button>
 
-      <!-- Drive File Explorer (7 cols) -->
-      <div class="w-full md:w-7/12 p-3.5 flex flex-col justify-between bg-white overflow-y-auto" id="drive-file-viewer">
-        <div>
-          <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
-            <span class="text-xs font-bold text-slate-800 font-cairo" id="current-folder-title">
-              📁 Contenu de : 01_Administration & Budget
-            </span>
-            <span class="text-[10px] text-slate-400">3 éléments</span>
-          </div>
+      <button type="button" class="fw-pill card-m3 bg-surface-container p-2.5 text-left border-2 border-white/10 hover:border-white/30 cursor-pointer transition-all" data-title="6. PLANIFIER" data-desc="Associer chaque livrable au temps disponible (Time-Blocking) pour garantir l'exécution sans stress." data-tools="Google Calendar, Google Tasks">
+        <div class="text-[9px] font-bold text-white/40 uppercase">Étape 06</div>
+        <div class="font-black text-xs text-white mt-0.5">SCHEDULE</div>
+        <div class="text-[10px] text-white/50 mt-0.5">Calendar / Tâches</div>
+      </button>
+    </div>
 
-          <div class="space-y-1.5" id="folder-files-container">
-            <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs">
-              <div class="flex items-center gap-2 font-medium text-slate-800">
-                <span class="text-[#006233] font-bold">📊</span>
-                <span>2026_09_Budget_Previsionnel_v1.xlsx</span>
-              </div>
-              <span class="text-[10px] text-slate-400">Modifié il y a 2h</span>
-            </div>
-            <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs">
-              <div class="flex items-center gap-2 font-medium text-slate-800">
-                <span class="text-[#0080C8] font-bold">📄</span>
-                <span>Convention_Partenariat_Signee.pdf</span>
-              </div>
-              <span class="text-[10px] text-slate-400">Hier</span>
-            </div>
-            <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs">
-              <div class="flex items-center gap-2 font-medium text-slate-800">
-                <span class="text-blue-500 font-bold">📝</span>
-                <span>Ordre_du_Jour_Reunion_Cadrage.gdoc</span>
-              </div>
-              <span class="text-[10px] text-slate-400">28 Août</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-2 p-2 rounded-lg bg-[#E6F4EA] border border-[#006233]/20 flex items-center justify-between text-[10px] text-[#006233]">
-          <span>💡 <strong>Bonne pratique :</strong> Préfixez toujours les dossiers par un numéro (01, 02) pour garder l'ordre logique.</span>
+    <!-- Active Stage Detail View -->
+    <div id="stage-detail-card" class="card-m3 bg-surface-container-high border-white/15 p-3.5">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-1.5">
+        <h3 id="stage-title" class="font-extrabold text-sm text-[#8AB4F8]">1. CAPTURER</h3>
+        <div class="text-xs px-2.5 py-0.5 bg-surface rounded-lg border border-white/10 font-semibold text-white/80" id="stage-tools">
+          Outils : Google Forms, Google Keep, Notion
         </div>
       </div>
+      <p id="stage-desc" class="text-xs text-white/80 leading-relaxed">
+        Transformer l'information brute ou dispersée en données structurées dès la première seconde.
+      </p>
     </div>
   </div>
 
-  <div class="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-100 relative z-10">
-    <span>Un dossier bien structuré fait gagner un temps précieux à chaque collaborateur</span>
-    <button type="button" class="btn-777 btn-777-green text-xs px-4 py-2 cursor-pointer" data-deck-next>
-      <span>PILIER 3 : CRÉER SANS REFAIRE →</span>
+  <div class="flex items-center justify-between text-xs text-white/50 pt-3 border-t border-white/10 relative z-10">
+    <span>Chaque pilier résout un problème précis du quotidien numérique</span>
+    <button type="button" class="btn-m3 btn-m3-blue text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>PILIER 1 : CAPTURE →</span>
     </button>
   </div>
 </section>
 
 <script>
-  const folderData: Record<string, { title: string; files: Array<{ icon: string; name: string; date: string }> }> = {
-    admin: {
-      title: "📁 Contenu de : 01_Administration & Budget",
-      files: [
-        { icon: "📊", name: "2026_09_Budget_Previsionnel_v1.xlsx", date: "Modifié il y a 2h" },
-        { icon: "📄", name: "Convention_Partenariat_Signee.pdf", date: "Hier" },
-        { icon: "📝", name: "Ordre_du_Jour_Reunion_Cadrage.gdoc", date: "28 Août" }
-      ]
-    },
-    design: {
-      title: "📁 Contenu de : 02_Design & Identité Visuelle",
-      files: [
-        { icon: "🎨", name: "777_Master_Logo_Vectoriel.svg", date: "22 Août" },
-        { icon: "🖼️", name: "Banniere_LinkedIn_1200x627.png", date: "24 Août" },
-        { icon: "🎨", name: "Palette_Couleurs_Tokens.pdf", date: "26 Août" }
-      ]
-    },
-    participants: {
-      title: "📁 Contenu de : 03_Participants & Inscriptions",
-      files: [
-        { icon: "📊", name: "Inscriptions_Atelier_Alger_LIVE.gsheet", date: "À l'instant" },
-        { icon: "🪪", name: "Generateur_Badges_Participants.gdoc", date: "Hier" },
-        { icon: "📋", name: "Feuille_Emargement_Matinale.pdf", date: "30 Août" }
-      ]
-    },
-    speakers: {
-      title: "📁 Contenu de : 04_Intervenants & Présentations",
-      files: [
-        { icon: "📽️", name: "Session_01_Productivite_Numerique.gslides", date: "Aujourd'hui" },
-        { icon: "👤", name: "Bio_Photos_HD_Saoudi.zip", date: "27 Août" },
-        { icon: "📝", name: "Questions_Reponses_Public.gdoc", date: "Hier" }
-      ]
-    },
-    reports: {
-      title: "📁 Contenu de : 05_Rapports & Clôture",
-      files: [
-        { icon: "📄", name: "Modele_Rapport_Activite_Final.gdoc", date: "20 Août" },
-        { icon: "📊", name: "Statistiques_Evaluation_Satisfaction.gsheet", date: "29 Août" }
-      ]
-    }
-  };
+  const pills = document.querySelectorAll('.fw-pill');
+  const stageTitle = document.getElementById('stage-title');
+  const stageDesc = document.getElementById('stage-desc');
+  const stageTools = document.getElementById('stage-tools');
 
-  const folderBtns = document.querySelectorAll('.drive-folder-item');
-  const folderTitle = document.getElementById('current-folder-title');
-  const filesContainer = document.getElementById('folder-files-container');
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      pills.forEach(p => p.classList.remove('border-[#8AB4F8]', 'bg-[#8AB4F8]/10'));
+      pill.classList.add('border-[#8AB4F8]', 'bg-[#8AB4F8]/10');
 
-  folderBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      folderBtns.forEach(b => {
-        b.classList.remove('text-[#006233]', 'bg-[#E6F4EA]', 'border-[#006233]/30', 'font-semibold');
-        b.classList.add('text-slate-700', 'font-medium');
-      });
-      btn.classList.add('text-[#006233]', 'bg-[#E6F4EA]', 'border-[#006233]/30', 'font-semibold');
-      btn.classList.remove('text-slate-700', 'font-medium');
+      const title = pill.getAttribute('data-title');
+      const desc = pill.getAttribute('data-desc');
+      const tools = pill.getAttribute('data-tools');
 
-      const folderKey = btn.getAttribute('data-folder') || 'admin';
-      const data = folderData[folderKey];
-      if (data && folderTitle && filesContainer) {
-        folderTitle.textContent = data.title;
-        filesContainer.innerHTML = data.files.map(f => `
-          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs">
-            <div class="flex items-center gap-2 font-medium text-slate-800">
-              <span class="font-bold">${f.icon}</span>
-              <span>${f.name}</span>
-            </div>
-            <span class="text-[10px] text-slate-400">${f.date}</span>
-          </div>
-        `).join('');
-      }
+      if (stageTitle && title) stageTitle.textContent = title;
+      if (stageDesc && desc) stageDesc.textContent = desc;
+      if (stageTools && tools) stageTools.textContent = `Outils : ${tools}`;
     });
   });
 </script>

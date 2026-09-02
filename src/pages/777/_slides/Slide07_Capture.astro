@@ -3,165 +3,56 @@ import SlideHeader from '../_components/SlideHeader.astro';
 ---
 
 <section class="deck-slide justify-between relative overflow-hidden" data-slide-index="7">
-  <div class="light-brand-accent-2"></div>
+  <div class="m3-glow-green"></div>
 
-  <SlideHeader category="Pilier 01" topic="CAPTURE : De l'Information Brute à la Donnée Structurée" />
+  <SlideHeader category="Le Déclic" topic="Changement de Paradigme" />
 
-  <div class="my-auto max-w-5xl w-full relative z-10">
-    <div class="flex items-center justify-between mb-3">
-      <div>
-        <span class="text-xs font-bold text-[#006233] tracking-wider uppercase bg-[#E6F4EA] px-2.5 py-1 rounded border border-[#006233]/20">
-          Google Forms ➔ Google Sheets
-        </span>
-        <h2 class="title-h1 text-slate-900 mt-1 font-cairo">
-          Ne demandez plus « Envoyez vos noms par WhatsApp »
-        </h2>
-      </div>
-      <div class="hidden sm:block text-right">
-        <span class="text-xs font-bold text-[#006233] bg-[#E6F4EA] px-3 py-1 rounded-full border border-[#006233]/30">
-          ⚡ Synchronisation Directe 100% Automatique
-        </span>
-      </div>
+  <div class="my-auto max-w-5xl relative z-10">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#81C784]/10 text-[#81C784] border border-[#81C784]/30 text-xs font-bold tracking-wider uppercase mb-4">
+      ⚡ Le Point d'Inflexion
     </div>
 
-    <!-- Live Interactive Demo Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5 my-2">
-      <!-- Mini Mock Form (5 cols) -->
-      <div class="md:col-span-5 card-777 p-3.5 border-slate-200">
-        <div class="flex items-center gap-2 pb-2 mb-2.5 border-b border-slate-100">
-          <div class="w-5 h-5 rounded bg-purple-600 text-white flex items-center justify-center font-bold text-[10px]">F</div>
-          <div>
-            <h4 class="font-bold text-xs text-slate-900 leading-tight font-cairo">Formulaire Inscription 7.77</h4>
-            <span class="text-[10px] text-slate-400">Atelier Numérique Wilayas</span>
-          </div>
+    <div class="space-y-3 mb-6">
+      <h2 class="title-display text-white/40 font-normal">
+        La productivité ne consiste pas à <span class="text-[#F28B82] font-bold">empiler plus d'outils</span>.
+      </h2>
+      <h2 class="title-display text-white font-black">
+        Elle consiste à <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#8AB4F8] via-[#81C784] to-[#FDD663]">construire de meilleurs workflows</span>.
+      </h2>
+    </div>
+
+    <!-- Comparison Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <div class="card-m3 border-[#F28B82]/20 bg-[#F28B82]/5 p-4">
+        <div class="flex items-center gap-2 text-[#F28B82] font-bold text-xs uppercase mb-2">
+          <span class="w-4 h-4 rounded-full bg-[#F28B82]/20 flex items-center justify-center text-[10px]">✕</span>
+          Approche Centrée Outils (Silos & Frictions)
         </div>
-
-        <form id="capture-mock-form" class="space-y-2">
-          <div>
-            <label class="block text-[10px] font-semibold text-slate-700 mb-0.5">Nom & Prénom</label>
-            <input type="text" id="cap-name" value="Amina Benali" required class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:border-[#0080C8] focus:outline-none bg-slate-50" />
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-[10px] font-semibold text-slate-700 mb-0.5">Wilaya</label>
-              <select id="cap-wilaya" class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:border-[#0080C8] focus:outline-none bg-slate-50">
-                <option value="16 - Alger">16 - Alger</option>
-                <option value="31 - Oran">31 - Oran</option>
-                <option value="25 - Constantine">25 - Constantine</option>
-                <option value="09 - Blida">09 - Blida</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-[10px] font-semibold text-slate-700 mb-0.5">Domaine</label>
-              <select id="cap-domain" class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:border-[#0080C8] focus:outline-none bg-slate-50">
-                <option value="Dev Web">Dev Web</option>
-                <option value="Data & IA">Data & IA</option>
-                <option value="Design UX">Design UX</option>
-                <option value="Management">Management</option>
-              </select>
-            </div>
-          </div>
-
-          <button type="submit" class="w-full btn-777 btn-777-green text-xs py-1.5 mt-1.5 cursor-pointer">
-            <span>SOUMETTRE L'INSCRIPTION →</span>
-          </button>
-        </form>
+        <ul class="space-y-1.5 text-xs text-white/70">
+          <li class="flex items-center gap-2">❌ Télécharger des applications sans vision d'ensemble</li>
+          <li class="flex items-center gap-2">❌ Transférer manuellement des fichiers d'un endroit à un autre</li>
+          <li class="flex items-center gap-2">❌ Éparpiller les échanges critiques dans des messages informels</li>
+        </ul>
       </div>
 
-      <!-- Arrow Indicator (1 col) -->
-      <div class="hidden md:flex md:col-span-1 items-center justify-center">
-        <div class="w-7 h-7 rounded-full bg-[#E8F5FD] text-[#0080C8] flex items-center justify-center font-bold text-xs">
-          ➔
+      <div class="card-m3 border-[#81C784]/30 bg-[#81C784]/5 p-4">
+        <div class="flex items-center gap-2 text-[#81C784] font-bold text-xs uppercase mb-2">
+          <span class="w-4 h-4 rounded-full bg-[#81C784]/20 flex items-center justify-center text-[10px]">✓</span>
+          Approche Centrée Workflow (Système Fluide)
         </div>
-      </div>
-
-      <!-- Live Mock Sheet (6 cols) -->
-      <div class="md:col-span-6 card-777 p-3.5 border-slate-200 flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
-            <div class="flex items-center gap-2">
-              <div class="w-5 h-5 rounded bg-[#006233] text-white flex items-center justify-center font-bold text-[10px]">S</div>
-              <div>
-                <h4 class="font-bold text-xs text-slate-900 leading-tight font-cairo">Inscriptions_7.77 (Réponses)</h4>
-                <span class="text-[10px] text-[#006233] font-semibold">● Connecté en direct</span>
-              </div>
-            </div>
-            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Google Sheets</span>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-[10px] text-left border-collapse" id="mock-sheets-table">
-              <thead>
-                <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 font-bold">
-                  <th class="p-1">Horodatage</th>
-                  <th class="p-1">Nom</th>
-                  <th class="p-1">Wilaya</th>
-                  <th class="p-1">Domaine</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 font-mono text-[10px]">
-                <tr class="text-slate-600">
-                  <td class="p-1 text-slate-400">10:14:02</td>
-                  <td class="p-1 font-sans font-medium text-slate-800">Karim Meziane</td>
-                  <td class="p-1">16 - Alger</td>
-                  <td class="p-1 text-[#0080C8] font-semibold">Data & IA</td>
-                </tr>
-                <tr class="text-slate-600">
-                  <td class="p-1 text-slate-400">10:18:45</td>
-                  <td class="p-1 font-sans font-medium text-slate-800">Sara Dahmani</td>
-                  <td class="p-1">31 - Oran</td>
-                  <td class="p-1 text-purple-600 font-semibold">Design UX</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
-          <span>0 saisie manuelle, 100% exploitable</span>
-          <span class="font-semibold text-[#006233]">Filtres & TCD prêts</span>
-        </div>
+        <ul class="space-y-1.5 text-xs text-white/90">
+          <li class="flex items-center gap-2">✅ Un canal d'entrée unique et structuré (Formulaires)</li>
+          <li class="flex items-center gap-2">✅ Une source unique de vérité partagée en temps réel (Docs)</li>
+          <li class="flex items-center gap-2">✅ Des passerelles automatisées sans saisie manuelle (Scripts)</li>
+        </ul>
       </div>
     </div>
   </div>
 
-  <div class="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-100 relative z-10">
-    <span>Règle d'or : Ne traitez jamais manuellement ce qu'un formulaire peut structurer</span>
-    <button type="button" class="btn-777 btn-777-green text-xs px-4 py-2 cursor-pointer" data-deck-next>
-      <span>PILIER 2 : ORGANISATION DRIVE →</span>
+  <div class="flex items-center justify-between text-xs text-white/50 pt-3 border-t border-white/10 relative z-10">
+    <span>Passer de la réaction permanente à une méthode reproductible</span>
+    <button type="button" class="btn-m3 btn-m3-green text-xs px-4 py-2 cursor-pointer" data-deck-next>
+      <span>LE FRAMEWORK EN 6 ÉTAPES →</span>
     </button>
   </div>
 </section>
-
-<script>
-  const form = document.getElementById('capture-mock-form') as HTMLFormElement;
-  const tableBody = document.querySelector('#mock-sheets-table tbody');
-
-  form?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const nameInput = document.getElementById('cap-name') as HTMLInputElement;
-    const wilayaInput = document.getElementById('cap-wilaya') as HTMLSelectElement;
-    const domainInput = document.getElementById('cap-domain') as HTMLSelectElement;
-
-    if (!nameInput || !tableBody) return;
-
-    const now = new Date();
-    const timeStr = now.toTimeString().split(' ')[0];
-
-    const tr = document.createElement('tr');
-    tr.className = 'bg-[#E6F4EA]/70 text-slate-900 font-bold transition-all';
-    tr.innerHTML = `
-      <td class="p-1 text-[#006233]">${timeStr}</td>
-      <td class="p-1 font-sans">${nameInput.value}</td>
-      <td class="p-1">${wilayaInput.value}</td>
-      <td class="p-1 text-[#0080C8] font-semibold">${domainInput.value}</td>
-    `;
-
-    tableBody.prepend(tr);
-
-    const sampleNames = ['Yacine Kaci', 'Meriem Bouzid', 'Reda Zerrouki', 'Samia Tlemcani'];
-    const randomName = sampleNames[Math.floor(Math.random() * sampleNames.length)];
-    nameInput.value = randomName;
-  });
-</script>
