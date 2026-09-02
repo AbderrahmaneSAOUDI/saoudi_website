@@ -27,73 +27,96 @@ import '../../styles/global.css';
         --ai-accent-tint: #e6f7f1;
         --brand-green: #1E824C;
         --brand-green-dark: #006233;
+        --brand-green-light: #e6f7f1;
         --brand-blue: #0080C8;
         --text-dark: #1A202C;
         --ease-m3: cubic-bezier(0.2, 0, 0.2, 1);
         --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
       }
 
-      /* Animated Glowing Floating Orbs in Background */
-      .bg-orb {
+      /* === 1. Multi-Layered Fluid Aurora Mesh Gradients === */
+      .bg-aurora-container {
         position: fixed;
-        border-radius: 9999px;
+        inset: 0;
         pointer-events: none;
         z-index: 0;
-        filter: blur(50px);
-        opacity: 0.65;
+        overflow: hidden;
+      }
+
+      .aurora-blob {
+        position: absolute;
+        border-radius: 9999px;
+        filter: blur(65px);
+        opacity: 0.75;
         will-change: transform;
       }
 
-      .bg-orb-1 {
-        width: 450px;
-        height: 450px;
-        background: radial-gradient(circle, rgba(0, 98, 51, 0.22) 0%, rgba(30, 130, 76, 0.08) 60%, transparent 70%);
-        top: -80px;
-        left: -80px;
-        animation: orbDrift1 22s ease-in-out infinite alternate;
+      .aurora-blob-1 {
+        width: 520px;
+        height: 520px;
+        background: radial-gradient(circle, rgba(0, 98, 51, 0.28) 0%, rgba(30, 130, 76, 0.12) 50%, transparent 70%);
+        top: -100px;
+        left: -100px;
+        animation: auroraMorph1 24s ease-in-out infinite alternate;
       }
 
-      .bg-orb-2 {
-        width: 550px;
-        height: 550px;
-        background: radial-gradient(circle, rgba(0, 128, 200, 0.18) 0%, rgba(0, 98, 51, 0.06) 60%, transparent 70%);
-        bottom: -100px;
-        right: -100px;
-        animation: orbDrift2 26s ease-in-out infinite alternate;
+      .aurora-blob-2 {
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(0, 128, 200, 0.24) 0%, rgba(0, 98, 51, 0.08) 50%, transparent 70%);
+        bottom: -120px;
+        right: -120px;
+        animation: auroraMorph2 28s ease-in-out infinite alternate;
       }
 
-      .bg-orb-3 {
-        width: 320px;
-        height: 320px;
-        background: radial-gradient(circle, rgba(249, 171, 0, 0.12) 0%, transparent 70%);
-        top: 40%;
-        right: 20%;
-        animation: orbDrift3 18s ease-in-out infinite alternate;
+      .aurora-blob-3 {
+        width: 420px;
+        height: 420px;
+        background: radial-gradient(circle, rgba(249, 171, 0, 0.16) 0%, rgba(30, 130, 76, 0.06) 60%, transparent 70%);
+        top: 35%;
+        right: 15%;
+        animation: auroraMorph3 20s ease-in-out infinite alternate;
       }
 
-      @keyframes orbDrift1 {
-        0% { transform: translate3d(0, 0, 0) scale(1); }
-        50% { transform: translate3d(120px, 80px, 0) scale(1.15); }
-        100% { transform: translate3d(60px, 140px, 0) scale(0.95); }
+      .aurora-blob-4 {
+        width: 480px;
+        height: 480px;
+        background: radial-gradient(circle, rgba(52, 168, 83, 0.2) 0%, rgba(0, 128, 200, 0.08) 60%, transparent 70%);
+        bottom: 25%;
+        left: 20%;
+        animation: auroraMorph4 22s ease-in-out infinite alternate;
       }
 
-      @keyframes orbDrift2 {
-        0% { transform: translate3d(0, 0, 0) scale(1); }
-        50% { transform: translate3d(-140px, -90px, 0) scale(1.1); }
-        100% { transform: translate3d(-70px, -150px, 0) scale(1.05); }
+      @keyframes auroraMorph1 {
+        0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+        50% { transform: translate3d(140px, 100px, 0) scale(1.18) rotate(45deg); }
+        100% { transform: translate3d(70px, 180px, 0) scale(0.92) rotate(90deg); }
       }
 
-      @keyframes orbDrift3 {
-        0% { transform: translate3d(0, 0, 0) scale(0.9); }
-        100% { transform: translate3d(-80px, 60px, 0) scale(1.2); }
+      @keyframes auroraMorph2 {
+        0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+        50% { transform: translate3d(-160px, -110px, 0) scale(1.15) rotate(-45deg); }
+        100% { transform: translate3d(-80px, -180px, 0) scale(1.05) rotate(-90deg); }
       }
 
-      /* Animated Particle Background System (Pure CSS) */
+      @keyframes auroraMorph3 {
+        0% { transform: translate3d(0, 0, 0) scale(0.95); }
+        50% { transform: translate3d(-100px, 80px, 0) scale(1.25); }
+        100% { transform: translate3d(-40px, -60px, 0) scale(1.0); }
+      }
+
+      @keyframes auroraMorph4 {
+        0% { transform: translate3d(0, 0, 0) scale(1.05); }
+        50% { transform: translate3d(110px, -90px, 0) scale(0.9); }
+        100% { transform: translate3d(50px, 80px, 0) scale(1.2); }
+      }
+
+      /* === 2. Enhanced Floating Particle Constellation === */
       .bg-particles::before,
       .bg-particles::after {
         content: '';
         position: fixed;
-        inset: -50px;
+        inset: -60px;
         pointer-events: none;
         z-index: 0;
         will-change: transform;
@@ -101,53 +124,82 @@ import '../../styles/global.css';
 
       .bg-particles::before {
         background-image:
-          radial-gradient(circle, rgba(0, 98, 51, 0.4) 1.5px, transparent 1.5px),
-          radial-gradient(circle, rgba(0, 128, 200, 0.3) 1.5px, transparent 1.5px),
-          radial-gradient(circle, rgba(30, 130, 76, 0.3) 1.2px, transparent 1.2px),
-          radial-gradient(circle, rgba(249, 171, 0, 0.28) 1.5px, transparent 1.5px);
+          radial-gradient(circle, rgba(0, 98, 51, 0.45) 1.5px, transparent 1.5px),
+          radial-gradient(circle, rgba(0, 128, 200, 0.35) 1.5px, transparent 1.5px),
+          radial-gradient(circle, rgba(30, 130, 76, 0.35) 1.2px, transparent 1.2px),
+          radial-gradient(circle, rgba(249, 171, 0, 0.32) 1.5px, transparent 1.5px);
         background-size: 70px 70px, 95px 95px, 70px 70px, 120px 120px;
         background-position: 0 0, 30% 15%, 25% 68%, 82% 88%;
         background-repeat: repeat;
-        animation: bgPoints 42s linear infinite;
-        opacity: 0.9;
+        animation: bgPoints 36s linear infinite;
+        opacity: 0.95;
       }
 
       .bg-particles::after {
         background-image:
-          radial-gradient(circle, rgba(0, 98, 51, 0.22) 1.5px, transparent 2px),
-          radial-gradient(circle, rgba(0, 128, 200, 0.2) 1.5px, transparent 2px),
-          radial-gradient(circle, rgba(0, 98, 51, 0.18) 1px, transparent 1.5px),
-          radial-gradient(circle, rgba(255, 255, 255, 0.7) 1px, transparent 1.5px);
+          radial-gradient(circle, rgba(0, 98, 51, 0.25) 1.5px, transparent 2px),
+          radial-gradient(circle, rgba(0, 128, 200, 0.22) 1.5px, transparent 2px),
+          radial-gradient(circle, rgba(0, 98, 51, 0.2) 1px, transparent 1.5px),
+          radial-gradient(circle, rgba(255, 255, 255, 0.8) 1px, transparent 1.5px);
         background-repeat: repeat;
         background-size: 120px 120px, 100px 100px, 24px 24px, 24px 24px;
         background-position: 8% 90%, 85% 60%, 0 0, 14px 14px;
-        animation: bgStars 20s linear infinite;
-        opacity: 0.95;
+        animation: bgStars 18s linear infinite;
+        opacity: 1;
       }
 
       @keyframes bgPoints {
         0% { transform: translate3d(0, 0, 0); }
-        50% { transform: translate3d(-60px, 45px, 0); }
+        50% { transform: translate3d(-70px, 50px, 0); }
         100% { transform: translate3d(0, 0, 0); }
       }
 
       @keyframes bgStars {
         0% { transform: translate3d(0, 0, 0); }
-        50% { transform: translate3d(90px, -90px, 0); }
+        50% { transform: translate3d(100px, -100px, 0); }
         100% { transform: translate3d(0, 0, 0); }
       }
 
-      /* Main presentation frame: ~94% of screen view with 16:9 ratio and animated border */
+      /* === 3. Floating Ambient Tech Geometric Nodes === */
+      .floating-node {
+        position: fixed;
+        pointer-events: none;
+        z-index: 1;
+        opacity: 0.35;
+        will-change: transform;
+      }
+
+      .node-1 { top: 12%; left: 8%; animation: floatNode1 14s ease-in-out infinite; }
+      .node-2 { top: 75%; left: 6%; animation: floatNode2 16s ease-in-out 1s infinite; }
+      .node-3 { top: 18%; right: 10%; animation: floatNode3 15s ease-in-out 2s infinite; }
+      .node-4 { bottom: 12%; right: 8%; animation: floatNode1 18s ease-in-out 3s infinite; }
+
+      @keyframes floatNode1 {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+      }
+
+      @keyframes floatNode2 {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(22px) rotate(-180deg); }
+      }
+
+      @keyframes floatNode3 {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        50% { transform: translate(-15px, -20px) rotate(120deg); }
+      }
+
+      /* === 4. Main Presentation Frame Dynamics === */
       .presentation-frame {
         width: min(94vw, calc(94vh * 16 / 9));
         height: min(94vh, calc(94vw * 9 / 16));
-        animation: frameEntrance 0.8s var(--ease-spring) forwards, frameLevitate 9s ease-in-out 1s infinite;
+        animation: frameEntrance 0.85s var(--ease-spring) forwards, frameLevitate 8s ease-in-out 1s infinite;
       }
 
       @keyframes frameEntrance {
         from {
           opacity: 0;
-          transform: scale(0.93) translateY(24px);
+          transform: scale(0.92) translateY(30px);
         }
         to {
           opacity: 1;
@@ -157,10 +209,24 @@ import '../../styles/global.css';
 
       @keyframes frameLevitate {
         0%, 100% {
-          transform: translateY(0px);
+          transform: translateY(0px) rotate(0deg);
         }
         50% {
-          transform: translateY(-5px);
+          transform: translateY(-6px) rotate(0.1deg);
+        }
+      }
+
+      /* Dynamic Border Hue Shift */
+      .frame-border-pulse {
+        animation: borderPulse 8s ease-in-out infinite;
+      }
+
+      @keyframes borderPulse {
+        0%, 100% {
+          border-color: rgba(0, 98, 51, 0.25);
+        }
+        50% {
+          border-color: rgba(0, 128, 200, 0.35);
         }
       }
 
@@ -169,8 +235,8 @@ import '../../styles/global.css';
         position: absolute;
         inset: 0;
         background: 
-          radial-gradient(ellipse at 90% 25%, rgba(230, 247, 241, 0.8) 0%, transparent 60%),
-          radial-gradient(ellipse at 75% 85%, rgba(240, 249, 245, 0.6) 0%, transparent 50%);
+          radial-gradient(ellipse at 90% 25%, rgba(230, 247, 241, 0.85) 0%, transparent 60%),
+          radial-gradient(ellipse at 75% 85%, rgba(240, 249, 245, 0.65) 0%, transparent 50%);
         pointer-events: none;
         z-index: 0;
       }
@@ -181,34 +247,45 @@ import '../../styles/global.css';
         pointer-events: none;
         user-select: none;
         z-index: 1;
-        opacity: 0.75;
+        opacity: 0.8;
       }
 
       .tag-1 {
-        top: 2.5rem;
+        top: 2.2rem;
         right: 3.5rem;
-        animation: tagFloat1 6s ease-in-out infinite alternate;
+        animation: tagFloat1 5.5s ease-in-out infinite alternate;
       }
 
       .tag-2 {
         bottom: 5.5rem;
-        right: 4.5rem;
-        animation: tagFloat2 7s ease-in-out 0.5s infinite alternate;
+        right: 4.2rem;
+        animation: tagFloat2 6.5s ease-in-out 0.5s infinite alternate;
+      }
+
+      .tag-3 {
+        top: 48%;
+        right: 2.8rem;
+        animation: tagFloat3 7s ease-in-out 1s infinite alternate;
       }
 
       @keyframes tagFloat1 {
         0% { transform: translateY(0px) rotate(0deg); }
-        100% { transform: translateY(-8px) rotate(2deg); }
+        100% { transform: translateY(-10px) rotate(2deg); }
       }
 
       @keyframes tagFloat2 {
         0% { transform: translateY(0px) rotate(0deg); }
-        100% { transform: translateY(8px) rotate(-2deg); }
+        100% { transform: translateY(10px) rotate(-2deg); }
+      }
+
+      @keyframes tagFloat3 {
+        0% { transform: translateY(0px) scale(0.98); }
+        100% { transform: translateY(-6px) scale(1.02); }
       }
 
       /* Speaker Pill Shimmer Sweep */
       .speaker-pill-wrapper {
-        animation: slideDownFade 0.65s var(--ease-spring) 0.15s backwards;
+        animation: slideDownFade 0.7s var(--ease-spring) 0.15s backwards;
       }
 
       .speaker-pill::after {
@@ -218,29 +295,29 @@ import '../../styles/global.css';
         left: -50%;
         width: 200%;
         height: 200%;
-        background: linear-gradient(60deg, transparent 40%, rgba(255, 255, 255, 0.3) 50%, transparent 60%);
+        background: linear-gradient(60deg, transparent 35%, rgba(255, 255, 255, 0.4) 50%, transparent 65%);
         transform: translateX(-100%);
-        animation: shimmerSweep 4.5s ease-in-out 1.5s infinite;
+        animation: shimmerSweep 4s ease-in-out 1.2s infinite;
       }
 
       @keyframes shimmerSweep {
         0% { transform: translateX(-100%); }
-        25%, 100% { transform: translateX(100%); }
+        30%, 100% { transform: translateX(100%); }
       }
 
       @keyframes livePulse {
-        0% { transform: scale(1); opacity: 0.8; }
-        100% { transform: scale(2.4); opacity: 0; }
+        0% { transform: scale(1); opacity: 0.85; }
+        100% { transform: scale(2.6); opacity: 0; }
       }
 
       .live-dot-pulse {
-        animation: livePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        animation: livePulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
       }
 
       @keyframes slideDownFade {
         from {
           opacity: 0;
-          transform: translateY(-20px) scale(0.95);
+          transform: translateY(-24px) scale(0.94);
         }
         to {
           opacity: 1;
@@ -248,18 +325,18 @@ import '../../styles/global.css';
         }
       }
 
-      /* Title Typography Animations */
+      /* === 5. Flowing Text Gradient Animation === */
       .title-highlight {
-        background: linear-gradient(110deg, #1E824C 0%, #006233 25%, #0080C8 50%, #1E824C 75%, #006233 100%);
+        background: linear-gradient(110deg, #006233 0%, #1E824C 25%, #0080C8 50%, #22C55E 75%, #006233 100%);
         background-size: 250% 100%;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        animation: slideRightFade 0.7s var(--ease-spring) 0.25s backwards, textGradientFlow 8s ease-in-out infinite;
+        animation: slideRightFade 0.75s var(--ease-spring) 0.25s backwards, textGradientFlow 7s ease-in-out infinite;
         will-change: background-position;
       }
 
       .title-subtext {
-        animation: slideRightFade 0.7s var(--ease-spring) 0.38s backwards;
+        animation: slideRightFade 0.75s var(--ease-spring) 0.38s backwards;
       }
 
       @keyframes textGradientFlow {
@@ -271,7 +348,7 @@ import '../../styles/global.css';
       @keyframes slideRightFade {
         from {
           opacity: 0;
-          transform: translateX(-30px);
+          transform: translateX(-35px);
         }
         to {
           opacity: 1;
@@ -279,10 +356,10 @@ import '../../styles/global.css';
         }
       }
 
-      /* Animated Horizontal Divider Line with Energy Beam */
+      /* === 6. Energy Beam on Divider Line === */
       .divider-line {
         transform-origin: left;
-        animation: expandLine 0.8s var(--ease-m3) 0.45s backwards;
+        animation: expandLine 0.85s var(--ease-m3) 0.45s backwards;
       }
 
       .divider-line::after {
@@ -290,15 +367,15 @@ import '../../styles/global.css';
         position: absolute;
         top: 0;
         left: 0;
-        width: 180px;
+        width: 220px;
         height: 100%;
-        background: linear-gradient(90deg, transparent 0%, #1E824C 40%, #0080C8 80%, transparent 100%);
-        animation: beamSweep 3.8s ease-in-out 1.2s infinite;
+        background: linear-gradient(90deg, transparent 0%, #1E824C 30%, #0080C8 70%, #81C784 90%, transparent 100%);
+        animation: beamSweep 3.2s ease-in-out 1.2s infinite;
       }
 
       @keyframes beamSweep {
-        0% { transform: translateX(-180px); }
-        40%, 100% { transform: translateX(1800px); }
+        0% { transform: translateX(-220px); }
+        45%, 100% { transform: translateX(1800px); }
       }
 
       @keyframes expandLine {
@@ -310,43 +387,47 @@ import '../../styles/global.css';
         }
       }
 
-      /* Animated Play Button with Sonar Radar Wave */
+      /* === 7. Multi-Ring Sonar Waves & Orbit on Play Button === */
       .play-circle-wrapper {
-        animation: popIn 0.6s var(--ease-spring) 0.6s backwards;
+        animation: popIn 0.65s var(--ease-spring) 0.6s backwards;
       }
 
       .sonar-wave {
-        animation: sonarPulse 2.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+        animation: sonarPulse 2.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
       }
 
       .sonar-wave-2 {
-        animation: sonarPulse 2.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.7s infinite;
+        animation: sonarPulse 2.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.65s infinite;
+      }
+
+      .sonar-wave-3 {
+        animation: sonarPulse 2.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.3s infinite;
       }
 
       @keyframes sonarPulse {
         0% {
-          transform: scale(0.85);
-          opacity: 0.9;
+          transform: scale(0.8);
+          opacity: 0.95;
         }
         100% {
-          transform: scale(1.6);
+          transform: scale(1.8);
           opacity: 0;
         }
       }
 
       .play-icon {
-        animation: iconNudge 2.2s ease-in-out infinite;
+        animation: iconNudge 2s ease-in-out infinite;
       }
 
       @keyframes iconNudge {
         0%, 100% { transform: translateX(0); }
-        50% { transform: translateX(2.5px); }
+        50% { transform: translateX(3px); }
       }
 
       @keyframes popIn {
         from {
           opacity: 0;
-          transform: scale(0) rotate(-45deg);
+          transform: scale(0) rotate(-60deg);
         }
         to {
           opacity: 1;
@@ -354,15 +435,15 @@ import '../../styles/global.css';
         }
       }
 
-      /* Animated Program & Category Tag */
+      /* === 8. Program & Category Tag Animation === */
       .program-tag {
-        animation: slideUpFade 0.65s var(--ease-spring) 0.55s backwards;
+        animation: slideUpFade 0.7s var(--ease-spring) 0.55s backwards;
       }
 
       @keyframes slideUpFade {
         from {
           opacity: 0;
-          transform: translateY(20px);
+          transform: translateY(24px);
         }
         to {
           opacity: 1;
@@ -370,30 +451,42 @@ import '../../styles/global.css';
         }
       }
 
-      /* Animated Logos Row with Sequential Delays */
+      /* === 9. Animated Logos Row with Dynamic Waves === */
       .logo-wrapper-1 {
-        animation: slideUpFade 0.65s var(--ease-spring) 0.7s backwards, logoBob 5s ease-in-out 1.5s infinite;
+        animation: slideUpFade 0.7s var(--ease-spring) 0.7s backwards, logoBob1 4.8s ease-in-out 1.5s infinite;
       }
 
       .logo-wrapper-2 {
-        animation: slideUpFade 0.65s var(--ease-spring) 0.82s backwards, logoBob 5.5s ease-in-out 1.8s infinite;
+        animation: slideUpFade 0.7s var(--ease-spring) 0.82s backwards, logoBob2 5.2s ease-in-out 1.8s infinite;
       }
 
       .logo-wrapper-3 {
-        animation: slideUpFade 0.65s var(--ease-spring) 0.94s backwards, logoBob 6s ease-in-out 2.1s infinite;
+        animation: slideUpFade 0.7s var(--ease-spring) 0.94s backwards, logoBob3 5.8s ease-in-out 2.1s infinite;
       }
 
-      @keyframes logoBob {
+      @keyframes logoBob1 {
         0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-3px); }
+        50% { transform: translateY(-4px); }
+      }
+
+      @keyframes logoBob2 {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+      }
+
+      @keyframes logoBob3 {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3.5px); }
       }
 
       /* Respect Reduced Motion */
       @media (prefers-reduced-motion: reduce) {
         .bg-particles::before,
         .bg-particles::after,
-        .bg-orb,
+        .aurora-blob,
+        .floating-node,
         .presentation-frame,
+        .frame-border-pulse,
         .speaker-pill::after,
         .live-dot-pulse,
         .title-highlight,
@@ -403,6 +496,7 @@ import '../../styles/global.css';
         .play-circle-wrapper,
         .sonar-wave,
         .sonar-wave-2,
+        .sonar-wave-3,
         .play-icon,
         .program-tag,
         .logo-wrapper-1,
@@ -417,17 +511,32 @@ import '../../styles/global.css';
       }
     </style>
   </head>
-  <body class="bg-[#e6f7f1] text-slate-800 font-sans w-screen h-screen overflow-hidden flex items-center justify-center relative bg-particles antialiased">
-    <!-- Background Ambient Glowing Orbs -->
-    <div class="bg-orb bg-orb-1"></div>
-    <div class="bg-orb bg-orb-2"></div>
-    <div class="bg-orb bg-orb-3"></div>
+  <body class="bg-[#e6f7f1] text-slate-800 font-sans w-screen h-screen overflow-hidden flex items-center justify-center relative bg-particles antialiased select-none">
+    <!-- 1. Background Ambient Multi-Aurora Morphing Blobs -->
+    <div class="bg-aurora-container">
+      <div class="aurora-blob aurora-blob-1"></div>
+      <div class="aurora-blob aurora-blob-2"></div>
+      <div class="aurora-blob aurora-blob-3"></div>
+      <div class="aurora-blob aurora-blob-4"></div>
+    </div>
 
-    <!-- Main Presentation Card (94% screen view, 16:9 ratio, bordered, levitating) -->
-    <main class="presentation-frame bg-white rounded-3xl sm:rounded-[32px] border-2 border-emerald-800/25 relative flex flex-col justify-between p-6 sm:p-10 md:p-14 lg:p-16 overflow-hidden z-10 hover:border-emerald-800/45 transition-colors duration-500">
+    <!-- 2. Floating Background Geometric Tech Nodes -->
+    <svg class="floating-node node-1 w-6 h-6 text-emerald-800/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 2v20M2 12h20" />
+    </svg>
+    <svg class="floating-node node-2 w-5 h-5 text-sky-800/35" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polygon points="12 2 22 12 12 22 2 12" />
+    </svg>
+    <svg class="floating-node node-3 w-5 h-5 text-emerald-800/35" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="8" />
+    </svg>
+    <svg class="floating-node node-4 w-6 h-6 text-amber-800/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 2v20M2 12h20" />
+    </svg>
+
+    <!-- 3. Main Presentation Card (94% screen view, 16:9 ratio, bordered, levitating) -->
+    <main class="presentation-frame frame-border-pulse bg-white rounded-3xl sm:rounded-[32px] border-2 border-emerald-800/25 relative flex flex-col justify-between p-6 sm:p-10 md:p-14 lg:p-16 overflow-hidden z-10 hover:border-emerald-800/50 transition-colors duration-500">
       <div class="bg-overlay"></div>
-
-     
 
       <div class="content-layer relative z-10 h-full flex flex-col justify-between">
         <!-- Top: Speaker's Name in Green Pill -->
@@ -459,13 +568,14 @@ import '../../styles/global.css';
 
         <!-- Bottom: Dividing Line + Program Tag + Logos -->
         <div class="pb-1">
-          <!-- Line with Right Play Circle & Sonar Waves -->
+          <!-- Line with Right Play Circle & Multi-Ring Sonar Waves -->
           <div class="relative w-full flex items-center my-2 sm:my-3">
             <div class="divider-line relative w-full h-[2px] bg-slate-900 overflow-hidden"></div>
             <div class="play-circle-wrapper absolute right-0 flex items-center justify-center">
-              <div class="sonar-wave absolute -inset-1.5 rounded-full border-2 border-emerald-600/40 pointer-events-none"></div>
-              <div class="sonar-wave-2 absolute -inset-3 rounded-full border-[1.5px] border-sky-600/30 pointer-events-none"></div>
-              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#1E824C] hover:bg-[#006233] flex items-center justify-center text-white border-2 border-white transition-all duration-300 hover:scale-110 hover:rotate-6 cursor-pointer select-none" title="Session 7.77">
+              <div class="sonar-wave absolute -inset-1.5 rounded-full border-2 border-emerald-600/45 pointer-events-none"></div>
+              <div class="sonar-wave-2 absolute -inset-3.5 rounded-full border-[1.5px] border-sky-600/35 pointer-events-none"></div>
+              <div class="sonar-wave-3 absolute -inset-5 rounded-full border border-emerald-500/25 pointer-events-none"></div>
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#1E824C] hover:bg-[#006233] flex items-center justify-center text-white border-2 border-white transition-all duration-300 hover:scale-115 hover:rotate-6 cursor-pointer select-none" title="Session 7.77">
                 <svg class="play-icon w-4 h-4 ml-0.5 fill-current" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
@@ -475,13 +585,14 @@ import '../../styles/global.css';
 
           <!-- Program & Age Tag -->
           <div class="program-tag text-[#1E824C] font-extrabold text-base sm:text-xl md:text-2xl tracking-tight inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
             <span>7.77 Program | Age: 24-30</span>
           </div>
 
           <!-- Institutional Logos -->
           <div class="flex items-center gap-6 sm:gap-10 md:gap-14 mt-4 sm:mt-6">
             <!-- Ministère de la Poste et des Télécommunications -->
-            <div class="logo-wrapper-1 flex items-center transition-transform duration-300 hover:-translate-y-1.5 hover:scale-105">
+            <div class="logo-wrapper-1 flex items-center transition-transform duration-300 hover:-translate-y-2 hover:scale-105">
               <img 
                 src={logoMinistere.src} 
                 alt="Ministère de la Poste et des Télécommunications" 
@@ -490,7 +601,7 @@ import '../../styles/global.css';
             </div>
 
             <!-- Algérie Télécom -->
-            <div class="logo-wrapper-2 flex items-center transition-transform duration-300 hover:-translate-y-1.5 hover:scale-105">
+            <div class="logo-wrapper-2 flex items-center transition-transform duration-300 hover:-translate-y-2 hover:scale-105">
               <img 
                 src={logoAlgerieTelecom.src} 
                 alt="Algérie Télécom" 
@@ -499,7 +610,7 @@ import '../../styles/global.css';
             </div>
 
             <!-- Mobilis -->
-            <div class="logo-wrapper-3 flex items-center transition-transform duration-300 hover:-translate-y-1.5 hover:scale-105">
+            <div class="logo-wrapper-3 flex items-center transition-transform duration-300 hover:-translate-y-2 hover:scale-105">
               <img 
                 src={logoMobilis.src} 
                 alt="Mobilis" 
