@@ -526,6 +526,7 @@
 
 .video-fade-loop {
   animation: videoFadeLoop 10.01s ease-in-out infinite;
+  background-color: transparent !important;
   will-change: opacity, transform;
 }
 
@@ -534,15 +535,15 @@
     opacity: 0;
     transform: scale(0.98);
   }
-  8% {
+  10% {
     opacity: 1;
     transform: scale(1);
   }
-  84% {
+  78% {
     opacity: 1;
     transform: scale(1);
   }
-  97% {
+  96% {
     opacity: 0;
     transform: scale(0.985);
   }
