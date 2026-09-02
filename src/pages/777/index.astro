@@ -3,6 +3,7 @@ import PresentationHeader from './_components/PresentationHeader.astro';
 import PresentationFooter from './_components/PresentationFooter.astro';
 import Slide1Cover from './_slides/Slide1Cover.astro';
 import Slide2Speaker from './_slides/Slide2Speaker.astro';
+import Slide3Welcome from './_slides/Slide3Welcome.astro';
 import '../../styles/global.css';
 import './_styles/presentation.css';
 ---
@@ -64,7 +65,7 @@ import './_styles/presentation.css';
     <!-- 4. Main Presentation Card (94% screen view, 16:9 ratio, bordered, levitating, 100% white background) -->
     <main 
       id="presentationDeck" 
-      data-current-slide="1" 
+      data-current-slide="3" 
       class="presentation-frame frame-border-pulse bg-white rounded-3xl sm:rounded-[32px] border-2 border-emerald-800/25 relative flex flex-col justify-between p-6 sm:p-10 md:p-12 lg:p-14 xl:p-16 overflow-hidden z-10 hover:border-emerald-800/50 transition-colors duration-500"
     >
       <!-- Architectural Corner L-Brackets -->
@@ -81,6 +82,7 @@ import './_styles/presentation.css';
         <div class="relative w-full flex-1 my-auto flex items-center min-h-0 overflow-hidden">
           <Slide1Cover />
           <Slide2Speaker />
+          <Slide3Welcome />
         </div>
 
         <!-- Bottom: Footer Component (Dividing line, navigation buttons, logos & tag/title) -->
@@ -96,8 +98,8 @@ import './_styles/presentation.css';
         const nextBtn = document.getElementById('nextSlideBtn');
         const video = document.getElementById('heroVideo');
 
-        let currentSlide = 1;
-        const totalSlides = 2;
+        let currentSlide = 3;
+        const totalSlides = 3;
         let isFadingOut = false;
 
         // Video Synchronized Fade Controller
