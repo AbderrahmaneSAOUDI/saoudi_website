@@ -1,43 +1,184 @@
 ---
-import PresentationDeck from './_components/PresentationDeck.astro';
-import './_styles/presentation.css';
+import logoMinistere from './_assets/logo_ministre.png';
+import logoAlgerieTelecom from './_assets/logo_Algérie_Télécom.svg';
+import logoMobilis from './_assets/logo_Mobilis.svg';
 ---
 
 <!doctype html>
-<html lang="fr" class="deck-mode">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>7.77 Program Presentation Deck • saoudi.online</title>
-    <meta name="description" content="Présentation interactive et keynote sur la productivité numérique, les systèmes de travail et Google Workspace pour le Programme National 7.77." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digital Productivity: Work Smarter, Not Harder • 777 Program</title>
+    <meta name="description" content="Digital Productivity: Work Smarter, Not Harder by Abderrahmane SAOUDI - 777 Program (Age: 24-30)." />
     
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="7.77 Program Presentation Deck • saoudi.online" />
-    <meta property="og:description" content="Keynote interactive pour le Programme National 7.77 par Abderrahmane SAOUDI." />
+    <meta property="og:title" content="Digital Productivity: Work Smarter, Not Harder • 777 Program" />
+    <meta property="og:description" content="Presentation by Abderrahmane SAOUDI for the 777 Program." />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="fr_DZ" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <style is:global>
-      /* Ensure absolute 0 margins and zero scrollbars */
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <style>
+      :root {
+        --ai-accent-tint: #e6f7f1;
+        --color-brand-green: #006233;
+        --color-brand-blue: #0080C8;
+        --color-dark-text: #0F172A;
+      }
+
       * {
         box-sizing: border-box;
-      }
-      
-      body {
         margin: 0;
         padding: 0;
+      }
+
+      body {
+        background-color: var(--ai-accent-tint);
+        color: var(--color-dark-text);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        min-height: 100vh;
+        width: 100vw;
+        overflow-x: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+      }
+
+      .cover-card {
+        background-color: #FFFFFF;
+        border-radius: 32px;
+        width: 100%;
+        max-width: 1280px;
+        min-height: min(88vh, 720px);
+        aspect-ratio: 16 / 9;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: clamp(2rem, 4vw, 3.5rem) clamp(2.5rem, 5vw, 4.5rem);
+        border: 1px solid rgba(0, 98, 51, 0.12);
+        position: relative;
         overflow: hidden;
-        background-color: #0E0E0E;
-        font-family: 'Google Sans', Inter, system-ui, sans-serif;
+      }
+
+      /* Subtle decorative geometry without shadows */
+      .corner-accent {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle at top right, rgba(0, 98, 51, 0.08) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .corner-accent-bottom {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 220px;
+        height: 220px;
+        background: radial-gradient(circle at bottom left, rgba(0, 128, 200, 0.06) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .font-cairo {
+        font-family: 'Cairo', sans-serif;
       }
     </style>
   </head>
-  <body class="deck-mode">
-    <main>
-      <PresentationDeck />
+  <body>
+    <main class="cover-card">
+      <div class="corner-accent"></div>
+      <div class="corner-accent-bottom"></div>
+
+      <!-- Top Header: Speaker's Name -->
+      <header class="relative z-10 flex items-center justify-between">
+        <div>
+          <span class="text-xs uppercase tracking-widest font-bold text-emerald-800/60 block mb-0.5">
+            Intervenant / Speaker
+          </span>
+          <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight font-cairo">
+            Abderrahmane SAOUDI
+          </h2>
+        </div>
+
+        <div class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#e6f7f1] border border-emerald-800/15 text-xs font-bold text-emerald-900">
+          <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+          <span>Session Keynote</span>
+        </div>
+      </header>
+
+      <!-- Center Content: Title, Program & Age Category -->
+      <section class="my-auto py-8 relative z-10 space-y-5 max-w-4xl">
+        <!-- Badge: 777 program | Age: 24-30 -->
+        <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#e6f7f1] border border-emerald-800/20 text-emerald-950 font-bold text-xs sm:text-sm tracking-wide">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
+          <span class="font-extrabold uppercase">777 program</span>
+          <span class="text-emerald-800/40">|</span>
+          <span class="font-semibold text-emerald-800">Age: 24-30</span>
+        </div>
+
+        <!-- Session Title -->
+        <div class="space-y-3">
+          <h1 class="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.15] font-cairo">
+            Digital Productivity :<br />
+            <span class="text-emerald-700">
+              Work Smarter, Not Harder
+            </span>
+          </h1>
+          <p class="text-base sm:text-lg text-slate-600 font-medium max-w-2xl leading-relaxed">
+            Maîtriser les systèmes de travail modernes, éliminer les frictions numériques et structurer la collaboration d'équipe.
+          </p>
+        </div>
+      </section>
+
+      <!-- Footer: Partner & Ministry Logos -->
+      <footer class="relative z-10 pt-6 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div class="flex items-center flex-wrap justify-center sm:justify-start gap-6 sm:gap-10">
+          <!-- Ministère de la Poste et des Télécommunications -->
+          <div class="flex items-center">
+            <img 
+              src={logoMinistere.src} 
+              alt="Ministère de la Poste et des Télécommunications" 
+              class="h-14 sm:h-16 w-auto object-contain"
+            />
+          </div>
+
+          <div class="h-10 w-px bg-slate-200 hidden sm:block"></div>
+
+          <!-- Algérie Télécom -->
+          <div class="flex items-center">
+            <img 
+              src={logoAlgerieTelecom.src} 
+              alt="Algérie Télécom" 
+              class="h-9 sm:h-11 w-auto object-contain"
+            />
+          </div>
+
+          <!-- Mobilis -->
+          <div class="flex items-center">
+            <img 
+              src={logoMobilis.src} 
+              alt="Mobilis" 
+              class="h-7 sm:h-9 w-auto object-contain"
+            />
+          </div>
+        </div>
+
+        <div class="text-xs text-slate-400 font-medium text-center sm:text-right">
+          <span class="font-bold text-slate-700">Programme National 7.77</span>
+          <span class="block text-[11px] text-slate-400">saoudi.online/777</span>
+        </div>
+      </footer>
     </main>
   </body>
 </html>
