@@ -1,0 +1,41 @@
+---
+import videoSrc from '../_assets/video.mp4';
+
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<!-- ================= SLIDE 1 PANE (COVER) ================= -->
+<section 
+  id="slide-1-content" 
+  class={`slide-pane slide-pane-1 w-full flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 lg:gap-8 xl:gap-10 ${className}`}
+>
+  <!-- Title Left Block -->
+  <div class="flex flex-col gap-1 sm:gap-2 shrink-0">
+    <!-- First Line: Green & Larger with Dynamic Shimmer Gradient -->
+    <h1 class="title-highlight font-black text-3xl sm:text-4xl md:text-5xl lg:text-[3.8rem] xl:text-[4.4rem] tracking-tight leading-[1.08] whitespace-nowrap">
+      Digital Productivity
+    </h1>
+    <!-- Second Line: Dark & Complementary -->
+    <h2 class="title-subtext font-light text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl text-slate-900 tracking-tight leading-tight">
+      Work Smarter, Not Harder
+    </h2>
+  </div>
+
+  <!-- Video Right Block (Bigger, borderless, pure transparent fade loop) -->
+  <div class="video-wrapper flex-1 w-full max-w-[420px] sm:max-w-[540px] md:max-w-[660px] lg:max-w-[780px] xl:max-w-[880px] 2xl:max-w-[940px] flex justify-center md:justify-end">
+    <div class="relative w-full aspect-video rounded-3xl overflow-hidden bg-transparent">
+      <video 
+        id="heroVideo"
+        src={videoSrc}
+        autoplay
+        muted
+        playsinline
+        class="hero-video w-full h-full object-contain md:object-cover bg-transparent pointer-events-none opacity-0"
+      ></video>
+    </div>
+  </div>
+</section>

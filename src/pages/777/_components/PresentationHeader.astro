@@ -1,0 +1,22 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<!-- Top Header positioned more to the bottom, taking only content-width -->
+<header class={`pt-3 sm:pt-5 md:pt-7 lg:pt-8 flex items-center shrink-0 ${className}`}>
+  <!-- Green Pill: Takes only content width, smoothly morphs text to "7.77 Program" on Slide 2 -->
+  <div class="speaker-pill relative overflow-hidden inline-flex items-center gap-2.5 bg-[#1E824C] hover:bg-[#006233] text-white font-bold text-sm sm:text-base md:text-lg px-5 sm:px-7 py-2 sm:py-2.5 rounded-full tracking-tight transition-all duration-400 cursor-default select-none max-w-max">
+    <span class="relative flex h-2.5 w-2.5 shrink-0">
+      <span class="live-dot-pulse absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-300"></span>
+    </span>
+    <!-- Slide 1 Name (takes its natural content width) -->
+    <span class="pill-text-1 whitespace-nowrap">Abderrahmane SAOUDI</span>
+    <!-- Slide 2 Converted Name (takes its natural content width) -->
+    <span class="pill-text-2 whitespace-nowrap">7.77 Program</span>
+  </div>
+</header>

@@ -1,0 +1,122 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<!-- ================= SLIDE 2 PANE (SPEAKER PROFILE & BIO CHIPS) ================= -->
+<section 
+  id="slide-2-content" 
+  class={`slide-pane slide-pane-2 w-full grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 xl:gap-10 items-center ${className}`}
+>
+  <!-- Left Column: Bigger Profile Card with Avatar, Google Colors Ring, Name, & Attractive Website Badge -->
+  <div class="col-span-1 md:col-span-5 flex flex-col items-center text-center p-6 sm:p-8 rounded-3xl bg-emerald-50/50 border-2 border-emerald-800/20 card-float">
+    <!-- Profile Avatar with Continuous Google Colors Gradient Ring & Spinning Celestial Dashed Orbit -->
+    <div class="relative w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 lg:w-52 lg:h-52 rounded-full p-2 avatar-gradient-ring mb-4 transition-transform duration-300">
+      <!-- Spinning Dashed Orbit Ring Around Avatar -->
+      <div class="avatar-orbit-ring absolute -inset-3.5 rounded-full border-2 border-dashed border-emerald-600/35 pointer-events-none"></div>
+      
+      <img 
+        src="/profile.webp" 
+        alt="Abderrahmane SAOUDI" 
+        width="208"
+        height="208"
+        class="w-full h-full object-cover rounded-full bg-white relative z-10"
+        onerror="if(!this.getAttribute('data-fallback-tried')){this.setAttribute('data-fallback-tried','1');this.setAttribute('src','/profile.webp');}"
+      />
+      <!-- Active Speaker Live Pulse Badge -->
+      <span class="absolute bottom-2 right-2 z-20 w-5 h-5 rounded-full bg-[#1E824C] border-2 border-white flex items-center justify-center" title="Intervenant Actif">
+        <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+      </span>
+    </div>
+
+    <!-- Speaker Name with Dynamic Shimmer Gradient -->
+    <h2 class="title-highlight font-black text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight">
+      Abderrahmane SAOUDI
+    </h2>
+
+    <!-- Subtitle Role -->
+    <p class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#006233] mt-1.5">
+      Tech Lead & Creative Engineer
+    </p>
+
+    <!-- Attractive Website Badge (www.saoudi.online) with continuous shimmer & light sweep -->
+    <a 
+      href="https://saoudi.online" 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      class="website-badge mt-4 inline-flex items-center gap-2.5 px-5 sm:px-6 py-2 sm:py-2.5 rounded-full bg-[#1E824C] hover:bg-[#006233] text-white font-mono text-sm sm:text-base font-bold tracking-tight ring-2 ring-emerald-500/40 transition-all duration-300 select-none cursor-pointer"
+    >
+      <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+      </svg>
+      <span>www.saoudi.online</span>
+      <svg class="w-3.5 h-3.5 fill-none stroke-current stroke-[2.5]" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7m0 0H7m10 0v10" />
+      </svg>
+    </a>
+  </div>
+
+  <!-- Right Column: 3 Clean Punchy Bio Pillars (No Descriptions, High Visual Polish) -->
+  <div class="col-span-1 md:col-span-7 flex flex-col gap-4 sm:gap-5">
+    <!-- Pillar 1: Graphic Designer and Advisor -->
+    <div class="bio-card bio-card-1 flex items-center justify-between p-4 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl bg-emerald-50/60 border-2 border-emerald-600/30">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#1E824C] text-white flex items-center justify-center shrink-0 icon-box-pulse">
+          <svg class="w-6 h-6 fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-base sm:text-lg lg:text-xl font-black text-slate-900 tracking-tight">
+            Graphic Designer and Advisor
+          </h3>
+        </div>
+      </div>
+      <span class="hidden sm:inline-flex px-3.5 py-1 rounded-full bg-white border border-emerald-600/25 text-xs font-bold text-[#006233] shrink-0">
+        Art Direction • UI/UX
+      </span>
+    </div>
+
+    <!-- Pillar 2: Mobile and Frontend Web Developer -->
+    <div class="bio-card bio-card-2 flex items-center justify-between p-4 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl bg-sky-50/60 border-2 border-sky-600/30">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#0080C8] text-white flex items-center justify-center shrink-0 icon-box-pulse">
+          <svg class="w-6 h-6 fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-base sm:text-lg lg:text-xl font-black text-slate-900 tracking-tight">
+            Mobile and Frontend Web Developer
+          </h3>
+        </div>
+      </div>
+      <span class="hidden sm:inline-flex px-3.5 py-1 rounded-full bg-white border border-sky-600/25 text-xs font-bold text-[#0080C8] shrink-0">
+        Flutter • Web SSR
+      </span>
+    </div>
+
+    <!-- Pillar 3: Former GDG Ghardaia Club President -->
+    <div class="bio-card bio-card-3 flex items-center justify-between p-4 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl bg-amber-50/60 border-2 border-amber-600/30">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#D97706] text-white flex items-center justify-center shrink-0 icon-box-pulse">
+          <svg class="w-6 h-6 fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-base sm:text-lg lg:text-xl font-black text-slate-900 tracking-tight">
+            Former GDG Ghardaia Club President
+          </h3>
+        </div>
+      </div>
+      <span class="hidden sm:inline-flex px-3.5 py-1 rounded-full bg-white border border-amber-600/25 text-xs font-bold text-[#D97706] shrink-0">
+        GDG Community Lead
+      </span>
+    </div>
+  </div>
+</section>
