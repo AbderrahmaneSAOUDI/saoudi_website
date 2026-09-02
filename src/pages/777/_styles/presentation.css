@@ -478,32 +478,35 @@
   }
 }
 
-/* === 10. Animated Logos Row with Dynamic Waves === */
+/* === 10. Animated Logos Row with Continuous Dynamic Waves === */
 .logo-wrapper-1 {
-  animation: slideUpFade 0.7s var(--ease-spring) 0.7s backwards, logoBob1 4.8s ease-in-out 1.5s infinite;
+  animation: logoBob1 3.4s ease-in-out infinite;
+  will-change: transform;
 }
 
 .logo-wrapper-2 {
-  animation: slideUpFade 0.7s var(--ease-spring) 0.82s backwards, logoBob2 5.2s ease-in-out 1.8s infinite;
+  animation: logoBob2 3.9s ease-in-out 0.3s infinite;
+  will-change: transform;
 }
 
 .logo-wrapper-3 {
-  animation: slideUpFade 0.7s var(--ease-spring) 0.94s backwards, logoBob3 5.8s ease-in-out 2.1s infinite;
+  animation: logoBob3 4.3s ease-in-out 0.6s infinite;
+  will-change: transform;
 }
 
 @keyframes logoBob1 {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  50% { transform: translateY(-6px); }
 }
 
 @keyframes logoBob2 {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+  50% { transform: translateY(-7.5px); }
 }
 
 @keyframes logoBob3 {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3.5px); }
+  50% { transform: translateY(-5px); }
 }
 
 /* === 11. Hero Video Loop & Smooth Fade === */
@@ -570,35 +573,44 @@
   position: relative;
 }
 
-/* Top green pill text morphing */
-.pill-name,
-.pill-program {
-  transition: opacity 0.45s var(--ease-m3), transform 0.5s var(--ease-spring);
-  will-change: opacity, transform;
+/* Top green pill dynamic content-width morphing */
+.speaker-pill {
+  width: max-content !important;
+  max-width: max-content !important;
+  transition: all 0.4s var(--ease-spring);
 }
 
-[data-current-slide="1"] .pill-name {
+[data-current-slide="1"] .pill-text-1 {
+  display: inline-block;
   opacity: 1;
   transform: translateY(0);
-  pointer-events: auto;
+  transition: opacity 0.35s ease, transform 0.4s var(--ease-spring);
 }
 
-[data-current-slide="1"] .pill-program {
-  opacity: 0;
-  transform: translateY(20px);
-  pointer-events: none;
+[data-current-slide="1"] .pill-text-2 {
+  display: none;
 }
 
-[data-current-slide="2"] .pill-name {
-  opacity: 0;
-  transform: translateY(-20px);
-  pointer-events: none;
+[data-current-slide="2"] .pill-text-1 {
+  display: none;
 }
 
-[data-current-slide="2"] .pill-program {
+[data-current-slide="2"] .pill-text-2 {
+  display: inline-block;
   opacity: 1;
   transform: translateY(0);
-  pointer-events: auto;
+  animation: fadeInPillText 0.35s var(--ease-spring);
+}
+
+@keyframes fadeInPillText {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Looping avatar gradient & card floating */
@@ -671,38 +683,36 @@
 /* Bottom footer transitions */
 .footer-logos-container {
   transition: transform 0.5s var(--ease-spring);
-  transform-origin: left bottom;
+  transform-origin: left center;
   will-change: transform;
 }
 
 [data-current-slide="2"] .footer-logos-container {
-  transform: scale(0.7);
+  transform: scale(0.72);
 }
 
-.footer-program-age-tag {
-  transition: opacity 0.35s ease, max-width 0.45s var(--ease-spring), transform 0.35s ease;
-  will-change: opacity, transform, max-width;
-}
-
-[data-current-slide="2"] .footer-program-age-tag {
-  opacity: 0;
-  transform: translateX(-16px);
-  pointer-events: none;
-  max-width: 0;
-  overflow: hidden;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* Slide 2 Bottom Right Title */
+/* Right-side footer elements transition */
+.footer-slide1-tag,
 .footer-slide2-title {
-  transition: opacity 0.45s var(--ease-m3) 0.1s, transform 0.5s var(--ease-spring) 0.1s;
+  transition: opacity 0.45s var(--ease-m3), transform 0.5s var(--ease-spring);
   will-change: opacity, transform;
+}
+
+[data-current-slide="1"] .footer-slide1-tag {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 [data-current-slide="1"] .footer-slide2-title {
   opacity: 0;
-  transform: translateY(14px);
+  transform: translateY(18px);
+  pointer-events: none;
+}
+
+[data-current-slide="2"] .footer-slide1-tag {
+  opacity: 0;
+  transform: translateY(-18px);
   pointer-events: none;
 }
 

@@ -74,25 +74,23 @@ import './_styles/presentation.css';
       <div class="corner-bracket corner-br"></div>
 
       <div class="content-layer relative z-10 h-full flex flex-col justify-between">
-        <!-- Top: Header positioned more to the bottom per user request -->
-        <div class="pt-3 sm:pt-5 md:pt-7 lg:pt-8 flex items-center">
-          <!-- Green Pill: Stays the same div, smoothly converts name to "7.77 Program" on Slide 2 -->
-          <div class="speaker-pill relative overflow-hidden inline-flex items-center gap-2.5 bg-[#1E824C] hover:bg-[#006233] text-white font-bold text-sm sm:text-base md:text-lg px-5 sm:px-7 py-2 sm:py-2.5 rounded-full tracking-tight transition-transform duration-200 hover:-translate-y-0.5 cursor-default select-none">
+        <!-- Top: Header positioned more to the bottom, taking only content-width -->
+        <div class="pt-3 sm:pt-5 md:pt-7 lg:pt-8 flex items-center shrink-0">
+          <!-- Green Pill: Takes only content width, smoothly morphs text to "7.77 Program" on Slide 2 -->
+          <div class="speaker-pill relative overflow-hidden inline-flex items-center gap-2.5 bg-[#1E824C] hover:bg-[#006233] text-white font-bold text-sm sm:text-base md:text-lg px-5 sm:px-7 py-2 sm:py-2.5 rounded-full tracking-tight transition-all duration-400 cursor-default select-none max-w-max">
             <span class="relative flex h-2.5 w-2.5 shrink-0">
               <span class="live-dot-pulse absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-300"></span>
             </span>
-            <div class="relative h-6 sm:h-7 overflow-hidden flex items-center">
-              <!-- Slide 1 Name -->
-              <span class="pill-name block whitespace-nowrap">Abderrahmane SAOUDI</span>
-              <!-- Slide 2 Converted Name -->
-              <span class="pill-program absolute inset-0 flex items-center whitespace-nowrap">7.77 Program</span>
-            </div>
+            <!-- Slide 1 Name (takes its natural content width) -->
+            <span class="pill-text-1 whitespace-nowrap">Abderrahmane SAOUDI</span>
+            <!-- Slide 2 Converted Name (takes its natural content width) -->
+            <span class="pill-text-2 whitespace-nowrap">7.77 Program</span>
           </div>
         </div>
 
-        <!-- Middle: Dynamic Slide Panes Deck Area -->
-        <div class="relative w-full my-auto py-2 min-h-[320px] sm:min-h-[360px] md:min-h-[400px] lg:min-h-[440px] flex items-center">
+        <!-- Middle: Dynamic Slide Panes Deck Area (Locked flex-1 layout so bottom bar NEVER shifts) -->
+        <div class="relative w-full flex-1 my-auto flex items-center min-h-0 overflow-hidden">
           
           <!-- ================= SLIDE 1 PANE (AS IT WAS) ================= -->
           <section id="slide-1-content" class="slide-pane slide-pane-1 w-full flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 lg:gap-8 xl:gap-10">
@@ -237,10 +235,11 @@ import './_styles/presentation.css';
 
         </div>
 
-        <!-- Bottom: Dividing Line + Solid Green Buttons (No Transparency) + Scaled Logos -->
-        <div class="pb-1">
-          <!-- Horizontal Line with Previous on Left and Next on Right -->
+        <!-- Bottom: Dividing Line + Solid Green Buttons (No Transparency) + Scaled Logos (LOCKED HEIGHT) -->
+        <div class="pb-1 shrink-0">
+          <!-- Horizontal Line with Previous on Left and Next on Right (Locked Vertical Height) -->
           <div class="relative w-full flex items-center my-2 sm:my-3">
+            <!-- Continuous Moving Light Energy Pulse Beam Across the Divider Line -->
             <div class="divider-line relative w-full h-0.5 bg-slate-900 overflow-hidden"></div>
 
             <!-- Previous Button on the LEFT side of the H line (Solid Green, No Transparency) -->
@@ -279,54 +278,54 @@ import './_styles/presentation.css';
             </div>
           </div>
 
-          <!-- Bottom Row: Left Logos (scales smaller into corner) & Right Title on Slide 2 -->
-          <div class="flex items-center justify-between gap-4 mt-2 sm:mt-4 min-h-[48px] sm:min-h-[56px]">
-            <!-- Left: Program Tag & Institutional Logos -->
-            <div class="flex items-center gap-4 sm:gap-6">
-              <!-- Program & Age Tag (visible on slide 1, collapses on slide 2) -->
-              <div class="footer-program-age-tag program-tag text-[#1E824C] font-extrabold text-base sm:text-xl md:text-2xl tracking-tight inline-flex items-center gap-2 shrink-0">
-                <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-                <span>7.77 Program | Age: 24-30</span>
+          <!-- Bottom Row: Logos on Left, Tag (Slide 1) or Title (Slide 2) on Right (Locked Vertical Height) -->
+          <div class="flex items-center justify-between gap-4 mt-2 sm:mt-4 h-12 sm:h-14">
+            <!-- Left: Institutional Logos Group (Continuous Levitation Animation) -->
+            <div class="footer-logos-container flex items-center gap-4 sm:gap-7 md:gap-9">
+              <!-- Ministère de la Poste et des Télécommunications -->
+              <div class="logo-wrapper-1 flex items-center">
+                <img 
+                  src={logoMinistere.src} 
+                  alt="Ministère de la Poste et des Télécommunications" 
+                  class="h-10 sm:h-14 md:h-16 w-auto object-contain"
+                />
               </div>
 
-              <!-- Institutional Logos Group (shrinks into left bottom corner on slide 2) -->
-              <div class="footer-logos-container flex items-center gap-4 sm:gap-7 md:gap-9">
-                <!-- Ministère de la Poste et des Télécommunications -->
-                <div class="logo-wrapper-1 flex items-center transition-transform duration-300 hover:-translate-y-2 hover:scale-105">
-                  <img 
-                    src={logoMinistere.src} 
-                    alt="Ministère de la Poste et des Télécommunications" 
-                    class="h-10 sm:h-14 md:h-16 w-auto object-contain"
-                  />
-                </div>
+              <!-- Algérie Télécom -->
+              <div class="logo-wrapper-2 flex items-center">
+                <img 
+                  src={logoAlgerieTelecom.src} 
+                  alt="Algérie Télécom" 
+                  class="h-7 sm:h-10 md:h-12 w-auto object-contain"
+                />
+              </div>
 
-                <!-- Algérie Télécom -->
-                <div class="logo-wrapper-2 flex items-center transition-transform duration-300 hover:-translate-y-2 hover:scale-105">
-                  <img 
-                    src={logoAlgerieTelecom.src} 
-                    alt="Algérie Télécom" 
-                    class="h-7 sm:h-10 md:h-12 w-auto object-contain"
-                  />
-                </div>
-
-                <!-- Mobilis -->
-                <div class="logo-wrapper-3 flex items-center transition-transform duration-300 hover:-translate-y-2 hover:scale-105">
-                  <img 
-                    src={logoMobilis.src} 
-                    alt="Mobilis" 
-                    class="h-6 sm:h-8 md:h-9 w-auto object-contain"
-                  />
-                </div>
+              <!-- Mobilis -->
+              <div class="logo-wrapper-3 flex items-center">
+                <img 
+                  src={logoMobilis.src} 
+                  alt="Mobilis" 
+                  class="h-6 sm:h-8 md:h-9 w-auto object-contain"
+                />
               </div>
             </div>
 
-            <!-- Right: Title "Digital Productivity: Work Smarter, Not Harder" on Slide 2 -->
-            <div class="footer-slide2-title text-right shrink-0">
-              <div class="title-highlight font-black text-sm sm:text-base md:text-lg lg:text-xl tracking-tight leading-tight">
-                Digital Productivity
+            <!-- Right: Tag on Slide 1 -> Morphs to Presentation Title on Slide 2 -->
+            <div class="relative flex items-center justify-end shrink-0 h-full">
+              <!-- Slide 1: 7.77 Program | Age: 24-30 (Right-aligned per user request) -->
+              <div class="footer-slide1-tag program-tag text-[#1E824C] font-extrabold text-base sm:text-xl md:text-2xl tracking-tight inline-flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                <span>7.77 Program | Age: 24-30</span>
               </div>
-              <div class="text-xs sm:text-sm font-light text-slate-700 tracking-tight leading-tight">
-                Work Smarter, Not Harder
+
+              <!-- Slide 2: Digital Productivity: Work Smarter, Not Harder -->
+              <div class="footer-slide2-title absolute right-0 text-right">
+                <div class="title-highlight font-black text-sm sm:text-base md:text-lg lg:text-xl tracking-tight leading-tight whitespace-nowrap">
+                  Digital Productivity
+                </div>
+                <div class="text-xs sm:text-sm font-light text-slate-700 tracking-tight leading-tight whitespace-nowrap">
+                  Work Smarter, Not Harder
+                </div>
               </div>
             </div>
           </div>
