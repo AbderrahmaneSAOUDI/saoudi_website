@@ -30,7 +30,11 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
       :root {
         --ai-accent-tint: #e6f7f1;
         --brand-green: #1E824C;
-        --text-dark: #1E293B;
+        --brand-green-dark: #006233;
+        --brand-green-light: #e6f7f1;
+        --text-dark: #1A202C;
+        --text-muted: #64748B;
+        --ease-m3: cubic-bezier(0.2, 0, 0.2, 1);
       }
 
       * {
@@ -48,30 +52,93 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         display: flex;
         align-items: center;
         justify-content: center;
+        position: relative;
       }
 
-      /* Main frame constrained to 90% of screen view (16:9 aspect ratio) */
+      /* Animated Particle Background System (matching website constellation) */
+      body::before,
+      body::after {
+        content: '';
+        position: fixed;
+        inset: -50px;
+        pointer-events: none;
+        z-index: 0;
+        will-change: transform;
+      }
+
+      body::before {
+        background-image:
+          radial-gradient(circle, rgba(0, 98, 51, 0.35) 1.5px, transparent 1.5px),
+          radial-gradient(circle, rgba(0, 128, 200, 0.28) 1.5px, transparent 1.5px),
+          radial-gradient(circle, rgba(30, 130, 76, 0.25) 1.2px, transparent 1.2px),
+          radial-gradient(circle, rgba(249, 171, 0, 0.25) 1.5px, transparent 1.5px);
+        background-size: 70px 70px, 95px 95px, 70px 70px, 120px 120px;
+        background-position: 0 0, 30% 15%, 25% 68%, 82% 88%;
+        background-repeat: repeat;
+        animation: bgPoints 48s linear infinite;
+        opacity: 0.85;
+      }
+
+      body::after {
+        background-image:
+          radial-gradient(circle, rgba(0, 98, 51, 0.2) 1.5px, transparent 2px),
+          radial-gradient(circle, rgba(0, 128, 200, 0.18) 1.5px, transparent 2px),
+          radial-gradient(circle, rgba(0, 98, 51, 0.15) 1px, transparent 1.5px),
+          radial-gradient(circle, rgba(255, 255, 255, 0.6) 1px, transparent 1.5px);
+        background-repeat: repeat;
+        background-size: 120px 120px, 100px 100px, 24px 24px, 24px 24px;
+        background-position: 8% 90%, 85% 60%, 0 0, 14px 14px;
+        animation: bgStars 24s linear infinite;
+        opacity: 0.9;
+      }
+
+      @keyframes bgPoints {
+        0% { transform: translate3d(0, 0, 0); }
+        50% { transform: translate3d(-50px, 40px, 0); }
+        100% { transform: translate3d(0, 0, 0); }
+      }
+
+      @keyframes bgStars {
+        0% { transform: translate3d(0, 0, 0); }
+        50% { transform: translate3d(80px, -80px, 0); }
+        100% { transform: translate3d(0, 0, 0); }
+      }
+
+      /* Main presentation frame: ~94% of screen view with 16:9 ratio and visible border */
       .presentation-frame {
-        width: min(90vw, calc(90vh * 16 / 9));
-        height: min(90vh, calc(90vw * 9 / 16));
+        width: min(94vw, calc(94vh * 16 / 9));
+        height: min(94vh, calc(94vw * 9 / 16));
         background-color: #FFFFFF;
-        border-radius: 28px;
+        border-radius: 32px;
+        border: 2px solid rgba(0, 98, 51, 0.22);
         position: relative;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding: clamp(2rem, 4.5vw, 4rem) clamp(2.5rem, 5.5vw, 5rem);
+        padding: clamp(2.2rem, 4.5vw, 4.2rem) clamp(2.8rem, 5.8vw, 5.5rem);
         overflow: hidden;
-        border: 1px solid rgba(0, 0, 0, 0.06);
+        z-index: 10;
+        animation: frameEntrance 0.7s var(--ease-m3) forwards;
       }
 
-      /* Subtle leaf / ambient light texture overlay matching slide aesthetic */
+      @keyframes frameEntrance {
+        from {
+          opacity: 0;
+          transform: scale(0.96) translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      /* Subtle inner botanical light texture */
       .bg-overlay {
         position: absolute;
         inset: 0;
         background: 
-          radial-gradient(ellipse at 85% 30%, rgba(240, 245, 242, 0.8) 0%, transparent 60%),
-          radial-gradient(ellipse at 70% 80%, rgba(230, 247, 241, 0.4) 0%, transparent 50%);
+          radial-gradient(ellipse at 90% 25%, rgba(230, 247, 241, 0.7) 0%, transparent 60%),
+          radial-gradient(ellipse at 75% 85%, rgba(240, 249, 245, 0.5) 0%, transparent 50%);
         pointer-events: none;
         z-index: 0;
       }
@@ -85,30 +152,79 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         justify-content: space-between;
       }
 
-      /* Speaker Pill Badge */
+      /* Animated Speaker Pill */
       .speaker-pill {
         display: inline-flex;
         align-items: center;
         background-color: var(--brand-green);
         color: #FFFFFF;
         font-weight: 700;
-        font-size: clamp(0.95rem, 1.5vw, 1.35rem);
-        padding: 0.55rem 1.6rem;
+        font-size: clamp(1rem, 1.6vw, 1.4rem);
+        padding: 0.6rem 1.8rem;
         border-radius: 9999px;
         letter-spacing: -0.01em;
         width: fit-content;
+        animation: slideDownFade 0.6s var(--ease-m3) 0.15s backwards;
+        transition: transform 0.2s var(--ease-m3), background-color 0.2s;
+        user-select: none;
       }
 
-      /* Session Title */
-      .session-title {
-        font-size: clamp(2rem, 3.8vw, 3.6rem);
+      .speaker-pill:hover {
+        transform: translateY(-2px);
+        background-color: var(--brand-green-dark);
+      }
+
+      @keyframes slideDownFade {
+        from {
+          opacity: 0;
+          transform: translateY(-16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Session Title Container */
+      .title-container {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(0.25rem, 0.8vw, 0.75rem);
+      }
+
+      /* First line: Digital Productivity (Large & Green, Single Line) */
+      .title-highlight {
+        font-size: clamp(2.6rem, 5.2vw, 5.4rem);
+        font-weight: 900;
+        color: var(--brand-green);
+        letter-spacing: -0.03em;
+        line-height: 1.08;
+        white-space: nowrap;
+        animation: slideRightFade 0.65s var(--ease-m3) 0.25s backwards;
+      }
+
+      /* Second line: Work Smarter, Not Harder */
+      .title-subtext {
+        font-size: clamp(1.8rem, 3.4vw, 3.4rem);
         font-weight: 800;
-        color: #1A202C;
+        color: var(--text-dark);
         letter-spacing: -0.025em;
-        line-height: 1.18;
+        line-height: 1.15;
+        animation: slideRightFade 0.65s var(--ease-m3) 0.35s backwards;
       }
 
-      /* Horizontal line with embedded play button */
+      @keyframes slideRightFade {
+        from {
+          opacity: 0;
+          transform: translateX(-24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      /* Animated Horizontal Divider Line */
       .divider-container {
         position: relative;
         width: 100%;
@@ -119,15 +235,27 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
 
       .divider-line {
         width: 100%;
-        height: 1.5px;
+        height: 2px;
         background-color: #1A202C;
+        transform-origin: left;
+        animation: expandLine 0.75s var(--ease-m3) 0.45s backwards;
       }
 
+      @keyframes expandLine {
+        from {
+          transform: scaleX(0);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+
+      /* Animated Play Button with Pulse Micro-interaction */
       .play-circle {
         position: absolute;
         right: 0;
-        width: clamp(2.5rem, 3.2vw, 3.2rem);
-        height: clamp(2.5rem, 3.2vw, 3.2rem);
+        width: clamp(2.6rem, 3.4vw, 3.4rem);
+        height: clamp(2.6rem, 3.4vw, 3.4rem);
         border-radius: 9999px;
         background-color: var(--brand-green);
         display: flex;
@@ -135,75 +263,137 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         justify-content: center;
         color: #FFFFFF;
         cursor: pointer;
-        transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), background-color 0.2s;
+        animation: popIn 0.5s var(--ease-m3) 0.6s backwards;
+        transition: transform 0.25s var(--ease-m3), background-color 0.2s;
+        border: 2px solid #FFFFFF;
       }
 
       .play-circle:hover {
-        transform: scale(1.06);
-        background-color: #166534;
+        transform: scale(1.1) rotate(5deg);
+        background-color: var(--brand-green-dark);
       }
 
-      /* Program and Category Text */
+      @keyframes popIn {
+        from {
+          opacity: 0;
+          transform: scale(0);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* Animated Program & Category Tag */
       .program-tag {
         color: var(--brand-green);
         font-weight: 800;
-        font-size: clamp(1.05rem, 1.7vw, 1.45rem);
-        letter-spacing: -0.01em;
+        font-size: clamp(1.15rem, 1.85vw, 1.6rem);
+        letter-spacing: -0.015em;
+        animation: slideUpFade 0.6s var(--ease-m3) 0.55s backwards;
       }
 
-      /* Partner Logos Bar */
+      @keyframes slideUpFade {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Animated Logos Row */
       .logos-row {
         display: flex;
         align-items: center;
-        gap: clamp(1.5rem, 3.5vw, 3.5rem);
-        margin-top: clamp(1rem, 2vw, 2rem);
+        gap: clamp(1.8rem, 3.8vw, 4rem);
+        margin-top: clamp(1rem, 2.2vw, 2.2rem);
+        animation: slideUpFade 0.6s var(--ease-m3) 0.7s backwards;
+      }
+
+      .logo-wrapper {
+        display: flex;
+        align-items: center;
+        transition: transform 0.25s var(--ease-m3);
+      }
+
+      .logo-wrapper:hover {
+        transform: translateY(-3px);
       }
 
       .logo-img-ministre {
-        height: clamp(2.8rem, 4.5vw, 4.2rem);
+        height: clamp(3rem, 4.8vw, 4.5rem);
         width: auto;
         object-fit: contain;
       }
 
       .logo-img-at {
-        height: clamp(2rem, 3.2vw, 3rem);
+        height: clamp(2.2rem, 3.4vw, 3.2rem);
         width: auto;
         object-fit: contain;
       }
 
       .logo-img-mobilis {
-        height: clamp(1.6rem, 2.5vw, 2.4rem);
+        height: clamp(1.8rem, 2.7vw, 2.5rem);
         width: auto;
         object-fit: contain;
+      }
+
+      /* Respect Reduced Motion */
+      @media (prefers-reduced-motion: reduce) {
+        body::before,
+        body::after,
+        .presentation-frame,
+        .speaker-pill,
+        .title-highlight,
+        .title-subtext,
+        .divider-line,
+        .play-circle,
+        .program-tag,
+        .logos-row {
+          animation: none !important;
+          transition: none !important;
+          transform: none !important;
+          opacity: 1 !important;
+        }
       }
     </style>
   </head>
   <body>
-    <!-- Main Presentation Card (90% of screen view, 16:9 ratio) -->
+    <!-- Main Presentation Card (94% screen view, 16:9 ratio, bordered) -->
     <main class="presentation-frame">
       <div class="bg-overlay"></div>
 
       <div class="content-layer">
         <!-- Top: Speaker's Name in Green Pill -->
-        <div class="pt-2">
-          <div class="speaker-pill">
+        <div class="pt-1">
+          <div class="speaker-pill" title="Intervenant">
             Abderrahmane SAOUDI
           </div>
         </div>
 
         <!-- Middle: Title -->
         <div class="my-auto py-2">
-          <h1 class="session-title">
-            Digital Productivity: Work Smarter, Not Harder
-          </h1>
+          <div class="title-container">
+            <!-- First Line: Green & Larger -->
+            <h1 class="title-highlight">
+              Digital Productivity
+            </h1>
+            <!-- Second Line: Dark & Complementary -->
+            <h2 class="title-subtext">
+              Work Smarter, Not Harder
+            </h2>
+          </div>
         </div>
 
         <!-- Bottom: Dividing Line + Program Tag + Logos -->
-        <div class="pb-2">
+        <div class="pb-1">
           <!-- Line with Right Play Circle -->
           <div class="divider-container">
             <div class="divider-line"></div>
-            <div class="play-circle" title="Start Session">
+            <div class="play-circle" title="Lancer la session">
               <svg class="w-4 h-4 ml-0.5 fill-current" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z" />
               </svg>
@@ -218,25 +408,31 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
           <!-- Institutional Logos -->
           <div class="logos-row">
             <!-- Ministère de la Poste et des Télécommunications -->
-            <img 
-              src={logoMinistere.src} 
-              alt="Ministère de la Poste et des Télécommunications" 
-              class="logo-img-ministre"
-            />
+            <div class="logo-wrapper">
+              <img 
+                src={logoMinistere.src} 
+                alt="Ministère de la Poste et des Télécommunications" 
+                class="logo-img-ministre"
+              />
+            </div>
 
             <!-- Algérie Télécom -->
-            <img 
-              src={logoAlgerieTelecom.src} 
-              alt="Algérie Télécom" 
-              class="logo-img-at"
-            />
+            <div class="logo-wrapper">
+              <img 
+                src={logoAlgerieTelecom.src} 
+                alt="Algérie Télécom" 
+                class="logo-img-at"
+              />
+            </div>
 
             <!-- Mobilis -->
-            <img 
-              src={logoMobilis.src} 
-              alt="Mobilis" 
-              class="logo-img-mobilis"
-            />
+            <div class="logo-wrapper">
+              <img 
+                src={logoMobilis.src} 
+                alt="Mobilis" 
+                class="logo-img-mobilis"
+              />
+            </div>
           </div>
         </div>
       </div>
