@@ -570,35 +570,83 @@
   position: relative;
 }
 
-/* Top bar pills transitions */
-.top-pill-1,
-.top-pill-2 {
-  transition: opacity 0.4s var(--ease-m3), transform 0.45s var(--ease-spring);
+/* Top green pill text morphing */
+.pill-name,
+.pill-program {
+  transition: opacity 0.45s var(--ease-m3), transform 0.5s var(--ease-spring);
   will-change: opacity, transform;
 }
 
-[data-current-slide="1"] .top-pill-1 {
+[data-current-slide="1"] .pill-name {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
 }
 
-[data-current-slide="1"] .top-pill-2 {
+[data-current-slide="1"] .pill-program {
   opacity: 0;
-  transform: translateY(-16px);
+  transform: translateY(20px);
   pointer-events: none;
 }
 
-[data-current-slide="2"] .top-pill-1 {
+[data-current-slide="2"] .pill-name {
   opacity: 0;
-  transform: translateY(-16px);
+  transform: translateY(-20px);
   pointer-events: none;
 }
 
-[data-current-slide="2"] .top-pill-2 {
+[data-current-slide="2"] .pill-program {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
+}
+
+/* Looping avatar gradient & card floating */
+.avatar-gradient-ring {
+  background: linear-gradient(135deg, #4285F4 0%, #0F9D58 35%, #F9AB00 70%, #EA4335 100%);
+  background-size: 200% 200%;
+  animation: avatarGradientLoop 5s ease infinite;
+}
+
+@keyframes avatarGradientLoop {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.card-float {
+  animation: subtleCardFloat 5s ease-in-out infinite;
+}
+
+@keyframes subtleCardFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.bio-card {
+  transition: all 0.3s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.bio-card:nth-child(1) { animation: subtleCardFloat 5s ease-in-out infinite; }
+.bio-card:nth-child(2) { animation: subtleCardFloat 5s ease-in-out 0.6s infinite; }
+.bio-card:nth-child(3) { animation: subtleCardFloat 5s ease-in-out 1.2s infinite; }
+
+.website-badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.website-badge::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: translateX(-100%);
+  animation: chipShimmer 3.2s infinite;
+}
+
+@keyframes chipShimmer {
+  0%, 35% { transform: translateX(-100%); }
+  60%, 100% { transform: translateX(100%); }
 }
 
 /* Bottom footer transitions */
