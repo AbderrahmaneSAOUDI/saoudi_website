@@ -528,6 +528,99 @@
   will-change: opacity;
 }
 
+/* === 12. Slide Transition System (Slide 1 & Slide 2) === */
+.slide-pane {
+  transition: opacity 0.55s var(--ease-spring), transform 0.55s var(--ease-spring), visibility 0.55s;
+}
+
+[data-current-slide="1"] #slide-1-content {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  visibility: visible;
+  position: relative;
+}
+
+[data-current-slide="1"] #slide-2-content {
+  opacity: 0;
+  transform: translateX(45px);
+  pointer-events: none;
+  visibility: hidden;
+  position: absolute;
+  inset: 0;
+}
+
+[data-current-slide="2"] #slide-1-content {
+  opacity: 0;
+  transform: translateX(-45px);
+  pointer-events: none;
+  visibility: hidden;
+  position: absolute;
+  inset: 0;
+}
+
+[data-current-slide="2"] #slide-2-content {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  visibility: visible;
+  position: relative;
+}
+
+/* Footer Dynamic Scaling & Placement Transition */
+.footer-logos-group {
+  transition: transform 0.65s var(--ease-m3), opacity 0.65s var(--ease-m3);
+  transform-origin: bottom left;
+}
+
+[data-current-slide="1"] .footer-logos-group {
+  transform: scale(1);
+}
+
+[data-current-slide="2"] .footer-logos-group {
+  transform: scale(0.76) translateY(2px);
+}
+
+.footer-slide2-title {
+  transition: opacity 0.65s var(--ease-m3), transform 0.65s var(--ease-m3);
+}
+
+[data-current-slide="1"] .footer-slide2-title {
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+}
+
+[data-current-slide="2"] .footer-slide2-title {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+[data-current-slide="1"] .slide1-top-pill {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+[data-current-slide="2"] .slide1-top-pill {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+[data-current-slide="1"] .slide2-top-pill {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+
+[data-current-slide="2"] .slide2-top-pill {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
 /* Respect Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   .bg-particles::before,
@@ -556,7 +649,10 @@
   .logo-wrapper-3,
   .floating-tag,
   .video-wrapper,
-  .video-fade-loop {
+  .hero-video,
+  .slide-pane,
+  .footer-logos-group,
+  .footer-slide2-title {
     animation: none !important;
     transition: none !important;
     transform: none !important;
