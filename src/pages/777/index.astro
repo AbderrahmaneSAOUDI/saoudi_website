@@ -32,7 +32,21 @@ import './_styles/presentation.css';
       <div class="aurora-blob aurora-blob-4"></div>
     </div>
 
-    <!-- 2. Floating Background Geometric Tech Nodes -->
+    <!-- 2. Twinkling Keynote Sparkle Stars -->
+    <svg class="sparkle-star sparkle-1 w-5 h-5 text-emerald-800/40" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5z" />
+    </svg>
+    <svg class="sparkle-star sparkle-2 w-4 h-4 text-sky-800/35" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5z" />
+    </svg>
+    <svg class="sparkle-star sparkle-3 w-4 h-4 text-amber-800/35" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5z" />
+    </svg>
+    <svg class="sparkle-star sparkle-4 w-5 h-5 text-emerald-800/35" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5z" />
+    </svg>
+
+    <!-- 3. Floating Background Geometric Tech Nodes -->
     <svg class="floating-node node-1 w-6 h-6 text-emerald-800/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M12 2v20M2 12h20" />
     </svg>
@@ -46,9 +60,15 @@ import './_styles/presentation.css';
       <path d="M12 2v20M2 12h20" />
     </svg>
 
-    <!-- 3. Main Presentation Card (94% screen view, 16:9 ratio, bordered, levitating) -->
-    <main class="presentation-frame frame-border-pulse bg-white rounded-3xl sm:rounded-4xl border-2 border-emerald-800/25 relative flex flex-col justify-between p-6 sm:p-8 md:p-10 lg:p-12 overflow-hidden z-10 hover:border-emerald-800/50 transition-colors duration-500">
+    <!-- 4. Main Presentation Card (94% screen view, 16:9 ratio, bordered, levitating) -->
+    <main class="presentation-frame frame-border-pulse bg-white rounded-3xl sm:rounded-[32px] border-2 border-emerald-800/25 relative flex flex-col justify-between p-6 sm:p-10 md:p-14 lg:p-16 overflow-hidden z-10 hover:border-emerald-800/50 transition-colors duration-500">
       <div class="bg-overlay"></div>
+
+      <!-- Architectural Corner L-Brackets -->
+      <div class="corner-bracket corner-tl"></div>
+      <div class="corner-bracket corner-tr"></div>
+      <div class="corner-bracket corner-bl"></div>
+      <div class="corner-bracket corner-br"></div>
 
       <div class="content-layer relative z-10 h-full flex flex-col justify-between">
         <!-- Top: Speaker's Name in Green Pill -->
@@ -80,13 +100,15 @@ import './_styles/presentation.css';
 
         <!-- Bottom: Dividing Line + Program Tag + Logos -->
         <div class="pb-1">
-          <!-- Line with Right Play Circle & Multi-Ring Sonar Waves -->
+          <!-- Line with Right Play Circle & Multi-Ring Sonar Waves & Orbit -->
           <div class="relative w-full flex items-center my-2 sm:my-3">
             <div class="divider-line relative w-full h-0.5 bg-slate-900 overflow-hidden"></div>
             <div class="play-circle-wrapper absolute right-0 flex items-center justify-center">
+              <!-- Spinning Dashed Orbit Ring -->
+              <div class="orbit-ring absolute -inset-6 rounded-full border border-dashed border-emerald-600/30 pointer-events-none"></div>
               <div class="sonar-wave absolute -inset-1.5 rounded-full border-2 border-emerald-600/45 pointer-events-none"></div>
               <div class="sonar-wave-2 absolute -inset-3.5 rounded-full border-[1.5px] border-sky-600/35 pointer-events-none"></div>
-              <div class="sonar-wave-3 absolute -inset-5 rounded-full border border-emerald-500/25 pointer-events-none"></div>
+              <div class="sonar-wave-3 absolute -inset-5.5 rounded-full border border-emerald-500/25 pointer-events-none"></div>
               <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#1E824C] hover:bg-[#006233] flex items-center justify-center text-white border-2 border-white transition-all duration-300 hover:scale-115 hover:rotate-6 cursor-pointer select-none" title="Session 7.77">
                 <svg class="play-icon w-4 h-4 ml-0.5 fill-current" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
