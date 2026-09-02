@@ -61,10 +61,8 @@ import './_styles/presentation.css';
       <path d="M12 2v20M2 12h20" />
     </svg>
 
-    <!-- 4. Main Presentation Card (94% screen view, 16:9 ratio, bordered, levitating) -->
+    <!-- 4. Main Presentation Card (94% screen view, 16:9 ratio, bordered, levitating, 100% white background) -->
     <main class="presentation-frame frame-border-pulse bg-white rounded-3xl sm:rounded-[32px] border-2 border-emerald-800/25 relative flex flex-col justify-between p-6 sm:p-10 md:p-12 lg:p-14 xl:p-16 overflow-hidden z-10 hover:border-emerald-800/50 transition-colors duration-500">
-      <div class="bg-overlay"></div>
-
       <!-- Architectural Corner L-Brackets -->
       <div class="corner-bracket corner-tl"></div>
       <div class="corner-bracket corner-tr"></div>
@@ -85,12 +83,12 @@ import './_styles/presentation.css';
           </div>
         </div>
 
-        <!-- Middle: Title on Left, Video on Right -->
-        <div class="my-auto py-2 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 lg:gap-10 xl:gap-14 w-full">
+        <!-- Middle: Title on Left, Much Bigger Video on Right -->
+        <div class="my-auto py-2 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 lg:gap-8 xl:gap-10 w-full">
           <!-- Title Left Block -->
-          <div class="flex flex-col gap-1 sm:gap-2 flex-shrink-0">
+          <div class="flex flex-col gap-1 sm:gap-2 shrink-0">
             <!-- First Line: Green & Larger with Dynamic Shimmer Gradient -->
-            <h1 class="title-highlight font-black text-3xl sm:text-5xl md:text-5xl lg:text-[4rem] xl:text-[4.6rem] tracking-tight leading-[1.08] whitespace-nowrap">
+            <h1 class="title-highlight font-black text-3xl sm:text-4xl md:text-5xl lg:text-[3.8rem] xl:text-[4.4rem] tracking-tight leading-[1.08] whitespace-nowrap">
               Digital Productivity
             </h1>
             <!-- Second Line: Dark & Complementary -->
@@ -99,16 +97,16 @@ import './_styles/presentation.css';
             </h2>
           </div>
 
-          <!-- Video Right Block (Much bigger, borderless, transparent background) -->
-          <div class="video-wrapper flex-1 w-full max-w-[360px] sm:max-w-[480px] md:max-w-[560px] lg:max-w-[660px] xl:max-w-[760px] flex justify-center md:justify-end">
-            <div class="relative w-full aspect-video rounded-2xl md:rounded-3xl overflow-hidden bg-transparent">
+          <!-- Video Right Block (Bigger, borderless, pure transparent fade loop) -->
+          <div class="video-wrapper flex-1 w-full max-w-[420px] sm:max-w-[540px] md:max-w-[660px] lg:max-w-[780px] xl:max-w-[880px] 2xl:max-w-[940px] flex justify-center md:justify-end">
+            <div class="relative w-full aspect-video rounded-3xl overflow-hidden bg-transparent">
               <video 
+                id="heroVideo"
                 src={videoSrc}
                 autoplay
                 muted
                 playsinline
-                loop
-                class="video-fade-loop w-full h-full object-contain md:object-cover bg-transparent pointer-events-none"
+                class="hero-video w-full h-full object-contain md:object-cover bg-transparent pointer-events-none opacity-0"
               ></video>
             </div>
           </div>
@@ -171,5 +169,53 @@ import './_styles/presentation.css';
         </div>
       </div>
     </main>
+
+    <!-- Synchronized Hero Video Loop Controller -->
+    <script is:inline>
+      (() => {
+        const video = document.getElementById('heroVideo');
+        if (!video) return;
+
+        let isFadingOut = false;
+
+        const fadeIn = () => {
+          isFadingOut = false;
+          video.style.opacity = '1';
+        };
+
+        video.addEventListener('play', fadeIn);
+        video.addEventListener('playing', fadeIn);
+
+        video.addEventListener('timeupdate', () => {
+          if (!video.duration || isFadingOut) return;
+          const timeLeft = video.duration - video.currentTime;
+          // Fade out smoothly over the final 1.2s of video playback
+          if (timeLeft <= 1.2) {
+            isFadingOut = true;
+            video.style.opacity = '0';
+          }
+        });
+
+        video.addEventListener('ended', () => {
+          video.style.opacity = '0';
+          setTimeout(() => {
+            video.currentTime = 0;
+            isFadingOut = false;
+            video.play().then(() => {
+              fadeIn();
+            }).catch(() => {});
+          }, 350);
+        });
+
+        // Autoplay initiation
+        if (!video.paused && video.currentTime > 0) {
+          fadeIn();
+        } else {
+          video.play().then(() => {
+            fadeIn();
+          }).catch(() => {});
+        }
+      })();
+    </script>
   </body>
 </html>
