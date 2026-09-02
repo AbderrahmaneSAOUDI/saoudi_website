@@ -9,11 +9,11 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Digital Productivity: Work Smarter, Not Harder • 777 Program</title>
+    <title>Digital Productivity: Work Smarter, Not Harder • 7.77 Program</title>
     <meta name="description" content="Digital Productivity: Work Smarter, Not Harder by Abderrahmane SAOUDI - 777 Program (Age: 24-30)." />
     
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Digital Productivity: Work Smarter, Not Harder • 777 Program" />
+    <meta property="og:title" content="Digital Productivity: Work Smarter, Not Harder • 7.77 Program" />
     <meta property="og:description" content="Presentation by Abderrahmane SAOUDI for the 777 Program." />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="fr_DZ" />
@@ -21,17 +21,16 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Inter & Cairo -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
     <style>
       :root {
         --ai-accent-tint: #e6f7f1;
-        --color-brand-green: #006233;
-        --color-brand-blue: #0080C8;
-        --color-dark-text: #0F172A;
+        --brand-green: #1E824C;
+        --text-dark: #1E293B;
       }
 
       * {
@@ -40,145 +39,207 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         padding: 0;
       }
 
-      body {
-        background-color: var(--ai-accent-tint);
-        color: var(--color-dark-text);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        min-height: 100vh;
+      html, body {
         width: 100vw;
-        overflow-x: hidden;
+        height: 100vh;
+        overflow: hidden;
+        background-color: var(--ai-accent-tint);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 1.5rem;
       }
 
-      .cover-card {
+      /* Main frame constrained to 90% of screen view (16:9 aspect ratio) */
+      .presentation-frame {
+        width: min(90vw, calc(90vh * 16 / 9));
+        height: min(90vh, calc(90vw * 9 / 16));
         background-color: #FFFFFF;
-        border-radius: 32px;
-        width: 100%;
-        max-width: 1280px;
-        min-height: min(88vh, 720px);
-        aspect-ratio: 16 / 9;
+        border-radius: 28px;
+        position: relative;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding: clamp(2rem, 4vw, 3.5rem) clamp(2.5rem, 5vw, 4.5rem);
-        border: 1px solid rgba(0, 98, 51, 0.12);
-        position: relative;
+        padding: clamp(2rem, 4.5vw, 4rem) clamp(2.5rem, 5.5vw, 5rem);
         overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.06);
       }
 
-      /* Subtle decorative geometry without shadows */
-      .corner-accent {
+      /* Subtle leaf / ambient light texture overlay matching slide aesthetic */
+      .bg-overlay {
         position: absolute;
-        top: 0;
+        inset: 0;
+        background: 
+          radial-gradient(ellipse at 85% 30%, rgba(240, 245, 242, 0.8) 0%, transparent 60%),
+          radial-gradient(ellipse at 70% 80%, rgba(230, 247, 241, 0.4) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .content-layer {
+        position: relative;
+        z-index: 10;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      /* Speaker Pill Badge */
+      .speaker-pill {
+        display: inline-flex;
+        align-items: center;
+        background-color: var(--brand-green);
+        color: #FFFFFF;
+        font-weight: 700;
+        font-size: clamp(0.95rem, 1.5vw, 1.35rem);
+        padding: 0.55rem 1.6rem;
+        border-radius: 9999px;
+        letter-spacing: -0.01em;
+        width: fit-content;
+      }
+
+      /* Session Title */
+      .session-title {
+        font-size: clamp(2rem, 3.8vw, 3.6rem);
+        font-weight: 800;
+        color: #1A202C;
+        letter-spacing: -0.025em;
+        line-height: 1.18;
+      }
+
+      /* Horizontal line with embedded play button */
+      .divider-container {
+        position: relative;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        margin: 0.5rem 0 1rem 0;
+      }
+
+      .divider-line {
+        width: 100%;
+        height: 1.5px;
+        background-color: #1A202C;
+      }
+
+      .play-circle {
+        position: absolute;
         right: 0;
-        width: 180px;
-        height: 180px;
-        background: radial-gradient(circle at top right, rgba(0, 98, 51, 0.08) 0%, transparent 70%);
-        pointer-events: none;
+        width: clamp(2.5rem, 3.2vw, 3.2rem);
+        height: clamp(2.5rem, 3.2vw, 3.2rem);
+        border-radius: 9999px;
+        background-color: var(--brand-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #FFFFFF;
+        cursor: pointer;
+        transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), background-color 0.2s;
       }
 
-      .corner-accent-bottom {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 220px;
-        height: 220px;
-        background: radial-gradient(circle at bottom left, rgba(0, 128, 200, 0.06) 0%, transparent 70%);
-        pointer-events: none;
+      .play-circle:hover {
+        transform: scale(1.06);
+        background-color: #166534;
       }
 
-      .font-cairo {
-        font-family: 'Cairo', sans-serif;
+      /* Program and Category Text */
+      .program-tag {
+        color: var(--brand-green);
+        font-weight: 800;
+        font-size: clamp(1.05rem, 1.7vw, 1.45rem);
+        letter-spacing: -0.01em;
+      }
+
+      /* Partner Logos Bar */
+      .logos-row {
+        display: flex;
+        align-items: center;
+        gap: clamp(1.5rem, 3.5vw, 3.5rem);
+        margin-top: clamp(1rem, 2vw, 2rem);
+      }
+
+      .logo-img-ministre {
+        height: clamp(2.8rem, 4.5vw, 4.2rem);
+        width: auto;
+        object-fit: contain;
+      }
+
+      .logo-img-at {
+        height: clamp(2rem, 3.2vw, 3rem);
+        width: auto;
+        object-fit: contain;
+      }
+
+      .logo-img-mobilis {
+        height: clamp(1.6rem, 2.5vw, 2.4rem);
+        width: auto;
+        object-fit: contain;
       }
     </style>
   </head>
   <body>
-    <main class="cover-card">
-      <div class="corner-accent"></div>
-      <div class="corner-accent-bottom"></div>
+    <!-- Main Presentation Card (90% of screen view, 16:9 ratio) -->
+    <main class="presentation-frame">
+      <div class="bg-overlay"></div>
 
-      <!-- Top Header: Speaker's Name -->
-      <header class="relative z-10 flex items-center justify-between">
-        <div>
-          <span class="text-xs uppercase tracking-widest font-bold text-emerald-800/60 block mb-0.5">
-            Intervenant / Speaker
-          </span>
-          <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight font-cairo">
+      <div class="content-layer">
+        <!-- Top: Speaker's Name in Green Pill -->
+        <div class="pt-2">
+          <div class="speaker-pill">
             Abderrahmane SAOUDI
-          </h2>
+          </div>
         </div>
 
-        <div class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#e6f7f1] border border-emerald-800/15 text-xs font-bold text-emerald-900">
-          <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-          <span>Session Keynote</span>
-        </div>
-      </header>
-
-      <!-- Center Content: Title, Program & Age Category -->
-      <section class="my-auto py-8 relative z-10 space-y-5 max-w-4xl">
-        <!-- Badge: 777 program | Age: 24-30 -->
-        <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#e6f7f1] border border-emerald-800/20 text-emerald-950 font-bold text-xs sm:text-sm tracking-wide">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
-          <span class="font-extrabold uppercase">777 program</span>
-          <span class="text-emerald-800/40">|</span>
-          <span class="font-semibold text-emerald-800">Age: 24-30</span>
-        </div>
-
-        <!-- Session Title -->
-        <div class="space-y-3">
-          <h1 class="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.15] font-cairo">
-            Digital Productivity :<br />
-            <span class="text-emerald-700">
-              Work Smarter, Not Harder
-            </span>
+        <!-- Middle: Title -->
+        <div class="my-auto py-2">
+          <h1 class="session-title">
+            Digital Productivity: Work Smarter, Not Harder
           </h1>
-          <p class="text-base sm:text-lg text-slate-600 font-medium max-w-2xl leading-relaxed">
-            Maîtriser les systèmes de travail modernes, éliminer les frictions numériques et structurer la collaboration d'équipe.
-          </p>
         </div>
-      </section>
 
-      <!-- Footer: Partner & Ministry Logos -->
-      <footer class="relative z-10 pt-6 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div class="flex items-center flex-wrap justify-center sm:justify-start gap-6 sm:gap-10">
-          <!-- Ministère de la Poste et des Télécommunications -->
-          <div class="flex items-center">
+        <!-- Bottom: Dividing Line + Program Tag + Logos -->
+        <div class="pb-2">
+          <!-- Line with Right Play Circle -->
+          <div class="divider-container">
+            <div class="divider-line"></div>
+            <div class="play-circle" title="Start Session">
+              <svg class="w-4 h-4 ml-0.5 fill-current" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Program & Age Tag -->
+          <div class="program-tag">
+            7.77 Program | Age: 24-30
+          </div>
+
+          <!-- Institutional Logos -->
+          <div class="logos-row">
+            <!-- Ministère de la Poste et des Télécommunications -->
             <img 
               src={logoMinistere.src} 
               alt="Ministère de la Poste et des Télécommunications" 
-              class="h-14 sm:h-16 w-auto object-contain"
+              class="logo-img-ministre"
             />
-          </div>
 
-          <div class="h-10 w-px bg-slate-200 hidden sm:block"></div>
-
-          <!-- Algérie Télécom -->
-          <div class="flex items-center">
+            <!-- Algérie Télécom -->
             <img 
               src={logoAlgerieTelecom.src} 
               alt="Algérie Télécom" 
-              class="h-9 sm:h-11 w-auto object-contain"
+              class="logo-img-at"
             />
-          </div>
 
-          <!-- Mobilis -->
-          <div class="flex items-center">
+            <!-- Mobilis -->
             <img 
               src={logoMobilis.src} 
               alt="Mobilis" 
-              class="h-7 sm:h-9 w-auto object-contain"
+              class="logo-img-mobilis"
             />
           </div>
         </div>
-
-        <div class="text-xs text-slate-400 font-medium text-center sm:text-right">
-          <span class="font-bold text-slate-700">Programme National 7.77</span>
-          <span class="block text-[11px] text-slate-400">saoudi.online/777</span>
-        </div>
-      </footer>
+      </div>
     </main>
   </body>
 </html>
