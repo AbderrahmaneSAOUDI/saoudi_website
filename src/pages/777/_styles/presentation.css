@@ -530,21 +530,21 @@
 
 /* === 12. Slide Deck Navigation & Smooth Transitions === */
 .slide-pane {
-  transition: opacity 0.5s var(--ease-m3), transform 0.5s var(--ease-spring);
+  transition: opacity 0.6s cubic-bezier(0.2, 0, 0, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
 /* Slide 1 State */
 [data-current-slide="1"] .slide-pane-1 {
   opacity: 1;
-  transform: translateX(0);
+  transform: scale(1) translateY(0);
   pointer-events: auto;
   position: relative;
 }
 
 [data-current-slide="1"] .slide-pane-2 {
   opacity: 0;
-  transform: translateX(40px);
+  transform: scale(0.96) translateY(24px);
   pointer-events: none;
   position: absolute;
   top: 0;
@@ -555,7 +555,7 @@
 /* Slide 2 State */
 [data-current-slide="2"] .slide-pane-1 {
   opacity: 0;
-  transform: translateX(-40px);
+  transform: scale(0.97) translateY(-20px);
   pointer-events: none;
   position: absolute;
   top: 0;
@@ -565,7 +565,7 @@
 
 [data-current-slide="2"] .slide-pane-2 {
   opacity: 1;
-  transform: translateX(0);
+  transform: scale(1) translateY(0);
   pointer-events: auto;
   position: relative;
 }
@@ -613,6 +613,10 @@
   50% { background-position: 100% 50%; }
 }
 
+.avatar-orbit-ring {
+  animation: spinOrbit 14s linear infinite;
+}
+
 .card-float {
   animation: subtleCardFloat 5s ease-in-out infinite;
 }
@@ -623,23 +627,38 @@
 }
 
 .bio-card {
-  transition: all 0.3s cubic-bezier(0.2, 0, 0.2, 1);
+  transition: transform 0.3s var(--ease-spring), border-color 0.3s ease;
 }
 
-.bio-card:nth-child(1) { animation: subtleCardFloat 5s ease-in-out infinite; }
-.bio-card:nth-child(2) { animation: subtleCardFloat 5s ease-in-out 0.6s infinite; }
-.bio-card:nth-child(3) { animation: subtleCardFloat 5s ease-in-out 1.2s infinite; }
+.bio-card-1 { animation: subtleCardFloat 4.8s ease-in-out infinite; }
+.bio-card-2 { animation: subtleCardFloat 4.8s ease-in-out 0.8s infinite; }
+.bio-card-3 { animation: subtleCardFloat 4.8s ease-in-out 1.6s infinite; }
+
+.icon-box-pulse {
+  animation: iconPulse 3s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
 
 .website-badge {
   position: relative;
   overflow: hidden;
+  animation: websiteFloat 4s ease-in-out infinite;
+}
+
+@keyframes websiteFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }
 
 .website-badge::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
   transform: translateX(-100%);
   animation: chipShimmer 3.2s infinite;
 }
