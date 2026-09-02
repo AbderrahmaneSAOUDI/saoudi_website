@@ -32,9 +32,11 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         --brand-green: #1E824C;
         --brand-green-dark: #006233;
         --brand-green-light: #e6f7f1;
+        --brand-blue: #0080C8;
         --text-dark: #1A202C;
         --text-muted: #64748B;
         --ease-m3: cubic-bezier(0.2, 0, 0.2, 1);
+        --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
       }
 
       * {
@@ -53,9 +55,65 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         align-items: center;
         justify-content: center;
         position: relative;
+        perspective: 1200px;
       }
 
-      /* Animated Particle Background System (matching website constellation) */
+      /* Animated Glowing Floating Orbs in Background */
+      .bg-orb {
+        position: fixed;
+        border-radius: 9999px;
+        pointer-events: none;
+        z-index: 0;
+        filter: blur(50px);
+        opacity: 0.65;
+        will-change: transform;
+      }
+
+      .bg-orb-1 {
+        width: 450px;
+        height: 450px;
+        background: radial-gradient(circle, rgba(0, 98, 51, 0.22) 0%, rgba(30, 130, 76, 0.08) 60%, transparent 70%);
+        top: -80px;
+        left: -80px;
+        animation: orbDrift1 22s ease-in-out infinite alternate;
+      }
+
+      .bg-orb-2 {
+        width: 550px;
+        height: 550px;
+        background: radial-gradient(circle, rgba(0, 128, 200, 0.18) 0%, rgba(0, 98, 51, 0.06) 60%, transparent 70%);
+        bottom: -100px;
+        right: -100px;
+        animation: orbDrift2 26s ease-in-out infinite alternate;
+      }
+
+      .bg-orb-3 {
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(circle, rgba(249, 171, 0, 0.12) 0%, transparent 70%);
+        top: 40%;
+        right: 20%;
+        animation: orbDrift3 18s ease-in-out infinite alternate;
+      }
+
+      @keyframes orbDrift1 {
+        0% { transform: translate3d(0, 0, 0) scale(1); }
+        50% { transform: translate3d(120px, 80px, 0) scale(1.15); }
+        100% { transform: translate3d(60px, 140px, 0) scale(0.95); }
+      }
+
+      @keyframes orbDrift2 {
+        0% { transform: translate3d(0, 0, 0) scale(1); }
+        50% { transform: translate3d(-140px, -90px, 0) scale(1.1); }
+        100% { transform: translate3d(-70px, -150px, 0) scale(1.05); }
+      }
+
+      @keyframes orbDrift3 {
+        0% { transform: translate3d(0, 0, 0) scale(0.9); }
+        100% { transform: translate3d(-80px, 60px, 0) scale(1.2); }
+      }
+
+      /* Animated Particle Background System */
       body::before,
       body::after {
         content: '';
@@ -68,49 +126,49 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
 
       body::before {
         background-image:
-          radial-gradient(circle, rgba(0, 98, 51, 0.35) 1.5px, transparent 1.5px),
-          radial-gradient(circle, rgba(0, 128, 200, 0.28) 1.5px, transparent 1.5px),
-          radial-gradient(circle, rgba(30, 130, 76, 0.25) 1.2px, transparent 1.2px),
-          radial-gradient(circle, rgba(249, 171, 0, 0.25) 1.5px, transparent 1.5px);
+          radial-gradient(circle, rgba(0, 98, 51, 0.4) 1.5px, transparent 1.5px),
+          radial-gradient(circle, rgba(0, 128, 200, 0.3) 1.5px, transparent 1.5px),
+          radial-gradient(circle, rgba(30, 130, 76, 0.3) 1.2px, transparent 1.2px),
+          radial-gradient(circle, rgba(249, 171, 0, 0.28) 1.5px, transparent 1.5px);
         background-size: 70px 70px, 95px 95px, 70px 70px, 120px 120px;
         background-position: 0 0, 30% 15%, 25% 68%, 82% 88%;
         background-repeat: repeat;
-        animation: bgPoints 48s linear infinite;
-        opacity: 0.85;
+        animation: bgPoints 42s linear infinite;
+        opacity: 0.9;
       }
 
       body::after {
         background-image:
-          radial-gradient(circle, rgba(0, 98, 51, 0.2) 1.5px, transparent 2px),
-          radial-gradient(circle, rgba(0, 128, 200, 0.18) 1.5px, transparent 2px),
-          radial-gradient(circle, rgba(0, 98, 51, 0.15) 1px, transparent 1.5px),
-          radial-gradient(circle, rgba(255, 255, 255, 0.6) 1px, transparent 1.5px);
+          radial-gradient(circle, rgba(0, 98, 51, 0.22) 1.5px, transparent 2px),
+          radial-gradient(circle, rgba(0, 128, 200, 0.2) 1.5px, transparent 2px),
+          radial-gradient(circle, rgba(0, 98, 51, 0.18) 1px, transparent 1.5px),
+          radial-gradient(circle, rgba(255, 255, 255, 0.7) 1px, transparent 1.5px);
         background-repeat: repeat;
         background-size: 120px 120px, 100px 100px, 24px 24px, 24px 24px;
         background-position: 8% 90%, 85% 60%, 0 0, 14px 14px;
-        animation: bgStars 24s linear infinite;
-        opacity: 0.9;
+        animation: bgStars 20s linear infinite;
+        opacity: 0.95;
       }
 
       @keyframes bgPoints {
         0% { transform: translate3d(0, 0, 0); }
-        50% { transform: translate3d(-50px, 40px, 0); }
+        50% { transform: translate3d(-60px, 45px, 0); }
         100% { transform: translate3d(0, 0, 0); }
       }
 
       @keyframes bgStars {
         0% { transform: translate3d(0, 0, 0); }
-        50% { transform: translate3d(80px, -80px, 0); }
+        50% { transform: translate3d(90px, -90px, 0); }
         100% { transform: translate3d(0, 0, 0); }
       }
 
-      /* Main presentation frame: ~94% of screen view with 16:9 ratio and visible border */
+      /* Main presentation frame: ~94% of screen view with 16:9 ratio and animated border */
       .presentation-frame {
         width: min(94vw, calc(94vh * 16 / 9));
         height: min(94vh, calc(94vw * 9 / 16));
         background-color: #FFFFFF;
         border-radius: 32px;
-        border: 2px solid rgba(0, 98, 51, 0.22);
+        border: 2px solid rgba(0, 98, 51, 0.25);
         position: relative;
         display: flex;
         flex-direction: column;
@@ -118,17 +176,31 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         padding: clamp(2.2rem, 4.5vw, 4.2rem) clamp(2.8rem, 5.8vw, 5.5rem);
         overflow: hidden;
         z-index: 10;
-        animation: frameEntrance 0.7s var(--ease-m3) forwards;
+        animation: frameEntrance 0.8s var(--ease-spring) forwards, frameLevitate 9s ease-in-out 1s infinite;
+        transition: border-color 0.5s ease;
+      }
+
+      .presentation-frame:hover {
+        border-color: rgba(0, 98, 51, 0.45);
       }
 
       @keyframes frameEntrance {
         from {
           opacity: 0;
-          transform: scale(0.96) translateY(12px);
+          transform: scale(0.93) translateY(24px);
         }
         to {
           opacity: 1;
           transform: scale(1) translateY(0);
+        }
+      }
+
+      @keyframes frameLevitate {
+        0%, 100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-5px);
         }
       }
 
@@ -137,10 +209,48 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         position: absolute;
         inset: 0;
         background: 
-          radial-gradient(ellipse at 90% 25%, rgba(230, 247, 241, 0.7) 0%, transparent 60%),
-          radial-gradient(ellipse at 75% 85%, rgba(240, 249, 245, 0.5) 0%, transparent 50%);
+          radial-gradient(ellipse at 90% 25%, rgba(230, 247, 241, 0.8) 0%, transparent 60%),
+          radial-gradient(ellipse at 75% 85%, rgba(240, 249, 245, 0.6) 0%, transparent 50%);
         pointer-events: none;
         z-index: 0;
+      }
+
+      /* Floating Decorative Background Tags */
+      .floating-tag {
+        position: absolute;
+        padding: 0.35rem 0.85rem;
+        border-radius: 9999px;
+        background: rgba(230, 247, 241, 0.6);
+        border: 1px solid rgba(0, 98, 51, 0.15);
+        font-size: clamp(9px, 0.9vw, 11px);
+        font-weight: 700;
+        color: var(--brand-green-dark);
+        pointer-events: none;
+        user-select: none;
+        z-index: 1;
+        opacity: 0.75;
+      }
+
+      .tag-1 {
+        top: 2.5rem;
+        right: 3.5rem;
+        animation: tagFloat1 6s ease-in-out infinite alternate;
+      }
+
+      .tag-2 {
+        bottom: 5.5rem;
+        right: 4.5rem;
+        animation: tagFloat2 7s ease-in-out 0.5s infinite alternate;
+      }
+
+      @keyframes tagFloat1 {
+        0% { transform: translateY(0px) rotate(0deg); }
+        100% { transform: translateY(-8px) rotate(2deg); }
+      }
+
+      @keyframes tagFloat2 {
+        0% { transform: translateY(0px) rotate(0deg); }
+        100% { transform: translateY(8px) rotate(-2deg); }
       }
 
       .content-layer {
@@ -152,10 +262,17 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         justify-content: space-between;
       }
 
-      /* Animated Speaker Pill */
+      /* Animated Speaker Pill with Radar Pulse */
+      .speaker-pill-wrapper {
+        display: flex;
+        align-items: center;
+        animation: slideDownFade 0.65s var(--ease-spring) 0.15s backwards;
+      }
+
       .speaker-pill {
         display: inline-flex;
         align-items: center;
+        gap: 0.6rem;
         background-color: var(--brand-green);
         color: #FFFFFF;
         font-weight: 700;
@@ -164,24 +281,66 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         border-radius: 9999px;
         letter-spacing: -0.01em;
         width: fit-content;
-        animation: slideDownFade 0.6s var(--ease-m3) 0.15s backwards;
-        transition: transform 0.2s var(--ease-m3), background-color 0.2s;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.25s var(--ease-m3), background-color 0.2s;
+        cursor: default;
         user-select: none;
       }
 
+      /* Pill Shimmer Sweep */
+      .speaker-pill::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(60deg, transparent 40%, rgba(255, 255, 255, 0.3) 50%, transparent 60%);
+        transform: translateX(-100%);
+        animation: shimmerSweep 4.5s ease-in-out 1.5s infinite;
+      }
+
+      @keyframes shimmerSweep {
+        0% { transform: translateX(-100%); }
+        25%, 100% { transform: translateX(100%); }
+      }
+
       .speaker-pill:hover {
-        transform: translateY(-2px);
+        transform: translateY(-2px) scale(1.02);
         background-color: var(--brand-green-dark);
+      }
+
+      .live-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 9999px;
+        background-color: #81C784;
+        position: relative;
+      }
+
+      .live-dot::before {
+        content: '';
+        position: absolute;
+        inset: -3px;
+        border-radius: 9999px;
+        background-color: rgba(129, 199, 132, 0.6);
+        animation: livePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+
+      @keyframes livePulse {
+        0% { transform: scale(1); opacity: 0.8; }
+        100% { transform: scale(2.4); opacity: 0; }
       }
 
       @keyframes slideDownFade {
         from {
           opacity: 0;
-          transform: translateY(-16px);
+          transform: translateY(-20px) scale(0.95);
         }
         to {
           opacity: 1;
-          transform: translateY(0);
+          transform: translateY(0) scale(1);
         }
       }
 
@@ -192,15 +351,25 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         gap: clamp(0.25rem, 0.8vw, 0.75rem);
       }
 
-      /* First line: Digital Productivity (Large & Green, Single Line) */
+      /* First line: Digital Productivity with Animated Shimmer Gradient */
       .title-highlight {
         font-size: clamp(2.6rem, 5.2vw, 5.4rem);
         font-weight: 900;
-        color: var(--brand-green);
         letter-spacing: -0.03em;
         line-height: 1.08;
         white-space: nowrap;
-        animation: slideRightFade 0.65s var(--ease-m3) 0.25s backwards;
+        background: linear-gradient(110deg, #1E824C 0%, #006233 25%, #0080C8 50%, #1E824C 75%, #006233 100%);
+        background-size: 250% 100%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: slideRightFade 0.7s var(--ease-spring) 0.25s backwards, textGradientFlow 8s ease-in-out infinite;
+        will-change: background-position;
+      }
+
+      @keyframes textGradientFlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
       }
 
       /* Second line: Work Smarter, Not Harder */
@@ -210,13 +379,14 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         color: var(--text-dark);
         letter-spacing: -0.025em;
         line-height: 1.15;
-        animation: slideRightFade 0.65s var(--ease-m3) 0.35s backwards;
+        animation: slideRightFade 0.7s var(--ease-spring) 0.38s backwards;
+        transition: color 0.3s ease;
       }
 
       @keyframes slideRightFade {
         from {
           opacity: 0;
-          transform: translateX(-24px);
+          transform: translateX(-30px);
         }
         to {
           opacity: 1;
@@ -224,7 +394,7 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         }
       }
 
-      /* Animated Horizontal Divider Line */
+      /* Animated Horizontal Divider Line with Energy Beam */
       .divider-container {
         position: relative;
         width: 100%;
@@ -238,7 +408,26 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         height: 2px;
         background-color: #1A202C;
         transform-origin: left;
-        animation: expandLine 0.75s var(--ease-m3) 0.45s backwards;
+        position: relative;
+        overflow: hidden;
+        animation: expandLine 0.8s var(--ease-m3) 0.45s backwards;
+      }
+
+      /* Energetic Light Beam Sweeping Across the Line */
+      .divider-line::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 180px;
+        height: 100%;
+        background: linear-gradient(90deg, transparent 0%, #1E824C 40%, #0080C8 80%, transparent 100%);
+        animation: beamSweep 3.8s ease-in-out 1.2s infinite;
+      }
+
+      @keyframes beamSweep {
+        0% { transform: translateX(-180px); }
+        40%, 100% { transform: translateX(1800px); }
       }
 
       @keyframes expandLine {
@@ -250,10 +439,17 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         }
       }
 
-      /* Animated Play Button with Pulse Micro-interaction */
-      .play-circle {
+      /* Animated Play Button with Sonar Radar Wave */
+      .play-circle-wrapper {
         position: absolute;
         right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: popIn 0.6s var(--ease-spring) 0.6s backwards;
+      }
+
+      .play-circle {
         width: clamp(2.6rem, 3.4vw, 3.4rem);
         height: clamp(2.6rem, 3.4vw, 3.4rem);
         border-radius: 9999px;
@@ -263,24 +459,72 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         justify-content: center;
         color: #FFFFFF;
         cursor: pointer;
-        animation: popIn 0.5s var(--ease-m3) 0.6s backwards;
-        transition: transform 0.25s var(--ease-m3), background-color 0.2s;
+        transition: transform 0.3s var(--ease-spring), background-color 0.2s;
         border: 2px solid #FFFFFF;
+        position: relative;
+        user-select: none;
+      }
+
+      /* Sonar Wave Rings */
+      .sonar-wave {
+        position: absolute;
+        inset: -6px;
+        border-radius: 9999px;
+        border: 2px solid rgba(30, 130, 76, 0.4);
+        pointer-events: none;
+        animation: sonarPulse 2.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+      }
+
+      .sonar-wave-2 {
+        position: absolute;
+        inset: -12px;
+        border-radius: 9999px;
+        border: 1.5px solid rgba(0, 128, 200, 0.3);
+        pointer-events: none;
+        animation: sonarPulse 2.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.7s infinite;
+      }
+
+      @keyframes sonarPulse {
+        0% {
+          transform: scale(0.85);
+          opacity: 0.9;
+        }
+        100% {
+          transform: scale(1.6);
+          opacity: 0;
+        }
+      }
+
+      .play-icon {
+        width: 1rem;
+        height: 1rem;
+        margin-left: 2px;
+        fill: currentColor;
+        animation: iconNudge 2.2s ease-in-out infinite;
+      }
+
+      @keyframes iconNudge {
+        0%, 100% { transform: translateX(0); }
+        50% { transform: translateX(2.5px); }
       }
 
       .play-circle:hover {
-        transform: scale(1.1) rotate(5deg);
+        transform: scale(1.15) rotate(6deg);
         background-color: var(--brand-green-dark);
+      }
+
+      .play-circle:active {
+        transform: scale(0.95);
       }
 
       @keyframes popIn {
         from {
           opacity: 0;
-          transform: scale(0);
+          transform: scale(0) rotate(-45deg);
         }
         to {
           opacity: 1;
-          transform: scale(1);
+          transform: scale(1) rotate(0deg);
         }
       }
 
@@ -290,13 +534,16 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         font-weight: 800;
         font-size: clamp(1.15rem, 1.85vw, 1.6rem);
         letter-spacing: -0.015em;
-        animation: slideUpFade 0.6s var(--ease-m3) 0.55s backwards;
+        animation: slideUpFade 0.65s var(--ease-spring) 0.55s backwards;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
       }
 
       @keyframes slideUpFade {
         from {
           opacity: 0;
-          transform: translateY(16px);
+          transform: translateY(20px);
         }
         to {
           opacity: 1;
@@ -304,23 +551,39 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         }
       }
 
-      /* Animated Logos Row */
+      /* Animated Logos Row with Sequential Delays */
       .logos-row {
         display: flex;
         align-items: center;
         gap: clamp(1.8rem, 3.8vw, 4rem);
         margin-top: clamp(1rem, 2.2vw, 2.2rem);
-        animation: slideUpFade 0.6s var(--ease-m3) 0.7s backwards;
       }
 
       .logo-wrapper {
         display: flex;
         align-items: center;
-        transition: transform 0.25s var(--ease-m3);
+        transition: transform 0.3s var(--ease-spring);
+      }
+
+      .logo-wrapper-1 {
+        animation: slideUpFade 0.65s var(--ease-spring) 0.7s backwards, logoBob 5s ease-in-out 1.5s infinite;
+      }
+
+      .logo-wrapper-2 {
+        animation: slideUpFade 0.65s var(--ease-spring) 0.82s backwards, logoBob 5.5s ease-in-out 1.8s infinite;
+      }
+
+      .logo-wrapper-3 {
+        animation: slideUpFade 0.65s var(--ease-spring) 0.94s backwards, logoBob 6s ease-in-out 2.1s infinite;
+      }
+
+      @keyframes logoBob {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
       }
 
       .logo-wrapper:hover {
-        transform: translateY(-3px);
+        transform: translateY(-6px) scale(1.04) !important;
       }
 
       .logo-img-ministre {
@@ -341,18 +604,46 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         object-fit: contain;
       }
 
+      /* Click Ripple Animation Container */
+      .ripple-effect {
+        position: absolute;
+        border-radius: 9999px;
+        background: radial-gradient(circle, rgba(30, 130, 76, 0.25) 0%, transparent 70%);
+        transform: scale(0);
+        pointer-events: none;
+        animation: rippleAnim 0.6s linear;
+        z-index: 5;
+      }
+
+      @keyframes rippleAnim {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+
       /* Respect Reduced Motion */
       @media (prefers-reduced-motion: reduce) {
         body::before,
         body::after,
+        .bg-orb,
         .presentation-frame,
         .speaker-pill,
+        .speaker-pill::after,
+        .live-dot::before,
         .title-highlight,
         .title-subtext,
         .divider-line,
+        .divider-line::after,
+        .play-circle-wrapper,
         .play-circle,
+        .sonar-wave,
+        .sonar-wave-2,
+        .play-icon,
         .program-tag,
-        .logos-row {
+        .logos-row,
+        .logo-wrapper,
+        .floating-tag {
           animation: none !important;
           transition: none !important;
           transform: none !important;
@@ -362,22 +653,38 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
     </style>
   </head>
   <body>
-    <!-- Main Presentation Card (94% screen view, 16:9 ratio, bordered) -->
-    <main class="presentation-frame">
+    <!-- Background Ambient Glowing Orbs -->
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+
+    <!-- Main Presentation Card (94% screen view, 16:9 ratio, bordered, levitating) -->
+    <main class="presentation-frame" id="presentationCard">
       <div class="bg-overlay"></div>
+
+      <!-- Subtle Floating Tech Badges -->
+      <div class="floating-tag tag-1">
+        ⚡ Djil & Djil • 24–30 ans
+      </div>
+      <div class="floating-tag tag-2">
+        🚀 Workflows & Systèmes
+      </div>
 
       <div class="content-layer">
         <!-- Top: Speaker's Name in Green Pill -->
         <div class="pt-1">
-          <div class="speaker-pill" title="Intervenant">
-            Abderrahmane SAOUDI
+          <div class="speaker-pill-wrapper">
+            <div class="speaker-pill" title="Intervenant">
+              <span class="live-dot"></span>
+              <span>Abderrahmane SAOUDI</span>
+            </div>
           </div>
         </div>
 
         <!-- Middle: Title -->
         <div class="my-auto py-2">
           <div class="title-container">
-            <!-- First Line: Green & Larger -->
+            <!-- First Line: Green & Larger with Dynamic Shimmer Gradient -->
             <h1 class="title-highlight">
               Digital Productivity
             </h1>
@@ -390,25 +697,29 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
 
         <!-- Bottom: Dividing Line + Program Tag + Logos -->
         <div class="pb-1">
-          <!-- Line with Right Play Circle -->
+          <!-- Line with Right Play Circle & Sonar Waves -->
           <div class="divider-container">
             <div class="divider-line"></div>
-            <div class="play-circle" title="Lancer la session">
-              <svg class="w-4 h-4 ml-0.5 fill-current" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
+            <div class="play-circle-wrapper">
+              <div class="sonar-wave"></div>
+              <div class="sonar-wave-2"></div>
+              <button type="button" class="play-circle" id="playBtn" title="Lancer la session" aria-label="Lancer la session">
+                <svg class="play-icon" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </button>
             </div>
           </div>
 
           <!-- Program & Age Tag -->
           <div class="program-tag">
-            7.77 Program | Age: 24-30
+            <span>7.77 Program | Age: 24-30</span>
           </div>
 
           <!-- Institutional Logos -->
           <div class="logos-row">
             <!-- Ministère de la Poste et des Télécommunications -->
-            <div class="logo-wrapper">
+            <div class="logo-wrapper logo-wrapper-1">
               <img 
                 src={logoMinistere.src} 
                 alt="Ministère de la Poste et des Télécommunications" 
@@ -417,7 +728,7 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
             </div>
 
             <!-- Algérie Télécom -->
-            <div class="logo-wrapper">
+            <div class="logo-wrapper logo-wrapper-2">
               <img 
                 src={logoAlgerieTelecom.src} 
                 alt="Algérie Télécom" 
@@ -426,7 +737,7 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
             </div>
 
             <!-- Mobilis -->
-            <div class="logo-wrapper">
+            <div class="logo-wrapper logo-wrapper-3">
               <img 
                 src={logoMobilis.src} 
                 alt="Mobilis" 
@@ -437,5 +748,30 @@ import logoMobilis from './_assets/logo_Mobilis.svg';
         </div>
       </div>
     </main>
+
+    <!-- Interactive Micro-Interactions Script -->
+    <script>
+      const playBtn = document.getElementById('playBtn');
+      const card = document.getElementById('presentationCard');
+
+      playBtn?.addEventListener('click', () => {
+        if (!card) return;
+        
+        // Interactive Ripple Feedback
+        const ripple = document.createElement('div');
+        ripple.className = 'ripple-effect';
+        const rect = playBtn.getBoundingClientRect();
+        const cardRect = card.getBoundingClientRect();
+        
+        const size = Math.max(cardRect.width, cardRect.height) * 0.4;
+        ripple.style.width = `${size}px`;
+        ripple.style.height = `${size}px`;
+        ripple.style.left = `${rect.left + rect.width / 2 - cardRect.left - size / 2}px`;
+        ripple.style.top = `${rect.top + rect.height / 2 - cardRect.top - size / 2}px`;
+        
+        card.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+      });
+    </script>
   </body>
 </html>
