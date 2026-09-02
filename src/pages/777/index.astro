@@ -2,6 +2,7 @@
 import logoMinistere from './_assets/logo_ministre.png';
 import logoAlgerieTelecom from './_assets/logo_Algérie_Télécom.svg';
 import logoMobilis from './_assets/logo_Mobilis.svg';
+import videoSrc from './_assets/video.mp4';
 import '../../styles/global.css';
 import './_styles/presentation.css';
 ---
@@ -61,7 +62,7 @@ import './_styles/presentation.css';
     </svg>
 
     <!-- 4. Main Presentation Card (94% screen view, 16:9 ratio, bordered, levitating) -->
-    <main class="presentation-frame frame-border-pulse bg-white rounded-3xl sm:rounded-[32px] border-2 border-emerald-800/25 relative flex flex-col justify-between p-6 sm:p-10 md:p-14 lg:p-16 overflow-hidden z-10 hover:border-emerald-800/50 transition-colors duration-500">
+    <main class="presentation-frame frame-border-pulse bg-white rounded-3xl sm:rounded-[32px] border-2 border-emerald-800/25 relative flex flex-col justify-between p-6 sm:p-10 md:p-12 lg:p-14 xl:p-16 overflow-hidden z-10 hover:border-emerald-800/50 transition-colors duration-500">
       <div class="bg-overlay"></div>
 
       <!-- Architectural Corner L-Brackets -->
@@ -84,17 +85,33 @@ import './_styles/presentation.css';
           </div>
         </div>
 
-        <!-- Middle: Title -->
-        <div class="my-auto py-2">
-          <div class="flex flex-col gap-1 sm:gap-2">
+        <!-- Middle: Title on Left, Video on Right -->
+        <div class="my-auto py-2 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 lg:gap-10 xl:gap-12">
+          <!-- Title Left Block -->
+          <div class="flex flex-col gap-1 sm:gap-2 flex-1 min-w-0">
             <!-- First Line: Green & Larger with Dynamic Shimmer Gradient -->
-            <h1 class="title-highlight font-black text-4xl sm:text-6xl md:text-7xl lg:text-[5.2rem] tracking-tight leading-[1.08] whitespace-nowrap">
+            <h1 class="title-highlight font-black text-3xl sm:text-5xl md:text-5xl lg:text-[4.2rem] xl:text-[4.8rem] tracking-tight leading-[1.08] whitespace-nowrap">
               Digital Productivity
             </h1>
             <!-- Second Line: Dark & Complementary -->
-            <h2 class="title-subtext font-light text-2xl sm:text-4xl md:text-5xl text-slate-900 tracking-tight leading-tight">
+            <h2 class="title-subtext font-light text-xl sm:text-3xl md:text-3xl lg:text-4xl xl:text-5xl text-slate-900 tracking-tight leading-tight">
               Work Smarter, Not Harder
             </h2>
+          </div>
+
+          <!-- Video Right Block -->
+          <div class="video-wrapper flex-shrink-0 w-full max-w-[280px] sm:max-w-[340px] md:max-w-[360px] lg:max-w-[420px] xl:max-w-[460px]">
+            <div class="relative w-full aspect-video rounded-2xl md:rounded-3xl overflow-hidden border-2 border-emerald-800/25 bg-slate-950/85 hover:border-emerald-800/50 transition-colors duration-500">
+              <video 
+                src={videoSrc}
+                autoplay
+                muted
+                playsinline
+                loop
+                class="video-fade-loop w-full h-full object-cover rounded-2xl md:rounded-3xl pointer-events-none"
+              ></video>
+              <div class="absolute inset-0 pointer-events-none rounded-2xl md:rounded-3xl ring-1 ring-inset ring-white/20"></div>
+            </div>
           </div>
         </div>
 

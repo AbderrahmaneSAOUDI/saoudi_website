@@ -508,6 +508,50 @@
   50% { transform: translateY(-3.5px); }
 }
 
+/* === 11. Hero Video Loop & Smooth Fade === */
+.video-wrapper {
+  animation: slideLeftFade 0.85s var(--ease-spring) 0.35s backwards;
+}
+
+@keyframes slideLeftFade {
+  from {
+    opacity: 0;
+    transform: translateX(35px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.video-fade-loop {
+  animation: videoFadeLoop 10.01s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+@keyframes videoFadeLoop {
+  0% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  8% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  84% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  97% {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
 /* Respect Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   .bg-particles::before,
@@ -534,7 +578,9 @@
   .logo-wrapper-1,
   .logo-wrapper-2,
   .logo-wrapper-3,
-  .floating-tag {
+  .floating-tag,
+  .video-wrapper,
+  .video-fade-loop {
     animation: none !important;
     transition: none !important;
     transform: none !important;
