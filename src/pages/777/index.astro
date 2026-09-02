@@ -75,9 +75,9 @@ import './_styles/presentation.css';
 
       <div class="content-layer relative z-10 h-full flex flex-col justify-between">
         <!-- Top: Dynamic Header Pills -->
-        <div class="pt-1 relative min-h-[44px]">
+        <div class="pt-1 relative min-h-[46px]">
           <!-- Slide 1 Top: Speaker Pill -->
-          <div class="slide1-top-pill transition-all duration-500 flex items-center">
+          <div class="top-pill-1 flex items-center">
             <div class="speaker-pill relative overflow-hidden inline-flex items-center gap-2.5 bg-[#1E824C] hover:bg-[#006233] text-white font-bold text-sm sm:text-base md:text-lg px-5 sm:px-7 py-2 sm:py-2.5 rounded-full tracking-tight transition-transform duration-200 hover:-translate-y-0.5 cursor-default select-none">
               <span class="relative flex h-2.5 w-2.5">
                 <span class="live-dot-pulse absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -87,24 +87,20 @@ import './_styles/presentation.css';
             </div>
           </div>
 
-          <!-- Slide 2 Top: Category & Speaker Profile Pill -->
-          <div class="slide2-top-pill absolute inset-0 transition-all duration-500 flex items-center justify-between">
-            <div class="inline-flex items-center gap-2.5 bg-emerald-50 border border-emerald-800/20 text-[#006233] font-bold text-xs sm:text-sm md:text-base px-4 sm:px-6 py-2 rounded-full tracking-tight">
-              <span class="w-2 h-2 rounded-full bg-[#1E824C]"></span>
-              <span>Intervenant • Speaker Profile</span>
-            </div>
-            <div class="hidden sm:inline-flex items-center gap-2 text-xs font-semibold text-slate-500">
-              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-              <span>Session 7.77 Digital Skills</span>
+          <!-- Slide 2 Top: 7.77 Program Badge in top left (no Age) -->
+          <div class="top-pill-2 absolute inset-0 flex items-center">
+            <div class="inline-flex items-center gap-2.5 bg-[#1E824C] hover:bg-[#006233] text-white font-bold text-sm sm:text-base md:text-lg px-5 sm:px-7 py-2 sm:py-2.5 rounded-full tracking-tight transition-transform duration-200 hover:-translate-y-0.5 cursor-default select-none">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-300"></span>
+              <span>7.77 Program</span>
             </div>
           </div>
         </div>
 
-        <!-- Middle: Dynamic Slide Content Deck Area -->
-        <div class="relative w-full my-auto py-2 min-h-[300px] sm:min-h-[360px] md:min-h-[400px] lg:min-h-[440px] flex items-center overflow-hidden">
+        <!-- Middle: Dynamic Slide Panes Area -->
+        <div class="relative w-full my-auto py-2 min-h-[320px] sm:min-h-[360px] md:min-h-[400px] lg:min-h-[440px] flex items-center">
           
-          <!-- ================= SLIDE 1 CONTENT ================= -->
-          <section id="slide-1-content" class="slide-pane w-full flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 lg:gap-8 xl:gap-10">
+          <!-- ================= SLIDE 1 PANE ================= -->
+          <section id="slide-1-content" class="slide-pane slide-pane-1 w-full flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 lg:gap-8 xl:gap-10">
             <!-- Title Left Block -->
             <div class="flex flex-col gap-1 sm:gap-2 shrink-0">
               <!-- First Line: Green & Larger with Dynamic Shimmer Gradient -->
@@ -132,90 +128,68 @@ import './_styles/presentation.css';
             </div>
           </section>
 
-          <!-- ================= SLIDE 2 CONTENT: SPEAKER BIO ================= -->
-          <section id="slide-2-content" class="slide-pane w-full grid grid-cols-12 gap-6 lg:gap-10 items-center">
-            <!-- Left: Speaker Profile Showcase Card -->
-            <div class="col-span-12 md:col-span-4 flex flex-col items-center text-center p-5 sm:p-7 rounded-3xl bg-slate-50/80 border border-slate-200/80">
-              <!-- Profile Avatar with Google Colors Ring -->
-              <div class="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full p-1 bg-gradient-to-tr from-[#4285F4] via-[#0F9D58] to-[#F9AB00] mb-4 transition-transform duration-300 hover:scale-105">
-                <img 
-                  src="/profile.webp" 
-                  alt="Abderrahmane SAOUDI" 
-                  class="w-full h-full object-cover rounded-full bg-slate-100"
-                />
-                <span class="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white" title="Active Speaker"></span>
+          <!-- ================= SLIDE 2 PANE: SPEAKER BIO ================= -->
+          <section id="slide-2-content" class="slide-pane slide-pane-2 w-full flex flex-col gap-5 sm:gap-6 lg:gap-8">
+            <!-- Speaker Header -->
+            <div class="flex flex-col gap-1 sm:gap-2">
+              <div class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#006233]">
+                <span class="w-2 h-2 rounded-full bg-[#1E824C]"></span>
+                <span>Intervenant • Speaker</span>
               </div>
-
-              <h2 class="text-xl sm:text-2xl font-black text-slate-900 font-sans tracking-tight">
-                Abderrahmane SAOUDI
+              <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-[3.4rem] font-black text-slate-900 tracking-tight leading-tight">
+                Abderrahmane <span class="title-highlight">SAOUDI</span>
               </h2>
-              <p class="text-xs sm:text-sm font-semibold text-[#006233] mt-1">
-                Technology Lead & Creative Engineer
-              </p>
-
-              <!-- Quick Badges -->
-              <div class="flex flex-wrap items-center justify-center gap-2 mt-4 pt-3 border-t border-slate-200/80 w-full text-[11px] font-medium text-slate-600">
-                <span class="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-slate-700 font-mono">saoudi.online</span>
-                <span class="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800">Algérie 🇩🇿</span>
-              </div>
             </div>
 
-            <!-- Right: 3 Bio Pillars as Modern Material 3 Cards -->
-            <div class="col-span-12 md:col-span-8 flex flex-col gap-3 sm:gap-4">
-              <!-- Header -->
-              <div class="mb-1">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-[#006233]">
-                  Biographie & Expertises
-                </h3>
-              </div>
-
+            <!-- 3 Bio Pillars Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 w-full">
               <!-- Pillar 1: Graphic Designer and Advisor -->
-              <div class="flex items-start gap-4 p-3.5 sm:p-4 rounded-2xl bg-white border border-emerald-800/20 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-700/40">
-                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-emerald-100/70 text-[#006233] flex items-center justify-center shrink-0">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <div class="flex flex-col justify-between p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-emerald-50/50 border border-emerald-800/20 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-700/40">
+                <div class="w-12 h-12 rounded-2xl bg-[#1E824C] text-white flex items-center justify-center mb-4">
+                  <svg class="w-6 h-6 fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
                 </div>
                 <div>
-                  <h4 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
+                  <h3 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-snug">
                     Graphic Designer and Advisor
-                  </h4>
-                  <p class="text-xs sm:text-sm text-slate-600 mt-0.5 leading-relaxed">
-                    Conception d'identités visuelles percutantes, direction artistique et conseil stratégique en design de marque et expérience utilisateur (UI/UX).
+                  </h3>
+                  <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed font-normal">
+                    Conception d'identités visuelles, direction artistique, stratégie de design de marque et expérience utilisateur (UI/UX).
                   </p>
                 </div>
               </div>
 
               <!-- Pillar 2: Mobile and Frontend Web Developer -->
-              <div class="flex items-start gap-4 p-3.5 sm:p-4 rounded-2xl bg-white border border-sky-800/20 transition-all duration-300 hover:-translate-y-1 hover:border-sky-700/40">
-                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-sky-100/70 text-[#0080C8] flex items-center justify-center shrink-0">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              <div class="flex flex-col justify-between p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-sky-50/50 border border-sky-800/20 transition-all duration-300 hover:-translate-y-1 hover:border-sky-700/40">
+                <div class="w-12 h-12 rounded-2xl bg-[#0080C8] text-white flex items-center justify-center mb-4">
+                  <svg class="w-6 h-6 fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <div>
-                  <h4 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
+                  <h3 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-snug">
                     Mobile and Frontend Web Developer
-                  </h4>
-                  <p class="text-xs sm:text-sm text-slate-600 mt-0.5 leading-relaxed">
-                    Développement d'applications mobiles cross-platform (Flutter) et d'architectures web SSR modernes et légères à hautes performances.
+                  </h3>
+                  <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed font-normal">
+                    Développement d'applications mobiles cross-platform (Flutter) et d'architectures web SSR modernes et ultra-légères.
                   </p>
                 </div>
               </div>
 
               <!-- Pillar 3: Former GDG Ghardaia Club President -->
-              <div class="flex items-start gap-4 p-3.5 sm:p-4 rounded-2xl bg-white border border-amber-800/20 transition-all duration-300 hover:-translate-y-1 hover:border-amber-700/40">
-                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-amber-100/70 text-[#D97706] flex items-center justify-center shrink-0">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <div class="flex flex-col justify-between p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-amber-50/50 border border-amber-800/20 transition-all duration-300 hover:-translate-y-1 hover:border-amber-700/40">
+                <div class="w-12 h-12 rounded-2xl bg-[#D97706] text-white flex items-center justify-center mb-4">
+                  <svg class="w-6 h-6 fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                   </svg>
                 </div>
                 <div>
-                  <h4 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
+                  <h3 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-snug">
                     Former GDG Ghardaia Club President
-                  </h4>
-                  <p class="text-xs sm:text-sm text-slate-600 mt-0.5 leading-relaxed">
-                    Leadership communautaire Google Developers Group, organisation d'ateliers tech, hackathons et vulgarisation du numérique auprès des jeunes talents.
+                  </h3>
+                  <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed font-normal">
+                    Leadership communautaire Google Developers Group, organisation d'ateliers tech, hackathons et mentorat numérique.
                   </p>
                 </div>
               </div>
@@ -226,91 +200,93 @@ import './_styles/presentation.css';
 
         <!-- Bottom: Dividing Line + Next/Previous Navigation Buttons + Responsive Footer -->
         <div class="pb-1">
-          <!-- Horizontal Dividing Line with Next/Previous Buttons -->
+          <!-- Horizontal Line with Previous on Left and Next on Right -->
           <div class="relative w-full flex items-center my-2 sm:my-3">
-            <div class="divider-line relative w-full h-0.5 bg-slate-900/80 overflow-hidden"></div>
-            
-            <!-- Dual Next/Previous Control Dock -->
-            <div class="absolute right-0 flex items-center gap-2 pl-3 bg-white z-20">
-              <!-- Slide Indicator -->
-              <span id="slideIndicator" class="text-xs font-bold text-slate-500 font-mono mr-1">
-                01 / 02
-              </span>
+            <div class="divider-line relative w-full h-0.5 bg-slate-900 overflow-hidden"></div>
 
-              <!-- Previous Button -->
+            <!-- Previous Button on the LEFT side of the H line -->
+            <div class="prev-btn-wrapper absolute left-0 flex items-center justify-center z-20">
               <button 
                 id="prevSlideBtn" 
                 type="button" 
                 aria-label="Previous Slide" 
-                disabled 
-                class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-slate-200 bg-slate-50 text-slate-700 flex items-center justify-center transition-all duration-200 hover:bg-emerald-50 hover:text-[#1E824C] hover:border-emerald-600/40 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed select-none"
+                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 hover:bg-emerald-50 text-slate-800 hover:text-[#1E824C] border-2 border-slate-300 hover:border-emerald-600/50 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer select-none" 
+                title="Slide Précédente"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 mr-0.5 fill-none stroke-current stroke-[2.5]" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
+            </div>
 
-              <!-- Next Button -->
+            <!-- Next / Play Button on the RIGHT side of the H line -->
+            <div class="next-btn-wrapper absolute right-0 flex items-center justify-center z-20">
+              <!-- Spinning Dashed Orbit Ring -->
+              <div class="orbit-ring absolute -inset-6 rounded-full border border-dashed border-emerald-600/30 pointer-events-none"></div>
+              <div class="sonar-wave absolute -inset-1.5 rounded-full border-2 border-emerald-600/45 pointer-events-none"></div>
+              <div class="sonar-wave-2 absolute -inset-3.5 rounded-full border-[1.5px] border-sky-600/35 pointer-events-none"></div>
+              <div class="sonar-wave-3 absolute -inset-5.5 rounded-full border border-emerald-500/25 pointer-events-none"></div>
               <button 
                 id="nextSlideBtn" 
                 type="button" 
                 aria-label="Next Slide" 
-                class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1E824C] hover:bg-[#006233] text-white flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer select-none"
+                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#1E824C] hover:bg-[#006233] flex items-center justify-center text-white border-2 border-white transition-all duration-300 hover:scale-115 hover:rotate-6 cursor-pointer select-none" 
+                title="Slide Suivante"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                <svg class="play-icon w-4 h-4 ml-0.5 fill-current" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
                 </svg>
               </button>
             </div>
           </div>
 
-          <!-- Bottom Row: Left Logos (dynamically scales to corner) & Right Title on Slide 2 -->
+          <!-- Bottom Row: Left Logos (scales smaller into corner) & Right Title on Slide 2 -->
           <div class="flex items-center justify-between gap-4 mt-2 sm:mt-4 min-h-[48px] sm:min-h-[56px]">
-            <!-- Left Bottom Corner: Institutional Logos & Program Tag -->
-            <div class="footer-logos-group flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 md:gap-8">
-              <!-- Program & Age Tag -->
-              <div class="program-tag text-[#1E824C] font-extrabold text-sm sm:text-base md:text-lg tracking-tight inline-flex items-center gap-2 shrink-0">
+            <!-- Left: Program Tag & Institutional Logos -->
+            <div class="flex items-center gap-4 sm:gap-6">
+              <!-- Program & Age Tag (visible on slide 1, collapses on slide 2) -->
+              <div class="footer-program-age-tag program-tag text-[#1E824C] font-extrabold text-base sm:text-xl md:text-2xl tracking-tight inline-flex items-center gap-2 shrink-0">
                 <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
                 <span>7.77 Program | Age: 24-30</span>
               </div>
 
-              <!-- Logos Group (Shrinks smoothly in bottom left corner on Slide 2) -->
-              <div class="flex items-center gap-4 sm:gap-7 md:gap-9">
+              <!-- Institutional Logos Group (shrinks into left bottom corner on slide 2) -->
+              <div class="footer-logos-container flex items-center gap-4 sm:gap-7 md:gap-9">
                 <!-- Ministère de la Poste et des Télécommunications -->
-                <div class="logo-wrapper-1 flex items-center transition-transform duration-300 hover:-translate-y-1.5 hover:scale-105">
+                <div class="logo-wrapper-1 flex items-center transition-transform duration-300 hover:-translate-y-2 hover:scale-105">
                   <img 
                     src={logoMinistere.src} 
                     alt="Ministère de la Poste et des Télécommunications" 
-                    class="h-10 sm:h-12 md:h-14 w-auto object-contain"
+                    class="h-10 sm:h-14 md:h-16 w-auto object-contain"
                   />
                 </div>
 
                 <!-- Algérie Télécom -->
-                <div class="logo-wrapper-2 flex items-center transition-transform duration-300 hover:-translate-y-1.5 hover:scale-105">
+                <div class="logo-wrapper-2 flex items-center transition-transform duration-300 hover:-translate-y-2 hover:scale-105">
                   <img 
                     src={logoAlgerieTelecom.src} 
                     alt="Algérie Télécom" 
-                    class="h-6 sm:h-8 md:h-10 w-auto object-contain"
+                    class="h-7 sm:h-10 md:h-12 w-auto object-contain"
                   />
                 </div>
 
                 <!-- Mobilis -->
-                <div class="logo-wrapper-3 flex items-center transition-transform duration-300 hover:-translate-y-1.5 hover:scale-105">
+                <div class="logo-wrapper-3 flex items-center transition-transform duration-300 hover:-translate-y-2 hover:scale-105">
                   <img 
                     src={logoMobilis.src} 
                     alt="Mobilis" 
-                    class="h-5 sm:h-7 md:h-8 w-auto object-contain"
+                    class="h-6 sm:h-8 md:h-9 w-auto object-contain"
                   />
                 </div>
               </div>
             </div>
 
-            <!-- Right Bottom Corner: Presentation Title (Smoothly appears on Slide 2) -->
+            <!-- Right: Title "Digital Productivity: Work Smarter, Not Harder" on Slide 2 -->
             <div class="footer-slide2-title text-right shrink-0">
-              <div class="title-highlight font-black text-sm sm:text-base md:text-lg tracking-tight leading-tight">
+              <div class="title-highlight font-black text-sm sm:text-base md:text-lg lg:text-xl tracking-tight leading-tight">
                 Digital Productivity
               </div>
-              <div class="text-[11px] sm:text-xs font-medium text-slate-700 leading-tight">
+              <div class="text-xs sm:text-sm font-light text-slate-700 tracking-tight leading-tight">
                 Work Smarter, Not Harder
               </div>
             </div>
@@ -326,7 +302,6 @@ import './_styles/presentation.css';
         const deck = document.getElementById('presentationDeck');
         const prevBtn = document.getElementById('prevSlideBtn');
         const nextBtn = document.getElementById('nextSlideBtn');
-        const indicator = document.getElementById('slideIndicator');
         const video = document.getElementById('heroVideo');
 
         let currentSlide = 1;
@@ -379,9 +354,13 @@ import './_styles/presentation.css';
           currentSlide = num;
           if (deck) deck.setAttribute('data-current-slide', String(currentSlide));
           
-          if (prevBtn) prevBtn.disabled = currentSlide === 1;
-          if (nextBtn) nextBtn.disabled = currentSlide === totalSlides;
-          if (indicator) indicator.textContent = `0${currentSlide} / 0${totalSlides}`;
+          if (nextBtn) {
+            if (currentSlide === totalSlides) {
+              nextBtn.classList.add('opacity-40', 'cursor-not-allowed');
+            } else {
+              nextBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+            }
+          }
 
           // Video state management between slides
           if (video) {
@@ -400,10 +379,14 @@ import './_styles/presentation.css';
         }
 
         if (nextBtn) {
-          nextBtn.addEventListener('click', () => setSlide(currentSlide + 1));
+          nextBtn.addEventListener('click', () => {
+            if (currentSlide < totalSlides) {
+              setSlide(currentSlide + 1);
+            }
+          });
         }
 
-        // Keyboard Navigation
+        // Keyboard Navigation (Arrow Keys & Space)
         window.addEventListener('keydown', (e) => {
           if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
             if (currentSlide < totalSlides) {

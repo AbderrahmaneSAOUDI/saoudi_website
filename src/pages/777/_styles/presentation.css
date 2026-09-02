@@ -528,61 +528,109 @@
   will-change: opacity;
 }
 
-/* === 12. Slide Transition System (Slide 1 & Slide 2) === */
+/* === 12. Slide Deck Navigation & Smooth Transitions === */
 .slide-pane {
-  transition: opacity 0.55s var(--ease-spring), transform 0.55s var(--ease-spring), visibility 0.55s;
+  transition: opacity 0.5s var(--ease-m3), transform 0.5s var(--ease-spring);
+  will-change: opacity, transform;
 }
 
-[data-current-slide="1"] #slide-1-content {
+/* Slide 1 State */
+[data-current-slide="1"] .slide-pane-1 {
   opacity: 1;
   transform: translateX(0);
   pointer-events: auto;
-  visibility: visible;
   position: relative;
 }
 
-[data-current-slide="1"] #slide-2-content {
+[data-current-slide="1"] .slide-pane-2 {
   opacity: 0;
-  transform: translateX(45px);
+  transform: translateX(40px);
   pointer-events: none;
-  visibility: hidden;
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 
-[data-current-slide="2"] #slide-1-content {
+/* Slide 2 State */
+[data-current-slide="2"] .slide-pane-1 {
   opacity: 0;
-  transform: translateX(-45px);
+  transform: translateX(-40px);
   pointer-events: none;
-  visibility: hidden;
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 
-[data-current-slide="2"] #slide-2-content {
+[data-current-slide="2"] .slide-pane-2 {
   opacity: 1;
   transform: translateX(0);
   pointer-events: auto;
-  visibility: visible;
   position: relative;
 }
 
-/* Footer Dynamic Scaling & Placement Transition */
-.footer-logos-group {
-  transition: transform 0.65s var(--ease-m3), opacity 0.65s var(--ease-m3);
-  transform-origin: bottom left;
+/* Top bar pills transitions */
+.top-pill-1,
+.top-pill-2 {
+  transition: opacity 0.4s var(--ease-m3), transform 0.45s var(--ease-spring);
+  will-change: opacity, transform;
 }
 
-[data-current-slide="1"] .footer-logos-group {
-  transform: scale(1);
+[data-current-slide="1"] .top-pill-1 {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
-[data-current-slide="2"] .footer-logos-group {
-  transform: scale(0.76) translateY(2px);
+[data-current-slide="1"] .top-pill-2 {
+  opacity: 0;
+  transform: translateY(-16px);
+  pointer-events: none;
 }
 
+[data-current-slide="2"] .top-pill-1 {
+  opacity: 0;
+  transform: translateY(-16px);
+  pointer-events: none;
+}
+
+[data-current-slide="2"] .top-pill-2 {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Bottom footer transitions */
+.footer-logos-container {
+  transition: transform 0.5s var(--ease-spring);
+  transform-origin: left bottom;
+  will-change: transform;
+}
+
+[data-current-slide="2"] .footer-logos-container {
+  transform: scale(0.7);
+}
+
+.footer-program-age-tag {
+  transition: opacity 0.35s ease, max-width 0.45s var(--ease-spring), transform 0.35s ease;
+  will-change: opacity, transform, max-width;
+}
+
+[data-current-slide="2"] .footer-program-age-tag {
+  opacity: 0;
+  transform: translateX(-16px);
+  pointer-events: none;
+  max-width: 0;
+  overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Slide 2 Bottom Right Title */
 .footer-slide2-title {
-  transition: opacity 0.65s var(--ease-m3), transform 0.65s var(--ease-m3);
+  transition: opacity 0.45s var(--ease-m3) 0.1s, transform 0.5s var(--ease-spring) 0.1s;
+  will-change: opacity, transform;
 }
 
 [data-current-slide="1"] .footer-slide2-title {
@@ -597,27 +645,21 @@
   pointer-events: auto;
 }
 
-[data-current-slide="1"] .slide1-top-pill {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+/* Previous button on the left end of the horizontal line */
+.prev-btn-wrapper {
+  transition: opacity 0.35s ease, transform 0.4s var(--ease-spring);
+  will-change: opacity, transform;
 }
 
-[data-current-slide="2"] .slide1-top-pill {
+[data-current-slide="1"] .prev-btn-wrapper {
   opacity: 0;
-  transform: translateY(-10px);
+  transform: translateX(-14px) scale(0.85);
   pointer-events: none;
 }
 
-[data-current-slide="1"] .slide2-top-pill {
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
-}
-
-[data-current-slide="2"] .slide2-top-pill {
+[data-current-slide="2"] .prev-btn-wrapper {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(0) scale(1);
   pointer-events: auto;
 }
 
@@ -649,10 +691,7 @@
   .logo-wrapper-3,
   .floating-tag,
   .video-wrapper,
-  .hero-video,
-  .slide-pane,
-  .footer-logos-group,
-  .footer-slide2-title {
+  .video-fade-loop {
     animation: none !important;
     transition: none !important;
     transform: none !important;
