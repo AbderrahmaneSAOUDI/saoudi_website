@@ -1,183 +1,279 @@
 ---
+import fs from 'node:fs';
+import path from 'node:path';
+
 export interface Props {
   class?: string;
 }
 
 const { class: className = '' } = Astro.props;
+
+// Load all AI model logos from _logos directory
+const logosDir = path.resolve(process.cwd(), 'src/pages/777/_assets/_logos');
+const logoFiles = fs.readdirSync(logosDir).filter(f => f.endsWith('.svg')).sort();
+
+const logos = logoFiles.map(file => {
+  const content = fs.readFileSync(path.join(logosDir, file), 'utf-8');
+  let name = file
+    .replace('logo_', '')
+    .replace('-color.svg', '')
+    .replace('.svg', '');
+  
+  if (name === 'metaai') name = 'Meta AI';
+  else if (name === 'openai') name = 'OpenAI';
+  else if (name === 'replit') name = 'Replit';
+  else if (name === 'perplexity') name = 'Perplexity';
+  else name = name.charAt(0).toUpperCase() + name.slice(1);
+
+  return { file, name, content };
+});
 ---
 
 <!-- ================= SLIDE 6 PANE (WHAT IS DIGITAL PRODUCTIVITY?) ================= -->
 <section 
   id="slide-6-content" 
-  class={`slide-pane slide-pane-6 w-full flex flex-col justify-center items-center text-center my-auto py-3 sm:py-6 h-full ${className}`}
+  class={`slide-pane slide-pane-6 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-4 h-full ${className}`}
 >
-  <!-- 1. HERO PRIMARY OBJECT: Grand Keynote Title -->
-  <div class="space-y-3 sm:space-y-4 max-w-5xl mx-auto">
-    <h2 class="font-black text-4xl sm:text-5xl md:text-6xl lg:text-[4.4rem] xl:text-[5rem] text-slate-900 tracking-tight leading-[1.08]">
+  <!-- 1. HERO TITLE: Strictly in One Single Line -->
+  <div class="w-full flex flex-col items-center justify-center shrink-0 mt-1 sm:mt-2 space-y-2 sm:space-y-3">
+    <h2 class="font-black text-3xl sm:text-4xl md:text-5xl lg:text-[3.8rem] xl:text-[4.2rem] text-slate-900 tracking-tight leading-none whitespace-nowrap">
       What is <span class="text-[#006233]">Digital Productivity</span>?
     </h2>
 
-    <!-- 2. HERO SECONDARY OBJECT: Prominent, Big Subtitle / Core Definition -->
-    <div class="px-5 sm:px-8 py-3.5 sm:py-4.5 rounded-3xl bg-emerald-50/80 border-2 border-emerald-600/30 inline-flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 text-lg sm:text-2xl md:text-3xl font-bold text-slate-800 tracking-tight max-w-4xl mx-auto">
+    <!-- 2. HERO SUBTITLE: Clean, Spacious, Not Bolded -->
+    <div class="px-6 sm:px-8 py-2.5 sm:py-3.5 rounded-3xl bg-emerald-50/70 border-2 border-emerald-600/25 inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-base sm:text-xl md:text-[22px] font-normal text-slate-700 tracking-tight max-w-4xl mx-auto">
       <span>Digital productivity = using the right tool to make everyday work</span>
-      <div class="inline-flex items-center gap-2 font-black text-base sm:text-xl md:text-2xl">
-        <span class="px-3 py-1 rounded-xl bg-emerald-100 text-[#006233] border border-emerald-600/40">easier</span>
-        <span class="text-slate-400">•</span>
-        <span class="px-3 py-1 rounded-xl bg-sky-100 text-[#0080C8] border border-sky-600/40">faster</span>
-        <span class="text-slate-400">•</span>
-        <span class="px-3 py-1 rounded-xl bg-amber-100 text-[#D97706] border border-amber-600/40">less messy</span>
+      <div class="inline-flex items-center gap-2 font-bold text-sm sm:text-lg md:text-xl">
+        <span class="px-2.5 py-0.5 rounded-lg bg-emerald-100/90 text-[#006233] border border-emerald-600/30">easier</span>
+        <span class="text-slate-400 font-normal">•</span>
+        <span class="px-2.5 py-0.5 rounded-lg bg-sky-100/90 text-[#0080C8] border border-sky-600/30">faster</span>
+        <span class="text-slate-400 font-normal">•</span>
+        <span class="px-2.5 py-0.5 rounded-lg bg-amber-100/90 text-[#D97706] border border-amber-600/30">less messy</span>
       </div>
     </div>
   </div>
 
-  <!-- 3. COMPACT VISUAL AID: Clean, Sleek, Scaled-Down n8n Workflow Graph -->
-  <div class="mt-8 sm:mt-10 md:mt-12 w-full max-w-4xl mx-auto">
-    
-    <!-- Automation Example Label -->
-    <div class="flex items-center justify-center gap-2 mb-2 sm:mb-3">
-      <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider">
-        <svg class="w-3.5 h-3.5 text-[#006233]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-        </svg>
-        <span>Workflow Example: Automated Message Processing</span>
-      </span>
-    </div>
-
-    <!-- Compact Workflow Card (n8n node style, fixed coordinates, 100% attached lines) -->
-    <div class="workflow-compact-box relative w-full h-[140px] sm:h-[160px] rounded-2xl bg-white border-2 border-slate-200/90 overflow-hidden flex items-center justify-center p-2">
-      <!-- Grid Dots Canvas -->
+  <!-- 3. EXPANDED, CLEAN WORKFLOW CANVAS (Bigger, perfectly contained texts, 100% attached) -->
+  <div class="w-full max-w-5xl mx-auto flex-1 flex items-center justify-center my-auto px-2">
+    <div class="workflow-main-card relative w-full rounded-3xl bg-white border-2 border-slate-200/90 p-4 sm:p-6 md:p-8 overflow-hidden">
+      <!-- Background Canvas Grid Dots -->
       <div class="canvas-grid-dots absolute inset-0 pointer-events-none opacity-30"></div>
 
-      <!-- Vector Connection Lines & Nodes in SVG (ViewBox 900 x 140) -->
-      <svg class="w-full h-full relative z-10" viewBox="0 0 900 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Content Container with 3 Major Stages -->
+      <div class="relative z-10 w-full flex items-center justify-between gap-2 sm:gap-4 md:gap-6">
         
-        <!-- Animated Connecting Wire 1: WhatsApp Trigger (x:150, y:70) -> AI Agent (x:370, y:70) -->
-        <path d="M 165,70 L 360,70" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round" />
-        <path d="M 165,70 L 360,70" stroke="#006233" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 6" class="flow-wire-active" />
-        
-        <!-- Animated Packet 1: Gliding to AI Agent -->
-        <circle r="4.5" fill="#006233" stroke="#ffffff" stroke-width="1.5">
-          <animateMotion dur="1.8s" repeatCount="indefinite" path="M 165,70 L 360,70" />
-        </circle>
-
-        <!-- Animated Connecting Wire 2A: AI Agent (x:530, y:50) -> WhatsApp Reply (x:730, y:40) -->
-        <path d="M 530,52 C 585,52 645,40 730,40" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round" />
-        <path d="M 530,52 C 585,52 645,40 730,40" stroke="#006233" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6 6" class="flow-wire-active" />
-        
-        <!-- Animated Packet 2A: Gliding to WhatsApp Reply -->
-        <circle r="4" fill="#006233" stroke="#ffffff" stroke-width="1.5">
-          <animateMotion dur="1.8s" begin="0.9s" repeatCount="indefinite" path="M 530,52 C 585,52 645,40 730,40" />
-        </circle>
-
-        <!-- Animated Connecting Wire 2B: AI Agent (x:530, y:88) -> Google Sheets (x:730, y:100) -->
-        <path d="M 530,88 C 585,88 645,100 730,100" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round" />
-        <path d="M 530,88 C 585,88 645,100 730,100" stroke="#009954" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6 6" class="flow-wire-active" />
-        
-        <!-- Animated Packet 2B: Gliding to Google Sheets -->
-        <circle r="4" fill="#009954" stroke="#ffffff" stroke-width="1.5">
-          <animateMotion dur="1.8s" begin="0.9s" repeatCount="indefinite" path="M 530,88 C 585,88 645,100 730,100" />
-        </circle>
-
-        <!-- ================= WORKFLOW NODES ================= -->
-
-        <!-- NODE 1: WHATSAPP TRIGGER (x: 45, y: 32) -->
-        <g transform="translate(45, 30)">
-          <!-- Node Container Card -->
-          <rect x="0" y="0" width="120" height="80" rx="16" fill="#ffffff" stroke="#006233" stroke-width="2" />
-          
-          <!-- Trigger Flash Pill -->
-          <rect x="10" y="8" width="56" height="16" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="1" />
-          <text x="38" y="20" text-anchor="middle" font-size="9" font-weight="900" fill="#dc2626" font-family="system-ui, sans-serif">⚡ TRIGGER</text>
+        <!-- STAGE 1: TRIGGER NODE (WhatsApp) -->
+        <div class="workflow-node trigger-node w-44 sm:w-52 p-3.5 sm:p-4 rounded-2xl bg-white border-2 border-emerald-600/50 flex flex-col items-center text-center space-y-2 shrink-0 relative transition-transform duration-300 hover:scale-[1.02]">
+          <!-- Trigger Flash Tag -->
+          <div class="px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-[10px] font-black text-rose-600 tracking-wider flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+            <span>TRIGGER</span>
+          </div>
 
           <!-- WhatsApp Vector Logo -->
-          <g transform="translate(14, 30) scale(0.09)">
-            <path fill="#25D366" fill-rule="evenodd" d="M307.546 52.566C273.709 18.684 228.706.017 180.756 0 81.951 0 1.538 80.404 1.504 179.235c-.017 31.594 8.242 62.432 23.928 89.609L0 361.736l95.024-24.925c26.179 14.285 55.659 21.805 85.655 21.814h.077c98.788 0 179.21-80.413 179.244-179.244.017-47.898-18.608-92.926-52.454-126.807v-.008Zm-126.79 275.788h-.06c-26.73-.008-52.952-7.194-75.831-20.765l-5.44-3.231-56.391 14.791 15.05-54.981-3.542-5.638c-14.912-23.721-22.793-51.139-22.776-79.286.035-82.14 66.867-148.973 149.051-148.973 39.793.017 77.198 15.53 105.328 43.695 28.131 28.157 43.61 65.596 43.593 105.398-.035 82.149-66.867 148.982-148.982 148.982v.008Zm81.719-111.577c-4.478-2.243-26.497-13.073-30.606-14.568-4.108-1.496-7.09-2.243-10.073 2.243-2.982 4.487-11.568 14.577-14.181 17.559-2.613 2.991-5.226 3.361-9.704 1.117-4.477-2.243-18.908-6.97-36.02-22.226-13.313-11.878-22.304-26.54-24.916-31.027-2.613-4.486-.275-6.91 1.959-9.136 2.011-2.011 4.478-5.234 6.721-7.847 2.244-2.613 2.983-4.486 4.478-7.469 1.496-2.991.748-5.603-.369-7.847-1.118-2.243-10.073-24.289-13.812-33.253-3.636-8.732-7.331-7.546-10.073-7.692-2.613-.13-5.595-.155-8.586-.155-2.991 0-7.839 1.118-11.947 5.604-4.108 4.486-15.677 15.324-15.677 37.361s16.047 43.344 18.29 46.335c2.243 2.991 31.585 48.225 76.51 67.632 10.684 4.615 19.029 7.374 25.535 9.437 10.727 3.412 20.49 2.931 28.208 1.779 8.604-1.289 26.498-10.838 30.228-21.298 3.73-10.46 3.73-19.433 2.613-21.298-1.117-1.865-4.108-2.991-8.586-5.234l.008-.017Z" clip-rule="evenodd"/>
-          </g>
+          <div class="w-12 h-12 rounded-2xl bg-[#e8fdf0] flex items-center justify-center p-2 shrink-0">
+            <svg class="w-8 h-8" viewBox="0 0 360 362" fill="none">
+              <path fill="#25D366" fill-rule="evenodd" d="M307.546 52.566C273.709 18.684 228.706.017 180.756 0 81.951 0 1.538 80.404 1.504 179.235c-.017 31.594 8.242 62.432 23.928 89.609L0 361.736l95.024-24.925c26.179 14.285 55.659 21.805 85.655 21.814h.077c98.788 0 179.21-80.413 179.244-179.244.017-47.898-18.608-92.926-52.454-126.807v-.008Zm-126.79 275.788h-.06c-26.73-.008-52.952-7.194-75.831-20.765l-5.44-3.231-56.391 14.791 15.05-54.981-3.542-5.638c-14.912-23.721-22.793-51.139-22.776-79.286.035-82.14 66.867-148.973 149.051-148.973 39.793.017 77.198 15.53 105.328 43.695 28.131 28.157 43.61 65.596 43.593 105.398-.035 82.149-66.867 148.982-148.982 148.982v.008Zm81.719-111.577c-4.478-2.243-26.497-13.073-30.606-14.568-4.108-1.496-7.09-2.243-10.073 2.243-2.982 4.487-11.568 14.577-14.181 17.559-2.613 2.991-5.226 3.361-9.704 1.117-4.477-2.243-18.908-6.97-36.02-22.226-13.313-11.878-22.304-26.54-24.916-31.027-2.613-4.486-.275-6.91 1.959-9.136 2.011-2.011 4.478-5.234 6.721-7.847 2.244-2.613 2.983-4.486 4.478-7.469 1.496-2.991.748-5.603-.369-7.847-1.118-2.243-10.073-24.289-13.812-33.253-3.636-8.732-7.331-7.546-10.073-7.692-2.613-.13-5.595-.155-8.586-.155-2.991 0-7.839 1.118-11.947 5.604-4.108 4.486-15.677 15.324-15.677 37.361s16.047 43.344 18.29 46.335c2.243 2.991 31.585 48.225 76.51 67.632 10.684 4.615 19.029 7.374 25.535 9.437 10.727 3.412 20.49 2.931 28.208 1.779 8.604-1.289 26.498-10.838 30.228-21.298 3.73-10.46 3.73-19.433 2.613-21.298-1.117-1.865-4.108-2.991-8.586-5.234l.008-.017Z" clip-rule="evenodd" />
+            </svg>
+          </div>
 
-          <text x="50" y="47" font-size="12" font-weight="900" fill="#0f172a" font-family="system-ui, sans-serif">WhatsApp</text>
-          <text x="50" y="62" font-size="10" font-weight="700" fill="#64748b" font-family="system-ui, sans-serif">New Message</text>
+          <!-- Fully Contained Text Content -->
+          <div class="w-full">
+            <h4 class="text-base sm:text-lg font-black text-slate-900 leading-snug">WhatsApp</h4>
+            <p class="text-xs font-semibold text-slate-500 mt-0.5">Incoming Message</p>
+          </div>
 
-          <!-- Right Port -->
-          <circle cx="120" cy="40" r="5" fill="#ffffff" stroke="#006233" stroke-width="2" />
-        </g>
+          <!-- Port Dot Right -->
+          <div class="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-emerald-600 flex items-center justify-center">
+            <div class="w-1.5 h-1.5 rounded-full bg-emerald-600"></div>
+          </div>
+        </div>
 
-        <!-- NODE 2: CENTRAL AI AGENT (x: 360, y: 22) -->
-        <g transform="translate(360, 20)">
-          <!-- Main Card Body -->
-          <rect x="0" y="0" width="170" height="100" rx="20" fill="#ffffff" stroke="#006233" stroke-width="2.5" />
+        <!-- CONNECTOR PIPE 1: Trigger -> AI Agent -->
+        <div class="flex-1 h-12 flex items-center justify-center relative min-w-[50px]">
+          <svg class="w-full h-8" preserveAspectRatio="none" viewBox="0 0 100 24" fill="none">
+            <!-- Base Line -->
+            <line x1="0" y1="12" x2="100" y2="12" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round" />
+            <!-- Flowing Active Dash -->
+            <line x1="0" y1="12" x2="100" y2="12" stroke="#006233" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 6" class="flow-wire-active" />
+            <!-- Gliding Packet -->
+            <circle r="4.5" fill="#006233" stroke="#ffffff" stroke-width="1.5">
+              <animateMotion dur="1.6s" repeatCount="indefinite" path="M 0,12 L 100,12" />
+            </circle>
+          </svg>
+        </div>
+
+        <!-- STAGE 2: CENTRAL AI AGENT (Featuring the 2s Logo Carousel) -->
+        <div class="workflow-node agent-node w-64 sm:w-72 p-4 sm:p-5 rounded-2xl bg-white border-2 border-[#006233] flex flex-col items-center text-center space-y-2.5 shrink-0 relative transition-transform duration-300 hover:scale-[1.02]">
           
-          <!-- Left Input Port -->
-          <circle cx="0" cy="50" r="5" fill="#ffffff" stroke="#006233" stroke-width="2" />
+          <!-- Port Dot Left -->
+          <div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-[#006233] flex items-center justify-center">
+            <div class="w-1.5 h-1.5 rounded-full bg-[#006233]"></div>
+          </div>
 
-          <!-- Top Status Pill -->
-          <rect x="105" y="10" width="54" height="16" rx="8" fill="#e8fdf0" stroke="#006233" stroke-width="1" />
-          <circle cx="114" cy="18" r="2.5" fill="#006233" />
-          <text x="135" y="22" text-anchor="middle" font-size="8.5" font-weight="900" fill="#006233" font-family="system-ui, sans-serif">ACTIVE</text>
+          <!-- Active Ping Pill -->
+          <div class="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-300 text-[10px] font-black text-[#006233] flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#006233] animate-ping"></span>
+            <span>ACTIVE AGENT</span>
+          </div>
 
-          <!-- Robot AI Icon -->
-          <g transform="translate(14, 22)">
-            <rect x="0" y="6" width="28" height="22" rx="6" fill="#ecfdf5" stroke="#006233" stroke-width="1.8" />
-            <circle cx="14" cy="2" r="2.5" fill="#006233" />
-            <line x1="14" y1="4" x2="14" y2="6" stroke="#006233" stroke-width="1.8" />
-            <circle cx="9" cy="16" r="2" fill="#006233" />
-            <circle cx="19" cy="16" r="2" fill="#006233" />
-          </g>
+          <!-- Central Icon Slot: The 2-second Animated Logo Carousel -->
+          <div class="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-slate-50 border-2 border-emerald-600/30 flex items-center justify-center p-2.5 overflow-hidden shrink-0">
+            {logos.map((logo, idx) => (
+              <div 
+                class={`agent-logo-item ${idx === 0 ? 'active-logo' : ''}`}
+                data-logo-name={logo.name}
+              >
+                <Fragment set:html={logo.content} />
+              </div>
+            ))}
+          </div>
 
-          <text x="50" y="38" font-size="16" font-weight="900" fill="#0f172a" font-family="system-ui, sans-serif">AI Agent</text>
-          <text x="50" y="52" font-size="10.5" font-weight="700" fill="#006233" font-family="system-ui, sans-serif">Smart Router</text>
+          <!-- Contained Text Content -->
+          <div class="w-full space-y-1">
+            <h3 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-snug">
+              AI Agent
+            </h3>
+            
+            <!-- Dynamic Model Name Label Tag -->
+            <div class="flex items-center justify-center">
+              <span id="activeModelLabel" class="px-2.5 py-0.5 rounded-full bg-emerald-100/80 text-xs font-bold text-[#006233] border border-emerald-300/80 transition-all duration-300">
+                {logos[0]?.name || 'Gemini'}
+              </span>
+            </div>
+          </div>
 
-          <!-- Sub-modules inside agent -->
-          <g transform="translate(14, 68)">
-            <rect x="0" y="0" width="66" height="20" rx="6" fill="#f0f9ff" stroke="#0080C8" stroke-width="1" />
-            <text x="33" y="14" text-anchor="middle" font-size="9" font-weight="800" fill="#0080C8" font-family="system-ui, sans-serif">✦ LLM Model</text>
-          </g>
-          <g transform="translate(86, 68)">
-            <rect x="0" y="0" width="70" height="20" rx="6" fill="#f8fafc" stroke="#64748b" stroke-width="1" />
-            <text x="35" y="14" text-anchor="middle" font-size="9" font-weight="800" fill="#64748b" font-family="system-ui, sans-serif">⛁ Memory</text>
-          </g>
+          <!-- Sub-features Tags -->
+          <div class="flex items-center gap-2 pt-1">
+            <span class="px-2 py-0.5 rounded-md bg-sky-50 text-[10px] font-bold text-[#0080C8] border border-sky-200">✦ Reasoning</span>
+            <span class="px-2 py-0.5 rounded-md bg-slate-50 text-[10px] font-bold text-slate-600 border border-slate-200">⛁ Memory</span>
+          </div>
 
-          <!-- Right Output Ports (Top for WhatsApp, Bottom for Sheets) -->
-          <circle cx="170" cy="32" r="4.5" fill="#ffffff" stroke="#006233" stroke-width="2" />
-          <circle cx="170" cy="68" r="4.5" fill="#ffffff" stroke="#009954" stroke-width="2" />
-        </g>
+          <!-- Port Dots Right (Top & Bottom for parallel branch) -->
+          <div class="absolute -right-2 top-1/3 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-[#006233] flex items-center justify-center">
+            <div class="w-1.5 h-1.5 rounded-full bg-[#006233]"></div>
+          </div>
+          <div class="absolute -right-2 top-2/3 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-[#009954] flex items-center justify-center">
+            <div class="w-1.5 h-1.5 rounded-full bg-[#009954]"></div>
+          </div>
+        </div>
 
-        <!-- NODE 3A: SEND WHATSAPP MESSAGE (x: 730, y: 10) -->
-        <g transform="translate(730, 8)">
-          <!-- Node Container Card -->
-          <rect x="0" y="0" width="125" height="56" rx="14" fill="#ffffff" stroke="#006233" stroke-width="1.8" />
+        <!-- CONNECTOR PIPE 2: AI Agent -> Two Outputs (Forked Wire) -->
+        <div class="flex-1 h-36 flex items-center justify-center relative min-w-[50px]">
+          <svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 120" fill="none">
+            <!-- Wire to WhatsApp Reply (Top) -->
+            <path d="M 0,40 C 50,40 50,25 100,25" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M 0,40 C 50,40 50,25 100,25" stroke="#006233" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6 6" class="flow-wire-active" />
+            <circle r="4" fill="#006233" stroke="#ffffff" stroke-width="1.5">
+              <animateMotion dur="1.6s" begin="0.8s" repeatCount="indefinite" path="M 0,40 C 50,40 50,25 100,25" />
+            </circle>
+
+            <!-- Wire to Google Sheets (Bottom) -->
+            <path d="M 0,80 C 50,80 50,95 100,95" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M 0,80 C 50,80 50,95 100,95" stroke="#009954" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6 6" class="flow-wire-active" />
+            <circle r="4" fill="#009954" stroke="#ffffff" stroke-width="1.5">
+              <animateMotion dur="1.6s" begin="0.8s" repeatCount="indefinite" path="M 0,80 C 50,80 50,95 100,95" />
+            </circle>
+          </svg>
+        </div>
+
+        <!-- STAGE 3: OUTPUT ACTIONS (Stacked Vertically, 100% Contained) -->
+        <div class="flex flex-col gap-3.5 sm:gap-4 shrink-0 w-52 sm:w-60">
           
-          <!-- Left Input Port -->
-          <circle cx="0" cy="32" r="4.5" fill="#ffffff" stroke="#006233" stroke-width="2" />
+          <!-- OUTPUT A: WhatsApp Reply -->
+          <div class="workflow-node output-node px-4 py-3 rounded-xl bg-white border-2 border-emerald-600/50 flex items-center gap-3 relative transition-transform duration-300 hover:scale-[1.02]">
+            <!-- Port Dot Left -->
+            <div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-emerald-600 flex items-center justify-center">
+              <div class="w-1.5 h-1.5 rounded-full bg-emerald-600"></div>
+            </div>
 
-          <!-- WhatsApp Vector Logo -->
-          <g transform="translate(10, 14) scale(0.08)">
-            <path fill="#25D366" fill-rule="evenodd" d="M307.546 52.566C273.709 18.684 228.706.017 180.756 0 81.951 0 1.538 80.404 1.504 179.235c-.017 31.594 8.242 62.432 23.928 89.609L0 361.736l95.024-24.925c26.179 14.285 55.659 21.805 85.655 21.814h.077c98.788 0 179.21-80.413 179.244-179.244.017-47.898-18.608-92.926-52.454-126.807v-.008Zm-126.79 275.788h-.06c-26.73-.008-52.952-7.194-75.831-20.765l-5.44-3.231-56.391 14.791 15.05-54.981-3.542-5.638c-14.912-23.721-22.793-51.139-22.776-79.286.035-82.14 66.867-148.973 149.051-148.973 39.793.017 77.198 15.53 105.328 43.695 28.131 28.157 43.61 65.596 43.593 105.398-.035 82.149-66.867 148.982-148.982 148.982v.008Zm81.719-111.577c-4.478-2.243-26.497-13.073-30.606-14.568-4.108-1.496-7.09-2.243-10.073 2.243-2.982 4.487-11.568 14.577-14.181 17.559-2.613 2.991-5.226 3.361-9.704 1.117-4.477-2.243-18.908-6.97-36.02-22.226-13.313-11.878-22.304-26.54-24.916-31.027-2.613-4.486-.275-6.91 1.959-9.136 2.011-2.011 4.478-5.234 6.721-7.847 2.244-2.613 2.983-4.486 4.478-7.469 1.496-2.991.748-5.603-.369-7.847-1.118-2.243-10.073-24.289-13.812-33.253-3.636-8.732-7.331-7.546-10.073-7.692-2.613-.13-5.595-.155-8.586-.155-2.991 0-7.839 1.118-11.947 5.604-4.108 4.486-15.677 15.324-15.677 37.361s16.047 43.344 18.29 46.335c2.243 2.991 31.585 48.225 76.51 67.632 10.684 4.615 19.029 7.374 25.535 9.437 10.727 3.412 20.49 2.931 28.208 1.779 8.604-1.289 26.498-10.838 30.228-21.298 3.73-10.46 3.73-19.433 2.613-21.298-1.117-1.865-4.108-2.991-8.586-5.234l.008-.017Z" clip-rule="evenodd"/>
-          </g>
+            <div class="w-10 h-10 rounded-xl bg-[#e8fdf0] flex items-center justify-center p-1.5 shrink-0">
+              <svg class="w-6 h-6" viewBox="0 0 360 362" fill="none">
+                <path fill="#25D366" fill-rule="evenodd" d="M307.546 52.566C273.709 18.684 228.706.017 180.756 0 81.951 0 1.538 80.404 1.504 179.235c-.017 31.594 8.242 62.432 23.928 89.609L0 361.736l95.024-24.925c26.179 14.285 55.659 21.805 85.655 21.814h.077c98.788 0 179.21-80.413 179.244-179.244.017-47.898-18.608-92.926-52.454-126.807v-.008Zm-126.79 275.788h-.06c-26.73-.008-52.952-7.194-75.831-20.765l-5.44-3.231-56.391 14.791 15.05-54.981-3.542-5.638c-14.912-23.721-22.793-51.139-22.776-79.286.035-82.14 66.867-148.973 149.051-148.973 39.793.017 77.198 15.53 105.328 43.695 28.131 28.157 43.61 65.596 43.593 105.398-.035 82.149-66.867 148.982-148.982 148.982v.008Zm81.719-111.577c-4.478-2.243-26.497-13.073-30.606-14.568-4.108-1.496-7.09-2.243-10.073 2.243-2.982 4.487-11.568 14.577-14.181 17.559-2.613 2.991-5.226 3.361-9.704 1.117-4.477-2.243-18.908-6.97-36.02-22.226-13.313-11.878-22.304-26.54-24.916-31.027-2.613-4.486-.275-6.91 1.959-9.136 2.011-2.011 4.478-5.234 6.721-7.847 2.244-2.613 2.983-4.486 4.478-7.469 1.496-2.991.748-5.603-.369-7.847-1.118-2.243-10.073-24.289-13.812-33.253-3.636-8.732-7.331-7.546-10.073-7.692-2.613-.13-5.595-.155-8.586-.155-2.991 0-7.839 1.118-11.947 5.604-4.108 4.486-15.677 15.324-15.677 37.361s16.047 43.344 18.29 46.335c2.243 2.991 31.585 48.225 76.51 67.632 10.684 4.615 19.029 7.374 25.535 9.437 10.727 3.412 20.49 2.931 28.208 1.779 8.604-1.289 26.498-10.838 30.228-21.298 3.73-10.46 3.73-19.433 2.613-21.298-1.117-1.865-4.108-2.991-8.586-5.234l.008-.017Z" clip-rule="evenodd" />
+              </svg>
+            </div>
 
-          <text x="44" y="28" font-size="11.5" font-weight="900" fill="#0f172a" font-family="system-ui, sans-serif">WhatsApp Reply</text>
-          <text x="44" y="44" font-size="9.5" font-weight="700" fill="#006233" font-family="system-ui, sans-serif">Instant Response</text>
-        </g>
+            <div class="text-left overflow-hidden">
+              <h4 class="text-sm font-black text-slate-900 leading-tight truncate">WhatsApp Reply</h4>
+              <p class="text-xs font-semibold text-[#006233] leading-tight truncate mt-0.5">Sends instant answer</p>
+            </div>
+          </div>
 
-        <!-- NODE 3B: GOOGLE SHEETS (x: 730, y: 74) -->
-        <g transform="translate(730, 74)">
-          <!-- Node Container Card -->
-          <rect x="0" y="0" width="125" height="56" rx="14" fill="#ffffff" stroke="#009954" stroke-width="1.8" />
-          
-          <!-- Left Input Port -->
-          <circle cx="0" cy="26" r="4.5" fill="#ffffff" stroke="#009954" stroke-width="2" />
+          <!-- OUTPUT B: Google Sheets -->
+          <div class="workflow-node output-node px-4 py-3 rounded-xl bg-white border-2 border-[#009954]/50 flex items-center gap-3 relative transition-transform duration-300 hover:scale-[1.02]">
+            <!-- Port Dot Left -->
+            <div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-[#009954] flex items-center justify-center">
+              <div class="w-1.5 h-1.5 rounded-full bg-[#009954]"></div>
+            </div>
 
-          <!-- Google Sheets Vector Icon -->
-          <g transform="translate(10, 14) scale(0.14)">
-            <path fill="#009954" d="M8 74.6c0-8.9 0-13.4 1.4-17a20 20 0 0 1 11.2-11.2C24.2 45 28.7 45 37.6 45h60.8c8.9 0 13.4 0 17 1.4a20 20 0 0 1 11.2 11.2C128 61.2 128 65.7 128 74.6v42.8c0 8.9 0 13.4-1.4 17a20 20 0 0 1-11.2 11.2C111.8 147 107.3 147 98.4 147H37.6c-8.9 0-13.4 0-17-1.4a20 20 0 0 1-11.2-11.2C8 130.8 8 126.3 8 117.4z"/>
-            <path fill="#0ebc5f" d="M24 32h160v128H24z" rx="20"/>
-            <path stroke="#fff" stroke-linecap="round" stroke-width="12" d="M80 121h84m-20 19V76"/>
-          </g>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center p-1 shrink-0">
+              <svg class="w-7 h-7" viewBox="0 0 192 192" fill="none">
+                <path fill="#009954" d="M8 74.6c0-8.9 0-13.4 1.4-17a20 20 0 0 1 11.2-11.2C24.2 45 28.7 45 37.6 45h60.8c8.9 0 13.4 0 17 1.4a20 20 0 0 1 11.2 11.2C128 61.2 128 65.7 128 74.6v42.8c0 8.9 0 13.4-1.4 17a20 20 0 0 1-11.2 11.2C111.8 147 107.3 147 98.4 147H37.6c-8.9 0-13.4 0-17-1.4a20 20 0 0 1-11.2-11.2C8 130.8 8 126.3 8 117.4z"/>
+                <path fill="#0ebc5f" d="M24 32h160v128H24z" rx="20"/>
+                <path stroke="#fff" stroke-linecap="round" stroke-width="12" d="M80 121h84m-20 19V76"/>
+              </svg>
+            </div>
 
-          <text x="44" y="28" font-size="11.5" font-weight="900" fill="#0f172a" font-family="system-ui, sans-serif">Google Sheets</text>
-          <text x="44" y="44" font-size="9.5" font-weight="700" fill="#009954" font-family="system-ui, sans-serif">Log & Save Row</text>
-        </g>
+            <div class="text-left overflow-hidden">
+              <h4 class="text-sm font-black text-slate-900 leading-tight truncate">Google Sheets</h4>
+              <p class="text-xs font-semibold text-[#009954] leading-tight truncate mt-0.5">Saves & logs copy</p>
+            </div>
+          </div>
 
-      </svg>
+        </div>
+
+      </div>
     </div>
   </div>
 </section>
+
+<!-- Logo Carousel Styles & Script -->
+<style>
+  .agent-logo-item {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    opacity: 0;
+    transform: scale(0.8) translateY(6px);
+    transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+
+  .agent-logo-item.active-logo {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+  }
+
+  .agent-logo-item :global(svg) {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 36px !important;
+    max-height: 36px !important;
+    object-fit: contain;
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const logoItems = document.querySelectorAll('.agent-logo-item');
+    const modelLabel = document.getElementById('activeModelLabel');
+    if (!logoItems || logoItems.length <= 1) return;
+
+    let currentIndex = 0;
+    setInterval(() => {
+      logoItems[currentIndex].classList.remove('active-logo');
+      currentIndex = (currentIndex + 1) % logoItems.length;
+      const nextLogo = logoItems[currentIndex];
+      nextLogo.classList.add('active-logo');
+      
+      if (modelLabel && nextLogo.dataset.logoName) {
+        modelLabel.textContent = nextLogo.dataset.logoName;
+      }
+    }, 2000);
+  })();
+</script>
