@@ -882,17 +882,75 @@
   pointer-events: none;
 }
 
-/* === 14. Slide 4: Initiative Metric Cards & Skill Pills === */
-.initiative-metric-card {
-  transition: transform 0.3s var(--ease-spring), border-color 0.3s ease;
+/* === 14. Slide 4: Keynote Metric Cards, Orbits & Skill Pills === */
+.keynote-metric-card {
+  transition: transform 0.35s var(--ease-spring), border-color 0.3s ease;
+  will-change: transform;
 }
 
 .metric-card-1 {
-  animation: subtleCardFloat 4.8s ease-in-out infinite;
+  animation: keynoteCardFloat1 5.5s ease-in-out infinite;
 }
 
 .metric-card-2 {
-  animation: subtleCardFloat 4.8s ease-in-out 0.8s infinite;
+  animation: keynoteCardFloat2 5.5s ease-in-out 1s infinite;
+}
+
+@keyframes keynoteCardFloat1 {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes keynoteCardFloat2 {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.stat-orbit-ring {
+  animation: spinOrbit 20s linear infinite;
+  will-change: transform;
+}
+
+.stat-orbit-ring-rev {
+  animation: spinOrbitReverse 28s linear infinite;
+  will-change: transform;
+}
+
+.card-shimmer-sweep {
+  position: relative;
+}
+
+.card-shimmer-sweep::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.45) 50%, transparent 80%);
+  transform: translateX(-100%);
+  animation: cardSweep 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes cardSweep {
+  0%, 25% { transform: translateX(-100%); }
+  55%, 100% { transform: translateX(100%); }
+}
+
+.spectrum-light-pulse {
+  animation: spectrumPulse 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+
+@keyframes spectrumPulse {
+  0% { transform: translateX(-120%); }
+  60%, 100% { transform: translateX(500%); }
 }
 
 .skill-pill {
@@ -901,6 +959,19 @@
 
 .skill-pill:hover {
   transform: translateY(-2px);
+  border-color: rgba(30, 130, 76, 0.5);
+}
+
+.skill-pill-1 { animation: pillFloat 4s ease-in-out 0.0s infinite; }
+.skill-pill-2 { animation: pillFloat 4s ease-in-out 0.4s infinite; }
+.skill-pill-3 { animation: pillFloat 4s ease-in-out 0.8s infinite; }
+.skill-pill-4 { animation: pillFloat 4s ease-in-out 1.2s infinite; }
+.skill-pill-5 { animation: pillFloat 4s ease-in-out 1.6s infinite; }
+.skill-pill-6 { animation: pillFloat 4s ease-in-out 2.0s infinite; }
+
+@keyframes pillFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }
 
 /* Respect Reduced Motion */
