@@ -882,7 +882,86 @@
   pointer-events: none;
 }
 
-/* === 14. Slide 4: Keynote Metric Cards, Orbits & Skill Pills === */
+/* === 14. Slide 4: Comprehensive Keynote Animations === */
+
+/* Program Top Badge */
+.program-badge-animated {
+  animation: badgeGlowPulse 4s ease-in-out infinite;
+}
+
+@keyframes badgeGlowPulse {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    border-color: rgba(30, 130, 76, 0.35);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.02);
+    border-color: rgba(30, 130, 76, 0.6);
+  }
+}
+
+/* Title Gentle Levitation */
+.title-container-animated {
+  animation: keynoteTitleFloat 6s ease-in-out infinite;
+}
+
+@keyframes keynoteTitleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Partners Card & Badges */
+.partners-card-animated {
+  animation: partnersCardFloat 6s ease-in-out 0.5s infinite;
+}
+
+@keyframes partnersCardFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.partner-badge-1 { animation: partnerFloat 4s ease-in-out 0s infinite; }
+.partner-badge-2 { animation: partnerFloat 4s ease-in-out 0.6s infinite; }
+.partner-badge-3 { animation: partnerFloat 4s ease-in-out 1.2s infinite; }
+
+@keyframes partnerFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* 6 Skill Pills Staggered Levitation */
+.skill-pill-animated {
+  transition: transform 0.25s var(--ease-spring), border-color 0.25s ease;
+  will-change: transform;
+}
+
+.skill-pill-animated:hover {
+  transform: translateY(-4px) scale(1.03);
+  border-color: rgba(30, 130, 76, 0.6);
+}
+
+.skill-pill-1 { animation: pillFloat 4.2s ease-in-out 0.0s infinite; }
+.skill-pill-2 { animation: pillFloat 4.2s ease-in-out 0.35s infinite; }
+.skill-pill-3 { animation: pillFloat 4.2s ease-in-out 0.7s infinite; }
+.skill-pill-4 { animation: pillFloat 4.2s ease-in-out 1.05s infinite; }
+.skill-pill-5 { animation: pillFloat 4.2s ease-in-out 1.4s infinite; }
+.skill-pill-6 { animation: pillFloat 4.2s ease-in-out 1.75s infinite; }
+
+@keyframes pillFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3.5px); }
+}
+
+.icon-pulse-wave {
+  animation: iconPulseWave 3s ease-in-out infinite;
+}
+
+@keyframes iconPulseWave {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Keynote Metric Cards */
 .keynote-metric-card {
   transition: transform 0.35s var(--ease-spring), border-color 0.3s ease;
   will-change: transform;
@@ -897,30 +976,42 @@
 }
 
 @keyframes keynoteCardFloat1 {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
 }
 
 @keyframes keynoteCardFloat2 {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+.stat-number-pulse {
+  display: inline-block;
+  animation: statNumberPulse 4s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes statNumberPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+.badge-pulse {
+  animation: badgePulseAnim 3s ease-in-out infinite;
+}
+
+@keyframes badgePulseAnim {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 .stat-orbit-ring {
-  animation: spinOrbit 20s linear infinite;
+  animation: spinOrbit 18s linear infinite;
   will-change: transform;
 }
 
 .stat-orbit-ring-rev {
-  animation: spinOrbitReverse 28s linear infinite;
+  animation: spinOrbitReverse 26s linear infinite;
   will-change: transform;
 }
 
@@ -934,7 +1025,7 @@
   inset: 0;
   background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.45) 50%, transparent 80%);
   transform: translateX(-100%);
-  animation: cardSweep 6s ease-in-out infinite;
+  animation: cardSweep 5.5s ease-in-out infinite;
   pointer-events: none;
 }
 
@@ -943,35 +1034,55 @@
   55%, 100% { transform: translateX(100%); }
 }
 
-.spectrum-light-pulse {
-  animation: spectrumPulse 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  will-change: transform;
+/* Clean Emerald Age Spectrum Laser Sweep */
+.age-laser-sweep {
+  animation: ageLaserSweep 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: left, opacity;
 }
 
-@keyframes spectrumPulse {
-  0% { transform: translateX(-120%); }
-  60%, 100% { transform: translateX(500%); }
+@keyframes ageLaserSweep {
+  0% {
+    left: -20%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.95;
+  }
+  85% {
+    opacity: 0.95;
+  }
+  100% {
+    left: 105%;
+    opacity: 0;
+  }
 }
 
-.skill-pill {
-  transition: transform 0.25s var(--ease-spring), border-color 0.25s ease;
+.milestone-box {
+  transition: transform 0.25s ease;
 }
 
-.skill-pill:hover {
-  transform: translateY(-2px);
-  border-color: rgba(30, 130, 76, 0.5);
+.active-milestone {
+  animation: activeMilestoneGlow 3s ease-in-out infinite;
 }
 
-.skill-pill-1 { animation: pillFloat 4s ease-in-out 0.0s infinite; }
-.skill-pill-2 { animation: pillFloat 4s ease-in-out 0.4s infinite; }
-.skill-pill-3 { animation: pillFloat 4s ease-in-out 0.8s infinite; }
-.skill-pill-4 { animation: pillFloat 4s ease-in-out 1.2s infinite; }
-.skill-pill-5 { animation: pillFloat 4s ease-in-out 1.6s infinite; }
-.skill-pill-6 { animation: pillFloat 4s ease-in-out 2.0s infinite; }
+@keyframes activeMilestoneGlow {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.5);
+  }
+}
 
-@keyframes pillFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+.hub-icon-pulse {
+  animation: hubIconPulse 3s ease-in-out infinite;
+}
+
+@keyframes hubIconPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
 }
 
 /* Respect Reduced Motion */
