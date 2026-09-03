@@ -1,0 +1,219 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+// Load tool logos as isolated base64 data-URIs to prevent collisions
+const assetsDir = path.resolve(process.cwd(), 'src/pages/777/_assets');
+
+const readSvgDataUri = (relPath: string) => {
+  try {
+    const raw = fs.readFileSync(path.join(assetsDir, relPath));
+    return `data:image/svg+xml;base64,${raw.toString('base64')}`;
+  } catch (e) {
+    return '';
+  }
+};
+
+// Selection of diverse tools for the toolbox showcase
+const toolListRow1 = [
+  { name: 'Google Drive', role: 'Cloud Storage', icon: readSvgDataUri('_google/logo_google-drive.svg'), bg: 'bg-emerald-50', border: 'border-emerald-200' },
+  { name: 'Discord', role: 'Community Voice & Chat', icon: readSvgDataUri('logo_discord.svg'), bg: 'bg-indigo-50', border: 'border-indigo-200' },
+  { name: 'Notion', role: 'Wikis & Docs', icon: readSvgDataUri('logo_notion.svg'), bg: 'bg-slate-100', border: 'border-slate-300' },
+  { name: 'Microsoft PowerPoint', role: 'Keynotes', icon: readSvgDataUri('_microsoft/logo_microsoft-powerpoint.svg'), bg: 'bg-orange-50', border: 'border-orange-200' },
+  { name: 'Google Calendar', role: 'Time Blocking', icon: readSvgDataUri('_google/logo_google-calendar.svg'), bg: 'bg-blue-50', border: 'border-blue-200' },
+  { name: 'Slack', role: 'Team Messaging', icon: readSvgDataUri('logo_slack.svg'), bg: 'bg-fuchsia-50', border: 'border-fuchsia-200' },
+  { name: 'Canva', role: 'Visual Design', icon: readSvgDataUri('logo_canva.svg'), bg: 'bg-teal-50', border: 'border-teal-200' },
+  { name: 'Microsoft Excel', role: 'Data Crunching', icon: readSvgDataUri('_microsoft/logo_microsoft-excel.svg'), bg: 'bg-emerald-50', border: 'border-emerald-200' },
+];
+
+const toolListRow2 = [
+  { name: 'Google Forms', role: 'Data Collection', icon: readSvgDataUri('_google/logo_google-forms.svg'), bg: 'bg-purple-50', border: 'border-purple-200' },
+  { name: 'Todoist', role: 'Task Tracking', icon: readSvgDataUri('logo_todoist.svg'), bg: 'bg-rose-50', border: 'border-rose-200' },
+  { name: 'Google Docs', role: 'Collaborative Writing', icon: readSvgDataUri('_google/logo_google-docs.svg'), bg: 'bg-sky-50', border: 'border-sky-200' },
+  { name: 'Microsoft Outlook', role: 'Email & Schedule', icon: readSvgDataUri('_microsoft/logo_microsoft-outlook.svg'), bg: 'bg-blue-50', border: 'border-blue-200' },
+  { name: 'Figma', role: 'Interface Design', icon: readSvgDataUri('logo_adobe-figma.svg'), bg: 'bg-amber-50', border: 'border-amber-200' },
+  { name: 'n8n', role: 'Workflow Automation', icon: readSvgDataUri('logo_n8n.svg'), bg: 'bg-orange-50', border: 'border-orange-200' },
+  { name: 'Google Gemini', role: 'AI Assistance', icon: readSvgDataUri('_google/logo_google-gemini.svg'), bg: 'bg-indigo-50', border: 'border-indigo-200' },
+  { name: 'Microsoft To-Do', role: 'Daily Agendas', icon: readSvgDataUri('_microsoft/logo_microsoft-todo.svg'), bg: 'bg-sky-50', border: 'border-sky-200' },
+];
+---
+
+<!-- ================= SLIDE 9 PANE (THE PRODUCTIVITY TOOLBOX) ================= -->
+<section 
+  id="slide-9-content" 
+  class={`slide-pane slide-pane-9 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+
+  <!-- Top Pill: Section Tag -->
+  <div class="toolbox-header-anim w-full flex flex-col items-center space-y-1.5 shrink-0 pt-1">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2 h-2 rounded-full bg-[#006233] animate-ping"></span>
+      <span>The Productivity Toolbox • 2–3 min</span>
+    </div>
+
+    <h2 class="font-black text-3xl sm:text-4xl md:text-5xl lg:text-[3.6rem] text-slate-900 tracking-tight leading-none mt-1">
+      The Productivity Toolbox
+    </h2>
+  </div>
+
+  <!-- Central Keynote Statement Card -->
+  <div class="toolbox-quote-card w-full max-w-4xl mx-auto my-auto p-6 sm:p-8 rounded-3xl bg-white/90 border-2 border-slate-200/90 relative overflow-hidden flex flex-col items-center justify-center text-center space-y-4 shadow-none">
+    <div class="canvas-grid-dots absolute inset-0 opacity-20 pointer-events-none"></div>
+
+    <!-- Decorative Quote Mark -->
+    <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#006233] text-2xl font-black shrink-0">
+      “
+    </div>
+
+    <!-- The Exact Quote Requested by the User -->
+    <p class="font-bold text-xl sm:text-2xl md:text-3xl text-slate-800 leading-relaxed max-w-3xl">
+      We just saw that productivity isn't about 
+      <span class="px-2.5 py-0.5 rounded-xl bg-rose-100/80 border border-rose-300 text-[#EA4335] inline-block mx-1">
+        one specific application
+      </span>.
+    </p>
+
+    <p class="font-medium text-base sm:text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl">
+      There are <span class="font-bold text-slate-900 underline decoration-emerald-500 decoration-2 underline-offset-4">hundreds of tools</span>, 
+      and each one is good at <span class="font-bold text-[#006233]">something different</span>.
+    </p>
+
+    <!-- Key Takeaway Sub-pills -->
+    <div class="flex flex-wrap items-center justify-center gap-2 pt-2">
+      <span class="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-xs font-semibold">
+        No single silver bullet
+      </span>
+      <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#006233] text-xs font-bold">
+        Match tool to job
+      </span>
+      <span class="px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs font-semibold">
+        Interconnected ecosystem
+      </span>
+    </div>
+  </div>
+
+  <!-- Animated Two-Way Infinite Tool Belts -->
+  <div class="toolbox-marquee-wrapper w-full max-w-5xl space-y-2.5 overflow-hidden py-1 shrink-0 relative">
+    
+    <!-- Gradient Fade Masks on sides -->
+    <div class="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+
+    <!-- Row 1: Leftward Scrolling Ticker -->
+    <div class="marquee-track track-left flex items-center gap-3">
+      <!-- Repeated twice for continuous seamless loop -->
+      {toolListRow1.concat(toolListRow1).map((tool) => (
+        <div class={`tool-chip flex items-center gap-2.5 px-3.5 py-1.5 rounded-2xl bg-white border-2 ${tool.border} shrink-0 transition-transform duration-200 hover:scale-105 cursor-pointer shadow-none`}>
+          <div class={`w-7 h-7 rounded-lg p-1 ${tool.bg} flex items-center justify-center shrink-0`}>
+            <img src={tool.icon} alt={tool.name} class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
+          </div>
+          <div class="flex flex-col text-left leading-tight">
+            <span class="text-xs font-bold text-slate-800 whitespace-nowrap">{tool.name}</span>
+            <span class="text-[10px] text-slate-400 whitespace-nowrap">{tool.role}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Row 2: Rightward Scrolling Ticker -->
+    <div class="marquee-track track-right flex items-center gap-3">
+      <!-- Repeated twice for continuous seamless loop -->
+      {toolListRow2.concat(toolListRow2).map((tool) => (
+        <div class={`tool-chip flex items-center gap-2.5 px-3.5 py-1.5 rounded-2xl bg-white border-2 ${tool.border} shrink-0 transition-transform duration-200 hover:scale-105 cursor-pointer shadow-none`}>
+          <div class={`w-7 h-7 rounded-lg p-1 ${tool.bg} flex items-center justify-center shrink-0`}>
+            <img src={tool.icon} alt={tool.name} class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
+          </div>
+          <div class="flex flex-col text-left leading-tight">
+            <span class="text-xs font-bold text-slate-800 whitespace-nowrap">{tool.name}</span>
+            <span class="text-[10px] text-slate-400 whitespace-nowrap">{tool.role}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+
+</section>
+
+<!-- Embedded Styles for Slide 9 Marquee and Entrances -->
+<style>
+  /* Entrance animations */
+  .toolbox-header-anim {
+    animation: toolboxEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .toolbox-quote-card {
+    animation: toolboxCardEnter 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+  }
+  .toolbox-marquee-wrapper {
+    animation: toolboxEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+  }
+
+  @keyframes toolboxEnter {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes toolboxCardEnter {
+    from {
+      opacity: 0;
+      transform: scale(0.92) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Infinite Smooth Marquee Tickers */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+  }
+
+  .track-left {
+    animation: marqueeScrollLeft 32s linear infinite;
+  }
+  .track-right {
+    animation: marqueeScrollRight 34s linear infinite;
+  }
+
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes marqueeScrollLeft {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes marqueeScrollRight {
+    0% {
+      transform: translateX(-50%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  /* Interactive Tool Chip Pulse */
+  .tool-chip:hover {
+    border-color: #006233 !important;
+    background-color: #f0fdf4 !important;
+  }
+</style>

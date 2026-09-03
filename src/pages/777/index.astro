@@ -9,6 +9,7 @@ import Slide5ProductivityCheck from './_slides/Slide5ProductivityCheck.astro';
 import Slide6DigitalProductivity from './_slides/Slide6DigitalProductivity.astro';
 import Slide7EventScenario from './_slides/Slide7EventScenario.astro';
 import Slide8BetterEvent from './_slides/Slide8BetterEvent.astro';
+import Slide9Toolbox from './_slides/Slide9Toolbox.astro';
 import '../../styles/global.css';
 import './_styles/presentation.css';
 ---
@@ -84,6 +85,7 @@ import './_styles/presentation.css';
           <Slide6DigitalProductivity />
           <Slide7EventScenario />
           <Slide8BetterEvent />
+          <Slide9Toolbox />
         </div>
 
         <!-- Bottom: Footer Component (Dividing line, navigation buttons, logos & tag/title) -->
@@ -100,7 +102,7 @@ import './_styles/presentation.css';
         const video = document.getElementById('heroVideo');
 
         let currentSlide = 1;
-        const totalSlides = 8;
+        const totalSlides = 9;
         let isFadingOut = false;
 
         // Support URL parameter (e.g. ?slide=5) or hash (e.g. #slide-5 or #5) while cleanly defaulting to 1

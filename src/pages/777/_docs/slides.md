@@ -36,4 +36,10 @@
   Google Calendar → Schedule
 * Show BEFORE; when I click AFTER, BEFORE card becomes a bit transparent and reveals AFTER.
 
+# slide 5
+* “The Productivity Toolbox” — 2–3 min
+* After event scenario slide:
+  “We just saw that productivity isn't about one specific application. There are hundreds of tools, and each one is good at something different.”
+
+
 
