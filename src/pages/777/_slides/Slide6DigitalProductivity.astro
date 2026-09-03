@@ -1,0 +1,331 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<!-- ================= SLIDE 6 PANE (WHAT IS DIGITAL PRODUCTIVITY? - N8N WORKFLOW) ================= -->
+<section 
+  id="slide-6-content" 
+  class={`slide-pane slide-pane-6 w-full flex flex-col justify-between my-auto py-1 sm:py-2 h-full ${className}`}
+>
+  <!-- 1. Top Section: Keynote Headline & Definition Formula -->
+  <div class="flex flex-col items-center text-center space-y-1.5 shrink-0 mt-1">
+    <h2 class="title-highlight font-black text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] xl:text-[3.6rem] tracking-tight leading-[1.05]">
+      What is Digital Productivity?
+    </h2>
+    <div class="inline-flex items-center gap-1.5 sm:gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm md:text-[15px] font-semibold text-slate-700 max-w-max">
+      <span>Digital productivity = using the right tool to make everyday work</span>
+      <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-[#006233] font-black">easier</span>,
+      <span class="px-2 py-0.5 rounded-md bg-sky-100 text-[#0080C8] font-black">faster</span>, and
+      <span class="px-2 py-0.5 rounded-md bg-amber-100 text-[#D97706] font-black">less messy</span>.
+    </div>
+  </div>
+
+  <!-- 2. Middle Section: Modern n8n Vector Automation Canvas (16:9 responsive frame) -->
+  <div class="workflow-canvas-container relative w-full flex-1 my-auto max-h-[360px] sm:max-h-[390px] md:max-h-[410px] rounded-3xl bg-slate-50/80 border-2 border-slate-200/80 overflow-hidden flex items-center justify-center p-2 sm:p-4">
+    
+    <!-- Canvas Grid Dots Background -->
+    <div class="canvas-grid-dots absolute inset-0 pointer-events-none opacity-40"></div>
+
+    <!-- Active Vector Workflow Graph (SVG 1000 x 400 ViewBox) -->
+    <svg 
+      class="w-full h-full max-w-[950px] relative z-10" 
+      viewBox="0 0 1000 370" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <!-- Gradients for animated links -->
+        <linearGradient id="flowGradGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#25D366" />
+          <stop offset="100%" stop-color="#1E824C" />
+        </linearGradient>
+        <linearGradient id="flowGradSky" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#1E824C" />
+          <stop offset="100%" stop-color="#0080C8" />
+        </linearGradient>
+        <linearGradient id="flowGradSheets" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#1E824C" />
+          <stop offset="100%" stop-color="#009954" />
+        </linearGradient>
+      </defs>
+
+      <!-- ================= 1. CONNECTING PATH WIRES (BASE + FLOW) ================= -->
+
+      <!-- Line 1: WhatsApp Trigger -> AI Agent -->
+      <path 
+        id="path-trigger-agent" 
+        d="M 215,95 L 390,95" 
+        stroke="#cbd5e1" 
+        stroke-width="3" 
+        stroke-linecap="round"
+      />
+      <path 
+        d="M 215,95 L 390,95" 
+        stroke="url(#flowGradGreen)" 
+        stroke-width="3.5" 
+        stroke-linecap="round"
+        stroke-dasharray="8 10" 
+        class="wire-flow-anim"
+      />
+
+      <!-- Line 2: AI Agent -> Send WhatsApp Reply -->
+      <path 
+        id="path-agent-reply" 
+        d="M 585,95 L 780,95" 
+        stroke="#cbd5e1" 
+        stroke-width="3" 
+        stroke-linecap="round"
+      />
+      <path 
+        d="M 585,95 L 780,95" 
+        stroke="url(#flowGradGreen)" 
+        stroke-width="3.5" 
+        stroke-linecap="round"
+        stroke-dasharray="8 10" 
+        class="wire-flow-anim"
+      />
+
+      <!-- Line 3: AI Agent (Chat Model port) -> OpenAI / Gemini Model -->
+      <path 
+        id="path-agent-model" 
+        d="M 435,135 C 435,185 300,195 300,245" 
+        stroke="#cbd5e1" 
+        stroke-width="2.5" 
+        stroke-dasharray="5 5" 
+        stroke-linecap="round"
+      />
+      <path 
+        d="M 435,135 C 435,185 300,195 300,245" 
+        stroke="#0080C8" 
+        stroke-width="3" 
+        stroke-dasharray="6 8" 
+        stroke-linecap="round"
+        class="wire-flow-anim-subtle"
+      />
+
+      <!-- Line 4: AI Agent (Memory port) -> Simple Memory -->
+      <path 
+        id="path-agent-memory" 
+        d="M 490,135 L 490,245" 
+        stroke="#cbd5e1" 
+        stroke-width="2.5" 
+        stroke-dasharray="5 5" 
+        stroke-linecap="round"
+      />
+      <path 
+        d="M 490,135 L 490,245" 
+        stroke="#64748b" 
+        stroke-width="3" 
+        stroke-dasharray="6 8" 
+        stroke-linecap="round"
+        class="wire-flow-anim-subtle"
+      />
+
+      <!-- Line 5: AI Agent (Tool port) -> Google Sheets Append -->
+      <path 
+        id="path-agent-sheets" 
+        d="M 545,135 C 545,185 690,195 690,245" 
+        stroke="#cbd5e1" 
+        stroke-width="2.5" 
+        stroke-dasharray="5 5" 
+        stroke-linecap="round"
+      />
+      <path 
+        d="M 545,135 C 545,185 690,195 690,245" 
+        stroke="url(#flowGradSheets)" 
+        stroke-width="3" 
+        stroke-dasharray="6 8" 
+        stroke-linecap="round"
+        class="wire-flow-anim-subtle"
+      />
+
+      <!-- ================= 2. ACTIVE DATA PACKETS (ANIMATEMOTION) ================= -->
+      
+      <!-- Packet 1: Incoming WhatsApp message data moving to AI Agent -->
+      <circle r="5" fill="#25D366" stroke="#ffffff" stroke-width="2" class="packet-glow">
+        <animateMotion dur="2.2s" repeatCount="indefinite" path="M 215,95 L 390,95" />
+      </circle>
+      <circle r="3" fill="#ffffff">
+        <animateMotion dur="2.2s" repeatCount="indefinite" path="M 215,95 L 390,95" />
+      </circle>
+
+      <!-- Packet 2: AI Agent query to LLM Model -->
+      <circle r="4" fill="#0080C8" stroke="#ffffff" stroke-width="1.5">
+        <animateMotion dur="2.5s" repeatCount="indefinite" path="M 435,135 C 435,185 300,195 300,245" />
+      </circle>
+
+      <!-- Packet 3: AI Agent accessing Memory -->
+      <circle r="4" fill="#64748b" stroke="#ffffff" stroke-width="1.5">
+        <animateMotion dur="2s" repeatCount="indefinite" path="M 490,135 L 490,245" />
+      </circle>
+
+      <!-- Packet 4: AI Agent saving copy to Google Sheets -->
+      <circle r="5" fill="#009954" stroke="#ffffff" stroke-width="2" class="packet-glow">
+        <animateMotion dur="2.4s" repeatCount="indefinite" path="M 545,135 C 545,185 690,195 690,245" />
+      </circle>
+
+      <!-- Packet 5: Generated smart reply sent via WhatsApp -->
+      <circle r="5" fill="#25D366" stroke="#ffffff" stroke-width="2" class="packet-glow">
+        <animateMotion dur="2.2s" begin="1.1s" repeatCount="indefinite" path="M 585,95 L 780,95" />
+      </circle>
+      <circle r="3" fill="#ffffff">
+        <animateMotion dur="2.2s" begin="1.1s" repeatCount="indefinite" path="M 585,95 L 780,95" />
+      </circle>
+
+      <!-- ================= 3. WORKFLOW NODES ================= -->
+
+      <!-- NODE 1: WHATSAPP TRIGGER -->
+      <g transform="translate(105, 55)" class="node-group node-float-1">
+        <!-- Trigger Lightning Icon -->
+        <path d="M -18,40 L -9,26 L -13,26 L -7,16 L -16,28 L -11,28 Z" fill="#EA4335" class="animate-pulse" />
+
+        <!-- Node Body Card -->
+        <rect x="0" y="0" width="105" height="80" rx="20" fill="#ffffff" stroke="#25D366" stroke-width="2.5" class="filter-node" />
+        
+        <!-- WhatsApp Icon Badge -->
+        <circle cx="52.5" cy="40" r="24" fill="#e8fdf0" />
+        <!-- WhatsApp Vector Symbol -->
+        <g transform="translate(38, 26) scale(0.08)">
+          <path fill="#25D366" fill-rule="evenodd" d="M307.546 52.566C273.709 18.684 228.706.017 180.756 0 81.951 0 1.538 80.404 1.504 179.235c-.017 31.594 8.242 62.432 23.928 89.609L0 361.736l95.024-24.925c26.179 14.285 55.659 21.805 85.655 21.814h.077c98.788 0 179.21-80.413 179.244-179.244.017-47.898-18.608-92.926-52.454-126.807v-.008Zm-126.79 275.788h-.06c-26.73-.008-52.952-7.194-75.831-20.765l-5.44-3.231-56.391 14.791 15.05-54.981-3.542-5.638c-14.912-23.721-22.793-51.139-22.776-79.286.035-82.14 66.867-148.973 149.051-148.973 39.793.017 77.198 15.53 105.328 43.695 28.131 28.157 43.61 65.596 43.593 105.398-.035 82.149-66.867 148.982-148.982 148.982v.008Z"/>
+        </g>
+
+        <!-- Right Output Port -->
+        <circle cx="105" cy="40" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2" />
+
+        <!-- Node Label -->
+        <text x="52.5" y="104" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a" font-family="system-ui, sans-serif">WhatsApp Trigger</text>
+        <text x="52.5" y="120" text-anchor="middle" font-size="11" font-weight="700" fill="#64748b" font-family="system-ui, sans-serif">On message received</text>
+      </g>
+
+      <!-- NODE 2: CENTRAL AI AGENT (Modern Keynote Centerpiece) -->
+      <g transform="translate(390, 45)" class="node-group node-float-2">
+        <!-- Main Card Body -->
+        <rect x="0" y="0" width="195" height="100" rx="24" fill="#ffffff" stroke="#1E824C" stroke-width="2.5" />
+        
+        <!-- Left Input Port -->
+        <circle cx="0" cy="50" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2" />
+        <!-- Right Output Port -->
+        <circle cx="195" cy="50" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2" />
+
+        <!-- Robot Agent Icon & Title -->
+        <g transform="translate(20, 24)">
+          <rect x="0" y="8" width="34" height="26" rx="8" fill="#ecfdf5" stroke="#1E824C" stroke-width="2" />
+          <circle cx="17" cy="3" r="3" fill="#1E824C" />
+          <line x1="17" y1="5" x2="17" y2="8" stroke="#1E824C" stroke-width="2" />
+          <circle cx="11" cy="20" r="2.5" fill="#1E824C" />
+          <circle cx="23" cy="20" r="2.5" fill="#1E824C" />
+        </g>
+
+        <text x="68" y="47" font-size="19" font-weight="900" fill="#0f172a" font-family="system-ui, sans-serif">AI Agent</text>
+        <text x="68" y="66" font-size="12" font-weight="700" fill="#1E824C" font-family="system-ui, sans-serif">Prompt & Tool Router</text>
+
+        <!-- Live Thinking Pulse Pill -->
+        <g transform="translate(130, 14)">
+          <rect x="0" y="0" width="50" height="18" rx="9" fill="#e8fdf0" stroke="#1E824C" stroke-width="1.2" />
+          <circle cx="10" cy="9" r="3" fill="#1E824C" class="animate-ping" />
+          <text x="26" y="13" text-anchor="middle" font-size="9" font-weight="900" fill="#006233" font-family="system-ui, sans-serif">ACTIVE</text>
+        </g>
+
+        <!-- Bottom Diamonds (Ports connecting to sub-tools) -->
+        <g transform="translate(45, 100)">
+          <rect x="-5" y="-5" width="10" height="10" transform="rotate(45)" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8" />
+          <text x="0" y="18" text-anchor="middle" font-size="10" font-weight="800" fill="#64748b" font-family="system-ui, sans-serif">Model</text>
+        </g>
+        <g transform="translate(100, 100)">
+          <rect x="-5" y="-5" width="10" height="10" transform="rotate(45)" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8" />
+          <text x="0" y="18" text-anchor="middle" font-size="10" font-weight="800" fill="#64748b" font-family="system-ui, sans-serif">Memory</text>
+        </g>
+        <g transform="translate(155, 100)">
+          <rect x="-5" y="-5" width="10" height="10" transform="rotate(45)" fill="#ffffff" stroke="#94a3b8" stroke-width="1.8" />
+          <text x="0" y="18" text-anchor="middle" font-size="10" font-weight="800" fill="#64748b" font-family="system-ui, sans-serif">Sheets</text>
+        </g>
+      </g>
+
+      <!-- NODE 3: SEND WHATSAPP MESSAGE (REPLY) -->
+      <g transform="translate(780, 55)" class="node-group node-float-1">
+        <!-- Node Body Card -->
+        <rect x="0" y="0" width="105" height="80" rx="20" fill="#ffffff" stroke="#25D366" stroke-width="2.5" />
+        
+        <!-- Left Input Port -->
+        <circle cx="0" cy="40" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2" />
+        
+        <!-- WhatsApp Icon Badge -->
+        <circle cx="52.5" cy="40" r="24" fill="#e8fdf0" />
+        <g transform="translate(38, 26) scale(0.08)">
+          <path fill="#25D366" fill-rule="evenodd" d="M307.546 52.566C273.709 18.684 228.706.017 180.756 0 81.951 0 1.538 80.404 1.504 179.235c-.017 31.594 8.242 62.432 23.928 89.609L0 361.736l95.024-24.925c26.179 14.285 55.659 21.805 85.655 21.814h.077c98.788 0 179.21-80.413 179.244-179.244.017-47.898-18.608-92.926-52.454-126.807v-.008Zm-126.79 275.788h-.06c-26.73-.008-52.952-7.194-75.831-20.765l-5.44-3.231-56.391 14.791 15.05-54.981-3.542-5.638c-14.912-23.721-22.793-51.139-22.776-79.286.035-82.14 66.867-148.973 149.051-148.973 39.793.017 77.198 15.53 105.328 43.695 28.131 28.157 43.61 65.596 43.593 105.398-.035 82.149-66.867 148.982-148.982 148.982v.008Z"/>
+        </g>
+
+        <!-- Right Output Port -->
+        <circle cx="105" cy="40" r="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2" />
+
+        <!-- Node Label -->
+        <text x="52.5" y="104" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a" font-family="system-ui, sans-serif">Send Message</text>
+        <text x="52.5" y="120" text-anchor="middle" font-size="11" font-weight="700" fill="#64748b" font-family="system-ui, sans-serif">Auto-reply to user</text>
+      </g>
+
+      <!-- ================= 4. BOTTOM SUB-NODES (MODEL, MEMORY, GOOGLE SHEETS) ================= -->
+
+      <!-- SUB-NODE A: CHAT MODEL (OpenAI / Gemini) -->
+      <g transform="translate(300, 280)" class="node-group node-float-3">
+        <!-- Top Port Diamond -->
+        <rect x="-4" y="-39" width="8" height="8" transform="rotate(45)" fill="#ffffff" stroke="#94a3b8" stroke-width="1.6" />
+
+        <!-- Circular Body -->
+        <circle cx="0" cy="0" r="34" fill="#ffffff" stroke="#0080C8" stroke-width="2.5" />
+        
+        <!-- Sparkle AI Symbol -->
+        <g transform="translate(-14, -14)">
+          <path d="M14 0c.3 0 .5.2.6.5a14 14 0 003.8 6.9 14 14 0 006.9 3.8c.3.1.5.3.5.6a.6.6 0 01-.5.6 14 14 0 00-6.9 3.8 14 14 0 00-3.8 6.9.6.6 0 01-.6.5.6.6 0 01-.6-.5 14 14 0 00-3.8-6.9 14 14 0 00-6.9-3.8.6.6 0 01-.5-.6c0-.3.2-.5.5-.6a14 14 0 006.9-3.8A14 14 0 0013.4.5c.1-.3.3-.5.6-.5z" fill="#0080C8" />
+        </g>
+
+        <!-- Label -->
+        <text x="0" y="52" text-anchor="middle" font-size="12" font-weight="900" fill="#0f172a" font-family="system-ui, sans-serif">AI Chat Model</text>
+        <text x="0" y="67" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0080C8" font-family="system-ui, sans-serif">Process & Reasoning</text>
+      </g>
+
+      <!-- SUB-NODE B: SIMPLE MEMORY -->
+      <g transform="translate(490, 280)" class="node-group node-float-2">
+        <!-- Top Port Diamond -->
+        <rect x="-4" y="-39" width="8" height="8" transform="rotate(45)" fill="#ffffff" stroke="#94a3b8" stroke-width="1.6" />
+
+        <!-- Circular Body -->
+        <circle cx="0" cy="0" r="34" fill="#ffffff" stroke="#64748b" stroke-width="2.5" />
+        
+        <!-- Database / Memory Symbol -->
+        <g transform="translate(-13, -13)">
+          <ellipse cx="13" cy="5" rx="10" ry="3.5" fill="none" stroke="#64748b" stroke-width="2" />
+          <path d="M3 5v16c0 1.9 4.5 3.5 10 3.5s10-1.6 10-3.5V5" fill="none" stroke="#64748b" stroke-width="2" />
+          <path d="M3 13c0 1.9 4.5 3.5 10 3.5s10-1.6 10-3.5" fill="none" stroke="#64748b" stroke-width="2" />
+        </g>
+
+        <!-- Label -->
+        <text x="0" y="52" text-anchor="middle" font-size="12" font-weight="900" fill="#0f172a" font-family="system-ui, sans-serif">Simple Memory</text>
+        <text x="0" y="67" text-anchor="middle" font-size="10.5" font-weight="700" fill="#64748b" font-family="system-ui, sans-serif">Context Retention</text>
+      </g>
+
+      <!-- SUB-NODE C: GOOGLE SHEETS (SAVE / APPEND COPY) -->
+      <g transform="translate(690, 280)" class="node-group node-float-3">
+        <!-- Top Port Diamond -->
+        <rect x="-4" y="-39" width="8" height="8" transform="rotate(45)" fill="#ffffff" stroke="#94a3b8" stroke-width="1.6" />
+
+        <!-- Circular Body -->
+        <circle cx="0" cy="0" r="34" fill="#ffffff" stroke="#009954" stroke-width="2.5" />
+        
+        <!-- Google Sheets Vector Icon -->
+        <g transform="translate(-14, -14) scale(0.15)">
+          <path fill="#009954" d="M8 74.6c0-8.9 0-13.4 1.4-17a20 20 0 0 1 11.2-11.2C24.2 45 28.7 45 37.6 45h60.8c8.9 0 13.4 0 17 1.4a20 20 0 0 1 11.2 11.2C128 61.2 128 65.7 128 74.6v42.8c0 8.9 0 13.4-1.4 17a20 20 0 0 1-11.2 11.2C111.8 147 107.3 147 98.4 147H37.6c-8.9 0-13.4 0-17-1.4a20 20 0 0 1-11.2-11.2C8 130.8 8 126.3 8 117.4z"/>
+          <path fill="#0ebc5f" d="M24 32h160v128H24z" rx="20"/>
+          <path stroke="#fff" stroke-linecap="round" stroke-width="12" d="M80 121h84m-20 19V76"/>
+        </g>
+
+        <!-- Label -->
+        <text x="0" y="52" text-anchor="middle" font-size="12" font-weight="900" fill="#0f172a" font-family="system-ui, sans-serif">Google Sheets</text>
+        <text x="0" y="67" text-anchor="middle" font-size="10.5" font-weight="700" fill="#009954" font-family="system-ui, sans-serif">Save Copy & Log</text>
+      </g>
+    </svg>
+  </div>
+</section>
