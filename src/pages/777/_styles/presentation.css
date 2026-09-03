@@ -1146,156 +1146,116 @@
 
 /* === 15. Slide 5: Are you actually productive? (Interactive Poll) === */
 .choice-btn {
-  transition: all 0.35s var(--ease-spring);
-  will-change: transform, border-color, opacity;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.25s ease,
+              border-color 0.25s ease,
+              opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
 }
 
-.choice-btn-yes {
-  animation: choiceFloatA 4.5s ease-in-out infinite;
+.choice-btn:hover {
+  transform: translateY(-2px) scale(1.03);
 }
 
-.choice-btn-no {
-  animation: choiceFloatB 4.5s ease-in-out 0.8s infinite;
+.choice-btn:active {
+  transform: translateY(1px) scale(0.97);
 }
 
-@keyframes choiceFloatA {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+/* Choice States: Silky smooth entrance & exit */
+.task-card {
+  transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.55s;
+  will-change: opacity, transform;
 }
 
-@keyframes choiceFloatB {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-}
-
-/* Choice States: Initially empty */
 [data-choice="none"] .task-card-no,
 [data-choice="none"] .task-card-yes {
   opacity: 0;
-  transform: scale(0.95) translateY(16px);
+  transform: translateY(24px) scale(0.96);
   pointer-events: none;
+  visibility: hidden;
   position: absolute;
   top: 0;
 }
 
-/* YES Selected */
+/* YES Selected: Button & Card States */
 [data-choice="yes"] .choice-btn-yes {
   background-color: #ecfdf5 !important;
   border-color: #1E824C !important;
-  transform: scale(1.08) translateY(-4px) !important;
-  outline: 3px solid rgba(30, 130, 76, 0.5);
+  transform: scale(1.06) !important;
 }
 
 [data-choice="yes"] .choice-btn-no {
-  opacity: 0.45;
+  opacity: 0.35;
   transform: scale(0.95);
 }
 
 [data-choice="yes"] .task-card-yes {
   opacity: 1;
-  transform: scale(1) translateY(0);
+  transform: translateY(0) scale(1);
   pointer-events: auto;
+  visibility: visible;
   position: relative;
-  animation: taskCardEntrance 0.4s var(--ease-spring), taskCardFloatYes 4.2s ease-in-out 0.4s infinite, taskCardRingPulseYes 3s ease-in-out infinite;
 }
 
 [data-choice="yes"] .task-card-no {
   opacity: 0;
-  transform: scale(0.95) translateY(16px);
+  transform: translateY(24px) scale(0.96);
   pointer-events: none;
+  visibility: hidden;
   position: absolute;
   top: 0;
 }
 
-/* NO Selected */
+/* NO Selected: Button & Card States */
 [data-choice="no"] .choice-btn-no {
   background-color: #fff1f2 !important;
   border-color: #EA4335 !important;
-  transform: scale(1.08) translateY(-4px) !important;
-  outline: 3px solid rgba(234, 67, 53, 0.5);
+  transform: scale(1.06) !important;
 }
 
 [data-choice="no"] .choice-btn-yes {
-  opacity: 0.45;
+  opacity: 0.35;
   transform: scale(0.95);
 }
 
 [data-choice="no"] .task-card-no {
   opacity: 1;
-  transform: scale(1) translateY(0);
+  transform: translateY(0) scale(1);
   pointer-events: auto;
+  visibility: visible;
   position: relative;
-  animation: taskCardEntrance 0.4s var(--ease-spring), taskCardFloatNo 4.2s ease-in-out 0.4s infinite, taskCardRingPulseNo 3s ease-in-out infinite;
 }
 
 [data-choice="no"] .task-card-yes {
   opacity: 0;
-  transform: scale(0.95) translateY(16px);
+  transform: translateY(24px) scale(0.96);
   pointer-events: none;
+  visibility: hidden;
   position: absolute;
   top: 0;
 }
 
-@keyframes taskCardEntrance {
-  0% {
-    opacity: 0;
-    transform: scale(0.92) translateY(24px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-/* Active Task Floating Levitation */
-@keyframes taskCardFloatYes {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-7px); }
-}
-
-@keyframes taskCardFloatNo {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-7px); }
-}
-
-/* High-Visibility Ring Pulsations */
-@keyframes taskCardRingPulseYes {
-  0%, 100% {
-    outline: 2px solid rgba(30, 130, 76, 0.3);
-  }
-  50% {
-    outline: 4px solid rgba(30, 130, 76, 0.7);
-  }
-}
-
-@keyframes taskCardRingPulseNo {
-  0%, 100% {
-    outline: 2px solid rgba(234, 67, 53, 0.3);
-  }
-  50% {
-    outline: 4px solid rgba(234, 67, 53, 0.7);
-  }
-}
-
-/* High-Energy Continuous Question Scale Animation */
+/* High-Energy Continuous Question Animation */
 .anim-question {
   display: inline-block;
-  animation: questionPulseAnim 3.2s ease-in-out infinite;
+  animation: questionBreathe 3.6s ease-in-out infinite;
   will-change: transform;
 }
 
-@keyframes questionPulseAnim {
+@keyframes questionBreathe {
   0%, 100% {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.035);
+    transform: scale(1.03);
   }
 }
 
 /* Community Task Pill Subtle Bounce */
 .community-task-pill {
-  animation: communityPillBounce 2.8s ease-in-out infinite;
+  animation: communityPillBounce 2.5s ease-in-out infinite;
   will-change: transform;
 }
 
@@ -1306,7 +1266,7 @@
 
 /* Continuous Laser Beam Across Minimal Task Card */
 .laser-scanner-beam-task {
-  animation: laserSweepTask 2.4s linear infinite;
+  animation: laserSweepTask 2.6s linear infinite;
   will-change: transform;
 }
 
@@ -1315,11 +1275,11 @@
     transform: translateX(-150%);
     opacity: 0;
   }
-  25% {
-    opacity: 1;
+  20% {
+    opacity: 0.9;
   }
-  75% {
-    opacity: 1;
+  80% {
+    opacity: 0.9;
   }
   100% {
     transform: translateX(450%);
