@@ -1031,17 +1031,6 @@
   50% { transform: translateY(-8px); }
 }
 
-/* Revolving Satellite Orbits */
-.satellite-orbit {
-  animation: spinOrbit 6s linear infinite;
-  will-change: transform;
-}
-
-.satellite-orbit-sky {
-  animation: spinOrbitReverse 6s linear infinite;
-  will-change: transform;
-}
-
 .stat-number-pulse {
   display: inline-block;
   animation: statNumberPulse 3.5s ease-in-out infinite;
@@ -1102,23 +1091,6 @@
     transform: scale(1.05);
     box-shadow: 0 0 0 4px rgba(30, 130, 76, 0.7);
   }
-}
-
-/* Active 360° Rotating Radar Scanner */
-.radar-screen {
-  position: relative;
-}
-
-.radar-scan-overlay {
-  background: conic-gradient(from 0deg, transparent 0deg, transparent 270deg, rgba(0, 128, 200, 0.35) 360deg);
-  animation: radarRotateSweep 3.5s linear infinite;
-  will-change: transform;
-  transform-origin: center center;
-}
-
-@keyframes radarRotateSweep {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 
 .radar-icon-ring {
