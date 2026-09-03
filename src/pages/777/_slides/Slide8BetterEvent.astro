@@ -1,0 +1,335 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+// Load SVGs as isolated base64 data-URIs to prevent collisions
+const assetsDir = path.resolve(process.cwd(), 'src/pages/777/_assets');
+
+const readSvgDataUri = (relPath: string) => {
+  try {
+    const raw = fs.readFileSync(path.join(assetsDir, relPath));
+    return `data:image/svg+xml;base64,${raw.toString('base64')}`;
+  } catch (e) {
+    return '';
+  }
+};
+
+const icons = {
+  discord: readSvgDataUri('logo_discord.svg'),
+  gforms: readSvgDataUri('_google/logo_google-forms.svg'),
+  gdrive: readSvgDataUri('_google/logo_google-drive.svg'),
+  gslides: readSvgDataUri('_google/logo_google-slides.svg'),
+  gcalendar: readSvgDataUri('_google/logo_google-calendar.svg'),
+};
+---
+
+<!-- ================= SLIDE 8 PANE (THE "BETTER EVENT" - BEFORE & AFTER) ================= -->
+<section 
+  id="slide-8-content" 
+  data-after-revealed="false"
+  class={`slide-pane slide-pane-8 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+
+  <!-- Top Header -->
+  <div class="w-full flex flex-col items-center space-y-1.5 shrink-0 pt-1">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-[11px] sm:text-xs font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2 h-2 rounded-full bg-[#006233] animate-ping"></span>
+      <span>The Outcome</span>
+    </div>
+
+    <div class="flex items-center justify-between w-full max-w-5xl px-2">
+      <div class="text-left">
+        <h2 class="font-black text-2xl sm:text-3xl md:text-4xl text-slate-900 tracking-tight leading-tight">
+          The “Better Event”
+        </h2>
+        <p class="text-xs sm:text-sm font-normal text-slate-500">
+          From scattered confusion to an orchestrated system.
+        </p>
+      </div>
+
+      <!-- Action Button to Reveal AFTER -->
+      <button 
+        id="revealAfterBtn"
+        type="button"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#006233] text-white hover:bg-emerald-800 font-bold text-xs sm:text-sm cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-emerald-400/40 shadow-none"
+      >
+        <span id="revealBtnLabel">Reveal AFTER</span>
+        <svg id="revealBtnIcon" class="w-4 h-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Comparison Columns (BEFORE vs AFTER) -->
+  <div class="flex-1 w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 my-auto items-stretch py-2 min-h-0">
+
+    <!-- ================= BEFORE CARD ================= -->
+    <div 
+      id="beforeCard"
+      class="before-card w-full rounded-3xl bg-rose-50/40 border-2 border-rose-200/80 p-4 sm:p-5 flex flex-col justify-between transition-all duration-500 relative overflow-hidden"
+    >
+      <div class="flex items-center justify-between border-b border-rose-200/80 pb-2.5 mb-2">
+        <span class="text-xs sm:text-sm font-black text-[#EA4335] uppercase tracking-widest flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#EA4335]"></span>
+          BEFORE
+        </span>
+        <span class="text-[11px] font-bold text-rose-500 bg-rose-100/80 px-2.5 py-0.5 rounded-full">
+          Scattered & Chaotic
+        </span>
+      </div>
+
+      <!-- 6 Chaotic Steps -->
+      <div class="flex-1 flex flex-col justify-around py-1 space-y-1 sm:space-y-1.5">
+        <!-- 1. WhatsApp -->
+        <div class="before-item px-3.5 py-2 rounded-xl bg-white border border-rose-200/90 flex items-center justify-between text-left">
+          <span class="font-bold text-xs sm:text-sm text-slate-800">WhatsApp group</span>
+          <span class="text-[10px] text-rose-500 font-semibold uppercase">Flooded</span>
+        </div>
+        <div class="before-arrow text-rose-400 font-bold text-xs leading-none">↓</div>
+
+        <!-- 2. Random files -->
+        <div class="before-item px-3.5 py-2 rounded-xl bg-white border border-rose-200/90 flex items-center justify-between text-left">
+          <span class="font-bold text-xs sm:text-sm text-slate-800">Random files</span>
+          <span class="text-[10px] text-rose-500 font-semibold uppercase">Scattered</span>
+        </div>
+        <div class="before-arrow text-rose-400 font-bold text-xs leading-none">↓</div>
+
+        <!-- 3. Private messages -->
+        <div class="before-item px-3.5 py-2 rounded-xl bg-white border border-rose-200/90 flex items-center justify-between text-left">
+          <span class="font-bold text-xs sm:text-sm text-slate-800">Private messages</span>
+          <span class="text-[10px] text-rose-500 font-semibold uppercase">Lost info</span>
+        </div>
+        <div class="before-arrow text-rose-400 font-bold text-xs leading-none">↓</div>
+
+        <!-- 4. Different presentation versions -->
+        <div class="before-item px-3.5 py-2 rounded-xl bg-white border border-rose-200/90 flex items-center justify-between text-left">
+          <span class="font-bold text-xs sm:text-sm text-slate-800">Different presentation versions</span>
+          <span class="text-[10px] text-rose-500 font-semibold uppercase">Conflicts</span>
+        </div>
+        <div class="before-arrow text-rose-400 font-bold text-xs leading-none">↓</div>
+
+        <!-- 5. Manual registration -->
+        <div class="before-item px-3.5 py-2 rounded-xl bg-white border border-rose-200/90 flex items-center justify-between text-left">
+          <span class="font-bold text-xs sm:text-sm text-slate-800">Manual registration</span>
+          <span class="text-[10px] text-rose-500 font-semibold uppercase">Errors</span>
+        </div>
+        <div class="before-arrow text-rose-400 font-bold text-xs leading-none">↓</div>
+
+        <!-- 6. "I forgot the meeting" -->
+        <div class="before-item px-3.5 py-2 rounded-xl bg-rose-100/70 border-2 border-rose-300 flex items-center justify-between text-left">
+          <span class="font-bold text-xs sm:text-sm text-[#EA4335] italic">“I forgot the meeting”</span>
+          <span class="text-[10px] text-rose-600 font-bold uppercase">No sync</span>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ================= AFTER CARD (HIDDEN INITIALLY) ================= -->
+    <div 
+      id="afterCard"
+      class="after-card w-full rounded-3xl bg-emerald-50/50 border-2 border-emerald-300/80 p-4 sm:p-5 flex flex-col justify-between transition-all duration-500 hidden opacity-0 scale-95"
+    >
+      <div class="flex items-center justify-between border-b border-emerald-200/80 pb-2.5 mb-2">
+        <span class="text-xs sm:text-sm font-black text-[#006233] uppercase tracking-widest flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#006233]"></span>
+          AFTER
+        </span>
+        <span class="text-[11px] font-bold text-[#006233] bg-emerald-100/90 px-2.5 py-0.5 rounded-full">
+          Organized & Automated
+        </span>
+      </div>
+
+      <!-- 5 Clear Mappings with Real Logos -->
+      <div class="flex-1 flex flex-col justify-around py-1 space-y-2">
+        
+        <!-- 1. Discord → Communication -->
+        <div class="after-row p-3 rounded-2xl bg-white border border-emerald-200/90 flex items-center justify-between transition-transform hover:scale-[1.02]">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl p-1.5 bg-[#eef2ff] border border-indigo-200 flex items-center justify-center shrink-0">
+              <img src={icons.discord} alt="Discord" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
+            </div>
+            <span class="font-bold text-xs sm:text-sm md:text-base text-slate-800">Discord</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400 text-xs sm:text-sm font-bold">→</span>
+            <span class="px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold text-xs sm:text-sm">
+              Communication
+            </span>
+          </div>
+        </div>
+
+        <!-- 2. Google Forms → Registration -->
+        <div class="after-row p-3 rounded-2xl bg-white border border-emerald-200/90 flex items-center justify-between transition-transform hover:scale-[1.02]">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl p-1.5 bg-purple-50 border border-purple-200 flex items-center justify-center shrink-0">
+              <img src={icons.gforms} alt="Google Forms" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
+            </div>
+            <span class="font-bold text-xs sm:text-sm md:text-base text-slate-800">Google Forms</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400 text-xs sm:text-sm font-bold">→</span>
+            <span class="px-2.5 py-1 rounded-lg bg-purple-50 border border-purple-200 text-purple-700 font-bold text-xs sm:text-sm">
+              Registration
+            </span>
+          </div>
+        </div>
+
+        <!-- 3. Google Drive → Files -->
+        <div class="after-row p-3 rounded-2xl bg-white border border-emerald-200/90 flex items-center justify-between transition-transform hover:scale-[1.02]">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl p-1.5 bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+              <img src={icons.gdrive} alt="Google Drive" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
+            </div>
+            <span class="font-bold text-xs sm:text-sm md:text-base text-slate-800">Google Drive</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400 text-xs sm:text-sm font-bold">→</span>
+            <span class="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-[#006233] font-bold text-xs sm:text-sm">
+              Files
+            </span>
+          </div>
+        </div>
+
+        <!-- 4. Google Slides → Presentation -->
+        <div class="after-row p-3 rounded-2xl bg-white border border-emerald-200/90 flex items-center justify-between transition-transform hover:scale-[1.02]">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl p-1.5 bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
+              <img src={icons.gslides} alt="Google Slides" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
+            </div>
+            <span class="font-bold text-xs sm:text-sm md:text-base text-slate-800">Google Slides</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400 text-xs sm:text-sm font-bold">→</span>
+            <span class="px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 font-bold text-xs sm:text-sm">
+              Presentation
+            </span>
+          </div>
+        </div>
+
+        <!-- 5. Google Calendar → Schedule -->
+        <div class="after-row p-3 rounded-2xl bg-white border border-emerald-200/90 flex items-center justify-between transition-transform hover:scale-[1.02]">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl p-1.5 bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
+              <img src={icons.gcalendar} alt="Google Calendar" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
+            </div>
+            <span class="font-bold text-xs sm:text-sm md:text-base text-slate-800">Google Calendar</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400 text-xs sm:text-sm font-bold">→</span>
+            <span class="px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 font-bold text-xs sm:text-sm">
+              Schedule
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- Embedded Styles for Slide 8 Transitions -->
+<style>
+  /* Before card dimming state when After is revealed */
+  .before-card.before-dimmed {
+    opacity: 0.32 !important;
+    filter: grayscale(0.2);
+    transform: scale(0.97);
+  }
+
+  /* After card revealed state */
+  .after-card.after-visible {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    animation: afterEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes afterEntrance {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.94);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Staggered rows entrance inside AFTER */
+  .after-card.after-visible .after-row:nth-child(1) {
+    animation: rowStagger 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+  }
+  .after-card.after-visible .after-row:nth-child(2) {
+    animation: rowStagger 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+  }
+  .after-card.after-visible .after-row:nth-child(3) {
+    animation: rowStagger 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.19s both;
+  }
+  .after-card.after-visible .after-row:nth-child(4) {
+    animation: rowStagger 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.26s both;
+  }
+  .after-card.after-visible .after-row:nth-child(5) {
+    animation: rowStagger 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.33s both;
+  }
+  @keyframes rowStagger {
+    from {
+      opacity: 0;
+      transform: translateX(16px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+</style>
+
+<!-- Slide 8 Reveal Controller Script -->
+<script is:inline>
+  (() => {
+    const root = document.getElementById('slide-8-content');
+    if (!root) return;
+
+    const revealBtn = document.getElementById('revealAfterBtn');
+    const beforeCard = document.getElementById('beforeCard');
+    const afterCard = document.getElementById('afterCard');
+    const btnLabel = document.getElementById('revealBtnLabel');
+
+    if (revealBtn && beforeCard && afterCard) {
+      revealBtn.addEventListener('click', () => {
+        const isRevealed = root.getAttribute('data-after-revealed') === 'true';
+
+        if (!isRevealed) {
+          // Reveal AFTER and dim BEFORE
+          root.setAttribute('data-after-revealed', 'true');
+          beforeCard.classList.add('before-dimmed');
+
+          afterCard.classList.remove('hidden');
+          // Force reflow
+          void afterCard.offsetWidth;
+          afterCard.classList.add('after-visible');
+
+          if (btnLabel) btnLabel.textContent = 'Hide AFTER';
+        } else {
+          // Re-toggle if clicked again
+          root.setAttribute('data-after-revealed', 'false');
+          beforeCard.classList.remove('before-dimmed');
+          afterCard.classList.remove('after-visible');
+          setTimeout(() => {
+            if (root.getAttribute('data-after-revealed') === 'false') {
+              afterCard.classList.add('hidden');
+            }
+          }, 350);
+
+          if (btnLabel) btnLabel.textContent = 'Reveal AFTER';
+        }
+      });
+    }
+  })();
+</script>

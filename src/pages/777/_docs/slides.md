@@ -23,3 +23,17 @@
 * (icon1/icon2) shows first icon and when hovered flips to show second icon
 * Then a button shows to click, hide list, and show "That's it."
 
+# slide 4
+* Now reveal the “better event”
+* After all six examples, show the event again.
+* BEFORE:
+  WhatsApp ↓ Random files ↓ Private messages ↓ Different presentation versions ↓ Manual registration ↓ "I forgot the meeting"
+* AFTER:
+  Discord → Communication
+  Google Forms → Registration
+  Google Drive → Files
+  Google Slides → Presentation
+  Google Calendar → Schedule
+* Show BEFORE; when I click AFTER, BEFORE card becomes a bit transparent and reveals AFTER.
+
+
