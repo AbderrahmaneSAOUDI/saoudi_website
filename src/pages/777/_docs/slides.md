@@ -41,5 +41,14 @@
 * After event scenario slide:
   “We just saw that productivity isn't about one specific application. There are hundreds of tools, and each one is good at something different.”
 
+# slide 6
+* Questions Time (Q&A Session)
+* Interactive discussion cards: Tool Selection, Automation & AI, Team Adoption, Deep Productivity
+
+# slide 7
+* Thank You (Outro & Closing)
+* Celebration card, speaker bio, links to saoudi.online, replay button
+
+
 
 

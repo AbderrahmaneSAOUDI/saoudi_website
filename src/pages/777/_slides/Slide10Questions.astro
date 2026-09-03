@@ -1,0 +1,141 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const questionPrompts = [
+  {
+    icon: '⚡',
+    title: 'Tool Selection',
+    desc: 'Which tool should I start with for my team or club?',
+    color: 'emerald',
+    border: 'border-emerald-200',
+    bg: 'bg-emerald-50/70',
+    tag: '#getting-started',
+  },
+  {
+    icon: '🔄',
+    title: 'Automation & AI',
+    desc: 'How can I automate routine tasks without coding?',
+    color: 'sky',
+    border: 'border-sky-200',
+    bg: 'bg-sky-50/70',
+    tag: '#workflows',
+  },
+  {
+    icon: '👥',
+    title: 'Team Adoption',
+    desc: 'How do I convince members to switch from messy chats?',
+    color: 'amber',
+    border: 'border-amber-200',
+    bg: 'bg-amber-50/70',
+    tag: '#collaboration',
+  },
+  {
+    icon: '🎯',
+    title: 'Deep Productivity',
+    desc: 'How to avoid tool overload and keep things dead simple?',
+    color: 'purple',
+    border: 'border-purple-200',
+    bg: 'bg-purple-50/70',
+    tag: '#mindset',
+  },
+];
+---
+
+<!-- ================= SLIDE 10 PANE (QUESTIONS TIME / Q&A) ================= -->
+<section 
+  id="slide-10-content" 
+  class={`slide-pane slide-pane-10 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-4 h-full relative overflow-hidden ${className}`}
+>
+
+  <!-- Top Pill: Section Tag -->
+  <div class="qa-header-anim w-full flex flex-col items-center space-y-2 shrink-0 pt-1">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2 h-2 rounded-full bg-[#006233] animate-ping"></span>
+      <span>Open Floor • Q&A Session</span>
+    </div>
+
+    <h2 class="font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-none">
+      Questions Time
+    </h2>
+    <p class="text-sm sm:text-base md:text-lg text-slate-600 font-medium max-w-xl">
+      Got questions, ideas, or specific bottlenecks? Let's talk through them together.
+    </p>
+  </div>
+
+  <!-- Central Interactive Discussion Cards Grid -->
+  <div class="qa-grid-wrapper w-full max-w-4xl mx-auto my-auto grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 p-2 shrink-0">
+    {questionPrompts.map((q, idx) => (
+      <div 
+        class={`qa-card flex items-start gap-3.5 p-4 sm:p-5 rounded-3xl bg-white/95 border-2 ${q.border} hover:border-[#006233] transition-all duration-300 hover:-translate-y-1 hover:bg-emerald-50/30 text-left cursor-pointer group shadow-none`}
+        style={`animation-delay: ${0.1 + idx * 0.08}s;`}
+      >
+        <!-- Icon Orb with Ripple Effect -->
+        <div class={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl ${q.bg} border ${q.border} flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+          <span>{q.icon}</span>
+        </div>
+
+        <!-- Text Content -->
+        <div class="flex flex-col min-w-0 flex-1">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="font-bold text-base sm:text-lg text-slate-800 group-hover:text-[#006233] transition-colors">
+              {q.title}
+            </h3>
+            <span class="text-[10px] font-mono font-semibold text-slate-600 uppercase tracking-wider">
+              {q.tag}
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 mt-1 leading-snug">
+            {q.desc}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Bottom Interactive Question Sparker -->
+  <div class="qa-footer-anim w-full max-w-xl mx-auto flex items-center justify-center gap-3 pt-2 shrink-0">
+    <div class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-slate-900 text-white text-xs sm:text-sm font-semibold tracking-wide">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span>Raise hand or unmute — any question is welcome</span>
+    </div>
+  </div>
+
+</section>
+
+<style>
+  .qa-header-anim {
+    animation: qaEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .qa-card {
+    animation: qaCardPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .qa-footer-anim {
+    animation: qaEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+  }
+
+  @keyframes qaEnter {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes qaCardPop {
+    from {
+      opacity: 0;
+      transform: scale(0.94) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+</style>
