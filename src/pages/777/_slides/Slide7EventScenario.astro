@@ -299,7 +299,7 @@ const icons = {
 
           <!-- Standalone 2: Canva -->
           <div class="flex flex-col items-center space-y-2.5">
-            <div class="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl p-5 bg-[#e6f8f8] border-2 border-teal-500/40 flex items-center justify-center transition-transform hover:scale-105">
+            <div class="standalone-card w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl p-5 bg-[#e6f8f8] border-2 border-teal-500/40 flex items-center justify-center cursor-pointer">
               <img src={icons.canva} alt="Canva" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
             </div>
             <span class="text-xs sm:text-sm font-bold text-slate-700">Canva</span>
@@ -327,7 +327,7 @@ const icons = {
 
           <!-- Standalone 2: Notion -->
           <div class="flex flex-col items-center space-y-2.5">
-            <div class="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl p-5 bg-slate-100 border-2 border-slate-300 flex items-center justify-center transition-transform hover:scale-105">
+            <div class="standalone-card w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl p-5 bg-slate-100 border-2 border-slate-300 flex items-center justify-center cursor-pointer">
               <img src={icons.notion} alt="Notion" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
             </div>
             <span class="text-xs sm:text-sm font-bold text-slate-700">Notion</span>
@@ -335,7 +335,7 @@ const icons = {
 
           <!-- Standalone 3: Todoist -->
           <div class="flex flex-col items-center space-y-2.5">
-            <div class="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl p-5 bg-rose-50 border-2 border-rose-500/40 flex items-center justify-center transition-transform hover:scale-105">
+            <div class="standalone-card w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl p-5 bg-rose-50 border-2 border-rose-500/40 flex items-center justify-center cursor-pointer">
               <img src={icons.todoist} alt="Todoist" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
             </div>
             <span class="text-xs sm:text-sm font-bold text-slate-700">Todoist</span>
@@ -402,17 +402,21 @@ const icons = {
 
 </section>
 
-<!-- Embedded Styles for 3D Card Flip & Active States -->
+<!-- Embedded Styles for 3D Card Flip, Transitions, and Staggered Animations -->
 <style>
   /* 3D Flip Card Architecture */
   .flip-card {
     perspective: 1000px;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+  }
+  .flip-card:hover {
+    transform: translateY(-6px) scale(1.03);
   }
   .flip-card-inner {
     position: relative;
     width: 100%;
     height: 100%;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
     transform-style: preserve-3d;
   }
   .flip-card:hover .flip-card-inner {
@@ -434,24 +438,108 @@ const icons = {
     transform: rotateY(180deg);
   }
 
+  /* Standalone Tool Cards Hover Lift */
+  .standalone-card {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+  }
+  .standalone-card:hover {
+    transform: translateY(-6px) scale(1.04);
+    border-color: rgba(0, 98, 51, 0.5);
+  }
+
   /* Active Category Button States */
   .scenario-category-btn {
     border-color: rgba(226, 232, 240, 0.9);
     background-color: #ffffff;
     color: #334155;
+    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .scenario-category-btn:hover {
     border-color: rgba(0, 98, 51, 0.4);
     background-color: #f8fafc;
+    transform: translateX(4px);
+  }
+  .scenario-category-btn:active {
+    transform: scale(0.97);
   }
   .scenario-category-btn.active-category {
     border-color: #006233 !important;
     background-color: #ecfdf5 !important;
     color: #006233 !important;
-    transform: translateX(6px);
+    transform: translateX(10px) scale(1.02);
+    box-shadow: 0 0 0 3px rgba(0, 98, 51, 0.12);
   }
   .scenario-category-btn.active-category .category-arrow {
     opacity: 1 !important;
+    transform: translateX(2px);
+  }
+
+  /* Smooth Step Container Fades */
+  .step-fade-in {
+    animation: stepFadeIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .step-fade-out {
+    animation: stepFadeOut 0.22s ease-in forwards;
+    pointer-events: none;
+  }
+  @keyframes stepFadeIn {
+    from { opacity: 0; transform: translateY(14px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes stepFadeOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.97); }
+  }
+
+  /* Tool Panel Crossfade & Staggered Item Entrance */
+  .tool-panel {
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .tool-panel.panel-entering {
+    animation: panelPop 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes panelPop {
+    from { opacity: 0; transform: scale(0.94); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* Staggered Card Entrance Animations */
+  .tool-panel.panel-entering .flip-card-wrapper:nth-child(1),
+  .tool-panel.panel-entering > div:nth-child(1) {
+    animation: toolCardStagger 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.04s both;
+  }
+  .tool-panel.panel-entering .flip-card-wrapper:nth-child(2),
+  .tool-panel.panel-entering > div:nth-child(2) {
+    animation: toolCardStagger 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+  }
+  .tool-panel.panel-entering .flip-card-wrapper:nth-child(3),
+  .tool-panel.panel-entering > div:nth-child(3) {
+    animation: toolCardStagger 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+  }
+  @keyframes toolCardStagger {
+    from {
+      opacity: 0;
+      transform: translateY(22px) scale(0.88);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Climax: That's it Grand Pop */
+  .thats-it-pop {
+    animation: thatsItPop 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes thatsItPop {
+    from {
+      opacity: 0;
+      transform: scale(0.82) translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
   }
 </style>
 
@@ -471,34 +559,52 @@ const icons = {
     const categoryBtns = root.querySelectorAll('.scenario-category-btn');
     const toolPanels = root.querySelectorAll('.tool-panel');
 
-    // Step 1 -> Step 2 (Starts with NO category selected and NO icons showing)
+    // Step 1 -> Step 2 with smooth transition
     if (greenBtn) {
       greenBtn.addEventListener('click', () => {
-        root.setAttribute('data-scenario-step', '2');
-        if (step1) step1.classList.add('hidden');
-        if (step2) step2.classList.remove('hidden');
-        if (step3) step3.classList.add('hidden');
+        if (!step1 || !step2) return;
+        step1.classList.add('step-fade-out');
+        setTimeout(() => {
+          root.setAttribute('data-scenario-step', '2');
+          step1.classList.add('hidden');
+          step1.classList.remove('step-fade-out');
 
-        // Reset category selection: show no icons initially
-        root.setAttribute('data-active-category', '');
-        categoryBtns.forEach(btn => btn.classList.remove('active-category'));
-        toolPanels.forEach(panel => panel.classList.add('hidden'));
+          step2.classList.remove('hidden');
+          step2.classList.add('step-fade-in');
+
+          // Reset category selection: show no icons initially
+          root.setAttribute('data-active-category', '');
+          categoryBtns.forEach(btn => btn.classList.remove('active-category'));
+          toolPanels.forEach(panel => {
+            panel.classList.add('hidden');
+            panel.classList.remove('panel-entering');
+          });
+        }, 220);
       });
     }
 
-    // Step 2 -> Step 3
+    // Step 2 -> Step 3 with smooth transition
     if (finishBtn) {
       finishBtn.addEventListener('click', () => {
-        root.setAttribute('data-scenario-step', '3');
-        if (step1) step1.classList.add('hidden');
-        if (step2) step2.classList.add('hidden');
-        if (step3) step3.classList.remove('hidden');
+        if (!step2 || !step3) return;
+        step2.classList.add('step-fade-out');
+        setTimeout(() => {
+          root.setAttribute('data-scenario-step', '3');
+          step2.classList.add('hidden');
+          step2.classList.remove('step-fade-out');
+
+          step3.classList.remove('hidden');
+          step3.classList.add('step-fade-in');
+          const titleContainer = step3.querySelector('.space-y-3');
+          if (titleContainer) titleContainer.classList.add('thats-it-pop');
+        }, 220);
       });
     }
 
-    // Switch categories on click
+    // Switch categories on click with smooth panel crossfade & staggered items
     function setActiveCategory(cat) {
       root.setAttribute('data-active-category', cat);
+      
       categoryBtns.forEach(btn => {
         if (btn.getAttribute('data-category') === cat) {
           btn.classList.add('active-category');
@@ -510,8 +616,13 @@ const icons = {
       toolPanels.forEach(panel => {
         if (panel.getAttribute('data-panel') === cat) {
           panel.classList.remove('hidden');
+          panel.classList.remove('panel-entering');
+          // Force repaint for smooth re-triggering of animation
+          void panel.offsetWidth;
+          panel.classList.add('panel-entering');
         } else {
           panel.classList.add('hidden');
+          panel.classList.remove('panel-entering');
         }
       });
     }
