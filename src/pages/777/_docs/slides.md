@@ -12,3 +12,14 @@
 * make it animated like the links should show that an information is passing
 * use "n8n flow.webp" to get the idea of what to do, its a vector image so it will be easy to recreate.
 * make it similar to the image but more modern
+
+# slide 3
+* The scenario: “You are organizing an event.”
+* You're part of a student/community club.
+* You have: 9 organizers, 70 participants, 1 event, 1 week to prepare
+* With an empty green button, when I click it, hide "you have" with its content and show this in the left side:
+  And you need to handle: Communication, Files, Presentation, Tasks, Schedule, Registration
+* When I click each one it highlighted and shows some icons related to it
+* (icon1/icon2) shows first icon and when hovered flips to show second icon
+* Then a button shows to click, hide list, and show "That's it."
+

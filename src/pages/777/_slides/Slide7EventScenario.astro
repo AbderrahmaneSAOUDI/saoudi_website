@@ -1,0 +1,565 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+// Load SVGs directly for razor-sharp zero-delay vector rendering
+const assetsDir = path.resolve(process.cwd(), 'src/pages/777/_assets');
+
+const readSvg = (relPath: string) => {
+  try {
+    return fs.readFileSync(path.join(assetsDir, relPath), 'utf-8');
+  } catch (e) {
+    return '';
+  }
+};
+
+const icons = {
+  whatsapp: readSvg('logo_whatsapp.svg'),
+  discord: readSvg('logo_discord.svg'),
+  outlook: readSvg('_microsoft/logo_microsoft-outlook.svg'),
+  gmail: readSvg('_google/logo_google-gmail.svg'),
+  explorer: readSvg('_microsoft/logo_microsoft-file-explorer.svg'),
+  drive: readSvg('_google/logo_google-drive.svg'),
+  powerpoint: readSvg('_microsoft/logo_microsoft-powerpoint.svg'),
+  slides: readSvg('_google/logo_google-slides.svg'),
+  canva: readSvg('logo_canva.svg'),
+  mstodo: readSvg('_microsoft/logo_microsoft-todo.svg'),
+  gtasks: readSvg('_google/logo_google-tasks.svg'),
+  notion: readSvg('logo_notion.svg'),
+  todoist: readSvg('logo_todoist.svg'),
+  mscalendar: readSvg('_microsoft/logo_microsoft-outlook-calendar.svg'),
+  gcalendar: readSvg('_google/logo_google-calendar.svg'),
+  gforms: readSvg('_google/logo_google-forms.svg'),
+  msforms: readSvg('_microsoft/logo_microsoft-forms.svg'),
+};
+---
+
+<!-- ================= SLIDE 7 PANE (THE SCENARIO - EVENT ORGANIZATION) ================= -->
+<section 
+  id="slide-7-content" 
+  data-scenario-step="1" 
+  data-active-category="communication"
+  class={`slide-pane slide-pane-7 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+
+  <!-- ================= STATE 1: INITIAL SCENARIO (THE EVENT) ================= -->
+  <div id="scenarioStep1" class="scenario-step-pane step-1-container w-full h-full flex flex-col justify-center items-center text-center max-w-4xl mx-auto space-y-4 sm:space-y-6">
+    
+    <!-- Top Pill: The Scenario -->
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2 h-2 rounded-full bg-[#006233] animate-ping"></span>
+      <span>The scenario</span>
+    </div>
+
+    <!-- Main Headline -->
+    <div class="space-y-2">
+      <h2 class="font-black text-4xl sm:text-5xl md:text-6xl text-slate-900 tracking-tight leading-tight">
+        “You are organizing an event.”
+      </h2>
+      <p class="text-lg sm:text-xl md:text-2xl font-medium text-slate-600">
+        You're part of a student/community club.
+      </p>
+    </div>
+
+    <!-- "You have:" 4 Stat Cards -->
+    <div class="w-full space-y-3 pt-2">
+      <h3 class="text-base sm:text-lg font-bold text-slate-500 uppercase tracking-wider">
+        You have:
+      </h3>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 w-full">
+        <!-- Stat 1: 9 Organizers -->
+        <div class="scenario-stat-card p-4 rounded-2xl bg-white border-2 border-slate-200/90 flex flex-col items-center justify-center text-center transition-transform hover:scale-105">
+          <span class="text-3xl sm:text-4xl font-black text-[#006233]">9</span>
+          <span class="text-sm font-bold text-slate-700 mt-1">Organizers</span>
+        </div>
+
+        <!-- Stat 2: 70 Participants -->
+        <div class="scenario-stat-card p-4 rounded-2xl bg-white border-2 border-slate-200/90 flex flex-col items-center justify-center text-center transition-transform hover:scale-105">
+          <span class="text-3xl sm:text-4xl font-black text-[#0080C8]">70</span>
+          <span class="text-sm font-bold text-slate-700 mt-1">Participants</span>
+        </div>
+
+        <!-- Stat 3: 1 Event -->
+        <div class="scenario-stat-card p-4 rounded-2xl bg-white border-2 border-slate-200/90 flex flex-col items-center justify-center text-center transition-transform hover:scale-105">
+          <span class="text-3xl sm:text-4xl font-black text-[#D97706]">1</span>
+          <span class="text-sm font-bold text-slate-700 mt-1">Event</span>
+        </div>
+
+        <!-- Stat 4: 1 Week to prepare -->
+        <div class="scenario-stat-card p-4 rounded-2xl bg-white border-2 border-slate-200/90 flex flex-col items-center justify-center text-center transition-transform hover:scale-105">
+          <span class="text-3xl sm:text-4xl font-black text-[#EA4335]">1</span>
+          <span class="text-sm font-bold text-slate-700 mt-1">Week to prepare</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty Green Action Button (Click to trigger State 2) -->
+    <div class="pt-3 sm:pt-5">
+      <button 
+        id="scenarioGreenBtn"
+        type="button"
+        title="Proceed"
+        class="scenario-empty-btn w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#006233] border-4 border-emerald-400/40 hover:border-emerald-300 flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 group relative"
+      >
+        <!-- Concentric pulse rings -->
+        <span class="absolute inset-0 rounded-full bg-[#006233] animate-ping opacity-30"></span>
+        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ================= STATE 2: AND YOU NEED TO HANDLE (SPLIT SCREEN) ================= -->
+  <div id="scenarioStep2" class="scenario-step-pane step-2-container w-full h-full flex flex-col justify-between hidden">
+    
+    <!-- Top Compact Header -->
+    <div class="flex items-center justify-between w-full border-b border-slate-200/80 pb-2 px-2 shrink-0">
+      <div class="inline-flex items-center gap-2">
+        <span class="text-xs sm:text-sm font-black text-[#006233] uppercase tracking-wider">The scenario</span>
+        <span class="text-slate-300">•</span>
+        <span class="text-xs sm:text-sm font-bold text-slate-700">“You are organizing an event.”</span>
+      </div>
+
+      <!-- Button to advance to Step 3: That's it -->
+      <button 
+        id="scenarioFinishBtn" 
+        type="button"
+        class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-slate-900 text-white hover:bg-[#006233] text-xs sm:text-sm font-bold transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
+      >
+        <span>Next</span>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Main Split-Screen Workspace -->
+    <div class="flex-1 w-full grid grid-cols-12 gap-4 sm:gap-6 my-auto items-center py-2 min-h-0">
+      
+      <!-- LEFT SIDE (5 COLS): And you need to handle categories -->
+      <div class="col-span-12 md:col-span-5 flex flex-col justify-center space-y-2 text-left pr-0 md:pr-4">
+        <h3 class="text-xl sm:text-2xl md:text-[1.7rem] font-black text-slate-900 tracking-tight mb-2">
+          And you need to handle:
+        </h3>
+
+        <!-- Interactive Category List -->
+        <div class="flex flex-col space-y-2">
+          <!-- 1. Communication -->
+          <button 
+            type="button" 
+            data-category="communication"
+            class="scenario-category-btn px-4 py-2.5 sm:py-3 rounded-2xl border-2 text-left font-bold text-base sm:text-lg flex items-center justify-between transition-all duration-200 cursor-pointer"
+          >
+            <span>• Communication</span>
+            <span class="category-arrow opacity-0 transition-opacity">→</span>
+          </button>
+
+          <!-- 2. Files -->
+          <button 
+            type="button" 
+            data-category="files"
+            class="scenario-category-btn px-4 py-2.5 sm:py-3 rounded-2xl border-2 text-left font-bold text-base sm:text-lg flex items-center justify-between transition-all duration-200 cursor-pointer"
+          >
+            <span>• Files</span>
+            <span class="category-arrow opacity-0 transition-opacity">→</span>
+          </button>
+
+          <!-- 3. Presentation -->
+          <button 
+            type="button" 
+            data-category="presentation"
+            class="scenario-category-btn px-4 py-2.5 sm:py-3 rounded-2xl border-2 text-left font-bold text-base sm:text-lg flex items-center justify-between transition-all duration-200 cursor-pointer"
+          >
+            <span>• Presentation</span>
+            <span class="category-arrow opacity-0 transition-opacity">→</span>
+          </button>
+
+          <!-- 4. Tasks -->
+          <button 
+            type="button" 
+            data-category="tasks"
+            class="scenario-category-btn px-4 py-2.5 sm:py-3 rounded-2xl border-2 text-left font-bold text-base sm:text-lg flex items-center justify-between transition-all duration-200 cursor-pointer"
+          >
+            <span>• Tasks</span>
+            <span class="category-arrow opacity-0 transition-opacity">→</span>
+          </button>
+
+          <!-- 5. Schedule -->
+          <button 
+            type="button" 
+            data-category="schedule"
+            class="scenario-category-btn px-4 py-2.5 sm:py-3 rounded-2xl border-2 text-left font-bold text-base sm:text-lg flex items-center justify-between transition-all duration-200 cursor-pointer"
+          >
+            <span>• Schedule</span>
+            <span class="category-arrow opacity-0 transition-opacity">→</span>
+          </button>
+
+          <!-- 6. Registration -->
+          <button 
+            type="button" 
+            data-category="registration"
+            class="scenario-category-btn px-4 py-2.5 sm:py-3 rounded-2xl border-2 text-left font-bold text-base sm:text-lg flex items-center justify-between transition-all duration-200 cursor-pointer"
+          >
+            <span>• Registration</span>
+            <span class="category-arrow opacity-0 transition-opacity">→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE (7 COLS): Tool Icons Showcase with 3D Flip on Hover -->
+      <div class="col-span-12 md:col-span-7 flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl bg-slate-50/80 border-2 border-slate-200/90 min-h-[280px] sm:min-h-[320px] relative">
+        <div class="canvas-grid-dots absolute inset-0 opacity-25 pointer-events-none"></div>
+
+        <!-- Hint Tag -->
+        <div class="absolute top-3 right-4 inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+          <span>⇄ Hover icon to flip tool</span>
+        </div>
+
+        <!-- CATEGORY 1 PANEL: COMMUNICATION -->
+        <div data-panel="communication" class="tool-panel w-full flex flex-wrap items-center justify-center gap-6 sm:gap-8">
+          <!-- Pair 1: WhatsApp / Discord -->
+          <div class="flip-card-wrapper flex flex-col items-center space-y-2">
+            <div class="flip-card w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
+              <div class="flip-card-inner">
+                <!-- Front: WhatsApp -->
+                <div class="flip-front rounded-2xl p-4 bg-[#e8fdf0] border-2 border-emerald-500/40">
+                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    <Fragment set:html={icons.whatsapp} />
+                  </div>
+                </div>
+                <!-- Back: Discord -->
+                <div class="flip-back rounded-2xl p-4 bg-[#eef2ff] border-2 border-indigo-500/40">
+                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    <Fragment set:html={icons.discord} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-slate-600">WhatsApp / Discord</span>
+          </div>
+
+          <!-- Pair 2: Outlook / Gmail -->
+          <div class="flip-card-wrapper flex flex-col items-center space-y-2">
+            <div class="flip-card w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
+              <div class="flip-card-inner">
+                <!-- Front: Microsoft Outlook -->
+                <div class="flip-front rounded-2xl p-4 bg-sky-50 border-2 border-sky-500/40">
+                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    <Fragment set:html={icons.outlook} />
+                  </div>
+                </div>
+                <!-- Back: Google Gmail -->
+                <div class="flip-back rounded-2xl p-4 bg-rose-50 border-2 border-rose-500/40">
+                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    <Fragment set:html={icons.gmail} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-slate-600">Outlook / Gmail</span>
+          </div>
+        </div>
+
+        <!-- CATEGORY 2 PANEL: FILES -->
+        <div data-panel="files" class="tool-panel w-full flex flex-wrap items-center justify-center gap-6 sm:gap-8 hidden">
+          <!-- Pair 1: File Explorer / Google Drive -->
+          <div class="flip-card-wrapper flex flex-col items-center space-y-2">
+            <div class="flip-card w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
+              <div class="flip-card-inner">
+                <!-- Front: Microsoft File Explorer -->
+                <div class="flip-front rounded-2xl p-4 bg-amber-50 border-2 border-amber-500/40">
+                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    <Fragment set:html={icons.explorer} />
+                  </div>
+                </div>
+                <!-- Back: Google Drive -->
+                <div class="flip-back rounded-2xl p-4 bg-emerald-50 border-2 border-emerald-500/40">
+                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    <Fragment set:html={icons.drive} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-slate-600">File Explorer / Drive</span>
+          </div>
+        </div>
+
+        <!-- CATEGORY 3 PANEL: PRESENTATION -->
+        <div data-panel="presentation" class="tool-panel w-full flex flex-wrap items-center justify-center gap-6 sm:gap-8 hidden">
+          <!-- Pair 1: PowerPoint / Google Slides -->
+          <div class="flip-card-wrapper flex flex-col items-center space-y-2">
+            <div class="flip-card w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
+              <div class="flip-card-inner">
+                <!-- Front: PowerPoint -->
+                <div class="flip-front rounded-2xl p-4 bg-orange-50 border-2 border-orange-500/40">
+                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    <Fragment set:html={icons.powerpoint} />
+                  </div>
+                </div>
+                <!-- Back: Google Slides -->
+                <div class="flip-back rounded-2xl p-4 bg-amber-50 border-2 border-amber-500/40">
+                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    <Fragment set:html={icons.slides} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-slate-600">PowerPoint / Slides</span>
+          </div>
+
+          <!-- Standalone 2: Canva -->
+          <div class="flex flex-col items-center space-y-2">
+            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-4 bg-[#e6f8f8] border-2 border-teal-500/40 flex items-center justify-center transition-transform hover:scale-105">
+              <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                <Fragment set:html={icons.canva} />
+              </div>
+            </div>
+            <span class="text-xs font-bold text-slate-600">Canva</span>
+          </div>
+        </div>
+
+        <!-- CATEGORY 4 PANEL: TASKS -->
+        <div data-panel="tasks" class="tool-panel w-full flex flex-wrap items-center justify-center gap-6 sm:gap-8 hidden">
+          <!-- Pair 1: Microsoft To-Do / Google Tasks -->
+          <div class="flip-card-wrapper flex flex-col items-center space-y-2">
+            <div class="flip-card w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
+              <div class="flip-card-inner">
+                <!-- Front: Microsoft To-Do -->
+                <div class="flip-front rounded-2xl p-4 bg-sky-50 border-2 border-sky-500/40">
+                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    <Fragment set:html={icons.mstodo} />
+                  </div>
+                </div>
+                <!-- Back: Google Tasks -->
+                <div class="flip-back rounded-2xl p-4 bg-blue-50 border-2 border-blue-500/40">
+                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    <Fragment set:html={icons.gtasks} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-slate-600">To-Do / Google Tasks</span>
+          </div>
+
+          <!-- Standalone 2: Notion -->
+          <div class="flex flex-col items-center space-y-2">
+            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-4 bg-slate-100 border-2 border-slate-300 flex items-center justify-center transition-transform hover:scale-105">
+              <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                <Fragment set:html={icons.notion} />
+              </div>
+            </div>
+            <span class="text-xs font-bold text-slate-600">Notion</span>
+          </div>
+
+          <!-- Standalone 3: Todoist -->
+          <div class="flex flex-col items-center space-y-2">
+            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-4 bg-rose-50 border-2 border-rose-500/40 flex items-center justify-center transition-transform hover:scale-105">
+              <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                <Fragment set:html={icons.todoist} />
+              </div>
+            </div>
+            <span class="text-xs font-bold text-slate-600">Todoist</span>
+          </div>
+        </div>
+
+        <!-- CATEGORY 5 PANEL: SCHEDULE -->
+        <div data-panel="schedule" class="tool-panel w-full flex flex-wrap items-center justify-center gap-6 sm:gap-8 hidden">
+          <!-- Pair 1: Outlook Calendar / Google Calendar -->
+          <div class="flip-card-wrapper flex flex-col items-center space-y-2">
+            <div class="flip-card w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
+              <div class="flip-card-inner">
+                <!-- Front: Outlook Calendar -->
+                <div class="flip-front rounded-2xl p-4 bg-sky-50 border-2 border-sky-500/40">
+                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    <Fragment set:html={icons.mscalendar} />
+                  </div>
+                </div>
+                <!-- Back: Google Calendar -->
+                <div class="flip-back rounded-2xl p-4 bg-blue-50 border-2 border-blue-500/40">
+                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    <Fragment set:html={icons.gcalendar} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-slate-600">Outlook / Google Calendar</span>
+          </div>
+        </div>
+
+        <!-- CATEGORY 6 PANEL: REGISTRATION -->
+        <div data-panel="registration" class="tool-panel w-full flex flex-wrap items-center justify-center gap-6 sm:gap-8 hidden">
+          <!-- Pair 1: Google Forms / Microsoft Forms -->
+          <div class="flip-card-wrapper flex flex-col items-center space-y-2">
+            <div class="flip-card w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
+              <div class="flip-card-inner">
+                <!-- Front: Google Forms -->
+                <div class="flip-front rounded-2xl p-4 bg-purple-50 border-2 border-purple-500/40">
+                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    <Fragment set:html={icons.gforms} />
+                  </div>
+                </div>
+                <!-- Back: Microsoft Forms -->
+                <div class="flip-back rounded-2xl p-4 bg-teal-50 border-2 border-teal-500/40">
+                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    <Fragment set:html={icons.msforms} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-slate-600">Google / Microsoft Forms</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ================= STATE 3: THAT'S IT ================= -->
+  <div id="scenarioStep3" class="scenario-step-pane step-3-container w-full h-full flex flex-col justify-center items-center text-center max-w-4xl mx-auto space-y-4 hidden">
+    <div class="space-y-3">
+      <h2 class="font-black text-6xl sm:text-7xl md:text-8xl lg:text-[7rem] text-slate-900 tracking-tight leading-none">
+        That's it.
+      </h2>
+      <p class="text-xl sm:text-2xl md:text-3xl font-medium text-slate-600">
+        Simple tools, orchestrated effortlessly.
+      </p>
+    </div>
+  </div>
+
+</section>
+
+<!-- Embedded Styles for 3D Card Flip & Active States -->
+<style>
+  /* 3D Flip Card Architecture */
+  .flip-card {
+    perspective: 1000px;
+  }
+  .flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-style: preserve-3d;
+  }
+  .flip-card:hover .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+  .flip-front,
+  .flip-back {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .flip-back {
+    transform: rotateY(180deg);
+  }
+
+  /* Active Category Button States */
+  .scenario-category-btn {
+    border-color: rgba(226, 232, 240, 0.9);
+    background-color: #ffffff;
+    color: #334155;
+  }
+  .scenario-category-btn:hover {
+    border-color: rgba(0, 98, 51, 0.4);
+    background-color: #f8fafc;
+  }
+  .scenario-category-btn.active-category {
+    border-color: #006233 !important;
+    background-color: #ecfdf5 !important;
+    color: #006233 !important;
+    transform: translateX(6px);
+  }
+  .scenario-category-btn.active-category .category-arrow {
+    opacity: 1 !important;
+  }
+</style>
+
+<!-- Slide 7 State Controller Script -->
+<script is:inline>
+  (() => {
+    const root = document.getElementById('slide-7-content');
+    if (!root) return;
+
+    const step1 = document.getElementById('scenarioStep1');
+    const step2 = document.getElementById('scenarioStep2');
+    const step3 = document.getElementById('scenarioStep3');
+
+    const greenBtn = document.getElementById('scenarioGreenBtn');
+    const finishBtn = document.getElementById('scenarioFinishBtn');
+
+    const categoryBtns = root.querySelectorAll('.scenario-category-btn');
+    const toolPanels = root.querySelectorAll('.tool-panel');
+
+    // Step 1 -> Step 2
+    if (greenBtn) {
+      greenBtn.addEventListener('click', () => {
+        root.setAttribute('data-scenario-step', '2');
+        if (step1) step1.classList.add('hidden');
+        if (step2) step2.classList.remove('hidden');
+        if (step3) step3.classList.add('hidden');
+
+        // Default to first category
+        setActiveCategory('communication');
+      });
+    }
+
+    // Step 2 -> Step 3
+    if (finishBtn) {
+      finishBtn.addEventListener('click', () => {
+        root.setAttribute('data-scenario-step', '3');
+        if (step1) step1.classList.add('hidden');
+        if (step2) step2.classList.add('hidden');
+        if (step3) step3.classList.remove('hidden');
+      });
+    }
+
+    // Switch categories on click
+    function setActiveCategory(cat) {
+      root.setAttribute('data-active-category', cat);
+      categoryBtns.forEach(btn => {
+        if (btn.getAttribute('data-category') === cat) {
+          btn.classList.add('active-category');
+        } else {
+          btn.classList.remove('active-category');
+        }
+      });
+
+      toolPanels.forEach(panel => {
+        if (panel.getAttribute('data-panel') === cat) {
+          panel.classList.remove('hidden');
+        } else {
+          panel.classList.add('hidden');
+        }
+      });
+    }
+
+    categoryBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cat = btn.getAttribute('data-category');
+        if (cat) setActiveCategory(cat);
+      });
+    });
+
+    // Default setup
+    setActiveCategory('communication');
+  })();
+</script>
