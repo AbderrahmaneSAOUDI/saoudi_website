@@ -10,190 +10,86 @@ const { class: className = '' } = Astro.props;
 <section 
   id="slide-5-content" 
   data-choice="none"
-  class={`slide-pane slide-pane-5 w-full flex flex-col justify-between my-auto py-1 sm:py-2 h-full ${className}`}
+  class={`slide-pane slide-pane-5 w-full flex flex-col justify-between my-auto py-2 sm:py-3 h-full ${className}`}
 >
-  <!-- 1. Top Section: Interactive Category Pill & Main Headline -->
-  <div class="flex flex-col items-center text-center space-y-2.5 sm:space-y-3">
-    <!-- Top Pill: Live Pulse Badge -->
-    <div class="program-badge-animated inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/35 text-xs sm:text-sm font-black text-[#006233] max-w-max">
-      <span class="relative flex h-3 w-3">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-80"></span>
-        <span class="relative inline-flex rounded-full h-3 w-3 bg-[#1E824C]"></span>
-      </span>
-      <span class="tracking-wide uppercase text-[11px] sm:text-xs font-black">Interactive Keynote Poll • Self Assessment</span>
-    </div>
-
-    <!-- Main Headline with Continuous Google Shimmer Gradient -->
-    <div class="title-container-animated">
-      <h2 class="title-highlight font-black text-4xl sm:text-5xl md:text-6xl lg:text-[3.8rem] xl:text-[4.2rem] tracking-tight leading-[1.04]">
-        Are you actually productive?
-      </h2>
-      <p class="text-slate-600 text-sm sm:text-base md:text-lg font-semibold mt-1">
-        Be honest with yourself — select an answer to unlock your live workshop challenge:
-      </p>
-    </div>
+  <!-- 1. Top Section: Clean Headline (No pill above) -->
+  <div class="flex flex-col items-center text-center space-y-1 sm:space-y-2 mt-2 sm:mt-4">
+    <h2 class="title-highlight font-black text-4xl sm:text-5xl md:text-6xl lg:text-[3.9rem] xl:text-[4.4rem] tracking-tight leading-[1.05]">
+      Are you actually productive?
+    </h2>
   </div>
 
-  <!-- 2. Middle Section: Two Big Keynote Interactive Action Buttons [YES] / [NO] -->
-  <div class="flex items-center justify-center gap-4 sm:gap-6 md:gap-8 my-2 sm:my-3">
+  <!-- 2. Middle Section: Two Action Buttons (Strictly Yes and No, No Option A/B) -->
+  <div class="flex items-center justify-center gap-5 sm:gap-8 md:gap-10 my-3 sm:my-5">
     <!-- YES Button -->
     <button
       id="pollBtnYes"
       type="button"
-      class="choice-btn choice-btn-yes group relative px-6 sm:px-8 md:px-10 py-3 sm:py-4 rounded-2xl sm:rounded-3xl bg-white border-2 border-emerald-600/40 hover:border-emerald-600 flex items-center gap-3 sm:gap-4 transition-all duration-300 cursor-pointer select-none"
+      class="choice-btn choice-btn-yes group relative px-8 sm:px-12 md:px-14 py-3.5 sm:py-5 rounded-2xl sm:rounded-3xl bg-white border-2 border-emerald-600/40 hover:border-emerald-600 flex items-center gap-3.5 sm:gap-4.5 transition-all duration-300 cursor-pointer select-none"
     >
-      <!-- Sonar Wave Ring -->
-      <div class="btn-sonar-ring absolute -inset-1.5 rounded-2xl sm:rounded-3xl border-2 border-emerald-500/30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
-      
-      <span class="choice-icon-box w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-[#1E824C] text-white flex items-center justify-center text-lg sm:text-xl font-black shrink-0 transition-transform duration-300 group-hover:scale-110">
-        <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+      <span class="choice-icon-box w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#1E824C] text-white flex items-center justify-center text-xl sm:text-2xl font-black shrink-0 transition-transform duration-300 group-hover:scale-110">
+        <svg class="w-6 h-6 sm:w-7 sm:h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5">
           <polyline points="20 6 9 17 4 12" />
         </svg>
       </span>
-      <div class="flex flex-col text-left">
-        <span class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider">Option A</span>
-        <span class="text-lg sm:text-2xl md:text-3xl font-black text-slate-900 group-hover:text-[#1E824C] transition-colors">
-          Yes, I am!
-        </span>
-      </div>
+      <span class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 group-hover:text-[#1E824C] transition-colors tracking-tight">
+        Yes
+      </span>
     </button>
 
     <!-- NO Button -->
     <button
       id="pollBtnNo"
       type="button"
-      class="choice-btn choice-btn-no group relative px-6 sm:px-8 md:px-10 py-3 sm:py-4 rounded-2xl sm:rounded-3xl bg-white border-2 border-rose-600/40 hover:border-rose-600 flex items-center gap-3 sm:gap-4 transition-all duration-300 cursor-pointer select-none"
+      class="choice-btn choice-btn-no group relative px-8 sm:px-12 md:px-14 py-3.5 sm:py-5 rounded-2xl sm:rounded-3xl bg-white border-2 border-rose-600/40 hover:border-rose-600 flex items-center gap-3.5 sm:gap-4.5 transition-all duration-300 cursor-pointer select-none"
     >
-      <!-- Sonar Wave Ring -->
-      <div class="btn-sonar-ring absolute -inset-1.5 rounded-2xl sm:rounded-3xl border-2 border-rose-500/30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
-
-      <span class="choice-icon-box w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-[#EA4335] text-white flex items-center justify-center text-lg sm:text-xl font-black shrink-0 transition-transform duration-300 group-hover:scale-110">
-        <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+      <span class="choice-icon-box w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#EA4335] text-white flex items-center justify-center text-xl sm:text-2xl font-black shrink-0 transition-transform duration-300 group-hover:scale-110">
+        <svg class="w-6 h-6 sm:w-7 sm:h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5">
           <line x1="18" y1="6" x2="6" y2="18" />
           <line x1="6" y1="6" x2="18" y2="18" />
         </svg>
       </span>
-      <div class="flex flex-col text-left">
-        <span class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider">Option B</span>
-        <span class="text-lg sm:text-2xl md:text-3xl font-black text-slate-900 group-hover:text-[#EA4335] transition-colors">
-          No, not really
-        </span>
-      </div>
+      <span class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 group-hover:text-[#EA4335] transition-colors tracking-tight">
+        No
+      </span>
     </button>
   </div>
 
-  <!-- 3. Bottom Dynamic Task Reveal Container (Driven by data-choice on parent) -->
-  <div class="task-reveal-container relative w-full min-h-[180px] sm:min-h-[210px] flex items-center justify-center">
+  <!-- 3. Bottom Task Container: Completely empty before clicking, animated Minimal Community Task after clicking -->
+  <div class="task-reveal-container relative w-full min-h-[170px] sm:min-h-[200px] flex items-center justify-center">
     
-    <!-- State 0: Initial Idle Prompt (Visible when no button clicked yet) -->
-    <div class="task-card task-card-idle w-full max-w-2xl p-5 sm:p-6 rounded-3xl bg-slate-50/90 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-center space-y-2 card-float-idle">
-      <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-[#1E824C] flex items-center justify-center text-xl animate-bounce">
-        👆
+    <!-- State 1: When user clicks [NO] -> Minimal Community Task -->
+    <div class="task-card task-card-no active-task-card-no w-full max-w-3xl p-6 sm:p-8 rounded-3xl bg-rose-50/95 border-2 border-rose-600/50 flex flex-col items-center text-center space-y-3.5 relative overflow-hidden">
+      <!-- Sweeping Laser Beam Across Card -->
+      <div class="laser-scanner-beam-task absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none"></div>
+
+      <!-- Minimal Title: Community Task -->
+      <div class="community-task-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border-2 border-rose-600/40 text-xs sm:text-sm font-black text-[#EA4335] uppercase tracking-wider relative z-10">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#EA4335] animate-ping"></span>
+        <span>Community Task</span>
       </div>
-      <h4 class="text-base sm:text-lg md:text-xl font-black text-slate-800">
-        Cast your vote above to reveal your workshop mission
-      </h4>
-      <p class="text-xs sm:text-sm text-slate-500 font-medium max-w-md">
-        Click <strong class="text-[#1E824C]">Yes</strong> or <strong class="text-[#EA4335]">No</strong> to discover tailored productivity benchmarks and time-saving workflows.
-      </p>
+
+      <!-- Animated Question -->
+      <h3 class="anim-question font-mono text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-black text-slate-900 tracking-tight leading-snug max-w-2xl relative z-10">
+        What is the one task you waste the most time on?
+      </h3>
     </div>
 
-    <!-- State 1: When user clicks [NO] -> "What is the one task you waste the most time on?" -->
-    <div class="task-card task-card-no w-full max-w-3xl p-5 sm:p-6 rounded-3xl bg-rose-50/95 border-2 border-rose-600/40 flex flex-col justify-between space-y-3">
-      <!-- Top Challenge Header -->
-      <div class="flex items-center justify-between gap-3">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-rose-600/30 text-xs font-black text-[#EA4335] uppercase tracking-wider">
-          <span class="w-2 h-2 rounded-full bg-[#EA4335] animate-ping"></span>
-          <span>Time Audit Challenge</span>
-        </div>
-        <span class="text-xs font-extrabold text-slate-500">Target: Automate & Eliminate</span>
+    <!-- State 2: When user clicks [YES] -> Minimal Community Task -->
+    <div class="task-card task-card-yes active-task-card-yes w-full max-w-3xl p-6 sm:p-8 rounded-3xl bg-emerald-50/95 border-2 border-emerald-600/50 flex flex-col items-center text-center space-y-3.5 relative overflow-hidden">
+      <!-- Sweeping Laser Beam Across Card -->
+      <div class="laser-scanner-beam-task absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none"></div>
+
+      <!-- Minimal Title: Community Task -->
+      <div class="community-task-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border-2 border-emerald-600/40 text-xs sm:text-sm font-black text-[#006233] uppercase tracking-wider relative z-10">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#1E824C] animate-ping"></span>
+        <span>Community Task</span>
       </div>
 
-      <!-- Main Challenge Question -->
-      <div>
-        <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-tight">
-          What is the one task you waste the most time on?
-        </h3>
-        <p class="text-slate-600 text-xs sm:text-sm font-semibold mt-1">
-          Identify your single biggest time-sink — this workshop gives you the tools to automate it:
-        </p>
-      </div>
-
-      <!-- 4 High-Frequency Time Sink Badges -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 pt-1">
-        <div class="sink-badge p-2.5 rounded-xl bg-white border border-rose-600/25 flex flex-col text-left">
-          <span class="text-base sm:text-lg mb-0.5">📧</span>
-          <span class="text-xs font-black text-slate-900">Email & Chats</span>
-          <span class="text-[10px] text-slate-500 font-semibold leading-tight mt-0.5">Repetitive replies & inbox triage</span>
-        </div>
-
-        <div class="sink-badge p-2.5 rounded-xl bg-white border border-rose-600/25 flex flex-col text-left">
-          <span class="text-base sm:text-lg mb-0.5">📋</span>
-          <span class="text-xs font-black text-slate-900">Data Entry</span>
-          <span class="text-[10px] text-slate-500 font-semibold leading-tight mt-0.5">Copy-pasting between sheets</span>
-        </div>
-
-        <div class="sink-badge p-2.5 rounded-xl bg-white border border-rose-600/25 flex flex-col text-left">
-          <span class="text-base sm:text-lg mb-0.5">🔍</span>
-          <span class="text-xs font-black text-slate-900">Lost Files</span>
-          <span class="text-[10px] text-slate-500 font-semibold leading-tight mt-0.5">Searching folders & archives</span>
-        </div>
-
-        <div class="sink-badge p-2.5 rounded-xl bg-white border border-rose-600/25 flex flex-col text-left">
-          <span class="text-base sm:text-lg mb-0.5">🔄</span>
-          <span class="text-xs font-black text-slate-900">Manual Follow-ups</span>
-          <span class="text-[10px] text-slate-500 font-semibold leading-tight mt-0.5">Chasing status & reminders</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- State 2: When user clicks [YES] -> "How do you speedup your tasks?" -->
-    <div class="task-card task-card-yes w-full max-w-3xl p-5 sm:p-6 rounded-3xl bg-emerald-50/95 border-2 border-emerald-600/40 flex flex-col justify-between space-y-3">
-      <!-- Top Accelerator Header -->
-      <div class="flex items-center justify-between gap-3">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-emerald-600/30 text-xs font-black text-[#006233] uppercase tracking-wider">
-          <span class="w-2 h-2 rounded-full bg-[#1E824C] animate-ping"></span>
-          <span>Speed & Automation Benchmark</span>
-        </div>
-        <span class="text-xs font-extrabold text-slate-500">Target: 10x Scale & Multipliers</span>
-      </div>
-
-      <!-- Main Accelerator Question -->
-      <div>
-        <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-tight">
-          How do you speedup your tasks?
-        </h3>
-        <p class="text-slate-600 text-xs sm:text-sm font-semibold mt-1">
-          Share your superpowers — and discover how 7.77 connects them into automated end-to-end pipelines:
-        </p>
-      </div>
-
-      <!-- 4 Accelerator Badges -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 pt-1">
-        <div class="accelerator-badge p-2.5 rounded-xl bg-white border border-emerald-600/25 flex flex-col text-left">
-          <span class="text-base sm:text-lg mb-0.5">🤖</span>
-          <span class="text-xs font-black text-slate-900">AI Assistants</span>
-          <span class="text-[10px] text-slate-500 font-semibold leading-tight mt-0.5">Structured prompting & drafts</span>
-        </div>
-
-        <div class="accelerator-badge p-2.5 rounded-xl bg-white border border-emerald-600/25 flex flex-col text-left">
-          <span class="text-base sm:text-lg mb-0.5">⚡</span>
-          <span class="text-xs font-black text-slate-900">Key Shortcuts</span>
-          <span class="text-[10px] text-slate-500 font-semibold leading-tight mt-0.5">Keyboard navigation & hotkeys</span>
-        </div>
-
-        <div class="accelerator-badge p-2.5 rounded-xl bg-white border border-emerald-600/25 flex flex-col text-left">
-          <span class="text-base sm:text-lg mb-0.5">🔗</span>
-          <span class="text-xs font-black text-slate-900">Integrations</span>
-          <span class="text-[10px] text-slate-500 font-semibold leading-tight mt-0.5">Auto-linking apps & webhooks</span>
-        </div>
-
-        <div class="accelerator-badge p-2.5 rounded-xl bg-white border border-emerald-600/25 flex flex-col text-left">
-          <span class="text-base sm:text-lg mb-0.5">📊</span>
-          <span class="text-xs font-black text-slate-900">Smart Templates</span>
-          <span class="text-[10px] text-slate-500 font-semibold leading-tight mt-0.5">Batch execution & presets</span>
-        </div>
-      </div>
+      <!-- Animated Question -->
+      <h3 class="anim-question font-mono text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-black text-slate-900 tracking-tight leading-snug max-w-2xl relative z-10">
+        How do you speedup your tasks?
+      </h3>
     </div>
 
   </div>

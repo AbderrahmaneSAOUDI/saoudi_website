@@ -1168,14 +1168,7 @@
   50% { transform: translateY(-5px); }
 }
 
-/* Choice States */
-[data-choice="none"] .task-card-idle {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  pointer-events: auto;
-  position: relative;
-}
-
+/* Choice States: Initially empty */
 [data-choice="none"] .task-card-no,
 [data-choice="none"] .task-card-yes {
   opacity: 0;
@@ -1189,20 +1182,13 @@
 [data-choice="yes"] .choice-btn-yes {
   background-color: #ecfdf5 !important;
   border-color: #1E824C !important;
-  transform: scale(1.06) translateY(-4px) !important;
-  outline: 3px solid rgba(30, 130, 76, 0.45);
+  transform: scale(1.08) translateY(-4px) !important;
+  outline: 3px solid rgba(30, 130, 76, 0.5);
 }
 
 [data-choice="yes"] .choice-btn-no {
-  opacity: 0.55;
-  transform: scale(0.96);
-}
-
-[data-choice="yes"] .task-card-idle {
-  opacity: 0;
-  transform: scale(0.95) translateY(-14px);
-  pointer-events: none;
-  position: absolute;
+  opacity: 0.45;
+  transform: scale(0.95);
 }
 
 [data-choice="yes"] .task-card-yes {
@@ -1210,7 +1196,7 @@
   transform: scale(1) translateY(0);
   pointer-events: auto;
   position: relative;
-  animation: taskCardEntrance 0.4s var(--ease-spring);
+  animation: taskCardEntrance 0.4s var(--ease-spring), taskCardFloatYes 4.2s ease-in-out 0.4s infinite, taskCardRingPulseYes 3s ease-in-out infinite;
 }
 
 [data-choice="yes"] .task-card-no {
@@ -1225,20 +1211,13 @@
 [data-choice="no"] .choice-btn-no {
   background-color: #fff1f2 !important;
   border-color: #EA4335 !important;
-  transform: scale(1.06) translateY(-4px) !important;
-  outline: 3px solid rgba(234, 67, 53, 0.45);
+  transform: scale(1.08) translateY(-4px) !important;
+  outline: 3px solid rgba(234, 67, 53, 0.5);
 }
 
 [data-choice="no"] .choice-btn-yes {
-  opacity: 0.55;
-  transform: scale(0.96);
-}
-
-[data-choice="no"] .task-card-idle {
-  opacity: 0;
-  transform: scale(0.95) translateY(-14px);
-  pointer-events: none;
-  position: absolute;
+  opacity: 0.45;
+  transform: scale(0.95);
 }
 
 [data-choice="no"] .task-card-no {
@@ -1246,7 +1225,7 @@
   transform: scale(1) translateY(0);
   pointer-events: auto;
   position: relative;
-  animation: taskCardEntrance 0.4s var(--ease-spring);
+  animation: taskCardEntrance 0.4s var(--ease-spring), taskCardFloatNo 4.2s ease-in-out 0.4s infinite, taskCardRingPulseNo 3s ease-in-out infinite;
 }
 
 [data-choice="no"] .task-card-yes {
@@ -1260,7 +1239,7 @@
 @keyframes taskCardEntrance {
   0% {
     opacity: 0;
-    transform: scale(0.93) translateY(18px);
+    transform: scale(0.92) translateY(24px);
   }
   100% {
     opacity: 1;
@@ -1268,23 +1247,84 @@
   }
 }
 
-.sink-badge,
-.accelerator-badge {
-  transition: transform 0.25s var(--ease-spring), border-color 0.25s ease;
-}
-
-.sink-badge:hover,
-.accelerator-badge:hover {
-  transform: translateY(-3px) scale(1.03);
-}
-
-.card-float-idle {
-  animation: idleCardPulse 3.5s ease-in-out infinite;
-}
-
-@keyframes idleCardPulse {
+/* Active Task Floating Levitation */
+@keyframes taskCardFloatYes {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes taskCardFloatNo {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+/* High-Visibility Ring Pulsations */
+@keyframes taskCardRingPulseYes {
+  0%, 100% {
+    outline: 2px solid rgba(30, 130, 76, 0.3);
+  }
+  50% {
+    outline: 4px solid rgba(30, 130, 76, 0.7);
+  }
+}
+
+@keyframes taskCardRingPulseNo {
+  0%, 100% {
+    outline: 2px solid rgba(234, 67, 53, 0.3);
+  }
+  50% {
+    outline: 4px solid rgba(234, 67, 53, 0.7);
+  }
+}
+
+/* High-Energy Continuous Question Scale Animation */
+.anim-question {
+  display: inline-block;
+  animation: questionPulseAnim 3.2s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes questionPulseAnim {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+/* Community Task Pill Subtle Bounce */
+.community-task-pill {
+  animation: communityPillBounce 2.8s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes communityPillBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Continuous Laser Beam Across Minimal Task Card */
+.laser-scanner-beam-task {
+  animation: laserSweepTask 2.4s linear infinite;
+  will-change: transform;
+}
+
+@keyframes laserSweepTask {
+  0% {
+    transform: translateX(-150%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(450%);
+    opacity: 0;
+  }
 }
 
 /* Respect Reduced Motion */
