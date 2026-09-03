@@ -882,177 +882,205 @@
   pointer-events: none;
 }
 
-/* === 14. Slide 4: Comprehensive Keynote Animations === */
+/* === 14. Slide 4: High-Visibility Keynote Animations === */
 
 /* Program Top Badge */
 .program-badge-animated {
-  animation: badgeGlowPulse 4s ease-in-out infinite;
+  animation: badgeGlowPulse 3s ease-in-out infinite, badgeFloat 3.5s ease-in-out infinite;
 }
 
 @keyframes badgeGlowPulse {
   0%, 100% {
-    transform: translateY(0) scale(1);
-    border-color: rgba(30, 130, 76, 0.35);
+    border-color: rgba(30, 130, 76, 0.4);
   }
   50% {
-    transform: translateY(-2px) scale(1.02);
-    border-color: rgba(30, 130, 76, 0.6);
+    border-color: rgba(30, 130, 76, 0.9);
   }
 }
 
-/* Title Gentle Levitation */
-.title-container-animated {
-  animation: keynoteTitleFloat 6s ease-in-out infinite;
-}
-
-@keyframes keynoteTitleFloat {
+@keyframes badgeFloat {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
 }
 
+/* Title Gentle Levitation */
+.title-container-animated {
+  animation: keynoteTitleFloat 5s ease-in-out infinite;
+}
+
+@keyframes keynoteTitleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
 /* Partners Card & Badges */
 .partners-card-animated {
-  animation: partnersCardFloat 6s ease-in-out 0.5s infinite;
+  animation: partnersCardFloat 5.5s ease-in-out 0.5s infinite;
 }
 
 @keyframes partnersCardFloat {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+  50% { transform: translateY(-4px); }
 }
 
-.partner-badge-1 { animation: partnerFloat 4s ease-in-out 0s infinite; }
-.partner-badge-2 { animation: partnerFloat 4s ease-in-out 0.6s infinite; }
-.partner-badge-3 { animation: partnerFloat 4s ease-in-out 1.2s infinite; }
+.partner-badge-1 { animation: partnerFloat 3.2s ease-in-out 0s infinite; }
+.partner-badge-2 { animation: partnerFloat 3.2s ease-in-out 0.5s infinite; }
+.partner-badge-3 { animation: partnerFloat 3.2s ease-in-out 1.0s infinite; }
 
 @keyframes partnerFloat {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+  50% { transform: translateY(-4px); }
 }
 
-/* 6 Skill Pills Staggered Levitation */
+/* 6 Skill Pills Visible Floating */
 .skill-pill-animated {
   transition: transform 0.25s var(--ease-spring), border-color 0.25s ease;
   will-change: transform;
 }
 
 .skill-pill-animated:hover {
-  transform: translateY(-4px) scale(1.03);
-  border-color: rgba(30, 130, 76, 0.6);
+  transform: translateY(-6px) scale(1.04);
+  border-color: rgba(30, 130, 76, 0.8);
 }
 
-.skill-pill-1 { animation: pillFloat 4.2s ease-in-out 0.0s infinite; }
-.skill-pill-2 { animation: pillFloat 4.2s ease-in-out 0.35s infinite; }
-.skill-pill-3 { animation: pillFloat 4.2s ease-in-out 0.7s infinite; }
-.skill-pill-4 { animation: pillFloat 4.2s ease-in-out 1.05s infinite; }
-.skill-pill-5 { animation: pillFloat 4.2s ease-in-out 1.4s infinite; }
-.skill-pill-6 { animation: pillFloat 4.2s ease-in-out 1.75s infinite; }
+.skill-pill-1 { animation: pillFloat 3.2s ease-in-out 0.0s infinite; }
+.skill-pill-2 { animation: pillFloat 3.2s ease-in-out 0.35s infinite; }
+.skill-pill-3 { animation: pillFloat 3.2s ease-in-out 0.7s infinite; }
+.skill-pill-4 { animation: pillFloat 3.2s ease-in-out 1.05s infinite; }
+.skill-pill-5 { animation: pillFloat 3.2s ease-in-out 1.4s infinite; }
+.skill-pill-6 { animation: pillFloat 3.2s ease-in-out 1.75s infinite; }
 
 @keyframes pillFloat {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3.5px); }
+  50% { transform: translateY(-6px); }
 }
 
-.icon-pulse-wave {
-  animation: iconPulseWave 3s ease-in-out infinite;
+/* 6 Distinct Skill Icon Animations */
+.anim-ai-sparkle {
+  animation: aiTwinkle 2.5s ease-in-out infinite;
 }
 
-@keyframes iconPulseWave {
+@keyframes aiTwinkle {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.18) rotate(12deg); }
+}
+
+.anim-shield-pulse {
+  animation: shieldBeat 2s ease-in-out infinite;
+}
+
+@keyframes shieldBeat {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  50% { transform: scale(1.15); }
 }
 
-/* Keynote Metric Cards */
-.keynote-metric-card {
-  transition: transform 0.35s var(--ease-spring), border-color 0.3s ease;
+.anim-code-bracket {
+  animation: codeNudge 2.2s ease-in-out infinite;
+}
+
+@keyframes codeNudge {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px) scale(1.1); }
+}
+
+.anim-data-bars {
+  animation: dataBarsWave 2s ease-in-out infinite;
+}
+
+@keyframes dataBarsWave {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.25); }
+}
+
+.anim-cloud-float {
+  animation: cloudDrift 2.8s ease-in-out infinite;
+}
+
+@keyframes cloudDrift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px) scale(1.1); }
+}
+
+.anim-rocket-thrust {
+  animation: rocketHover 1.8s ease-in-out infinite;
+}
+
+@keyframes rocketHover {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(2px, -3px) rotate(4deg); }
+}
+
+/* Metric Cards Levitation (Noticeable 9px float) */
+.card-float-1 {
+  animation: cardLevitate1 4.8s ease-in-out infinite;
   will-change: transform;
 }
 
-.metric-card-1 {
-  animation: keynoteCardFloat1 5.5s ease-in-out infinite;
+.card-float-2 {
+  animation: cardLevitate2 4.8s ease-in-out 1s infinite;
+  will-change: transform;
 }
 
-.metric-card-2 {
-  animation: keynoteCardFloat2 5.5s ease-in-out 1s infinite;
-}
-
-@keyframes keynoteCardFloat1 {
+@keyframes cardLevitate1 {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-7px); }
+  50% { transform: translateY(-8px); }
 }
 
-@keyframes keynoteCardFloat2 {
+@keyframes cardLevitate2 {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-7px); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Revolving Satellite Orbits */
+.satellite-orbit {
+  animation: spinOrbit 6s linear infinite;
+  will-change: transform;
+}
+
+.satellite-orbit-sky {
+  animation: spinOrbitReverse 6s linear infinite;
+  will-change: transform;
 }
 
 .stat-number-pulse {
   display: inline-block;
-  animation: statNumberPulse 4s ease-in-out infinite;
+  animation: statNumberPulse 3.5s ease-in-out infinite;
   will-change: transform;
 }
 
 @keyframes statNumberPulse {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.03); }
+  50% { transform: scale(1.04); }
 }
 
 .badge-pulse {
-  animation: badgePulseAnim 3s ease-in-out infinite;
+  animation: badgePulseAnim 2.5s ease-in-out infinite;
 }
 
 @keyframes badgePulseAnim {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  50% { transform: scale(1.06); }
 }
 
-.stat-orbit-ring {
-  animation: spinOrbit 18s linear infinite;
+/* Working Laser Scanner Beam Across Age Track */
+.laser-scanner-beam {
+  animation: laserSweepFast 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   will-change: transform;
 }
 
-.stat-orbit-ring-rev {
-  animation: spinOrbitReverse 26s linear infinite;
-  will-change: transform;
-}
-
-.card-shimmer-sweep {
-  position: relative;
-}
-
-.card-shimmer-sweep::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.45) 50%, transparent 80%);
-  transform: translateX(-100%);
-  animation: cardSweep 5.5s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes cardSweep {
-  0%, 25% { transform: translateX(-100%); }
-  55%, 100% { transform: translateX(100%); }
-}
-
-/* Clean Emerald Age Spectrum Laser Sweep */
-.age-laser-sweep {
-  animation: ageLaserSweep 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  will-change: left, opacity;
-}
-
-@keyframes ageLaserSweep {
+@keyframes laserSweepFast {
   0% {
-    left: -20%;
+    transform: translateX(-120%);
     opacity: 0;
   }
-  15% {
-    opacity: 0.95;
+  20% {
+    opacity: 1;
   }
-  85% {
-    opacity: 0.95;
+  80% {
+    opacity: 1;
   }
   100% {
-    left: 105%;
+    transform: translateX(450%);
     opacity: 0;
   }
 }
@@ -1062,27 +1090,44 @@
 }
 
 .active-milestone {
-  animation: activeMilestoneGlow 3s ease-in-out infinite;
+  animation: activeMilestoneGlow 2.5s ease-in-out infinite;
 }
 
 @keyframes activeMilestoneGlow {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 0 0 2px rgba(30, 130, 76, 0.4);
   }
   50% {
-    transform: scale(1.04);
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.5);
+    transform: scale(1.05);
+    box-shadow: 0 0 0 4px rgba(30, 130, 76, 0.7);
   }
 }
 
-.hub-icon-pulse {
-  animation: hubIconPulse 3s ease-in-out infinite;
+/* Active 360° Rotating Radar Scanner */
+.radar-screen {
+  position: relative;
 }
 
-@keyframes hubIconPulse {
+.radar-scan-overlay {
+  background: conic-gradient(from 0deg, transparent 0deg, transparent 270deg, rgba(0, 128, 200, 0.35) 360deg);
+  animation: radarRotateSweep 3.5s linear infinite;
+  will-change: transform;
+  transform-origin: center center;
+}
+
+@keyframes radarRotateSweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.radar-icon-ring {
+  animation: radarIconPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes radarIconPulse {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
+  50% { transform: scale(1.1); }
 }
 
 /* Respect Reduced Motion */
