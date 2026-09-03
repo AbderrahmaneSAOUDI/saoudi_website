@@ -678,13 +678,52 @@
 .bio-card-2 { animation: subtleCardFloat 4.8s ease-in-out 0.8s infinite; }
 .bio-card-3 { animation: subtleCardFloat 4.8s ease-in-out 1.6s infinite; }
 
-.welcome-card {
-  transition: transform 0.3s var(--ease-spring), border-color 0.3s ease;
+/* === 13. Pure Animated Welcome Slide === */
+.welcome-halo {
+  animation: spinOrbit 22s linear infinite;
 }
 
-.welcome-card-1 { animation: subtleCardFloat 4.5s ease-in-out infinite; }
-.welcome-card-2 { animation: subtleCardFloat 4.5s ease-in-out 0.7s infinite; }
-.welcome-card-3 { animation: subtleCardFloat 4.5s ease-in-out 1.4s infinite; }
+.welcome-halo-outer {
+  animation: spinOrbitReverse 32s linear infinite;
+}
+
+@keyframes spinOrbitReverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.welcome-pulse-ring {
+  animation: welcomePulseRing 3.5s cubic-bezier(0.2, 0, 0.4, 1) infinite;
+}
+
+@keyframes welcomePulseRing {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(0.92);
+    opacity: 0.55;
+  }
+}
+
+.welcome-title {
+  animation: welcomeFloat 4.8s ease-in-out infinite, titleShimmer 6s linear infinite;
+  will-change: transform;
+}
+
+@keyframes welcomeFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.02);
+  }
+}
 
 .icon-box-pulse {
   animation: iconPulse 3s ease-in-out infinite;
