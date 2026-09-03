@@ -8,35 +8,36 @@ export interface Props {
 
 const { class: className = '' } = Astro.props;
 
-// Load SVGs directly for razor-sharp zero-delay vector rendering
+// Load SVGs as isolated base64 data-URIs to completely prevent SVG ID/mask/gradient/style collisions
 const assetsDir = path.resolve(process.cwd(), 'src/pages/777/_assets');
 
-const readSvg = (relPath: string) => {
+const readSvgDataUri = (relPath: string) => {
   try {
-    return fs.readFileSync(path.join(assetsDir, relPath), 'utf-8');
+    const raw = fs.readFileSync(path.join(assetsDir, relPath));
+    return `data:image/svg+xml;base64,${raw.toString('base64')}`;
   } catch (e) {
     return '';
   }
 };
 
 const icons = {
-  whatsapp: readSvg('logo_whatsapp.svg'),
-  discord: readSvg('logo_discord.svg'),
-  outlook: readSvg('_microsoft/logo_microsoft-outlook.svg'),
-  gmail: readSvg('_google/logo_google-gmail.svg'),
-  explorer: readSvg('_microsoft/logo_microsoft-file-explorer.svg'),
-  drive: readSvg('_google/logo_google-drive.svg'),
-  powerpoint: readSvg('_microsoft/logo_microsoft-powerpoint.svg'),
-  slides: readSvg('_google/logo_google-slides.svg'),
-  canva: readSvg('logo_canva.svg'),
-  mstodo: readSvg('_microsoft/logo_microsoft-todo.svg'),
-  gtasks: readSvg('_google/logo_google-tasks.svg'),
-  notion: readSvg('logo_notion.svg'),
-  todoist: readSvg('logo_todoist.svg'),
-  mscalendar: readSvg('_microsoft/logo_microsoft-outlook-calendar.svg'),
-  gcalendar: readSvg('_google/logo_google-calendar.svg'),
-  gforms: readSvg('_google/logo_google-forms.svg'),
-  msforms: readSvg('_microsoft/logo_microsoft-forms.svg'),
+  whatsapp: readSvgDataUri('logo_whatsapp.svg'),
+  discord: readSvgDataUri('logo_discord.svg'),
+  outlook: readSvgDataUri('_microsoft/logo_microsoft-outlook.svg'),
+  gmail: readSvgDataUri('_google/logo_google-gmail.svg'),
+  explorer: readSvgDataUri('_microsoft/logo_microsoft-file-explorer.svg'),
+  drive: readSvgDataUri('_google/logo_google-drive.svg'),
+  powerpoint: readSvgDataUri('_microsoft/logo_microsoft-powerpoint.svg'),
+  slides: readSvgDataUri('_google/logo_google-slides.svg'),
+  canva: readSvgDataUri('logo_canva.svg'),
+  mstodo: readSvgDataUri('_microsoft/logo_microsoft-todo.svg'),
+  gtasks: readSvgDataUri('_google/logo_google-tasks.svg'),
+  notion: readSvgDataUri('logo_notion.svg'),
+  todoist: readSvgDataUri('logo_todoist.svg'),
+  mscalendar: readSvgDataUri('_microsoft/logo_microsoft-outlook-calendar.svg'),
+  gcalendar: readSvgDataUri('_google/logo_google-calendar.svg'),
+  gforms: readSvgDataUri('_google/logo_google-forms.svg'),
+  msforms: readSvgDataUri('_microsoft/logo_microsoft-forms.svg'),
 };
 ---
 
@@ -44,7 +45,7 @@ const icons = {
 <section 
   id="slide-7-content" 
   data-scenario-step="1" 
-  data-active-category="communication"
+  data-active-category=""
   class={`slide-pane slide-pane-7 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
 >
 
@@ -216,207 +217,168 @@ const icons = {
         </div>
       </div>
 
-      <!-- RIGHT SIDE (7 COLS): Tool Icons Showcase with 3D Flip on Hover -->
-      <div class="col-span-12 md:col-span-7 flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl bg-slate-50/80 border-2 border-slate-200/90 min-h-[280px] sm:min-h-[320px] relative">
+      <!-- RIGHT SIDE (7 COLS): Tool Icons Showcase with 3D Flip on Hover (Initially empty until category selected) -->
+      <div class="col-span-12 md:col-span-7 flex flex-col items-center justify-center p-6 sm:p-8 rounded-3xl bg-slate-50/80 border-2 border-slate-200/90 min-h-[300px] sm:min-h-[360px] relative">
         <div class="canvas-grid-dots absolute inset-0 opacity-25 pointer-events-none"></div>
 
-        <!-- Hint Tag -->
-        <div class="absolute top-3 right-4 inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-          <span>⇄ Hover icon to flip tool</span>
-        </div>
-
         <!-- CATEGORY 1 PANEL: COMMUNICATION -->
-        <div data-panel="communication" class="tool-panel w-full flex flex-wrap items-center justify-center gap-6 sm:gap-8">
+        <div data-panel="communication" class="tool-panel w-full flex flex-wrap items-center justify-center gap-8 sm:gap-12 hidden">
           <!-- Pair 1: WhatsApp / Discord -->
-          <div class="flip-card-wrapper flex flex-col items-center space-y-2">
-            <div class="flip-card w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
+          <div class="flip-card-wrapper flex flex-col items-center space-y-2.5">
+            <div class="flip-card w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
               <div class="flip-card-inner">
                 <!-- Front: WhatsApp -->
-                <div class="flip-front rounded-2xl p-4 bg-[#e8fdf0] border-2 border-emerald-500/40">
-                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                    <Fragment set:html={icons.whatsapp} />
-                  </div>
+                <div class="flip-front rounded-3xl p-5 bg-[#e8fdf0] border-2 border-emerald-500/40">
+                  <img src={icons.whatsapp} alt="WhatsApp" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
                 </div>
                 <!-- Back: Discord -->
-                <div class="flip-back rounded-2xl p-4 bg-[#eef2ff] border-2 border-indigo-500/40">
-                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                    <Fragment set:html={icons.discord} />
-                  </div>
+                <div class="flip-back rounded-3xl p-5 bg-[#eef2ff] border-2 border-indigo-500/40">
+                  <img src={icons.discord} alt="Discord" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
                 </div>
               </div>
             </div>
-            <span class="text-xs font-bold text-slate-600">WhatsApp / Discord</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-700">WhatsApp / Discord</span>
           </div>
 
           <!-- Pair 2: Outlook / Gmail -->
-          <div class="flip-card-wrapper flex flex-col items-center space-y-2">
-            <div class="flip-card w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
+          <div class="flip-card-wrapper flex flex-col items-center space-y-2.5">
+            <div class="flip-card w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
               <div class="flip-card-inner">
                 <!-- Front: Microsoft Outlook -->
-                <div class="flip-front rounded-2xl p-4 bg-sky-50 border-2 border-sky-500/40">
-                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                    <Fragment set:html={icons.outlook} />
-                  </div>
+                <div class="flip-front rounded-3xl p-5 bg-sky-50 border-2 border-sky-500/40">
+                  <img src={icons.outlook} alt="Microsoft Outlook" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
                 </div>
                 <!-- Back: Google Gmail -->
-                <div class="flip-back rounded-2xl p-4 bg-rose-50 border-2 border-rose-500/40">
-                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                    <Fragment set:html={icons.gmail} />
-                  </div>
+                <div class="flip-back rounded-3xl p-5 bg-rose-50 border-2 border-rose-500/40">
+                  <img src={icons.gmail} alt="Google Gmail" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
                 </div>
               </div>
             </div>
-            <span class="text-xs font-bold text-slate-600">Outlook / Gmail</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-700">Outlook / Gmail</span>
           </div>
         </div>
 
         <!-- CATEGORY 2 PANEL: FILES -->
-        <div data-panel="files" class="tool-panel w-full flex flex-wrap items-center justify-center gap-6 sm:gap-8 hidden">
+        <div data-panel="files" class="tool-panel w-full flex flex-wrap items-center justify-center gap-8 sm:gap-12 hidden">
           <!-- Pair 1: File Explorer / Google Drive -->
-          <div class="flip-card-wrapper flex flex-col items-center space-y-2">
-            <div class="flip-card w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
+          <div class="flip-card-wrapper flex flex-col items-center space-y-2.5">
+            <div class="flip-card w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
               <div class="flip-card-inner">
                 <!-- Front: Microsoft File Explorer -->
-                <div class="flip-front rounded-2xl p-4 bg-amber-50 border-2 border-amber-500/40">
-                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                    <Fragment set:html={icons.explorer} />
-                  </div>
+                <div class="flip-front rounded-3xl p-5 bg-amber-50 border-2 border-amber-500/40">
+                  <img src={icons.explorer} alt="File Explorer" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
                 </div>
                 <!-- Back: Google Drive -->
-                <div class="flip-back rounded-2xl p-4 bg-emerald-50 border-2 border-emerald-500/40">
-                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                    <Fragment set:html={icons.drive} />
-                  </div>
+                <div class="flip-back rounded-3xl p-5 bg-emerald-50 border-2 border-emerald-500/40">
+                  <img src={icons.drive} alt="Google Drive" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
                 </div>
               </div>
             </div>
-            <span class="text-xs font-bold text-slate-600">File Explorer / Drive</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-700">File Explorer / Drive</span>
           </div>
         </div>
 
         <!-- CATEGORY 3 PANEL: PRESENTATION -->
-        <div data-panel="presentation" class="tool-panel w-full flex flex-wrap items-center justify-center gap-6 sm:gap-8 hidden">
+        <div data-panel="presentation" class="tool-panel w-full flex flex-wrap items-center justify-center gap-8 sm:gap-12 hidden">
           <!-- Pair 1: PowerPoint / Google Slides -->
-          <div class="flip-card-wrapper flex flex-col items-center space-y-2">
-            <div class="flip-card w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
+          <div class="flip-card-wrapper flex flex-col items-center space-y-2.5">
+            <div class="flip-card w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
               <div class="flip-card-inner">
                 <!-- Front: PowerPoint -->
-                <div class="flip-front rounded-2xl p-4 bg-orange-50 border-2 border-orange-500/40">
-                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                    <Fragment set:html={icons.powerpoint} />
-                  </div>
+                <div class="flip-front rounded-3xl p-5 bg-orange-50 border-2 border-orange-500/40">
+                  <img src={icons.powerpoint} alt="PowerPoint" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
                 </div>
                 <!-- Back: Google Slides -->
-                <div class="flip-back rounded-2xl p-4 bg-amber-50 border-2 border-amber-500/40">
-                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                    <Fragment set:html={icons.slides} />
-                  </div>
+                <div class="flip-back rounded-3xl p-5 bg-amber-50 border-2 border-amber-500/40">
+                  <img src={icons.slides} alt="Google Slides" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
                 </div>
               </div>
             </div>
-            <span class="text-xs font-bold text-slate-600">PowerPoint / Slides</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-700">PowerPoint / Slides</span>
           </div>
 
           <!-- Standalone 2: Canva -->
-          <div class="flex flex-col items-center space-y-2">
-            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-4 bg-[#e6f8f8] border-2 border-teal-500/40 flex items-center justify-center transition-transform hover:scale-105">
-              <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                <Fragment set:html={icons.canva} />
-              </div>
+          <div class="flex flex-col items-center space-y-2.5">
+            <div class="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl p-5 bg-[#e6f8f8] border-2 border-teal-500/40 flex items-center justify-center transition-transform hover:scale-105">
+              <img src={icons.canva} alt="Canva" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
             </div>
-            <span class="text-xs font-bold text-slate-600">Canva</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-700">Canva</span>
           </div>
         </div>
 
         <!-- CATEGORY 4 PANEL: TASKS -->
-        <div data-panel="tasks" class="tool-panel w-full flex flex-wrap items-center justify-center gap-6 sm:gap-8 hidden">
+        <div data-panel="tasks" class="tool-panel w-full flex flex-wrap items-center justify-center gap-6 sm:gap-10 hidden">
           <!-- Pair 1: Microsoft To-Do / Google Tasks -->
-          <div class="flip-card-wrapper flex flex-col items-center space-y-2">
-            <div class="flip-card w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
+          <div class="flip-card-wrapper flex flex-col items-center space-y-2.5">
+            <div class="flip-card w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
               <div class="flip-card-inner">
                 <!-- Front: Microsoft To-Do -->
-                <div class="flip-front rounded-2xl p-4 bg-sky-50 border-2 border-sky-500/40">
-                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                    <Fragment set:html={icons.mstodo} />
-                  </div>
+                <div class="flip-front rounded-3xl p-5 bg-sky-50 border-2 border-sky-500/40">
+                  <img src={icons.mstodo} alt="Microsoft To-Do" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
                 </div>
                 <!-- Back: Google Tasks -->
-                <div class="flip-back rounded-2xl p-4 bg-blue-50 border-2 border-blue-500/40">
-                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                    <Fragment set:html={icons.gtasks} />
-                  </div>
+                <div class="flip-back rounded-3xl p-5 bg-blue-50 border-2 border-blue-500/40">
+                  <img src={icons.gtasks} alt="Google Tasks" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
                 </div>
               </div>
             </div>
-            <span class="text-xs font-bold text-slate-600">To-Do / Google Tasks</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-700">To-Do / Google Tasks</span>
           </div>
 
           <!-- Standalone 2: Notion -->
-          <div class="flex flex-col items-center space-y-2">
-            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-4 bg-slate-100 border-2 border-slate-300 flex items-center justify-center transition-transform hover:scale-105">
-              <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                <Fragment set:html={icons.notion} />
-              </div>
+          <div class="flex flex-col items-center space-y-2.5">
+            <div class="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl p-5 bg-slate-100 border-2 border-slate-300 flex items-center justify-center transition-transform hover:scale-105">
+              <img src={icons.notion} alt="Notion" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
             </div>
-            <span class="text-xs font-bold text-slate-600">Notion</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-700">Notion</span>
           </div>
 
           <!-- Standalone 3: Todoist -->
-          <div class="flex flex-col items-center space-y-2">
-            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-4 bg-rose-50 border-2 border-rose-500/40 flex items-center justify-center transition-transform hover:scale-105">
-              <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                <Fragment set:html={icons.todoist} />
-              </div>
+          <div class="flex flex-col items-center space-y-2.5">
+            <div class="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl p-5 bg-rose-50 border-2 border-rose-500/40 flex items-center justify-center transition-transform hover:scale-105">
+              <img src={icons.todoist} alt="Todoist" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
             </div>
-            <span class="text-xs font-bold text-slate-600">Todoist</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-700">Todoist</span>
           </div>
         </div>
 
         <!-- CATEGORY 5 PANEL: SCHEDULE -->
-        <div data-panel="schedule" class="tool-panel w-full flex flex-wrap items-center justify-center gap-6 sm:gap-8 hidden">
+        <div data-panel="schedule" class="tool-panel w-full flex flex-wrap items-center justify-center gap-8 sm:gap-12 hidden">
           <!-- Pair 1: Outlook Calendar / Google Calendar -->
-          <div class="flip-card-wrapper flex flex-col items-center space-y-2">
-            <div class="flip-card w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
+          <div class="flip-card-wrapper flex flex-col items-center space-y-2.5">
+            <div class="flip-card w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
               <div class="flip-card-inner">
                 <!-- Front: Outlook Calendar -->
-                <div class="flip-front rounded-2xl p-4 bg-sky-50 border-2 border-sky-500/40">
-                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                    <Fragment set:html={icons.mscalendar} />
-                  </div>
+                <div class="flip-front rounded-3xl p-5 bg-sky-50 border-2 border-sky-500/40">
+                  <img src={icons.mscalendar} alt="Outlook Calendar" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
                 </div>
                 <!-- Back: Google Calendar -->
-                <div class="flip-back rounded-2xl p-4 bg-blue-50 border-2 border-blue-500/40">
-                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                    <Fragment set:html={icons.gcalendar} />
-                  </div>
+                <div class="flip-back rounded-3xl p-5 bg-blue-50 border-2 border-blue-500/40">
+                  <img src={icons.gcalendar} alt="Google Calendar" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
                 </div>
               </div>
             </div>
-            <span class="text-xs font-bold text-slate-600">Outlook / Google Calendar</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-700">Outlook / Google Calendar</span>
           </div>
         </div>
 
         <!-- CATEGORY 6 PANEL: REGISTRATION -->
-        <div data-panel="registration" class="tool-panel w-full flex flex-wrap items-center justify-center gap-6 sm:gap-8 hidden">
+        <div data-panel="registration" class="tool-panel w-full flex flex-wrap items-center justify-center gap-8 sm:gap-12 hidden">
           <!-- Pair 1: Google Forms / Microsoft Forms -->
-          <div class="flip-card-wrapper flex flex-col items-center space-y-2">
-            <div class="flip-card w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
+          <div class="flip-card-wrapper flex flex-col items-center space-y-2.5">
+            <div class="flip-card w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-3xl bg-white border-2 border-slate-200 shadow-none cursor-pointer">
               <div class="flip-card-inner">
                 <!-- Front: Google Forms -->
-                <div class="flip-front rounded-2xl p-4 bg-purple-50 border-2 border-purple-500/40">
-                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                    <Fragment set:html={icons.gforms} />
-                  </div>
+                <div class="flip-front rounded-3xl p-5 bg-purple-50 border-2 border-purple-500/40">
+                  <img src={icons.gforms} alt="Google Forms" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
                 </div>
                 <!-- Back: Microsoft Forms -->
-                <div class="flip-back rounded-2xl p-4 bg-teal-50 border-2 border-teal-500/40">
-                  <div class="w-full h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                    <Fragment set:html={icons.msforms} />
-                  </div>
+                <div class="flip-back rounded-3xl p-5 bg-teal-50 border-2 border-teal-500/40">
+                  <img src={icons.msforms} alt="Microsoft Forms" class="w-full h-full object-contain pointer-events-none select-none" loading="eager" decoding="sync" />
                 </div>
               </div>
             </div>
-            <span class="text-xs font-bold text-slate-600">Google / Microsoft Forms</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-700">Google / Microsoft Forms</span>
           </div>
         </div>
 
@@ -509,7 +471,7 @@ const icons = {
     const categoryBtns = root.querySelectorAll('.scenario-category-btn');
     const toolPanels = root.querySelectorAll('.tool-panel');
 
-    // Step 1 -> Step 2
+    // Step 1 -> Step 2 (Starts with NO category selected and NO icons showing)
     if (greenBtn) {
       greenBtn.addEventListener('click', () => {
         root.setAttribute('data-scenario-step', '2');
@@ -517,8 +479,10 @@ const icons = {
         if (step2) step2.classList.remove('hidden');
         if (step3) step3.classList.add('hidden');
 
-        // Default to first category
-        setActiveCategory('communication');
+        // Reset category selection: show no icons initially
+        root.setAttribute('data-active-category', '');
+        categoryBtns.forEach(btn => btn.classList.remove('active-category'));
+        toolPanels.forEach(panel => panel.classList.add('hidden'));
       });
     }
 
@@ -558,8 +522,5 @@ const icons = {
         if (cat) setActiveCategory(cat);
       });
     });
-
-    // Default setup
-    setActiveCategory('communication');
   })();
 </script>
