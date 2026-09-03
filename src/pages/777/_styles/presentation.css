@@ -1331,73 +1331,19 @@
 
 /* === 16. Slide 6: What is Digital Productivity? (n8n Workflow Automation) === */
 .canvas-grid-dots {
-  background-image: radial-gradient(circle, #94a3b8 1.2px, transparent 1.2px);
-  background-size: 22px 22px;
+  background-image: radial-gradient(circle, #cbd5e1 1.2px, transparent 1.2px);
+  background-size: 16px 16px;
 }
 
 /* Active Flowing Data Wires */
-.wire-flow-anim {
-  animation: wireDashFlow 1.2s linear infinite;
+.flow-wire-active {
+  animation: flowWireDash 1.2s linear infinite;
   will-change: stroke-dashoffset;
 }
 
-@keyframes wireDashFlow {
+@keyframes flowWireDash {
   to {
-    stroke-dashoffset: -18;
-  }
-}
-
-.wire-flow-anim-subtle {
-  animation: wireDashFlowSubtle 1.8s linear infinite;
-  will-change: stroke-dashoffset;
-}
-
-@keyframes wireDashFlowSubtle {
-  to {
-    stroke-dashoffset: -14;
-  }
-}
-
-/* Node Organic Floating Animations */
-.node-float-1 {
-  animation: nodeFloatA 4.2s ease-in-out infinite;
-  transform-origin: center center;
-}
-
-.node-float-2 {
-  animation: nodeFloatB 4.6s ease-in-out 0.4s infinite;
-  transform-origin: center center;
-}
-
-.node-float-3 {
-  animation: nodeFloatC 4s ease-in-out 0.8s infinite;
-  transform-origin: center center;
-}
-
-@keyframes nodeFloatA {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-@keyframes nodeFloatB {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-@keyframes nodeFloatC {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
+    stroke-dashoffset: -12;
   }
 }
 
