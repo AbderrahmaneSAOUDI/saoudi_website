@@ -66,6 +66,7 @@ import './_styles/presentation.css';
     <main 
       id="presentationDeck" 
       data-current-slide="3" 
+      data-is-last-slide="true"
       class="presentation-frame frame-border-pulse bg-white rounded-3xl sm:rounded-[32px] border-2 border-emerald-800/25 relative flex flex-col justify-between p-6 sm:p-10 md:p-12 lg:p-14 xl:p-16 overflow-hidden z-10 hover:border-emerald-800/50 transition-colors duration-500"
     >
       <!-- Architectural Corner L-Brackets -->
@@ -146,7 +147,14 @@ import './_styles/presentation.css';
         function setSlide(num) {
           if (num < 1 || num > totalSlides) return;
           currentSlide = num;
-          if (deck) deck.setAttribute('data-current-slide', String(currentSlide));
+          if (deck) {
+            deck.setAttribute('data-current-slide', String(currentSlide));
+            if (currentSlide === totalSlides) {
+              deck.setAttribute('data-is-last-slide', 'true');
+            } else {
+              deck.removeAttribute('data-is-last-slide');
+            }
+          }
 
           // Video state management between slides
           if (video) {
@@ -168,8 +176,6 @@ import './_styles/presentation.css';
           nextBtn.addEventListener('click', () => {
             if (currentSlide < totalSlides) {
               setSlide(currentSlide + 1);
-            } else {
-              setSlide(1); // Smooth loop back to first slide
             }
           });
         }
@@ -177,11 +183,9 @@ import './_styles/presentation.css';
         // Keyboard Navigation (Arrow Keys & Space)
         window.addEventListener('keydown', (e) => {
           if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
-            e.preventDefault();
             if (currentSlide < totalSlides) {
+              e.preventDefault();
               setSlide(currentSlide + 1);
-            } else {
-              setSlide(1);
             }
           } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
             if (currentSlide > 1) {
