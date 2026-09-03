@@ -1,0 +1,156 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<!-- ================= SLIDE 4 PANE (7.77 DIGITAL SKILLS INITIATIVE) ================= -->
+<section 
+  id="slide-4-content" 
+  class={`slide-pane slide-pane-4 w-full grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 xl:gap-10 items-center my-auto py-2 ${className}`}
+>
+  <!-- Left Column: Title, Institutional Leadership & 6 Key Focus Areas -->
+  <div class="col-span-1 md:col-span-7 flex flex-col justify-between space-y-3 sm:space-y-4">
+    <!-- Top Pill Tag -->
+    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-600/25 text-xs sm:text-sm font-bold text-[#006233] max-w-max">
+      <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+      <span>National Digital Empowerment Initiative</span>
+    </div>
+
+    <!-- Main Headline with Dynamic Gradient Shimmer -->
+    <div>
+      <h2 class="title-highlight font-black text-3xl sm:text-4xl md:text-5xl lg:text-[3.2rem] tracking-tight leading-[1.08]">
+        7.77 Digital Skills
+      </h2>
+      <h3 class="text-slate-900 font-light text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-tight mt-1">
+        for Every Generation
+      </h3>
+    </div>
+
+    <!-- Institutional Partnership Summary -->
+    <p class="text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl">
+      A national digital empowerment initiative led by Algeria’s <strong class="text-slate-900 font-bold">Ministry of Post and Telecommunications</strong>, in partnership with <strong class="text-[#0080C8] font-bold">Algérie Télécom</strong> and <strong class="text-[#006233] font-bold">Mobilis</strong>.
+    </p>
+
+    <!-- 6 Practical Skill Focus Areas Grid -->
+    <div class="pt-3 border-t border-emerald-800/15">
+      <p class="text-xs sm:text-sm text-slate-800 font-bold mb-2.5 flex items-center gap-1.5">
+        <span class="text-[#1E824C]">✦</span>
+        <span>Practical, inclusive & accessible training across core disciplines:</span>
+      </p>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
+        <!-- AI -->
+        <div class="skill-pill flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50/70 border border-emerald-600/25 text-slate-800 text-xs font-bold transition-transform duration-200">
+          <span class="w-6 h-6 rounded-lg bg-[#1E824C] text-white flex items-center justify-center shrink-0 text-[11px] icon-box-pulse">
+            🤖
+          </span>
+          <span class="truncate">Artificial Intelligence</span>
+        </div>
+
+        <!-- Cybersecurity -->
+        <div class="skill-pill flex items-center gap-2 px-3 py-2 rounded-xl bg-rose-50/70 border border-rose-600/25 text-slate-800 text-xs font-bold transition-transform duration-200">
+          <span class="w-6 h-6 rounded-lg bg-[#EA4335] text-white flex items-center justify-center shrink-0 text-[11px] icon-box-pulse">
+            🛡️
+          </span>
+          <span class="truncate">Cybersecurity</span>
+        </div>
+
+        <!-- Coding -->
+        <div class="skill-pill flex items-center gap-2 px-3 py-2 rounded-xl bg-sky-50/70 border border-sky-600/25 text-slate-800 text-xs font-bold transition-transform duration-200">
+          <span class="w-6 h-6 rounded-lg bg-[#0080C8] text-white flex items-center justify-center shrink-0 text-[11px] icon-box-pulse">
+            💻
+          </span>
+          <span class="truncate">Coding & Software</span>
+        </div>
+
+        <!-- Data -->
+        <div class="skill-pill flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-50/70 border border-amber-600/25 text-slate-800 text-xs font-bold transition-transform duration-200">
+          <span class="w-6 h-6 rounded-lg bg-[#D97706] text-white flex items-center justify-center shrink-0 text-[11px] icon-box-pulse">
+            📊
+          </span>
+          <span class="truncate">Data Intelligence</span>
+        </div>
+
+        <!-- Cloud -->
+        <div class="skill-pill flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-50/70 border border-indigo-600/25 text-slate-800 text-xs font-bold transition-transform duration-200">
+          <span class="w-6 h-6 rounded-lg bg-[#4285F4] text-white flex items-center justify-center shrink-0 text-[11px] icon-box-pulse">
+            ☁️
+          </span>
+          <span class="truncate">Cloud Technologies</span>
+        </div>
+
+        <!-- Entrepreneurship -->
+        <div class="skill-pill flex items-center gap-2 px-3 py-2 rounded-xl bg-teal-50/70 border border-teal-600/25 text-slate-800 text-xs font-bold transition-transform duration-200">
+          <span class="w-6 h-6 rounded-lg bg-[#0F9D58] text-white flex items-center justify-center shrink-0 text-[11px] icon-box-pulse">
+            🚀
+          </span>
+          <span class="truncate">Entrepreneurship</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: 2 Commanding Animated Metric Cards -->
+  <div class="col-span-1 md:col-span-5 flex flex-col gap-4 sm:gap-5 justify-center">
+    <!-- Metric Card 1: 7 → 77 Age Range -->
+    <div class="initiative-metric-card metric-card-1 p-5 sm:p-6 rounded-3xl bg-emerald-50/60 border-2 border-emerald-600/30 flex flex-col justify-between space-y-3 relative overflow-hidden">
+      <!-- Top Orbit Accent -->
+      <div class="avatar-orbit-ring absolute -top-8 -right-8 w-32 h-32 rounded-full border-2 border-dashed border-emerald-600/20 pointer-events-none"></div>
+
+      <div class="flex items-center justify-between gap-3 relative z-10">
+        <span class="font-mono text-4xl sm:text-5xl lg:text-6xl font-black text-[#1E824C] tracking-tight">
+          7 → 77
+        </span>
+        <span class="px-3 py-1 rounded-full bg-white border border-emerald-600/25 text-xs font-bold text-[#006233] shadow-none shrink-0">
+          Years Covered
+        </span>
+      </div>
+
+      <div class="relative z-10">
+        <h4 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+          Age Range Covered
+        </h4>
+        <p class="text-slate-600 text-xs sm:text-sm font-medium leading-relaxed mt-1">
+          Tailored learning pathways empowering everyone from young primary school students to lifelong senior learners.
+        </p>
+      </div>
+
+      <div class="pt-2 border-t border-emerald-600/15 flex items-center justify-between text-xs text-[#006233] font-bold relative z-10">
+        <span>Universal Lifecycle Learning</span>
+        <span class="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
+      </div>
+    </div>
+
+    <!-- Metric Card 2: 07 Skill Centers -->
+    <div class="initiative-metric-card metric-card-2 p-5 sm:p-6 rounded-3xl bg-sky-50/60 border-2 border-sky-600/30 flex flex-col justify-between space-y-3 relative overflow-hidden">
+      <!-- Top Orbit Accent -->
+      <div class="avatar-orbit-ring absolute -top-8 -right-8 w-32 h-32 rounded-full border-2 border-dashed border-sky-600/20 pointer-events-none"></div>
+
+      <div class="flex items-center justify-between gap-3 relative z-10">
+        <span class="font-mono text-4xl sm:text-5xl lg:text-6xl font-black text-[#0080C8] tracking-tight">
+          07
+        </span>
+        <span class="px-3 py-1 rounded-full bg-white border border-sky-600/25 text-xs font-bold text-[#0080C8] shadow-none shrink-0">
+          Across Algeria
+        </span>
+      </div>
+
+      <div class="relative z-10">
+        <h4 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+          Regional Skill Centers
+        </h4>
+        <p class="text-slate-600 text-xs sm:text-sm font-medium leading-relaxed mt-1">
+          Core specialized technology and training hubs deployed across wilayas to deliver local hands-on workshops.
+        </p>
+      </div>
+
+      <div class="pt-2 border-t border-sky-600/15 flex items-center justify-between text-xs text-[#0080C8] font-bold relative z-10">
+        <span>Nationwide Tech Deployment</span>
+        <span class="w-2 h-2 rounded-full bg-[#0080C8] animate-ping"></span>
+      </div>
+    </div>
+  </div>
+</section>
