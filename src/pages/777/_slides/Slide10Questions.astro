@@ -58,7 +58,7 @@ const questionPrompts = [
       <span>Open Floor • Q&A Session</span>
     </div>
 
-    <h2 class="font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-none">
+    <h2 class="font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-none">
       Questions Time
     </h2>
     <p class="text-sm sm:text-base md:text-lg text-slate-600 font-medium max-w-xl">
@@ -70,7 +70,7 @@ const questionPrompts = [
   <div class="qa-grid-wrapper w-full max-w-4xl mx-auto my-auto grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 p-2 shrink-0">
     {questionPrompts.map((q, idx) => (
       <div 
-        class={`qa-card flex items-start gap-3.5 p-4 sm:p-5 rounded-3xl bg-white/95 border-2 ${q.border} hover:border-[#006233] transition-all duration-300 hover:-translate-y-1 hover:bg-emerald-50/30 text-left cursor-pointer group shadow-none`}
+        class={`qa-card flex items-start gap-3.5 p-4 sm:p-5 rounded-3xl bg-white/95 border-2 ${q.border} hover:border-[#006233] transition-all duration-300 hover:-translate-y-1 hover:bg-emerald-50/30 text-left cursor-pointer group`}
         style={`animation-delay: ${0.1 + idx * 0.08}s;`}
       >
         <!-- Icon Orb with Ripple Effect -->

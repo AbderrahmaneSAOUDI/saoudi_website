@@ -1414,11 +1414,13 @@
 @keyframes activeMilestoneGlow {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 2px rgba(30, 130, 76, 0.4);
+    outline: 2px solid rgba(30, 130, 76, 0.4);
+    outline-offset: 0px;
   }
   50% {
     transform: scale(1.05);
-    box-shadow: 0 0 0 4px rgba(30, 130, 76, 0.7);
+    outline: 3px solid rgba(30, 130, 76, 0.7);
+    outline-offset: 1px;
   }
 }
 
@@ -1592,6 +1594,101 @@
   }
 }
 
+/* === MOBILE RESPONSIVE BREAKPOINTS === */
+
+/* Tablet and below: full-bleed frame, hide ambient decorations */
+@media (max-width: 768px) {
+  .presentation-frame {
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 16px !important;
+    border-width: 1px !important;
+  }
+
+  /* Shrink aurora blobs to prevent horizontal scroll */
+  .aurora-blob {
+    display: none;
+  }
+
+  /* Hide floating geometric nodes and sparkle stars */
+  .floating-node,
+  .sparkle-star {
+    display: none;
+  }
+
+  /* Hide corner brackets */
+  .corner-bracket {
+    display: none;
+  }
+
+  /* Kill levitation animation on mobile — causes jank */
+  .presentation-frame {
+    animation: frameEntrance 0.85s var(--ease-spring) forwards !important;
+  }
+
+  /* Shrink footer logos further */
+  .footer-logos-container {
+    gap: 8px !important;
+  }
+
+  [data-current-slide="2"] .footer-logos-container,
+  [data-current-slide="3"] .footer-logos-container,
+  [data-current-slide="4"] .footer-logos-container,
+  [data-current-slide="5"] .footer-logos-container,
+  [data-current-slide="6"] .footer-logos-container,
+  [data-current-slide="7"] .footer-logos-container,
+  [data-current-slide="8"] .footer-logos-container,
+  [data-current-slide="9"] .footer-logos-container,
+  [data-current-slide="10"] .footer-logos-container,
+  [data-current-slide="11"] .footer-logos-container {
+    transform: scale(0.55);
+  }
+
+  /* Hide orbit and sonar rings around next button */
+  .orbit-ring,
+  .sonar-wave,
+  .sonar-wave-2,
+  .sonar-wave-3 {
+    display: none;
+  }
+
+  /* Tighter padding on main frame */
+  .content-layer {
+    padding: 0 !important;
+  }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  .presentation-frame {
+    border-radius: 0 !important;
+    border: none !important;
+    padding: 12px !important;
+  }
+
+  /* Footer: hide right-side title text on tiny screens */
+  .footer-slide2-title {
+    display: none !important;
+  }
+
+  /* Scale footer logos even more */
+  [data-current-slide] .footer-logos-container {
+    transform: scale(0.45) !important;
+    transform-origin: left center;
+  }
+
+  /* Speaker pill: truncate name if needed */
+  .speaker-pill {
+    max-width: calc(100vw - 40px) !important;
+  }
+  .pill-text-1,
+  .pill-text-2 {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 /* Respect Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   .bg-particles::before,
@@ -1620,7 +1717,16 @@
   .logo-wrapper-3,
   .floating-tag,
   .video-wrapper,
-  .video-fade-loop {
+  .video-fade-loop,
+  .toolbox-header-anim,
+  .toolbox-quote-card,
+  .toolbox-marquee-wrapper,
+  .qa-header-anim,
+  .qa-card,
+  .qa-footer-anim,
+  .thankyou-header-anim,
+  .thankyou-card-anim,
+  .thankyou-footer-anim {
     animation: none !important;
     transition: none !important;
     transform: none !important;

@@ -190,7 +190,13 @@ import './_styles/presentation.css';
               video.pause();
             }
           }
+
+          // Expose global setter for slides
+          window.setDeckSlide = setSlide;
         }
+
+        // Expose immediately
+        window.setDeckSlide = setSlide;
 
         // Apply URL parameter or hash if present on initial load
         if (currentSlide !== 1) {
@@ -209,8 +215,13 @@ import './_styles/presentation.css';
           });
         }
 
-        // Keyboard Navigation (Arrow Keys & Space)
+        // Keyboard Navigation (Arrow Keys & Space) - Guard against input elements
         window.addEventListener('keydown', (e) => {
+          const target = e.target;
+          if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+            return;
+          }
+
           if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
             if (currentSlide < totalSlides) {
               e.preventDefault();
@@ -223,6 +234,33 @@ import './_styles/presentation.css';
             }
           }
         });
+
+        // Touch Swipe Navigation for Mobile Devices
+        let touchStartX = 0;
+        let touchStartY = 0;
+        window.addEventListener('touchstart', (e) => {
+          if (e.touches && e.touches.length === 1) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+          }
+        }, { passive: true });
+
+        window.addEventListener('touchend', (e) => {
+          if (e.changedTouches && e.changedTouches.length === 1) {
+            const deltaX = e.changedTouches[0].clientX - touchStartX;
+            const deltaY = e.changedTouches[0].clientY - touchStartY;
+            // Require dominant horizontal swipe >= 50px
+            if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+              if (deltaX < 0) {
+                // Swipe Left -> Next
+                if (currentSlide < totalSlides) setSlide(currentSlide + 1);
+              } else {
+                // Swipe Right -> Prev
+                if (currentSlide > 1) setSlide(currentSlide - 1);
+              }
+            }
+          }
+        }, { passive: true });
       })();
     </script>
   </body>

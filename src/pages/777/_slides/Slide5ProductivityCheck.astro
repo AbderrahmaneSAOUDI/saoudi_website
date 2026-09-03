@@ -14,7 +14,7 @@ const { class: className = '' } = Astro.props;
 >
   <!-- 1. Top Section: Clean Headline (No pill above) -->
   <div class="flex flex-col items-center text-center space-y-1 sm:space-y-2 mt-2 sm:mt-4">
-    <h2 class="title-highlight font-black text-4xl sm:text-5xl md:text-6xl lg:text-[3.9rem] xl:text-[4.4rem] tracking-tight leading-[1.05]">
+    <h2 class="title-highlight font-black text-2xl sm:text-4xl md:text-5xl lg:text-[3.9rem] xl:text-[4.4rem] tracking-tight leading-[1.05]">
       Are you actually productive?
     </h2>
   </div>
@@ -25,14 +25,14 @@ const { class: className = '' } = Astro.props;
     <button
       id="pollBtnYes"
       type="button"
-      class="choice-btn choice-btn-yes group relative px-8 sm:px-12 md:px-14 py-3.5 sm:py-5 rounded-2xl sm:rounded-3xl bg-white border-2 border-emerald-600/40 hover:border-emerald-600 flex items-center gap-3.5 sm:gap-4.5 cursor-pointer select-none"
+      class="choice-btn choice-btn-yes group relative px-5 sm:px-10 md:px-14 py-2.5 sm:py-4 md:py-5 rounded-2xl sm:rounded-3xl bg-white border-2 border-emerald-600/40 hover:border-emerald-600 flex items-center gap-2.5 sm:gap-4 cursor-pointer select-none"
     >
       <span class="choice-icon-box w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#1E824C] text-white flex items-center justify-center text-xl sm:text-2xl font-black shrink-0 transition-transform duration-300 group-hover:scale-110">
         <svg class="w-6 h-6 sm:w-7 sm:h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5">
           <polyline points="20 6 9 17 4 12" />
         </svg>
       </span>
-      <span class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 group-hover:text-[#1E824C] transition-colors tracking-tight">
+      <span class="text-xl sm:text-2xl md:text-4xl font-black text-slate-900 group-hover:text-[#1E824C] transition-colors tracking-tight">
         Yes
       </span>
     </button>
@@ -41,7 +41,7 @@ const { class: className = '' } = Astro.props;
     <button
       id="pollBtnNo"
       type="button"
-      class="choice-btn choice-btn-no group relative px-8 sm:px-12 md:px-14 py-3.5 sm:py-5 rounded-2xl sm:rounded-3xl bg-white border-2 border-rose-600/40 hover:border-rose-600 flex items-center gap-3.5 sm:gap-4.5 cursor-pointer select-none"
+      class="choice-btn choice-btn-no group relative px-5 sm:px-10 md:px-14 py-2.5 sm:py-4 md:py-5 rounded-2xl sm:rounded-3xl bg-white border-2 border-rose-600/40 hover:border-rose-600 flex items-center gap-2.5 sm:gap-4 cursor-pointer select-none"
     >
       <span class="choice-icon-box w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#EA4335] text-white flex items-center justify-center text-xl sm:text-2xl font-black shrink-0 transition-transform duration-300 group-hover:scale-110">
         <svg class="w-6 h-6 sm:w-7 sm:h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5">
@@ -49,7 +49,7 @@ const { class: className = '' } = Astro.props;
           <line x1="6" y1="6" x2="18" y2="18" />
         </svg>
       </span>
-      <span class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 group-hover:text-[#EA4335] transition-colors tracking-tight">
+      <span class="text-xl sm:text-2xl md:text-4xl font-black text-slate-900 group-hover:text-[#EA4335] transition-colors tracking-tight">
         No
       </span>
     </button>

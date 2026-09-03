@@ -21,24 +21,24 @@ const { class: className = '' } = Astro.props;
   </div>
 
   <!-- Central Celebratory Thank You Card -->
-  <div class="thankyou-card-anim w-full max-w-3xl mx-auto my-auto p-6 sm:p-8 rounded-3xl bg-white/95 border-2 border-emerald-800/20 relative flex flex-col items-center justify-center text-center space-y-4 shadow-none">
+  <div class="thankyou-card-anim w-full max-w-3xl mx-auto my-auto p-6 sm:p-8 rounded-3xl bg-white/95 border-2 border-emerald-800/20 relative flex flex-col items-center justify-center text-center space-y-4">
     
     <!-- Sparkle Stars Floating around -->
     <div class="absolute -top-3 -left-3 text-2xl text-emerald-500 animate-bounce pointer-events-none">✦</div>
     <div class="absolute -bottom-3 -right-3 text-2xl text-teal-500 animate-pulse pointer-events-none">✧</div>
 
     <!-- Big Heart / Clapping Icon Orb -->
-    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center text-3xl sm:text-4xl shadow-none">
+    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center text-3xl sm:text-4xl">
       <span>🎉</span>
     </div>
 
     <!-- Main Thank You Heading -->
-    <h2 class="font-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-slate-900 tracking-tight leading-none">
+    <h2 class="font-black text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-slate-900 tracking-tight leading-none">
       Thank You!
     </h2>
 
     <!-- Empowering Final Quote -->
-    <p class="font-medium text-base sm:text-xl md:text-2xl text-slate-700 max-w-xl leading-relaxed">
+    <p class="font-medium text-sm sm:text-xl md:text-2xl text-slate-700 max-w-xl leading-relaxed">
       Productivity is a daily craft. <br class="hidden sm:inline" />
       <span class="font-bold text-[#006233]">Start small, automate routine work,</span> and reclaim your time.
     </p>
@@ -100,8 +100,12 @@ const { class: className = '' } = Astro.props;
     const restartBtn = document.getElementById('restartDeckBtn');
     if (restartBtn) {
       restartBtn.addEventListener('click', () => {
-        window.location.hash = '#slide-1';
-        window.location.reload();
+        if (typeof window.setDeckSlide === 'function') {
+          window.setDeckSlide(1);
+        } else {
+          window.location.hash = '#slide-1';
+          window.location.reload();
+        }
       });
     }
   })();

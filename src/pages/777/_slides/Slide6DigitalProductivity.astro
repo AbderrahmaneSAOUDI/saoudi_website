@@ -36,7 +36,7 @@ const logos = logoFiles.map(file => {
 >
   <!-- 1. HERO TITLE: Strictly in One Single Line -->
   <div class="w-full flex flex-col items-center justify-center shrink-0 mt-1 sm:mt-2 space-y-2 sm:space-y-3">
-    <h2 class="font-black text-3xl sm:text-4xl md:text-5xl lg:text-[3.8rem] xl:text-[4.2rem] text-slate-900 tracking-tight leading-none whitespace-nowrap">
+    <h2 class="font-black text-2xl sm:text-4xl md:text-5xl lg:text-[3.8rem] xl:text-[4.2rem] text-slate-900 tracking-tight leading-none sm:whitespace-nowrap">
       What is <span class="text-[#006233]">Digital Productivity</span>?
     </h2>
 
@@ -60,10 +60,10 @@ const logos = logoFiles.map(file => {
       <div class="canvas-grid-dots absolute inset-0 pointer-events-none opacity-30"></div>
 
       <!-- Content Container with 3 Major Stages -->
-      <div class="relative z-10 w-full flex items-center justify-between gap-2 sm:gap-4 md:gap-6">
+      <div class="relative z-10 w-full flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 md:gap-6">
         
         <!-- STAGE 1: TRIGGER NODE (WhatsApp) -->
-        <div class="workflow-node trigger-node w-44 sm:w-52 p-3.5 sm:p-4 rounded-2xl bg-white border-2 border-emerald-600/50 flex flex-col items-center text-center space-y-2 shrink-0 relative transition-transform duration-300 hover:scale-[1.02]">
+        <div class="workflow-node trigger-node w-full md:w-44 lg:w-52 p-3 sm:p-3.5 md:p-4 rounded-2xl bg-white border-2 border-emerald-600/50 flex flex-row md:flex-col items-center md:text-center gap-3 md:gap-0 md:space-y-2 shrink-0 relative transition-transform duration-300 hover:scale-[1.02]">
           <!-- Trigger Flash Tag -->
           <div class="px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-[10px] font-black text-rose-600 tracking-wider flex items-center gap-1">
             <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
@@ -90,7 +90,7 @@ const logos = logoFiles.map(file => {
         </div>
 
         <!-- CONNECTOR PIPE 1: Trigger -> AI Agent -->
-        <div class="flex-1 h-12 flex items-center justify-center relative min-w-[50px]">
+        <div class="hidden md:flex flex-1 h-12 items-center justify-center relative min-w-[50px]">
           <svg class="w-full h-8" preserveAspectRatio="none" viewBox="0 0 100 24" fill="none">
             <!-- Base Line -->
             <line x1="0" y1="12" x2="100" y2="12" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round" />
@@ -104,7 +104,7 @@ const logos = logoFiles.map(file => {
         </div>
 
         <!-- STAGE 2: CENTRAL AI AGENT (Featuring the 2s Logo Carousel) -->
-        <div class="workflow-node agent-node w-64 sm:w-72 p-4 sm:p-5 rounded-2xl bg-white border-2 border-[#006233] flex flex-col items-center text-center space-y-2.5 shrink-0 relative transition-transform duration-300 hover:scale-[1.02]">
+        <div class="workflow-node agent-node w-full md:w-64 lg:w-72 p-3 sm:p-4 md:p-5 rounded-2xl bg-white border-2 border-[#006233] flex flex-row md:flex-col items-center md:text-center gap-3 md:gap-0 md:space-y-2.5 shrink-0 relative transition-transform duration-300 hover:scale-[1.02]">
           
           <!-- Port Dot Left -->
           <div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-[#006233] flex items-center justify-center">
@@ -159,7 +159,7 @@ const logos = logoFiles.map(file => {
         </div>
 
         <!-- CONNECTOR PIPE 2: AI Agent -> Two Outputs (Forked Wire) -->
-        <div class="flex-1 h-36 flex items-center justify-center relative min-w-[50px]">
+        <div class="hidden md:flex flex-1 h-36 items-center justify-center relative min-w-[50px]">
           <svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 120" fill="none">
             <!-- Wire to WhatsApp Reply (Top) -->
             <path d="M 0,40 C 50,40 50,25 100,25" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round" />
@@ -178,7 +178,7 @@ const logos = logoFiles.map(file => {
         </div>
 
         <!-- STAGE 3: OUTPUT ACTIONS (Stacked Vertically, 100% Contained) -->
-        <div class="flex flex-col gap-3.5 sm:gap-4 shrink-0 w-52 sm:w-60">
+        <div class="flex flex-row md:flex-col gap-3 sm:gap-3.5 md:gap-4 shrink-0 w-full md:w-52 lg:w-60">
           
           <!-- OUTPUT A: WhatsApp Reply -->
           <div class="workflow-node output-node px-4 py-3 rounded-xl bg-white border-2 border-emerald-600/50 flex items-center gap-3 relative transition-transform duration-300 hover:scale-[1.02]">
