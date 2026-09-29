@@ -4,7 +4,7 @@
 `saoudi.online` is the personal portfolio and admin content-management system for Abderrahmane SAOUDI. It delivers a fast, Material 3 dark-mode, zero-JavaScript public website powered by Astro SSR, paired with a protected admin workspace for real-time Firestore/Storage content management and system telemetry.
 
 ## Tech Stack
-- **Framework:** Astro v6 (`output: 'server'` SSR mode) with `@astrojs/vercel` adapter.
+- **Framework:** Astro v7 (`output: 'server'` SSR mode) with `@astrojs/vercel` adapter.
 - **Language & Runtime:** TypeScript (strict mode `astro/tsconfigs/strict`), Node.js (≥22.12.0).
 - **Styling:** Tailwind CSS v4 (`@tailwindcss/vite`), Vanilla CSS (`src/styles/global.css`, `background_animation.css`), self-hosted Google Sans fonts (`/public/fonts/`).
 - **Database & Storage:** Firebase Admin SDK v14 (`firebase-admin` for Firestore & Firebase Storage).

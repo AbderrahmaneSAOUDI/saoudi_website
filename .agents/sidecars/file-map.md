@@ -10,7 +10,7 @@
 ├── astro.config.mjs       # Astro SSR + Vercel + React + Tailwind v4
 ├── tailwind.config.mjs    # Custom breakpoints only (colors in CSS)
 ├── tsconfig.json          # Extends astro/tsconfigs/strict
-├── package.json           # pnpm, Astro 6.x, React 19.x, firebase-admin 14.x
+├── package.json           # pnpm, Astro 7.x, React 19.x, firebase-admin 14.x
 ├── public/
 │   ├── favicon.{svg,ico,png}
 │   ├── logo.png

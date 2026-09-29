@@ -129,7 +129,7 @@ The public site is server-rendered and styled with CSS and Tailwind utilities. T
 
 | Layer | Technology |
 | :---- | :--------- |
-| Framework | Astro 6 |
+| Framework | Astro 7 |
 | Language | TypeScript |
 | Styling | Tailwind CSS 4 + global CSS |
 | Admin UI | Astro with scoped scripts inside `/admin` |
