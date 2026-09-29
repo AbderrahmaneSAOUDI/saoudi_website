@@ -1457,8 +1457,8 @@ try {
 
 				const oldSize = formatBytes(file.size);
 				const newSize = formatBytes(processedFile.size);
-				const diffPercent = Math.round(((processedFile.size - file.size) / file.size) * 100);
-				const diffStr = diffPercent > 0 ? `+${diffPercent}%` : `${diffPercent}%`;
+				const diffPercent = file.size > 0 ? ((processedFile.size - file.size) / file.size) * 100 : 0;
+				const diffStr = diffPercent > 0 ? `+${diffPercent.toFixed(2)}%` : `${diffPercent.toFixed(2)}%`;
 
 				showStatus('success', `Image converted: ${oldSize} → ${newSize} (${diffStr})`);
 

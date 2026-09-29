@@ -582,11 +582,12 @@ try {
 				logoPreview.classList.remove('hidden');
 				dropZonePrompt.classList.add('hidden');
 				const newKB = parseFloat((webpFile.size / 1024).toFixed(1));
-				const diffPct = oldKB > 0 ? Math.round(((newKB - oldKB) / oldKB) * 100) : 0;
-				fileDetails.textContent = `✓ ${file.name} (${newKB}KB WebP)`;
+				const diffPct = oldKB > 0 ? ((newKB - oldKB) / oldKB) * 100 : 0;
+				const diffStr = diffPct > 0 ? `+${diffPct.toFixed(2)}%` : `${diffPct.toFixed(2)}%`;
+				fileDetails.textContent = `✓ ${file.name} (${newKB}KB WebP, ${diffStr})`;
 				fileDetails.classList.remove('hidden');
 				if (typeof (window as any).showToast === 'function') {
-					(window as any).showToast(`Compressed: ${oldKB}KB → ${newKB}KB (${diffPct}%) WebP`, 'success');
+					(window as any).showToast(`Compressed: ${oldKB}KB → ${newKB}KB (${diffStr}) WebP`, 'success');
 				}
 			} catch (err) {
 				console.error('Failed to convert image to WebP:', err);

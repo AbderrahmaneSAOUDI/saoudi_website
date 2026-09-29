@@ -53,7 +53,7 @@ export function compressImageToWebpUnder50KB(file: File, maxDim = 1200): Promise
 
 				const approxBytes = Math.round((dataUrl.length * 3) / 4);
 				const newKB = Math.round(approxBytes / 1024);
-				const diffPercent = oldKB > 0 ? Math.round(((newKB - oldKB) / oldKB) * 100) : 0;
+				const diffPercent = oldKB > 0 ? Number((((newKB - oldKB) / oldKB) * 100).toFixed(2)) : 0;
 
 				resolve({ webpDataUrl: dataUrl, oldKB, newKB, diffPercent });
 			};

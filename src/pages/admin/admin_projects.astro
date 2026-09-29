@@ -824,7 +824,7 @@ try {
 						
 						const approxBytes = Math.round((dataUrl.length * 3) / 4);
 						const newKB = Math.round(approxBytes / 1024);
-						const diffPercent = Math.round(((newKB - oldKB) / oldKB) * 100);
+						const diffPercent = oldKB > 0 ? Number((((newKB - oldKB) / oldKB) * 100).toFixed(2)) : 0;
 
 						resolve({ webpDataUrl: dataUrl, oldKB, newKB, diffPercent });
 					};
@@ -1011,7 +1011,8 @@ try {
 									const res = await compressImageToWebpUnder50KB(file);
 									block.imageUrl = res.webpDataUrl;
 									updateBlocksUI();
-									showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${res.diffPercent}%) WebP`, 'success');
+									const diffStr = res.diffPercent > 0 ? `+${res.diffPercent.toFixed(2)}%` : `${res.diffPercent.toFixed(2)}%`;
+									showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${diffStr}) WebP`, 'success');
 								} catch (e: any) {
 									showToast('Failed to process image', 'error');
 								}
@@ -1039,7 +1040,8 @@ try {
 									const res = await compressImageToWebpUnder50KB(file);
 									block.imageUrl = res.webpDataUrl;
 									updateBlocksUI();
-									showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${res.diffPercent}%) WebP`, 'success');
+									const diffStr = res.diffPercent > 0 ? `+${res.diffPercent.toFixed(2)}%` : `${res.diffPercent.toFixed(2)}%`;
+									showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${diffStr}) WebP`, 'success');
 								} catch (e) {
 									showToast('Failed to process image', 'error');
 								}
@@ -1054,7 +1056,8 @@ try {
 									const res = await compressImageToWebpUnder50KB(file);
 									block.imageUrl = res.webpDataUrl;
 									updateBlocksUI();
-									showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${res.diffPercent}%) WebP`, 'success');
+									const diffStr = res.diffPercent > 0 ? `+${res.diffPercent.toFixed(2)}%` : `${res.diffPercent.toFixed(2)}%`;
+									showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${diffStr}) WebP`, 'success');
 								} catch (e) {
 									showToast('Failed to process image', 'error');
 								}
@@ -1112,7 +1115,8 @@ try {
 								if (!Array.isArray(block.images)) block.images = [];
 								block.images.push(res.webpDataUrl);
 								updateBlocksUI();
-								showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${res.diffPercent}%) WebP`, 'success');
+								const diffStr = res.diffPercent > 0 ? `+${res.diffPercent.toFixed(2)}%` : `${res.diffPercent.toFixed(2)}%`;
+								showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${diffStr}) WebP`, 'success');
 							} catch (e) {
 								showToast('Failed to process image', 'error');
 							}
@@ -1128,7 +1132,8 @@ try {
 								if (!Array.isArray(block.images)) block.images = [];
 								block.images.push(res.webpDataUrl);
 								updateBlocksUI();
-								showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${res.diffPercent}%) WebP`, 'success');
+								const diffStr = res.diffPercent > 0 ? `+${res.diffPercent.toFixed(2)}%` : `${res.diffPercent.toFixed(2)}%`;
+								showToast(`Compressed: ${res.oldKB}KB → ${res.newKB}KB (${diffStr}) WebP`, 'success');
 							} catch (e) {
 								showToast('Failed to process image', 'error');
 							}
@@ -1681,8 +1686,8 @@ try {
 
 				const oldSize = formatBytes(file.size);
 				const newSize = formatBytes(processedFile.size);
-				const diffPercent = Math.round(((processedFile.size - file.size) / file.size) * 100);
-				const diffStr = diffPercent > 0 ? `+${diffPercent}%` : `${diffPercent}%`;
+				const diffPercent = file.size > 0 ? ((processedFile.size - file.size) / file.size) * 100 : 0;
+				const diffStr = diffPercent > 0 ? `+${diffPercent.toFixed(2)}%` : `${diffPercent.toFixed(2)}%`;
 
 				setStatus(`Image converted: ${oldSize} → ${newSize} (${diffStr})`, 'success');
 				showToast(`Image converted: ${oldSize} → ${newSize} (${diffStr})`, 'success');
