@@ -250,7 +250,7 @@ if (marqueeVisibilityClass !== null && displayCompanies.length > 0) {
 
 						{/* Static row when items fit comfortably in view */}
 						{staticRowVisibilityClass && (
-							<div class={`flex-1 min-w-0 items-center justify-center gap-6 sm:gap-10 ${staticRowVisibilityClass}`}>
+							<div class={`flex-1 min-w-0 items-center justify-center gap-8 sm:gap-14 md:gap-16 ${staticRowVisibilityClass}`}>
 								{randomizedCompanies.map((company) => {
 									const href = company.websiteUrl.startsWith('http') ? company.websiteUrl : `https://${company.websiteUrl}`;
 									return (
@@ -260,7 +260,7 @@ if (marqueeVisibilityClass !== null && displayCompanies.length > 0) {
 											rel="noopener noreferrer"
 											title={company.name}
 											aria-label={company.name}
-											class="flex items-center justify-center shrink-0 h-11 sm:h-13 w-auto px-2 opacity-90 hover:opacity-100 hover:scale-105 transition-all duration-300 cursor-pointer"
+											class="flex items-center justify-center shrink-0 h-11 sm:h-13 w-auto px-3 sm:px-4 opacity-90 hover:opacity-100 hover:scale-105 transition-all duration-300 cursor-pointer"
 										>
 											<img
 												src={company.logoUrl}
@@ -281,7 +281,7 @@ if (marqueeVisibilityClass !== null && displayCompanies.length > 0) {
 								<div class="pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-16 bg-linear-to-r from-white to-transparent z-10"></div>
 								<div class="pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-16 bg-linear-to-l from-white to-transparent z-10"></div>
 								<div class="trust-marquee-track flex items-center">
-									<div class="flex items-center gap-6 sm:gap-10 shrink-0 pr-6 sm:pr-10">
+									<div class="flex items-center gap-8 sm:gap-14 md:gap-16 shrink-0 pr-8 sm:pr-14 md:pr-16">
 										{displayCompanies.map((company) => {
 											const href = company.websiteUrl.startsWith('http') ? company.websiteUrl : `https://${company.websiteUrl}`;
 											return (
@@ -291,7 +291,7 @@ if (marqueeVisibilityClass !== null && displayCompanies.length > 0) {
 													rel="noopener noreferrer"
 													title={company.name}
 													aria-label={company.name}
-													class="flex items-center justify-center shrink-0 h-11 sm:h-13 w-auto px-2 opacity-90 hover:opacity-100 hover:scale-105 transition-all duration-300 cursor-pointer"
+													class="flex items-center justify-center shrink-0 h-11 sm:h-13 w-auto px-3 sm:px-4 opacity-90 hover:opacity-100 hover:scale-105 transition-all duration-300 cursor-pointer"
 												>
 													<img
 														src={company.logoUrl}
@@ -304,7 +304,7 @@ if (marqueeVisibilityClass !== null && displayCompanies.length > 0) {
 											);
 										})}
 									</div>
-									<div class="flex items-center gap-6 sm:gap-10 shrink-0 pr-6 sm:pr-10" aria-hidden="true">
+									<div class="flex items-center gap-8 sm:gap-14 md:gap-16 shrink-0 pr-8 sm:pr-14 md:pr-16" aria-hidden="true">
 										{displayCompanies.map((company) => {
 											const href = company.websiteUrl.startsWith('http') ? company.websiteUrl : `https://${company.websiteUrl}`;
 											return (
@@ -315,7 +315,7 @@ if (marqueeVisibilityClass !== null && displayCompanies.length > 0) {
 													tabindex="-1"
 													title={company.name}
 													aria-label={company.name}
-													class="flex items-center justify-center shrink-0 h-11 sm:h-13 w-auto px-2 opacity-90 hover:opacity-100 hover:scale-105 transition-all duration-300 cursor-pointer"
+													class="flex items-center justify-center shrink-0 h-11 sm:h-13 w-auto px-3 sm:px-4 opacity-90 hover:opacity-100 hover:scale-105 transition-all duration-300 cursor-pointer"
 												>
 													<img
 														src={company.logoUrl}
