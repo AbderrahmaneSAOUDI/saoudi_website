@@ -250,7 +250,7 @@ if (marqueeVisibilityClass !== null && displayCompanies.length > 0) {
 
 						{/* Static row when items fit comfortably in view */}
 						{staticRowVisibilityClass && (
-							<div class={`items-center gap-6 sm:gap-10 pl-2 ${staticRowVisibilityClass}`}>
+							<div class={`flex-1 min-w-0 items-center justify-center gap-6 sm:gap-10 ${staticRowVisibilityClass}`}>
 								{randomizedCompanies.map((company) => {
 									const href = company.websiteUrl.startsWith('http') ? company.websiteUrl : `https://${company.websiteUrl}`;
 									return (
