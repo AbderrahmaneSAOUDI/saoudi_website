@@ -30,3 +30,8 @@ pnpm-debug.log*
 # local file uploads (dev only)
 public/uploads/
 .env*
+
+# agent cache & sidecar logs
+.agents/cache/
+*.log
+
