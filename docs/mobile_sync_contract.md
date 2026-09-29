@@ -130,4 +130,6 @@ The mobile application is **completely standalone** and interacts directly with 
 - **Overview Features In Scope**:
   1. `trusted_companies`: Added dedicated Firestore collection for trusted companies, clients, and partners. Managed directly under the emails card on the Admin Overview page.
   2. Each company record contains `id`, `name`, `logoUrl`, `websiteUrl`, `order`, `createdAt`, `updatedAt`.
-- **Mobile App Action Required**: Add model and UI widget for `trusted_companies` list CRUD under overview dashboard.
+  3. `order` field is deprecated in the web UI (order is dynamically randomized on public display on every page refresh).
+  4. Logo image upload is automatically compressed and converted to WebP format client-side.
+- **Mobile App Action Required**: Add model and UI widget for `trusted_companies` list CRUD under overview dashboard. Manual order input can be omitted or hidden as items are shuffled dynamically on the public showcase.

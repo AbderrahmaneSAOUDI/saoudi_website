@@ -6,7 +6,6 @@
     "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
     "yoavbls.pretty-ts-errors",
-    "WallabyJs.console-ninja",
     "mikestead.dotenv",
     "christian-kohler.path-intellisense",
     "naumovs.color-highlight"

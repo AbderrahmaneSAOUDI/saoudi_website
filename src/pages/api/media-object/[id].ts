@@ -9,6 +9,7 @@ const ALLOWED_CONTENT_TYPES = new Set([
 	'image/jpeg',
 	'image/png',
 	'image/webp',
+	'image/svg+xml',
 ]);
 
 type MediaObjectData = {

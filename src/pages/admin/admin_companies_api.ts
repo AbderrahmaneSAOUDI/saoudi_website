@@ -142,7 +142,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			}
 
 			if (!finalLogoUrl) {
-				finalLogoUrl = '/favicon.svg';
+				return jsonResponse({ error: 'Company logo is required. Please upload an image.' }, 400);
 			}
 
 			const now = new Date().toISOString();

@@ -28,7 +28,7 @@ export function getSafePublicHref(value: unknown): string {
 
 export function getSafeImageSrc(value: unknown): string {
 	const candidate = String(value ?? '').trim();
-	if (/^data:image\/(?:avif|gif|jpe?g|png|webp);base64,[a-z0-9+/=\s]+$/i.test(candidate)) {
+	if (/^data:image\/(?:avif|gif|jpe?g|png|webp|svg\+xml);base64,[a-z0-9+/=\s]+$/i.test(candidate)) {
 		return candidate;
 	}
 	return getSafePublicHref(candidate);
