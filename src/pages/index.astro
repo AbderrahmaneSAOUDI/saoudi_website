@@ -48,11 +48,31 @@ function shuffleArray<T>(items: T[]): T[] {
 }
 
 const randomizedCompanies = shuffleArray(trustedCompanies || []);
+const itemCount = randomizedCompanies.length;
 
-// Ensure at least 10 items in display loop so track is wider than any viewport even with 1 item
+// Responsive visibility: don't marquee if items fit in view
+// - <= 2 items: fits comfortably on all screens -> static row only (no marquee track)
+// - 3 to 4 items: fits on tablet/desktop (>= 640px) -> marquee on mobile (< 640px), static row on sm+
+// - 5 to 6 items: fits on desktop (>= 1024px) -> marquee on mobile/tablet (< 1024px), static row on lg+
+// - > 6 items: overflows all screens -> marquee track only
+const marqueeVisibilityClass =
+	itemCount <= 2 ? null :
+	itemCount <= 4 ? 'sm:hidden' :
+	itemCount <= 6 ? 'lg:hidden' :
+	'';
+
+const staticRowVisibilityClass =
+	itemCount <= 2 ? 'flex' :
+	itemCount <= 4 ? 'hidden sm:flex' :
+	itemCount <= 6 ? 'hidden lg:flex' :
+	null;
+
+// For marquee tracks, duplicate items until at least 8 so track width comfortably loops
 let displayCompanies = [...randomizedCompanies];
-while (displayCompanies.length > 0 && displayCompanies.length < 10) {
-	displayCompanies = displayCompanies.concat(randomizedCompanies);
+if (marqueeVisibilityClass !== null && displayCompanies.length > 0) {
+	while (displayCompanies.length < 8) {
+		displayCompanies = displayCompanies.concat(randomizedCompanies);
+	}
 }
 
 
@@ -214,7 +234,7 @@ while (displayCompanies.length > 0 && displayCompanies.length < 10) {
 		</section>
 
 		<!-- Who Trusts Me Section -->
-		{randomizedCompanies.length > 0 && (
+		{itemCount > 0 && (
 			<section class="mt-4 animate-fade-in" style="animation-delay: 0.15s;">
 				<div class="relative w-full">
 					<div
@@ -228,68 +248,89 @@ while (displayCompanies.length > 0 && displayCompanies.length < 10) {
 							</span>
 						</div>
 
-						<!-- Right: Infinite Logo Marquee -->
-						<div class="relative w-full min-w-0 flex-1 overflow-hidden trust-marquee-wrapper">
-							<!-- Left transparency gradient mask overlay -->
-							<div class="pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-16 bg-linear-to-r from-surface-container to-transparent z-10"></div>
+						{/* Static row when items fit comfortably in view */}
+						{staticRowVisibilityClass && (
+							<div class={`items-center gap-6 sm:gap-10 pl-2 ${staticRowVisibilityClass}`}>
+								{randomizedCompanies.map((company) => {
+									const href = company.websiteUrl.startsWith('http') ? company.websiteUrl : `https://${company.websiteUrl}`;
+									return (
+										<a
+											href={href}
+											target="_blank"
+											rel="noopener noreferrer"
+											title={company.name}
+											aria-label={company.name}
+											class="flex items-center justify-center shrink-0 h-8 sm:h-9 w-20 sm:w-28 px-2 py-1 opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-300 cursor-pointer"
+										>
+											<img
+												src={company.logoUrl}
+												alt={company.name}
+												class="max-h-full max-w-full object-contain transition-transform duration-300"
+												loading="lazy"
+												decoding="async"
+											/>
+										</a>
+									);
+								})}
+							</div>
+						)}
 
-							<!-- Right transparency gradient mask overlay -->
-							<div class="pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-16 bg-linear-to-l from-surface-container to-transparent z-10"></div>
-
-							<!-- Scrolling track -->
-							<div class="trust-marquee-track flex items-center">
-								<!-- Track Half 1 -->
-								<div class="flex items-center gap-6 sm:gap-10 shrink-0 pr-6 sm:pr-10">
-									{displayCompanies.map((company) => {
-										const href = company.websiteUrl.startsWith('http') ? company.websiteUrl : `https://${company.websiteUrl}`;
-										return (
-											<a
-												href={href}
-												target="_blank"
-												rel="noopener noreferrer"
-												title={company.name}
-												aria-label={company.name}
-												class="flex items-center justify-center shrink-0 h-8 sm:h-9 w-20 sm:w-28 px-2 py-1 opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-300 cursor-pointer"
-											>
-												<img
-													src={company.logoUrl}
-													alt={company.name}
-													class="max-h-full max-w-full object-contain transition-transform duration-300"
-													loading="lazy"
-													decoding="async"
-												/>
-											</a>
-										);
-									})}
-								</div>
-
-								<!-- Track Half 2 (identical duplicate for seamless infinite loop) -->
-								<div class="flex items-center gap-6 sm:gap-10 shrink-0 pr-6 sm:pr-10" aria-hidden="true">
-									{displayCompanies.map((company) => {
-										const href = company.websiteUrl.startsWith('http') ? company.websiteUrl : `https://${company.websiteUrl}`;
-										return (
-											<a
-												href={href}
-												target="_blank"
-												rel="noopener noreferrer"
-												tabindex="-1"
-												title={company.name}
-												aria-label={company.name}
-												class="flex items-center justify-center shrink-0 h-8 sm:h-9 w-20 sm:w-28 px-2 py-1 opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-300 cursor-pointer"
-											>
-												<img
-													src={company.logoUrl}
-													alt={company.name}
-													class="max-h-full max-w-full object-contain transition-transform duration-300"
-													loading="lazy"
-													decoding="async"
-												/>
-											</a>
-										);
-									})}
+						{/* Infinite marquee track when items exceed view */}
+						{marqueeVisibilityClass !== null && (
+							<div class={`relative w-full min-w-0 flex-1 overflow-hidden trust-marquee-wrapper ${marqueeVisibilityClass}`}>
+								<div class="pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-16 bg-linear-to-r from-surface-container to-transparent z-10"></div>
+								<div class="pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-16 bg-linear-to-l from-surface-container to-transparent z-10"></div>
+								<div class="trust-marquee-track flex items-center">
+									<div class="flex items-center gap-6 sm:gap-10 shrink-0 pr-6 sm:pr-10">
+										{displayCompanies.map((company) => {
+											const href = company.websiteUrl.startsWith('http') ? company.websiteUrl : `https://${company.websiteUrl}`;
+											return (
+												<a
+													href={href}
+													target="_blank"
+													rel="noopener noreferrer"
+													title={company.name}
+													aria-label={company.name}
+													class="flex items-center justify-center shrink-0 h-8 sm:h-9 w-20 sm:w-28 px-2 py-1 opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-300 cursor-pointer"
+												>
+													<img
+														src={company.logoUrl}
+														alt={company.name}
+														class="max-h-full max-w-full object-contain transition-transform duration-300"
+														loading="lazy"
+														decoding="async"
+													/>
+												</a>
+											);
+										})}
+									</div>
+									<div class="flex items-center gap-6 sm:gap-10 shrink-0 pr-6 sm:pr-10" aria-hidden="true">
+										{displayCompanies.map((company) => {
+											const href = company.websiteUrl.startsWith('http') ? company.websiteUrl : `https://${company.websiteUrl}`;
+											return (
+												<a
+													href={href}
+													target="_blank"
+													rel="noopener noreferrer"
+													tabindex="-1"
+													title={company.name}
+													aria-label={company.name}
+													class="flex items-center justify-center shrink-0 h-8 sm:h-9 w-20 sm:w-28 px-2 py-1 opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-300 cursor-pointer"
+												>
+													<img
+														src={company.logoUrl}
+														alt={company.name}
+														class="max-h-full max-w-full object-contain transition-transform duration-300"
+														loading="lazy"
+														decoding="async"
+													/>
+												</a>
+											);
+										})}
+									</div>
 								</div>
 							</div>
-						</div>
+						)}
 					</div>
 				</div>
 			</section>
