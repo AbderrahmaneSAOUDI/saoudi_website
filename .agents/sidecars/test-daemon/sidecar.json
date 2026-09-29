@@ -1,6 +1,6 @@
 {
   "name": "test-daemon",
-  "enabled": false,
+  "enabled": true,
   "description": "Background test & verification watcher daemon",
   "command": "bash",
   "args": ["run_daemon.sh"],

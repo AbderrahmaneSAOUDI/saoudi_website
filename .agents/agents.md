@@ -128,3 +128,7 @@ GOOGLE_CLIENT_ID=...
 7. **Visual shadows are universally prohibited** — every agent must avoid CSS, SVG, filter, and Tailwind shadows and use solid tonal surfaces, borders, rings, color changes, or transforms instead
 8. **Media assets must be optimized** — all raster images must be converted to WebP and kept under 50 KB, and all SVG files must be compressed before use or commit
 9. **Mandatory end-of-prompt Git push** — every agent must stage all changes (`git add .`), commit with a message starting with the current version from `package.json` (e.g. `git commit -m "1.74.349 - fix: description here"`), and push to remote (`git push`) at the end of each prompt turn
+10. **High-speed execution & parallel lookups** — follow `.agents/rules/speed-and-efficiency.md` (emit lookups concurrently, no re-reading, single-pass batch editing, zero polling)
+11. **Code quality & safety** — follow `.agents/rules/code-quality-and-safety.md` (preserve existing comments, decoupled business logic, defensive error handling, safe non-destructive config modifications)
+12. **Deterministic hooks & sidecars** — lifecycle hooks are configured in `.agents/hooks.json` (`dangerous_command_guard.py`, `session_start.py`, `version_increment.py`) and background daemons run from `.agents/sidecars/` (`codebase-index-daemon`, `test-daemon`)
+

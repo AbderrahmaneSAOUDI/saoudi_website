@@ -12,6 +12,9 @@ Personal portfolio & admin CMS for Abderrahmane SAOUDI built with Astro SSR, Typ
 - `src/styles/` — Global styling (`global.css`, `background_animation.css`).
 - `src/types.ts` — Single authoritative schema (Zod schemas + TypeScript interfaces).
 - `docs/` — Progressive disclosure architecture, invariants, and data model documentation.
+- `.agents/rules/` — Persistent operational rules (architecture, design system, speed & efficiency, code quality).
+- `.agents/hooks/` & `hooks.json` — Lifecycle hooks (dangerous command guard, session start context, version automation).
+- `.agents/sidecars/` — Background daemons (codebase indexer, test watcher) and status maps.
 - `.agents/skills/` — On-demand procedural playbooks and workflows.
 
 ## Key Commands
@@ -42,4 +45,7 @@ Personal portfolio & admin CMS for Abderrahmane SAOUDI built with Astro SSR, Typ
 - Core System Invariants & Rules: [docs/invariants.md](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/docs/invariants.md)
 - Multi-Collection Data Model: [docs/data-model.md](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/docs/data-model.md)
 - Mobile App Sync Contract: [docs/mobile_sync_contract.md](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/docs/mobile_sync_contract.md)
+- Execution Efficiency & Safety Rules: [.agents/rules/](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/.agents/rules)
+- Lifecycle Hooks Configuration: [.agents/hooks.json](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/.agents/hooks.json)
+- Sidecars & Daemons: [.agents/sidecars/](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/.agents/sidecars)
 - Workflows & Procedural Playbooks: [.agents/skills/](file:///home/saoudi26/Documents/GitHub/PERSONAL/saoudi_website/.agents/skills)
