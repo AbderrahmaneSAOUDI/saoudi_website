@@ -207,6 +207,28 @@ export const serviceSchema = z.object({
 	updatedAt: z.string().optional(),
 });
 
+// ─── Collection: trusted_companies ──────────────────────────────────────────
+
+export interface TrustedCompany {
+	id: string;
+	name: string;
+	logoUrl: string;
+	websiteUrl: string;
+	order: number;
+	createdAt?: string;
+	updatedAt?: string;
+}
+
+export const trustedCompanySchema = z.object({
+	id: z.string().min(1),
+	name: z.string().min(1),
+	logoUrl: z.string().min(1),
+	websiteUrl: z.string().min(1),
+	order: z.number().int().default(0),
+	createdAt: z.string().optional(),
+	updatedAt: z.string().optional(),
+});
+
 // ─── Collection: accepted_admin_emails ────────────────────────────────────
 
 export interface AcceptedAdminEmail {
@@ -463,4 +485,12 @@ export const parseAdminTodo = parseAdminTask;
 
 export const parseSystemLog = (data: unknown): SystemLog => {
 	return systemLogSchema.parse(data);
+};
+
+export const parseTrustedCompany = (data: unknown): TrustedCompany => {
+	return trustedCompanySchema.parse(data);
+};
+
+export const isValidTrustedCompany = (data: unknown): data is TrustedCompany => {
+	return trustedCompanySchema.safeParse(data).success;
 };

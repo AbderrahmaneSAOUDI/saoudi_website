@@ -6,7 +6,8 @@ export type PublicMediaCollection =
 	| 'projects'
 	| 'experience'
 	| 'services'
-	| 'configuration';
+	| 'configuration'
+	| 'trusted_companies';
 
 /**
  * Builds a stable media endpoint without loading the stored media field first.

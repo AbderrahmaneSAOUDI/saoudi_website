@@ -77,6 +77,20 @@ The mobile application is **completely standalone** and interacts directly with 
   - `excludeAdminDownloads`: `boolean`
   - `lastResetAt`: `string` (optional)
 
+### 5. `trusted_companies` (Who Trusts Me / Partner Companies)
+- **Path**: `/trusted_companies/{companyId}`
+- **Doc ID**: `company_UUID` (or custom Firestore ID)
+- **Schema**:
+  | Field | Type | Description |
+  | :--- | :--- | :--- |
+  | `id` | `string` | Document ID |
+  | `name` | `string` | Company or organization display name |
+  | `logoUrl` | `string` | URL or path to company logo image |
+  | `websiteUrl` | `string` | Company homepage link |
+  | `order` | `number` | Integer sorting rank |
+  | `createdAt` | `string` (ISO 8601) | Creation timestamp |
+  | `updatedAt` | `string` (ISO 8601) | Update timestamp |
+
 ---
 
 ## ⚖️ Business Logic & Invariants
@@ -110,3 +124,10 @@ The mobile application is **completely standalone** and interacts directly with 
   3. `admin_todos`: Admin tasks with Active/Completed/Archived status, 6 categories, and 3 priority levels.
   4. Aggregate counts via Firestore collection counts & `configuration/static_data`.
 - **Mobile App Action Required**: Initial mobile client setup using direct Firebase SDK (`cloud_firestore`, `firebase_auth`).
+
+#### [2026-09-29] — Add Who Trusts Me (`trusted_companies`) to Admin Overview
+- **Source**: `saoudi_website`
+- **Overview Features In Scope**:
+  1. `trusted_companies`: Added dedicated Firestore collection for trusted companies, clients, and partners. Managed directly under the emails card on the Admin Overview page.
+  2. Each company record contains `id`, `name`, `logoUrl`, `websiteUrl`, `order`, `createdAt`, `updatedAt`.
+- **Mobile App Action Required**: Add model and UI widget for `trusted_companies` list CRUD under overview dashboard.

@@ -1,9 +1,10 @@
 ---
 import IconComponent from './Icon.astro';
 import AcceptedAdminEmailsCard from './admin/AcceptedAdminEmailsCard.astro';
+import TrustedCompaniesCard from './admin/TrustedCompaniesCard.astro';
 import AdminLogsCard from './admin/AdminLogsCard.astro';
 import AdminTasksCard from './admin/AdminTasksCard.astro';
-import type { AcceptedAdminEmail, AdminTask, AdminTodo, SystemLog } from '../types';
+import type { AcceptedAdminEmail, AdminTask, AdminTodo, SystemLog, TrustedCompany } from '../types';
 
 /**
  * AdminDashboard Component
@@ -24,13 +25,14 @@ interface DashboardMetrics {
 interface Props {
   metrics: DashboardMetrics;
   initialAcceptedEmails?: AcceptedAdminEmail[];
+  initialCompanies?: TrustedCompany[];
   initialTasks?: AdminTask[];
   initialTodos?: AdminTodo[];
   initialLogs?: SystemLog[];
   isPrimaryAdmin?: boolean;
 }
 
-const { metrics, initialAcceptedEmails = [], initialTasks, initialTodos = [], initialLogs = [], isPrimaryAdmin = true } = Astro.props;
+const { metrics, initialAcceptedEmails = [], initialCompanies = [], initialTasks, initialTodos = [], initialLogs = [], isPrimaryAdmin = true } = Astro.props;
 const effectiveTasks = initialTasks ?? initialTodos;
 const { counts } = metrics;
 ---
@@ -357,7 +359,10 @@ const { counts } = metrics;
 
     <!-- Admin Tools & Overview Cards -->
     <section class="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
-      <AcceptedAdminEmailsCard initialEmails={initialAcceptedEmails} isPrimaryAdmin={isPrimaryAdmin} />
+      <div class="flex flex-col gap-6">
+        <AcceptedAdminEmailsCard initialEmails={initialAcceptedEmails} isPrimaryAdmin={isPrimaryAdmin} />
+        <TrustedCompaniesCard initialCompanies={initialCompanies} isPrimaryAdmin={isPrimaryAdmin} />
+      </div>
       <AdminLogsCard initialLogs={initialLogs} isPrimaryAdmin={isPrimaryAdmin} />
       <AdminTasksCard initialTasks={effectiveTasks} isPrimaryAdmin={isPrimaryAdmin} />
     </section>

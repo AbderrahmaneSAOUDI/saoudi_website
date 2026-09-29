@@ -15,6 +15,7 @@ Firestore Database
 ├── designs/                 → Graphic design showcase items (Design)
 ├── certificates/            → Certifications and accreditations (Certificate)
 ├── services/                → Technical & design offerings (Service)
+├── trusted_companies/       → Organizations & partners that trust Saoudi (TrustedCompany)
 ├── accepted_admin_emails/   → Authorized secondary admin accounts (AcceptedAdminEmail)
 ├── admin_todos/             → Internal admin task tracking (AdminTask)
 └── system_logs/             → Audit logging & security telemetry (SystemLog)
@@ -82,3 +83,7 @@ Firestore Database
 
 ### 9. `system_logs` (Telemetry & Audit)
 - **Fields:** `id`, `type` (`'auth' | 'content' | 'admin' | 'system' | 'security' | 'visitor' | 'task' | 'storage'`), `severity` (`'info' | 'warn' | 'error' | 'critical'`), `action` (`LogAction`), `title`, `details?`, `userEmail`, `isPrimaryEmail?`, `timestamp`, `ip?`, `userAgent?`, `requestPath?`, `sessionId?`, `targetCollection?`, `targetDocId?`, `changeType?`, `changedFields?`, `metadata?`
+
+### 10. `trusted_companies` (Who Trusts Me)
+- **Fields:** `id`, `name`, `logoUrl`, `websiteUrl`, `order`, `createdAt?`, `updatedAt?`
+

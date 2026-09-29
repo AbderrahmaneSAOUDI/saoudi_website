@@ -8,6 +8,7 @@ const DEFAULT_FIELDS = {
 	experience: 'logoUrl',
 	services: 'logoUrl',
 	configuration: 'previewUrl',
+	trusted_companies: 'logoUrl',
 } as const;
 
 const CONFIGURATION_FIELDS = new Set(['previewUrl']);

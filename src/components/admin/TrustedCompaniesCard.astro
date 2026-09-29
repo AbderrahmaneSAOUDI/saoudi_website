@@ -1,0 +1,676 @@
+---
+import Icon from '../Icon.astro';
+import type { TrustedCompany } from '../../types';
+
+interface Props {
+	initialCompanies?: TrustedCompany[];
+	isPrimaryAdmin?: boolean;
+}
+
+const { initialCompanies = [], isPrimaryAdmin = true } = Astro.props;
+---
+
+<div id="trusted-companies-card" class="p-6 rounded-3xl border border-[#2B2930] bg-[#1D1B20] flex flex-col h-95 lg:h-[calc(90vh-420px)] min-h-90 relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.2,0,0.2,1)]">
+	<!-- Card Header -->
+	<div id="companies-card-header" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#2B2930]/80 pb-4 shrink-0 transition-all duration-300">
+		<!-- Header Title Button (Collapse / Expand Trigger) -->
+		<button
+			type="button"
+			id="btn-header-toggle-companies"
+			class="flex items-center gap-3 text-left cursor-pointer group/header select-none focus:outline-none"
+			title="Click to collapse / expand Trusted Companies"
+		>
+			<div class="w-10 h-10 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shrink-0 transition-transform duration-200 group-hover/header:scale-105 group/building">
+				<Icon name="business" size={20} class="w-5 h-5 flex items-center justify-center group-hover/building:hidden!" />
+				<Icon name="business_filled" size={20} class="w-5 h-5 hidden! group-hover/building:inline-flex! items-center justify-center" />
+			</div>
+			<div class="flex items-center gap-2">
+				<h2 class="text-lg font-bold text-white tracking-tight group-hover/header:text-primary transition-colors">Who Trusts Me</h2>
+				<span id="company-count-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-primary/15 text-primary border border-primary/30">
+					{initialCompanies.length}
+				</span>
+			</div>
+		</button>
+
+		<div id="companies-header-actions" class="flex items-center gap-2 shrink-0 transition-all duration-300 ease-out opacity-100 visible">
+			<button
+				type="button"
+				id="btn-toggle-add-company"
+				class="p-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs transition-all duration-200 flex items-center justify-center cursor-pointer shrink-0"
+				title="Add Trusted Company"
+				aria-label="Add Trusted Company"
+			>
+				<Icon name="plus" size={16} class="w-4 h-4" />
+			</button>
+		</div>
+	</div>
+
+	<!-- Collapsible Content Wrapper -->
+	<div id="companies-card-content" class="flex-1 min-h-0 flex flex-col transition-all duration-300 ease-out opacity-100 translate-y-0">
+		<!-- Smooth Collapsible Add/Edit Company Drawer -->
+		<div
+			id="company-drawer-wrapper"
+			class="grid transition-all duration-300 ease-[cubic-bezier(0.2,0,0.2,1)] shrink-0 overflow-hidden"
+			style="grid-template-rows: 0fr; opacity: 0; pointer-events: none;"
+		>
+			<div class="min-h-0 overflow-hidden">
+				<div class="pt-4">
+					<div class="p-4 rounded-2xl bg-[#211F26] border border-[#2B2930] space-y-3">
+						<div class="flex items-center justify-between">
+							<h3 id="drawer-form-title" class="text-xs font-bold text-white uppercase tracking-wider">Add Trusted Company</h3>
+							<button type="button" id="btn-close-company-drawer" class="group p-1 rounded-lg text-[#E6E1E5]/50 hover:text-white hover:bg-white/5 transition-all cursor-pointer" title="Close">
+								<Icon name="close" size={16} class="w-4 h-4 group-hover:hidden!" />
+								<Icon name="close_filled" size={16} class="w-4 h-4 hidden! group-hover:inline-flex!" />
+							</button>
+						</div>
+
+						<form id="company-form" class="space-y-3">
+							<input type="hidden" id="company-id" />
+							
+							<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+								<div>
+									<label class="block text-[11px] font-medium text-[#E6E1E5]/70 mb-1">Company Name *</label>
+									<input
+										type="text"
+										id="company-name"
+										required
+										placeholder="e.g. Google Developer Groups"
+										class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-xs focus:outline-none focus:border-primary transition-colors placeholder-[#E6E1E5]/30"
+									/>
+								</div>
+								<div>
+									<label class="block text-[11px] font-medium text-[#E6E1E5]/70 mb-1">Homepage URL *</label>
+									<input
+										type="url"
+										id="company-website"
+										required
+										placeholder="https://example.com"
+										class="w-full px-3 py-2 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-xs focus:outline-none focus:border-primary transition-colors placeholder-[#E6E1E5]/30"
+									/>
+								</div>
+							</div>
+
+							<!-- Logo Section: File Dropzone OR URL -->
+							<div>
+								<label class="block text-[11px] font-medium text-[#E6E1E5]/70 mb-1">Company Logo *</label>
+								<div class="flex items-center gap-3">
+									<!-- Dropzone Area -->
+									<div
+										id="company-logo-dropzone"
+										class="flex-1 border-2 border-dashed border-[#2B2930] hover:border-primary/50 bg-[#141218] rounded-xl p-3 text-center cursor-pointer transition-colors flex items-center justify-center gap-2 group"
+									>
+										<input
+											type="file"
+											id="company-logo-file"
+											accept="image/webp,image/png,image/jpeg,image/svg+xml"
+											class="hidden"
+										/>
+										<Icon name="upload" size={16} class="w-4 h-4 text-[#E6E1E5]/40 group-hover:text-primary transition-colors" />
+										<span id="company-file-details" class="text-[11px] text-[#E6E1E5]/60 group-hover:text-white transition-colors">
+											Upload Logo (WebP, PNG, SVG)
+										</span>
+									</div>
+
+									<!-- Live Logo Preview Box -->
+									<div class="w-12 h-12 rounded-xl bg-[#141218] border border-[#2B2930] flex items-center justify-center p-1 shrink-0 overflow-hidden">
+										<img
+											id="company-logo-preview"
+											src=""
+											alt="Preview"
+											class="w-full h-full object-contain hidden"
+										/>
+										<span id="company-logo-placeholder" class="text-[10px] text-[#E6E1E5]/30">Logo</span>
+									</div>
+								</div>
+
+								<!-- Direct URL alternative input -->
+								<div class="mt-2">
+									<input
+										type="text"
+										id="company-logo-url"
+										placeholder="Or enter logo URL (e.g. /uploads/companies/gdg.svg)"
+										class="w-full px-3 py-1.5 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-[11px] focus:outline-none focus:border-primary transition-colors placeholder-[#E6E1E5]/30"
+									/>
+								</div>
+							</div>
+
+							<div class="flex items-center justify-between gap-2 pt-1">
+								<div class="flex items-center gap-2">
+									<label class="text-[11px] font-medium text-[#E6E1E5]/70">Order:</label>
+									<input
+										type="number"
+										id="company-order"
+										value="0"
+										min="0"
+										class="w-16 px-2 py-1 rounded-xl border border-[#2B2930] bg-[#141218] text-white text-xs focus:outline-none focus:border-primary text-center"
+									/>
+								</div>
+
+								<div class="flex items-center gap-2">
+									<button
+										type="button"
+										id="btn-cancel-company"
+										class="px-3 py-1.5 rounded-xl border border-[#2B2930] hover:bg-[#211F26] text-[#E6E1E5]/70 text-xs transition-colors cursor-pointer"
+									>
+										Cancel
+									</button>
+									<button
+										type="submit"
+										id="btn-submit-company"
+										class="px-4 py-1.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+									>
+										<!-- State: Normal Icon -->
+										<span id="btn-save-check-icon" class="inline-flex items-center">
+											<Icon name="check" size={14} class="w-3.5 h-3.5" />
+										</span>
+										<!-- State: Loading Spinner -->
+										<svg id="btn-save-spinner-icon" class="w-3.5 h-3.5 animate-spin hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+											<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+											<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+										</svg>
+										<span id="btn-save-text">Save Company</span>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- List of Trusted Companies (Scrollable) -->
+		<div class="flex-1 min-h-0 pt-4 overflow-hidden flex flex-col">
+			<div id="trusted-companies-list" class="space-y-2.5 overflow-y-auto flex-1 scrollbar-hide pr-1">
+				<!-- Rendered dynamically -->
+			</div>
+
+			<!-- Empty State -->
+			<div id="companies-empty-state" class="hidden my-auto py-8 text-center text-[#E6E1E5]/40 bg-[#211F26]/50 rounded-2xl border border-dashed border-[#2B2930]">
+				<p class="text-xs font-semibold text-white">No trusted companies recorded</p>
+				<p class="text-[11px] mt-0.5">Click "+" above to add organizations or clients that trust your work.</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script is:inline define:vars={{ initialCompaniesData: initialCompanies, isPrimaryAdminUser: isPrimaryAdmin }}>
+	Object.assign(window, {
+		initialTrustedCompanies: initialCompaniesData || [],
+		isPrimaryAdminUser: Boolean(isPrimaryAdminUser)
+	});
+</script>
+
+<script>
+	import { escapeHtml, escapeAttribute, getSafePublicHref, getSafeImageSrc } from '../../lib/client-safety';
+	import { compressImageToWebpUnderTargetKB } from '../../lib/client-image';
+
+	document.addEventListener('DOMContentLoaded', () => {
+		const listContainer = document.getElementById('trusted-companies-list') as HTMLDivElement;
+		const emptyState = document.getElementById('companies-empty-state') as HTMLDivElement;
+		const countBadge = document.getElementById('company-count-badge') as HTMLSpanElement;
+
+		const cardElem = document.getElementById('trusted-companies-card') as HTMLDivElement;
+		const cardContent = document.getElementById('companies-card-content') as HTMLDivElement;
+		const cardHeader = document.getElementById('companies-card-header') as HTMLDivElement;
+		const headerActions = document.getElementById('companies-header-actions') as HTMLDivElement;
+		const btnHeaderToggle = document.getElementById('btn-header-toggle-companies') as HTMLButtonElement;
+
+		const btnToggleAdd = document.getElementById('btn-toggle-add-company') as HTMLButtonElement;
+		const drawerWrapper = document.getElementById('company-drawer-wrapper') as HTMLDivElement;
+		const btnCloseDrawer = document.getElementById('btn-close-company-drawer') as HTMLButtonElement;
+		const btnCancel = document.getElementById('btn-cancel-company') as HTMLButtonElement;
+		const companyForm = document.getElementById('company-form') as HTMLFormElement;
+		const drawerFormTitle = document.getElementById('drawer-form-title') as HTMLHeadingElement;
+
+		const idInput = document.getElementById('company-id') as HTMLInputElement;
+		const nameInput = document.getElementById('company-name') as HTMLInputElement;
+		const websiteInput = document.getElementById('company-website') as HTMLInputElement;
+		const orderInput = document.getElementById('company-order') as HTMLInputElement;
+		const logoUrlInput = document.getElementById('company-logo-url') as HTMLInputElement;
+		const logoFileInput = document.getElementById('company-logo-file') as HTMLInputElement;
+		const logoDropZone = document.getElementById('company-logo-dropzone') as HTMLDivElement;
+		const fileDetails = document.getElementById('company-file-details') as HTMLSpanElement;
+		const logoPreview = document.getElementById('company-logo-preview') as HTMLImageElement;
+		const logoPlaceholder = document.getElementById('company-logo-placeholder') as HTMLSpanElement;
+
+		const btnSubmit = document.getElementById('btn-submit-company') as HTMLButtonElement;
+		const btnSaveText = document.getElementById('btn-save-text') as HTMLSpanElement;
+		const btnSaveCheckIcon = document.getElementById('btn-save-check-icon') as HTMLElement;
+		const btnSaveSpinnerIcon = document.getElementById('btn-save-spinner-icon') as HTMLElement;
+
+		let selectedLogoFile: File | null = null;
+		let isDrawerOpen = false;
+
+		// --- Collapse / Expand State Management ---
+		const STORAGE_KEY = 'admin_companies_collapsed';
+		let isCollapsed = localStorage.getItem(STORAGE_KEY) === 'true';
+
+		function setCollapsedState(collapsed: boolean) {
+			isCollapsed = collapsed;
+			if (collapsed) {
+				cardElem?.classList.remove('h-95', 'lg:h-[calc(90vh-420px)]', 'min-h-90');
+				cardElem?.classList.add('h-[88px]', 'min-h-[88px]');
+				cardContent?.classList.add('opacity-0', 'pointer-events-none', '-translate-y-2');
+				cardContent?.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+				headerActions?.classList.add('opacity-0', 'pointer-events-none', 'invisible');
+				headerActions?.classList.remove('opacity-100', 'pointer-events-auto', 'visible');
+				cardHeader?.classList.remove('border-[#2B2930]/80', 'pb-4');
+				cardHeader?.classList.add('border-transparent', 'pb-0');
+				btnHeaderToggle?.setAttribute('aria-expanded', 'false');
+			} else {
+				cardElem?.classList.add('h-95', 'lg:h-[calc(90vh-420px)]', 'min-h-90');
+				cardElem?.classList.remove('h-[88px]', 'min-h-[88px]');
+				cardContent?.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-2');
+				cardContent?.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+				headerActions?.classList.remove('opacity-0', 'pointer-events-none', 'invisible');
+				headerActions?.classList.add('opacity-100', 'pointer-events-auto', 'visible');
+				cardHeader?.classList.add('border-[#2B2930]/80', 'pb-4');
+				cardHeader?.classList.remove('border-transparent', 'pb-0');
+				btnHeaderToggle?.setAttribute('aria-expanded', 'true');
+			}
+		}
+
+		setCollapsedState(isCollapsed);
+
+		if (btnHeaderToggle) {
+			btnHeaderToggle.addEventListener('click', (e) => {
+				e.preventDefault();
+				const nextState = !isCollapsed;
+				localStorage.setItem(STORAGE_KEY, String(nextState));
+				setCollapsedState(nextState);
+			});
+		}
+
+		// --- Drawer Controls ---
+		function setDrawerState(open: boolean) {
+			isDrawerOpen = open;
+			if (drawerWrapper) {
+				drawerWrapper.style.gridTemplateRows = open ? '1fr' : '0fr';
+				drawerWrapper.style.opacity = open ? '1' : '0';
+				drawerWrapper.style.pointerEvents = open ? 'auto' : 'none';
+			}
+			if (open) {
+				setTimeout(() => nameInput?.focus(), 150);
+			}
+		}
+
+		function resetForm() {
+			companyForm.reset();
+			idInput.value = '';
+			selectedLogoFile = null;
+			drawerFormTitle.textContent = 'Add Trusted Company';
+			btnSaveText.textContent = 'Save Company';
+			logoPreview.src = '';
+			logoPreview.classList.add('hidden');
+			logoPlaceholder.classList.remove('hidden');
+			fileDetails.textContent = 'Upload Logo (WebP, PNG, SVG)';
+			orderInput.value = String(companiesList.length);
+		}
+
+		if (btnToggleAdd) {
+			btnToggleAdd.addEventListener('click', (e) => {
+				e.stopPropagation();
+				if (isCollapsed) {
+					setCollapsedState(false);
+					localStorage.setItem(STORAGE_KEY, 'false');
+				}
+				if (isDrawerOpen && idInput.value === '') {
+					setDrawerState(false);
+				} else {
+					resetForm();
+					setDrawerState(true);
+				}
+			});
+		}
+
+		if (btnCloseDrawer) {
+			btnCloseDrawer.addEventListener('click', () => {
+				setDrawerState(false);
+				resetForm();
+			});
+		}
+
+		if (btnCancel) {
+			btnCancel.addEventListener('click', () => {
+				setDrawerState(false);
+				resetForm();
+			});
+		}
+
+		// --- File Upload / Drag & Drop Handling ---
+		if (logoDropZone && logoFileInput) {
+			logoDropZone.addEventListener('click', () => logoFileInput.click());
+
+			logoDropZone.addEventListener('dragover', (e) => {
+				e.preventDefault();
+				logoDropZone.classList.add('border-primary', 'bg-primary/5');
+			});
+
+			logoDropZone.addEventListener('dragleave', () => {
+				logoDropZone.classList.remove('border-primary', 'bg-primary/5');
+			});
+
+			logoDropZone.addEventListener('drop', (e) => {
+				e.preventDefault();
+				logoDropZone.classList.remove('border-primary', 'bg-primary/5');
+				if (e.dataTransfer?.files?.length) {
+					processFile(e.dataTransfer.files[0]);
+				}
+			});
+
+			logoFileInput.addEventListener('change', () => {
+				if (logoFileInput.files?.length) {
+					processFile(logoFileInput.files[0]);
+				}
+			});
+		}
+
+		async function processFile(file: File) {
+			if (!file.type.startsWith('image/')) {
+				showToast('Please select a valid image file.', 'error');
+				return;
+			}
+
+			try {
+				if (file.type === 'image/svg+xml') {
+					selectedLogoFile = file;
+					logoPreview.src = URL.createObjectURL(file);
+					logoPreview.classList.remove('hidden');
+					logoPlaceholder.classList.add('hidden');
+					fileDetails.textContent = `✓ ${file.name} (SVG)`;
+					logoUrlInput.value = '';
+					return;
+				}
+
+				showToast('Optimizing logo to WebP...', 'info');
+				const webpFile = await compressImageToWebpUnderTargetKB(file, 20, 256);
+				selectedLogoFile = webpFile;
+				logoPreview.src = URL.createObjectURL(webpFile);
+				logoPreview.classList.remove('hidden');
+				logoPlaceholder.classList.add('hidden');
+				const kb = (webpFile.size / 1024).toFixed(1);
+				fileDetails.textContent = `✓ ${file.name} (${kb}KB WebP)`;
+				logoUrlInput.value = '';
+			} catch (err) {
+				console.error('Image compression error:', err);
+				selectedLogoFile = file;
+				logoPreview.src = URL.createObjectURL(file);
+				logoPreview.classList.remove('hidden');
+				logoPlaceholder.classList.add('hidden');
+				fileDetails.textContent = `✓ ${file.name}`;
+			}
+		}
+
+		if (logoUrlInput) {
+			logoUrlInput.addEventListener('input', () => {
+				const val = logoUrlInput.value.trim();
+				if (val) {
+					selectedLogoFile = null;
+					logoPreview.src = getSafeImageSrc(val);
+					logoPreview.classList.remove('hidden');
+					logoPlaceholder.classList.add('hidden');
+					fileDetails.textContent = 'Using Direct Logo URL';
+				} else if (!selectedLogoFile) {
+					logoPreview.src = '';
+					logoPreview.classList.add('hidden');
+					logoPlaceholder.classList.remove('hidden');
+					fileDetails.textContent = 'Upload Logo (WebP, PNG, SVG)';
+				}
+			});
+		}
+
+		// --- Toast Notification Helper ---
+		function showToast(msg: string, type: 'success' | 'error' | 'info') {
+			if (typeof (window as any).showToast === 'function') {
+				(window as any).showToast(msg, type);
+			}
+		}
+
+		// --- List State & Rendering ---
+		let companiesList: any[] = (window as any).initialTrustedCompanies || [];
+		renderCompanies();
+
+		async function fetchCompanies() {
+			try {
+				const res = await fetch('/admin/admin_companies_api');
+				if (res.ok) {
+					const data = await res.json();
+					if (data.success && Array.isArray(data.companies)) {
+						companiesList = data.companies;
+						renderCompanies();
+					}
+				}
+			} catch (err) {
+				console.warn('Could not fetch latest companies list:', err);
+			}
+		}
+
+		(window as any).refreshTrustedCompanies = fetchCompanies;
+
+		function renderCompanies() {
+			if (countBadge) countBadge.textContent = String(companiesList.length);
+			listContainer.innerHTML = '';
+
+			if (companiesList.length === 0) {
+				emptyState?.classList.remove('hidden');
+				listContainer.classList.add('hidden');
+				return;
+			}
+
+			emptyState?.classList.add('hidden');
+			listContainer.classList.remove('hidden');
+
+			companiesList.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+
+			companiesList.forEach((company) => {
+				const itemElem = document.createElement('div');
+				itemElem.className = 'p-3 rounded-2xl bg-[#211F26] border border-[#2B2930] hover:border-primary/40 transition-all flex items-center justify-between gap-3 group/item';
+
+				const logoSrc = getSafeImageSrc(company.logoUrl);
+				const webUrl = getSafePublicHref(company.websiteUrl);
+
+				itemElem.innerHTML = `
+					<div class="flex items-center gap-3 min-w-0 flex-1">
+						<div class="w-10 h-10 rounded-xl bg-[#141218] border border-white/10 flex items-center justify-center p-1.5 shrink-0 overflow-hidden">
+							<img
+								src="${logoSrc || '/favicon.svg'}"
+								alt="${escapeAttribute(company.name)}"
+								class="w-full h-full object-contain filter grayscale group-hover/item:grayscale-0 transition-all"
+								onerror="this.onerror=null;this.src='/favicon.svg';"
+							/>
+						</div>
+						<div class="min-w-0 flex-1">
+							<div class="flex items-center gap-2">
+								<h4 class="text-xs font-bold text-white tracking-tight truncate">${escapeHtml(company.name)}</h4>
+								<span class="text-[10px] text-[#E6E1E5]/60 bg-white/5 px-1.5 py-0.5 rounded-md border border-white/5 shrink-0">#${Number(company.order) || 0}</span>
+							</div>
+							<a
+								href="${webUrl || '#'}"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-[11px] text-primary/80 hover:text-primary hover:underline inline-flex items-center gap-1 truncate max-w-44 sm:max-w-56 mt-0.5"
+								title="Visit homepage"
+							>
+								<span class="truncate">${escapeHtml(company.websiteUrl)}</span>
+								<svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+									<polyline points="15 3 21 3 21 9"></polyline>
+									<line x1="10" y1="14" x2="21" y2="3"></line>
+								</svg>
+							</a>
+						</div>
+					</div>
+
+					<div class="flex items-center gap-1.5 shrink-0">
+						<!-- Edit Button -->
+						<button
+							type="button"
+							class="btn-edit-company p-1.5 rounded-lg text-[#E6E1E5]/50 hover:text-primary hover:bg-white/5 transition-colors cursor-pointer"
+							data-id="${escapeAttribute(company.id)}"
+							title="Edit company"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+								<path d="m15 5 4 4"></path>
+							</svg>
+						</button>
+
+						<!-- Delete Button -->
+						<button
+							type="button"
+							class="btn-delete-company p-1.5 rounded-lg text-[#E6E1E5]/50 hover:text-[#EA4335] hover:bg-[#EA4335]/10 transition-colors cursor-pointer"
+							data-id="${escapeAttribute(company.id)}"
+							data-name="${escapeAttribute(company.name)}"
+							title="Delete company"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M3 6h18"></path>
+								<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+								<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+							</svg>
+						</button>
+					</div>
+				`;
+
+				// Attach edit listener
+				const editBtn = itemElem.querySelector('.btn-edit-company') as HTMLButtonElement;
+				editBtn?.addEventListener('click', () => {
+					idInput.value = company.id;
+					nameInput.value = company.name;
+					websiteInput.value = company.websiteUrl;
+					orderInput.value = String(company.order ?? 0);
+					logoUrlInput.value = company.logoUrl || '';
+					selectedLogoFile = null;
+
+					if (company.logoUrl) {
+						logoPreview.src = getSafeImageSrc(company.logoUrl);
+						logoPreview.classList.remove('hidden');
+						logoPlaceholder.classList.add('hidden');
+						fileDetails.textContent = 'Existing company logo';
+					} else {
+						logoPreview.src = '';
+						logoPreview.classList.add('hidden');
+						logoPlaceholder.classList.remove('hidden');
+						fileDetails.textContent = 'Upload Logo (WebP, PNG, SVG)';
+					}
+
+					drawerFormTitle.textContent = `Edit "${company.name}"`;
+					btnSaveText.textContent = 'Update Company';
+
+					if (isCollapsed) {
+						setCollapsedState(false);
+						localStorage.setItem(STORAGE_KEY, 'false');
+					}
+					setDrawerState(true);
+				});
+
+				// Attach delete listener
+				const deleteBtn = itemElem.querySelector('.btn-delete-company') as HTMLButtonElement;
+				deleteBtn?.addEventListener('click', async () => {
+					const compName = company.name || 'this company';
+					const confirmed = typeof (window as any).showConfirmDialog === 'function'
+						? await (window as any).showConfirmDialog('Delete Company', `Are you sure you want to remove "${compName}" from Who Trusts Me?`)
+						: confirm(`Delete "${compName}"?`);
+
+					if (confirmed) {
+						try {
+							const fd = new FormData();
+							fd.append('action', 'delete');
+							fd.append('id', company.id);
+
+							const res = await fetch('/admin/admin_companies_api', {
+								method: 'POST',
+								body: fd,
+							});
+							const data = await res.json();
+							if (res.ok && data.success) {
+								showToast(`Removed "${compName}" successfully!`, 'success');
+								companiesList = companiesList.filter((c) => c.id !== company.id);
+								renderCompanies();
+							} else {
+								showToast(data.error || 'Failed to delete company', 'error');
+							}
+						} catch (err) {
+							console.error('Error deleting company:', err);
+							showToast('Error deleting company', 'error');
+						}
+					}
+				});
+
+				listContainer.appendChild(itemElem);
+			});
+		}
+
+		// --- Form Submit (Add / Edit) ---
+		companyForm.addEventListener('submit', async (e) => {
+			e.preventDefault();
+
+			const name = nameInput.value.trim();
+			const websiteUrl = websiteInput.value.trim();
+			const order = orderInput.value.trim();
+			const logoUrl = logoUrlInput.value.trim();
+			const currentId = idInput.value.trim();
+
+			if (!name) {
+				showToast('Please enter a company name', 'error');
+				return;
+			}
+			if (!websiteUrl) {
+				showToast('Please enter a website URL', 'error');
+				return;
+			}
+			if (!selectedLogoFile && !logoUrl && !currentId) {
+				showToast('Please provide a logo image or logo URL', 'error');
+				return;
+			}
+
+			// Loading state
+			btnSubmit.disabled = true;
+			btnSaveCheckIcon.classList.add('hidden');
+			btnSaveSpinnerIcon.classList.remove('hidden');
+			btnSaveText.textContent = currentId ? 'Updating...' : 'Saving...';
+
+			try {
+				const fd = new FormData();
+				fd.append('action', 'save');
+				if (currentId) fd.append('id', currentId);
+				fd.append('name', name);
+				fd.append('websiteUrl', websiteUrl);
+				fd.append('order', order || '0');
+				if (logoUrl) fd.append('logoUrl', logoUrl);
+				if (selectedLogoFile) fd.append('logo', selectedLogoFile);
+
+				const res = await fetch('/admin/admin_companies_api', {
+					method: 'POST',
+					body: fd,
+				});
+				const data = await res.json();
+
+				if (res.ok && data.success && data.company) {
+					showToast(currentId ? `Updated "${name}"!` : `Added "${name}"!`, 'success');
+					setDrawerState(false);
+					resetForm();
+
+					// Update local list
+					const existingIdx = companiesList.findIndex((c) => c.id === data.company.id);
+					if (existingIdx >= 0) {
+						companiesList[existingIdx] = data.company;
+					} else {
+						companiesList.push(data.company);
+					}
+					renderCompanies();
+				} else {
+					showToast(data.error || 'Failed to save company', 'error');
+				}
+			} catch (err) {
+				console.error('Error saving company:', err);
+				showToast('Failed to save company', 'error');
+			} finally {
+				btnSubmit.disabled = false;
+				btnSaveCheckIcon.classList.remove('hidden');
+				btnSaveSpinnerIcon.classList.add('hidden');
+				btnSaveText.textContent = currentId ? 'Update Company' : 'Save Company';
+			}
+		});
+	});
+</script>
