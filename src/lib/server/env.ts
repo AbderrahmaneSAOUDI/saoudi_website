@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { getSecret } from 'astro:env/server';
 
 /**
  * Cached parsed .env entries.
@@ -56,12 +57,18 @@ export function getEnvFallback(key: string): string | undefined {
 }
 
 /**
- * Retrieves the value of an environment variable from process.env,
- * import.meta.env, or a local .env file fallback.
+ * Retrieves the value of an environment variable using Astro 7's getSecret,
+ * falling back to process.env, import.meta.env, or a local .env file.
  *
  * @param key The name of the environment variable.
  * @returns The value of the environment variable or undefined.
  */
 export function getEnv(key: string): string | undefined {
+	try {
+		const secretVal = getSecret(key);
+		if (secretVal !== undefined) return secretVal;
+	} catch {
+		/* Fall through to standard environment readers */
+	}
 	return process.env[key] || import.meta.env[key] || getEnvFallback(key);
 }
