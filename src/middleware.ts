@@ -130,7 +130,7 @@ function addSecurityHeaders(
       response.headers.set('Cache-Control', 'private, no-store');
     } else if (cachePublicPage) {
       response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=600, stale-while-revalidate=86400');
-    } else if (pathname.startsWith('/uploads/') || pathname.endsWith('.webp')) {
+    } else if (pathname.startsWith('/uploads/') || pathname.endsWith('.webp') || pathname.endsWith('.png') || pathname.endsWith('.woff2')) {
       response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
     }
     return response;
@@ -150,7 +150,7 @@ function addSecurityHeaders(
       headers.set('Cache-Control', 'private, no-store');
     } else if (cachePublicPage) {
       headers.set('Cache-Control', 'public, max-age=0, s-maxage=600, stale-while-revalidate=86400');
-    } else if (pathname.startsWith('/uploads/') || pathname.endsWith('.webp')) {
+    } else if (pathname.startsWith('/uploads/') || pathname.endsWith('.webp') || pathname.endsWith('.png') || pathname.endsWith('.woff2')) {
       headers.set('Cache-Control', 'public, max-age=31536000, immutable');
     }
 
