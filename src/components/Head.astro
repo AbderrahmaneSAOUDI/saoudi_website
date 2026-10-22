@@ -48,6 +48,8 @@ if (isAdmin) {
     <link rel="alternate icon" href={faviconHref} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#121212" />
+    <meta name="color-scheme" content="dark" />
 
     {/* SEO: Meta description for search engine results */}
     <meta name="description" content={description} />
@@ -77,10 +79,44 @@ if (isAdmin) {
     <link rel="preconnect" href="https://storage.googleapis.com" crossorigin />
     <link rel="dns-prefetch" href="https://storage.googleapis.com" />
 
+    {/* PERFORMANCE: Preload Hero LCP image on the home page */}
+    {Astro.url.pathname === '/' && (
+        <link rel="preload" href="/profile.webp" as="image" type="image/webp" fetchpriority="high" />
+    )}
+
     {/* PERFORMANCE: Preload WOFF2 core fonts */}
     <link rel="preload" href="/fonts/GoogleSans-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/GoogleSans-Medium.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/GoogleSans-Bold.woff2" as="font" type="font/woff2" crossorigin />
+
+    {/* STRUCTURED DATA: Schema.org Person & WebSite for Google Search rich snippets */}
+    {!isAdmin && (
+        <script type="application/ld+json" is:inline set:html={JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+                {
+                    "@type": "WebSite",
+                    "@id": `${siteUrl}/#website`,
+                    "url": siteUrl,
+                    "name": "saoudi.online",
+                    "description": "Abderrahmane SAOUDI — Software Engineer, Community Leader, and Graphic Designer from Ghardaia, Algeria.",
+                    "inLanguage": "en-US"
+                },
+                {
+                    "@type": "Person",
+                    "@id": `${siteUrl}/#person`,
+                    "name": "Abderrahmane SAOUDI",
+                    "jobTitle": "Software Engineer",
+                    "url": siteUrl,
+                    "image": ogImageUrl,
+                    "sameAs": [
+                        "https://github.com/AbderrahmaneSAOUDI",
+                        "https://www.linkedin.com/in/abderrahmane-saoudi"
+                    ]
+                }
+            ]
+        })} />
+    )}
 
     {/* ADMIN PREFERENCE: Restore shortcuts visibility state prior to render */}
     <script is:inline>

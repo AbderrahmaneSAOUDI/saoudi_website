@@ -13,7 +13,7 @@ const DEFAULT_FIELDS = {
 
 const CONFIGURATION_FIELDS = new Set(['previewUrl']);
 const MAX_MEDIA_BYTES = 2 * 1024 * 1024;
-const CACHE_CONTROL = 'public, max-age=0, s-maxage=60, stale-while-revalidate=300';
+const CACHE_CONTROL = 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800';
 
 type MediaCollection = keyof typeof DEFAULT_FIELDS;
 
