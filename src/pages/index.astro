@@ -3,7 +3,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Icon from "../components/Icon.astro";
 import HomeCountsIsland from "../components/HomeCountsIsland.astro";
 import ContactCard from "../components/ContactCard.astro";
-import SkeletonCardGrid from "../components/SkeletonCardGrid.astro";
 import { getFirebaseAdminDb } from "../lib/server/firebase-admin";
 import { CACHE_TTL_MS, getOrSetCached } from "../lib/server/cache";
 import { getPublicMediaUrl } from "../lib/media";
@@ -513,9 +512,7 @@ if (marqueeVisibilityClass !== null && displayCompanies.length > 0) {
 				>
 				</div>
 
-				<HomeCountsIsland server:defer>
-					<SkeletonCardGrid slot="fallback" variant="stat" />
-				</HomeCountsIsland>
+				<HomeCountsIsland />
 			</div>
 		</section>
 

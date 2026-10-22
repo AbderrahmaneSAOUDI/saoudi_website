@@ -3,7 +3,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GlobalLightbox from '../components/GlobalLightbox.astro';
 import DesignsIsland from '../components/DesignsIsland.astro';
-import SkeletonCardGrid from '../components/SkeletonCardGrid.astro';
 
 ---
 
@@ -15,9 +14,7 @@ import SkeletonCardGrid from '../components/SkeletonCardGrid.astro';
 				My <span class="text-primary">Designs</span>
 			</h1>
 		</section>
-		<DesignsIsland server:defer>
-			<SkeletonCardGrid slot="fallback" variant="design" count={8} groups={2} />
-		</DesignsIsland>
+		<DesignsIsland />
 	</div>
 
 	<!-- Render Lightbox outside transform scopes -->

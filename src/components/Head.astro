@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 
 interface Props {
@@ -41,6 +42,7 @@ if (isAdmin) {
 ---
 
 <head>
+    <ClientRouter />
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href={faviconHref} />
     <link rel="alternate icon" href={faviconHref} />

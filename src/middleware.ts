@@ -125,7 +125,7 @@ function addSecurityHeaders(
     if (preventCaching) {
       response.headers.set('Cache-Control', 'private, no-store');
     } else if (cachePublicPage) {
-      response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=60, stale-while-revalidate=300');
+      response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=600, stale-while-revalidate=86400');
     } else if (pathname.startsWith('/uploads/') || pathname.endsWith('.webp')) {
       response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
     }
@@ -141,7 +141,7 @@ function addSecurityHeaders(
     if (preventCaching) {
       headers.set('Cache-Control', 'private, no-store');
     } else if (cachePublicPage) {
-      headers.set('Cache-Control', 'public, max-age=0, s-maxage=60, stale-while-revalidate=300');
+      headers.set('Cache-Control', 'public, max-age=0, s-maxage=600, stale-while-revalidate=86400');
     } else if (pathname.startsWith('/uploads/') || pathname.endsWith('.webp')) {
       headers.set('Cache-Control', 'public, max-age=31536000, immutable');
     }

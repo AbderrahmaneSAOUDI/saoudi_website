@@ -47,6 +47,8 @@ interface Props {}
 
 <script is:inline>
 	(function() {
+		if (window.__globalLightboxInitialized) return;
+		window.__globalLightboxInitialized = true;
 		let previouslyFocused = null;
 		const setupLightbox = () => {
 			document.addEventListener('click', (e) => {

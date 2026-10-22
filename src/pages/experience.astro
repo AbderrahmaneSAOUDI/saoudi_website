@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ExperienceIsland from '../components/ExperienceIsland.astro';
-import SkeletonCardGrid from '../components/SkeletonCardGrid.astro';
 
 ---
 
@@ -13,8 +12,6 @@ import SkeletonCardGrid from '../components/SkeletonCardGrid.astro';
 				My <span class="text-primary">Story</span>
 			</h1>
 		</section>
-		<ExperienceIsland server:defer>
-			<SkeletonCardGrid slot="fallback" variant="project" count={4} groups={1} />
-		</ExperienceIsland>
+		<ExperienceIsland />
 	</div>
 </BaseLayout>
