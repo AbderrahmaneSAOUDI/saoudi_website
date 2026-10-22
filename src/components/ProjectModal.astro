@@ -65,11 +65,11 @@ const { projects = [] } = Astro.props;
 
 <script is:inline define:vars={{ initialProjects: projects }}>
 	(function() {
-		const projectsMap = new Map();
+		window.__projectsMap = window.__projectsMap || new Map();
 		let lastFocusedElement = null;
 		if (Array.isArray(initialProjects)) {
 			initialProjects.forEach(p => {
-				if (p && typeof p === 'object' && typeof p.id === 'string') projectsMap.set(p.id, p);
+				if (p && typeof p === 'object' && typeof p.id === 'string') window.__projectsMap.set(p.id, p);
 			});
 		}
 
@@ -102,15 +102,19 @@ const { projects = [] } = Astro.props;
 
 		function openProjectFromTrigger(trigger) {
 			const id = trigger?.getAttribute('data-project-card-id');
-			const project = projectsMap.get(id);
+			const project = window.__projectsMap ? window.__projectsMap.get(id) : null;
 			if (!project) return;
 			populateProjectModal(project);
 			openModal();
 		}
 
+		if (window.__projectModalListenersBound) return;
+		window.__projectModalListenersBound = true;
+
 		document.addEventListener('click', (e) => {
 			const backdrop = e.target.closest('#project-modal-backdrop');
-			if (backdrop) {
+			const closeBtn = e.target.closest('#project-modal-close');
+			if (backdrop || closeBtn) {
 				closeModal();
 				return;
 			}
@@ -132,8 +136,6 @@ const { projects = [] } = Astro.props;
 			e.preventDefault();
 			openProjectFromTrigger(trigger);
 		});
-
-		document.getElementById('project-modal-close')?.addEventListener('click', closeModal);
 
 		function getSafeUrl(value, allowImageData = false) {
 			if (typeof value !== 'string' || !value.trim()) return null;

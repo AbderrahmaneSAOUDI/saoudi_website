@@ -160,17 +160,10 @@ const statCards = [
 		});
 	}
 
-	// Server islands can be inserted after DOMContentLoaded. Initialize both the
-	// immediate DOM and the eventual island response without keeping an observer alive.
 	animateCounters();
-	if (!document.getElementById('home-counts-island')) {
-		const islandObserver = new MutationObserver(() => {
-			if (!document.getElementById('home-counts-island')) return;
-			animateCounters();
-			islandObserver.disconnect();
-		});
-		islandObserver.observe(document.documentElement, { childList: true, subtree: true });
-	}
+	document.addEventListener('astro:page-load', () => {
+		animateCounters();
+	});
 
 	if (!(window as any).__homeCountsClickHandlerBound) {
 		(window as any).__homeCountsClickHandlerBound = true;

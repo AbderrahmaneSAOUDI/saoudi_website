@@ -445,3 +445,17 @@ html[data-hide-shortcuts="true"] kbd {
   color: var(--text-secondary, #E2E8F0);
 }
 
+/* ── View Transitions (M3 Motion & Accessibility) ────────────────────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+  animation-timing-function: cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
+

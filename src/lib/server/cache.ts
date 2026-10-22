@@ -12,7 +12,7 @@
 const MAX_ENTRIES = 64;
 
 export const CACHE_TTL_MS = {
-  PUBLIC_DATA: 60_000,
+  PUBLIC_DATA: 600_000, // 10 minutes (promptly cleared on admin writes)
   ADMIN_DATA: 30_000,
 } as const;
 
