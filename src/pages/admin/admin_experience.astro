@@ -468,7 +468,7 @@ try {
 </script>
 
 <script>
-	import { escapeAttribute, escapeHtml, getSafeImageSrc } from '../../lib/client-safety';
+	import { escapeAttribute, escapeHtml, getSafeImageSrc, generateShortId } from '../../lib/client-safety';
 	import { compressImageToWebpUnderTargetKB } from '../../lib/client-image';
 
 	document.addEventListener('DOMContentLoaded', () => {
@@ -905,11 +905,7 @@ try {
 		// --- Form State Management ---
 		function setNewExperienceState() {
 			currentSelectedId = null;
-			const shortId = (crypto && crypto.randomUUID)
-				? crypto.randomUUID().substring(0, 8)
-				: Math.random().toString(36).substring(2, 10);
-
-			formId.value = `exp_${shortId}`;
+			formId.value = `exp_${generateShortId()}`;
 			formRole.value = '';
 			formCompany.value = '';
 			formEmploymentType.value = 'Full-time';

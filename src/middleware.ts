@@ -5,14 +5,18 @@ import { isAuthorizedAdminEmail, normalizeAdminEmail } from './lib/server/admin-
 
 const ADMIN_API_PATHS = new Set([
   '/admin/admin_certificates_api',
+  '/admin/admin_companies_api',
   '/admin/admin_designs_api',
-  '/admin/admin_resume_upload',
   '/admin/admin_emails_api',
-  '/admin/admin_tasks_api',
-  '/admin/admin_todos_api',
+  '/admin/admin_experience_api',
+  '/admin/admin_logout',
   '/admin/admin_logs_api',
   '/admin/admin_projects_api',
+  '/admin/admin_resume_upload',
+  '/admin/admin_services_api',
   '/admin/admin_stats_api',
+  '/admin/admin_tasks_api',
+  '/admin/admin_todos_api',
 ]);
 
 const PUBLIC_PAGE_PATHS = new Set([

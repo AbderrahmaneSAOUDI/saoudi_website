@@ -517,7 +517,7 @@ try {
 <script>
 	import { compressImageToWebp } from '../../lib/client-image';
 	import { formatAdminDate } from '../../lib/date-utils';
-	import { escapeAttribute, escapeHtml, getSafeImageSrc } from '../../lib/client-safety';
+	import { escapeAttribute, escapeHtml, getSafeImageSrc, generateShortId } from '../../lib/client-safety';
 
 	document.addEventListener('DOMContentLoaded', () => {
 		// Element Declarations
@@ -1499,12 +1499,7 @@ try {
 		// --- Form State Management ---
 		function setNewProjectState() {
 			currentSelectedId = null;
-			
-			const shortId = (crypto && crypto.randomUUID) 
-				? crypto.randomUUID().substring(0, 8) 
-				: Math.random().toString(36).substring(2, 10);
-			
-			formId.value = `proj_${shortId}`;
+			formId.value = `proj_${generateShortId()}`;
 			formTitle.value = '';
 			renderFieldsDropdown();
 			formTechnologies.value = '';

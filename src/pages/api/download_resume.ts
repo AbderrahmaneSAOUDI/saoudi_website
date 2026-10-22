@@ -1,18 +1,9 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
 import { CACHE_TTL_MS, getOrSetCached, clearCache } from '../../lib/server/cache';
+import { isSafePublicUrl } from '../../lib/server/api-guards';
 import { FieldValue } from 'firebase-admin/firestore';
 import { addSystemLog } from '../../lib/server/system-logs';
-
-function isSafeDownloadTarget(value: string): boolean {
-	if (value.startsWith('/') && !value.startsWith('//')) return true;
-	try {
-		const parsed = new URL(value);
-		return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-	} catch {
-		return false;
-	}
-}
 
 export const GET: APIRoute = async ({ locals }) => {
 	let targetUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
@@ -47,7 +38,7 @@ export const GET: APIRoute = async ({ locals }) => {
 		if (config.resumeUrl) {
 			const configuredUrl = String(config.resumeUrl);
 			if (configuredUrl.startsWith('data:')) inlineResumeUrl = configuredUrl;
-			else if (isSafeDownloadTarget(configuredUrl)) targetUrl = configuredUrl;
+			else if (isSafePublicUrl(configuredUrl)) targetUrl = configuredUrl;
 		}
 
 		// Check if request originates from an authenticated admin

@@ -42,6 +42,23 @@ export function formatAdminDate(dateStr?: string | null): string {
 }
 
 /**
+ * Formats a YYYY-MM or YYYY-MM-DD date string into "Month Year" format (e.g. "Aug 2026").
+ * If dateStr is empty/null, returns presentFallback (default "Present").
+ */
+export function formatMonthYear(dateStr?: string | null, presentFallback = 'Present'): string {
+	if (!dateStr) return presentFallback;
+	const parts = dateStr.split('-');
+	if (parts.length >= 2) {
+		const year = parts[0];
+		const monthIdx = parseInt(parts[1], 10) - 1;
+		if (monthIdx >= 0 && monthIdx < 12) {
+			return `${SHORT_MONTHS[monthIdx]} ${year}`;
+		}
+	}
+	return dateStr;
+}
+
+/**
  * Extracts unique years from a list of date strings (YYYY-MM-DD or YYYY-MM format)
  * sorted in descending order.
  */

@@ -482,7 +482,7 @@ try {
 <script>
 	import { compressImageToWebp } from '../../lib/client-image';
 	import { formatAdminDate } from '../../lib/date-utils';
-	import { escapeAttribute, escapeHtml, getSafeImageSrc } from '../../lib/client-safety';
+	import { escapeAttribute, escapeHtml, getSafeImageSrc, generateShortId } from '../../lib/client-safety';
 
 	document.addEventListener('DOMContentLoaded', () => {
 		// Element Declarations
@@ -942,13 +942,7 @@ try {
 		// --- Form State Management ---
 		function setNewDesignState() {
 			currentSelectedId = null;
-			
-			// Generate short safe random UUID/ID
-			const shortId = (crypto && crypto.randomUUID) 
-				? crypto.randomUUID().substring(0, 8) 
-				: Math.random().toString(36).substring(2, 10);
-			
-			formId.value = `design_${shortId}`;
+			formId.value = `design_${generateShortId()}`;
 			formTitle.value = '';
 
 			// Default company selection (cached for next additions)

@@ -407,7 +407,7 @@ try {
 <script>
 	import { compressImageToWebp } from '../../lib/client-image';
 	import { formatAdminDate } from '../../lib/date-utils';
-	import { escapeAttribute, escapeHtml, getSafeImageSrc, getSafePublicHref } from '../../lib/client-safety';
+	import { escapeAttribute, escapeHtml, getSafeImageSrc, getSafePublicHref, generateShortId } from '../../lib/client-safety';
 
 	document.addEventListener('DOMContentLoaded', () => {
 		// Element Declarations
@@ -722,13 +722,7 @@ try {
 		// --- Form State Management ---
 		function setNewCertificateState() {
 			currentSelectedId = null;
-			
-			// Generate short safe random ID
-			const shortId = (crypto && crypto.randomUUID) 
-				? crypto.randomUUID().substring(0, 8) 
-				: Math.random().toString(36).substring(2, 10);
-			
-			formId.value = `cert_${shortId}`;
+			formId.value = `cert_${generateShortId()}`;
 			formTitle.value = '';
 			formIssuer.value = '';
 			

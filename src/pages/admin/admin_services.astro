@@ -243,7 +243,7 @@ try {
 
 <script>
 	import { compressImageToWebpUnderTargetKB } from '../../lib/client-image';
-	import { escapeAttribute, escapeHtml, getSafeImageSrc } from '../../lib/client-safety';
+	import { escapeAttribute, escapeHtml, getSafeImageSrc, generateShortId } from '../../lib/client-safety';
 
 	document.addEventListener('DOMContentLoaded', () => {
 		const searchInput = document.getElementById('search-input') as HTMLInputElement;
@@ -447,11 +447,7 @@ try {
 		editorBackdrop.addEventListener('click', closeDrawer);
 
 		function setNewServiceState() {
-			const shortId = (crypto && crypto.randomUUID) 
-				? crypto.randomUUID().substring(0, 8) 
-				: Math.random().toString(36).substring(2, 10);
-
-			formId.value = `service_${shortId}`;
+			formId.value = `service_${generateShortId()}`;
 			formTitle.value = '';
 			formOrder.value = '0';
 			formDescription.value = '';

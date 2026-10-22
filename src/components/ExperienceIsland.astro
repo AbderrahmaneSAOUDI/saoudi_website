@@ -3,6 +3,7 @@ import type { Experience } from '../types';
 import { getFirebaseAdminDb } from '../lib/server/firebase-admin';
 import { CACHE_TTL_MS, getOrSetCached } from '../lib/server/cache';
 import { getPublicMediaUrl } from '../lib/media';
+import { formatMonthYear } from '../lib/date-utils';
 import Icon from './Icon.astro';
 
 let experiences: Experience[] = [];
@@ -44,16 +45,6 @@ try {
 	console.warn('Failed to fetch experiences for public page:', error);
 	errorMsg = 'Degraded mode: Professional experience data is currently offline.';
 }
-
-function formatDate(dateStr: string | null): string {
-	if (!dateStr) return 'Present';
-	const [year, month] = dateStr.split('-');
-	if (!year) return dateStr;
-	if (!month) return year;
-	const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-	const mIdx = parseInt(month, 10) - 1;
-	return `${months[mIdx] || month} ${year}`;
-}
 ---
 
 {errorMsg && (
@@ -85,8 +76,8 @@ function formatDate(dateStr: string | null): string {
 
 		{experiences.map((exp, index) => {
 			const isEven = index % 2 === 0;
-			const formattedStart = formatDate(exp.startDate);
-			const formattedEnd = formatDate(exp.endDate);
+			const formattedStart = formatMonthYear(exp.startDate);
+			const formattedEnd = formatMonthYear(exp.endDate);
 			const isPresent = !exp.endDate;
 			const delaySec = (index * 0.18 + 0.15).toFixed(2);
 			const dotDelaySec = (index * 0.18 + 0.05).toFixed(2);

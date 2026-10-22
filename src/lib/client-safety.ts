@@ -33,3 +33,10 @@ export function getSafeImageSrc(value: unknown): string {
 	}
 	return getSafePublicHref(candidate);
 }
+
+/** Generates a collision-resistant 8-character alphanumeric string for newly drafted CMS items. */
+export function generateShortId(): string {
+	return (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+		? crypto.randomUUID().substring(0, 8)
+		: Math.random().toString(36).substring(2, 10);
+}
