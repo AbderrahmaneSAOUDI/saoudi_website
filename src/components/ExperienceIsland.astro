@@ -13,7 +13,9 @@ try {
 		'experience_list',
 		async () => {
 			const db = getFirebaseAdminDb();
-			const snapshot = await db.collection('experience').get();
+			const snapshot = await db.collection('experience')
+				.select('order', 'role', 'company', 'logoUrl', 'employmentType', 'startDate', 'endDate', 'responsibilities')
+				.get();
 			const list = snapshot.docs.map((doc) => {
 				const data = doc.data();
 				return {

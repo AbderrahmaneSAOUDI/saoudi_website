@@ -22,7 +22,9 @@ try {
 		"services_list",
 		async () => {
 			const db = getFirebaseAdminDb();
-			const snapshot = await db.collection("services").get();
+			const snapshot = await db.collection("services")
+				.select('order', 'title', 'description', 'logoUrl', 'features')
+				.get();
 			const list = snapshot.docs.map((doc) => {
 				const data = doc.data();
 				return {
@@ -93,6 +95,8 @@ const colorAccents = [
 												<img
 													src={service.logoUrl}
 													alt={service.title}
+													width="56"
+													height="56"
 													class="w-full h-full object-contain p-2.5"
 													loading={index < 3 ? 'eager' : 'lazy'}
 													decoding="async"

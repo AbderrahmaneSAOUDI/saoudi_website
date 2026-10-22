@@ -29,8 +29,11 @@ import Icon from './Icon.astro';
 </footer>
 
 <script>
-	const versionEl = document.getElementById('footer-version');
-	if (versionEl) {
+	function setupFooterVersion() {
+		const versionEl = document.getElementById('footer-version');
+		if (!versionEl || (versionEl as any).__bound) return;
+		(versionEl as any).__bound = true;
+
 		let timer: ReturnType<typeof setTimeout> | null = null;
 		let isLongPress = false;
 		const LONG_PRESS_DURATION = 600;
@@ -64,4 +67,7 @@ import Icon from './Icon.astro';
 			}
 		});
 	}
+
+	setupFooterVersion();
+	document.addEventListener('astro:page-load', setupFooterVersion);
 </script>
