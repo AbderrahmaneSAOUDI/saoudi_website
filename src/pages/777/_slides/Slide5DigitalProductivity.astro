@@ -1,0 +1,120 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const pillars = [
+  {
+    title: 'Less Friction',
+    tag: 'Fewer Obstacles',
+    icon: '⚡',
+    desc: 'Remove awkward steps, lost files, and confusing tools so work starts immediately.',
+    benefit: 'Save 15–30 min per task',
+    accent: 'emerald',
+    borderColor: 'border-emerald-500/35',
+    bgBadge: 'bg-emerald-50 text-[#006233]',
+  },
+  {
+    title: 'Less Repetition',
+    tag: 'Never Start at Zero',
+    icon: '🔁',
+    desc: 'Reuse standard email templates, checklists, and document outlines instead of re-typing.',
+    benefit: 'Eliminate duplicate effort',
+    accent: 'sky',
+    borderColor: 'border-sky-500/35',
+    bgBadge: 'bg-sky-50 text-[#0080C8]',
+  },
+  {
+    title: 'Better Focus',
+    tag: 'Protected Attention',
+    icon: '🎯',
+    desc: 'Stop keeping mental to-do lists. Single-task in scheduled blocks without notification pings.',
+    benefit: 'Clearer mental bandwidth',
+    accent: 'amber',
+    borderColor: 'border-amber-500/35',
+    bgBadge: 'bg-amber-50 text-[#D97706]',
+  },
+  {
+    title: 'More Useful Output',
+    tag: 'Real Results',
+    icon: '🚀',
+    desc: 'Finish high-value priorities with less stress rather than merely answering urgent noise.',
+    benefit: 'Tangible finished work',
+    accent: 'purple',
+    borderColor: 'border-purple-500/35',
+    bgBadge: 'bg-purple-50 text-purple-700',
+  },
+];
+---
+
+<!-- ================= SLIDE 5 PANE (WHAT IS DIGITAL PRODUCTIVITY?) ================= -->
+<section 
+  id="slide-5-content" 
+  class={`slide-pane slide-pane-5 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+  <!-- Top Tag & Main Title -->
+  <div class="flex flex-col items-center space-y-2 shrink-0 pt-1">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#006233] animate-ping"></span>
+      <span>Core Principle</span>
+    </div>
+
+    <h2 class="title-highlight font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-tight">
+      What Is Digital Productivity?
+    </h2>
+
+    <!-- Official Definition Card -->
+    <div class="max-w-3xl px-6 py-3 rounded-2xl bg-white border-2 border-emerald-600/30 shadow-sm">
+      <p class="text-sm sm:text-base md:text-lg font-bold text-slate-800 leading-snug">
+        “Digital productivity is using technology <span class="text-[#006233] font-black underline decoration-emerald-400 decoration-2 underline-offset-2">intentionally</span> to reduce unnecessary effort and achieve <span class="text-[#006233] font-black">better results</span>.”
+      </p>
+    </div>
+  </div>
+
+  <!-- 4 Cohesive Interconnected Pillars Grid with Relational Visual Flow -->
+  <div class="w-full max-w-5xl mx-auto my-auto grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-5 px-2 py-2">
+    {pillars.map((item, idx) => (
+      <div class={`pillar-card p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white border-2 ${item.borderColor} hover:border-[#006233] transition-all duration-300 flex flex-col justify-between text-left group hover:-translate-y-1`}>
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2.5">
+            <span class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+              {item.icon}
+            </span>
+            <span class={`px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wider ${item.bgBadge}`}>
+              {item.tag}
+            </span>
+          </div>
+
+          <span class="font-mono text-xs font-black text-slate-400">0{idx + 1}</span>
+        </div>
+
+        <div>
+          <h3 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight group-hover:text-[#006233] transition-colors">
+            {item.title}
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mt-1">
+            {item.desc}
+          </p>
+        </div>
+
+        <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] sm:text-xs">
+          <span class="font-semibold text-slate-400">Direct impact:</span>
+          <span class="font-bold text-[#006233] bg-emerald-50 px-2 py-0.5 rounded-md">
+            {item.benefit}
+          </span>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Bottom Visual Connection Bar -->
+  <div class="w-full max-w-2xl mx-auto flex items-center justify-center gap-2 text-xs text-slate-500 font-medium pb-1 shrink-0">
+    <span class="text-emerald-700 font-bold">Less friction & repetition</span>
+    <span>→</span>
+    <span class="text-sky-700 font-bold">Unlocks deeper focus</span>
+    <span>→</span>
+    <span class="text-[#006233] font-extrabold">Produces meaningful results</span>
+  </div>
+</section>

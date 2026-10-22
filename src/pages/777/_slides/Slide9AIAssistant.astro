@@ -1,0 +1,109 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const useCases = [
+  {
+    title: 'Drafting Professional Emails',
+    example: 'Transform 3 informal bullet points into a courteous, polished client email.',
+    icon: '✉️',
+    tag: 'Communication',
+  },
+  {
+    title: 'Summarizing Long Documents',
+    example: 'Extract the top 5 decisions, responsibilities, and deadlines from a 20-page PDF.',
+    icon: '📑',
+    tag: 'Analysis',
+  },
+  {
+    title: 'Organizing Messy Notes',
+    example: 'Convert chaotic verbal meeting scribbles into a structured action item list.',
+    icon: '📋',
+    tag: 'Structure',
+  },
+  {
+    title: 'Preparing Action Plans',
+    example: 'Break a large goal into sequential phases, milestones, and realistic timelines.',
+    icon: '🗺️',
+    tag: 'Planning',
+  },
+  {
+    title: 'Brainstorming Ideas & Outlines',
+    example: 'Generate 10 workshop exercise ideas, article topics, or presentation structures.',
+    icon: '💡',
+    tag: 'Ideation',
+  },
+  {
+    title: 'Refining Written Tone & Clarity',
+    example: 'Fix English grammar, shorten wordy explanations, or adjust formal vs casual tone.',
+    icon: '✍️',
+    tag: 'Refinement',
+  },
+];
+---
+
+<!-- ================= SLIDE 9 PANE (AI AS YOUR EVERYDAY ASSISTANT) ================= -->
+<section 
+  id="slide-9-content" 
+  class={`slide-pane slide-pane-9 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+  <!-- Top Tag & Header -->
+  <div class="flex flex-col items-center space-y-1.5 shrink-0 pt-1">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#006233] animate-ping"></span>
+      <span>Practical AI Skills</span>
+    </div>
+
+    <h2 class="title-highlight font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-tight">
+      AI as Your Everyday Assistant
+    </h2>
+
+    <p class="text-xs sm:text-sm md:text-base font-medium text-slate-600">
+      Spend less time starting from scratch. Reclaim hours on first drafts.
+    </p>
+  </div>
+
+  <!-- 6 Realistic Practical Use Cases Grid -->
+  <div class="w-full max-w-5xl mx-auto my-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 px-2 py-2">
+    {useCases.map((item) => (
+      <div class="ai-card p-4 sm:p-4.5 rounded-2xl sm:rounded-3xl bg-white border-2 border-slate-200/90 hover:border-emerald-600 transition-all duration-300 flex flex-col justify-between text-left group hover:-translate-y-1">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200/80 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              {item.icon}
+            </span>
+            <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-[10px] font-bold text-slate-600 uppercase tracking-wide">
+              {item.tag}
+            </span>
+          </div>
+
+          <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-snug group-hover:text-[#006233] transition-colors mb-1.5">
+            {item.title}
+          </h3>
+        </div>
+
+        <p class="text-xs text-slate-600 font-medium leading-relaxed border-t border-slate-100 pt-2 mt-1">
+          {item.example}
+        </p>
+      </div>
+    ))}
+  </div>
+
+  <!-- Crucial Safety & Accuracy Guard Box (High contrast, clearly visible) -->
+  <div class="w-full max-w-4xl mx-auto p-3.5 px-6 rounded-2xl sm:rounded-3xl bg-amber-50/90 border-2 border-amber-500/40 flex items-center justify-between gap-4 text-left shrink-0 mb-1">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl shrink-0">🛡️</span>
+      <div>
+        <h4 class="text-xs sm:text-sm font-black text-amber-950 uppercase tracking-wide">
+          Crucial Safety Principle:
+        </h4>
+        <p class="text-xs sm:text-sm text-amber-900 font-medium leading-snug">
+          AI output <strong class="font-extrabold underline decoration-amber-500">must always be reviewed</strong> by you before sending. <strong class="font-extrabold">Never paste confidential company passwords, bank details, or private personal data</strong> into public AI tools.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

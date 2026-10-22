@@ -1,0 +1,147 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+// Load tool logos as base64 data URIs
+const assetsDir = path.resolve(process.cwd(), 'src/pages/777/_assets');
+const readSvg = (relPath: string) => {
+  try {
+    const raw = fs.readFileSync(path.join(assetsDir, relPath));
+    return `data:image/svg+xml;base64,${raw.toString('base64')}`;
+  } catch (e) {
+    return '';
+  }
+};
+
+const icons = {
+  whatsapp: readSvg('logo_whatsapp.svg'),
+  gmail: readSvg('_google/logo_google-gmail.svg'),
+  outlook: readSvg('_microsoft/logo_microsoft-outlook.svg'),
+  drive: readSvg('_google/logo_google-drive.svg'),
+  onedrive: readSvg('_microsoft/logo_microsoft-onedrive.svg'),
+  gtasks: readSvg('_google/logo_google-tasks.svg'),
+  gcalendar: readSvg('_google/logo_google-calendar.svg'),
+  gdocs: readSvg('_google/logo_google-docs.svg'),
+  word: readSvg('_microsoft/logo_microsoft-word.svg'),
+  chatgpt: readSvg('_logos/logo_openai.svg'),
+  gemini: readSvg('_google/logo_google-gemini.svg'),
+};
+
+const categories = [
+  {
+    category: 'Communication',
+    icon: '💬',
+    tools: [
+      { name: 'WhatsApp', icon: icons.whatsapp, desc: 'Quick direct messaging' },
+      { name: 'Gmail', icon: icons.gmail, desc: 'External correspondence' },
+      { name: 'Outlook', icon: icons.outlook, desc: 'Formal business email' },
+    ],
+    border: 'border-emerald-500/30',
+  },
+  {
+    category: 'Cloud Files',
+    icon: '📁',
+    tools: [
+      { name: 'Google Drive', icon: icons.drive, desc: 'Cloud storage & sharing' },
+      { name: 'OneDrive', icon: icons.onedrive, desc: 'Microsoft ecosystem storage' },
+    ],
+    border: 'border-sky-500/30',
+  },
+  {
+    category: 'Tasks & Time',
+    icon: '⏰',
+    tools: [
+      { name: 'Google Tasks', icon: icons.gtasks, desc: 'Lightweight to-do list' },
+      { name: 'Google Calendar', icon: icons.gcalendar, desc: 'Time-blocking & agendas' },
+    ],
+    border: 'border-amber-500/30',
+  },
+  {
+    category: 'Documents',
+    icon: '📄',
+    tools: [
+      { name: 'Google Docs', icon: icons.gdocs, desc: 'Collaborative writing' },
+      { name: 'Microsoft Word', icon: icons.word, desc: 'Official reports & letters' },
+    ],
+    border: 'border-blue-500/30',
+  },
+  {
+    category: 'AI Assistance',
+    icon: '✨',
+    tools: [
+      { name: 'ChatGPT', icon: icons.chatgpt, desc: 'Ideation & drafting' },
+      { name: 'Gemini', icon: icons.gemini, desc: 'Google Workspace AI' },
+    ],
+    border: 'border-purple-500/30',
+  },
+];
+---
+
+<!-- ================= SLIDE 12 PANE (YOUR MINIMAL PRODUCTIVITY TOOLBOX) ================= -->
+<section 
+  id="slide-12-content" 
+  class={`slide-pane slide-pane-12 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+  <!-- Top Tag & Header -->
+  <div class="flex flex-col items-center space-y-1.5 shrink-0 pt-1">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#006233] animate-ping"></span>
+      <span>Essential Ecosystem</span>
+    </div>
+
+    <h2 class="title-highlight font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-tight">
+      Your Minimal Productivity Toolbox
+    </h2>
+
+    <!-- Core Principle Banner -->
+    <div class="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-slate-900 text-white text-xs sm:text-sm font-bold shadow-xs">
+      <span class="text-emerald-400">🎯</span>
+      <span>Start with what you already use. Add tools only when they solve a real problem.</span>
+    </div>
+  </div>
+
+  <!-- 5 Functional Category Cards Grid -->
+  <div class="w-full max-w-5xl mx-auto my-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-3.5 px-2 py-2">
+    {categories.map((cat) => (
+      <div class={`cat-card p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl bg-white border-2 ${cat.border} hover:border-[#006233] transition-all duration-300 flex flex-col justify-between text-left group hover:-translate-y-1`}>
+        <!-- Category Header -->
+        <div class="border-b border-slate-100 pb-2 mb-2 flex items-center justify-between">
+          <span class="text-xs sm:text-sm font-black text-slate-900 tracking-tight flex items-center gap-1.5">
+            <span>{cat.icon}</span>
+            <span>{cat.category}</span>
+          </span>
+        </div>
+
+        <!-- Tool Rows in Category -->
+        <div class="space-y-2 my-auto">
+          {cat.tools.map((t) => (
+            <div class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-white transition-colors">
+              <div class="w-7 h-7 rounded-lg bg-white p-1 border border-slate-200 flex items-center justify-center shrink-0">
+                <img src={t.icon} alt={t.name} class="w-full h-full object-contain pointer-events-none select-none" />
+              </div>
+              <div class="min-w-0">
+                <h4 class="text-xs font-bold text-slate-900 leading-tight truncate">{t.name}</h4>
+                <p class="text-[10px] text-slate-500 font-medium leading-tight truncate">{t.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 mt-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+          Standard Tools
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Bottom Pragmatic Advice -->
+  <div class="w-full max-w-2xl mx-auto flex items-center justify-center gap-2 text-xs text-slate-500 font-medium pb-1 shrink-0">
+    <span>💡 No need to pay for 10 subscription apps. Master these foundational tools first.</span>
+  </div>
+</section>

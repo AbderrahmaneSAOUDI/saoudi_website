@@ -1,0 +1,142 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+// Load Google Tasks & Google Calendar SVGs as clean base64 data URIs
+const assetsDir = path.resolve(process.cwd(), 'src/pages/777/_assets');
+const readSvg = (relPath: string) => {
+  try {
+    const raw = fs.readFileSync(path.join(assetsDir, relPath));
+    return `data:image/svg+xml;base64,${raw.toString('base64')}`;
+  } catch (e) {
+    return '';
+  }
+};
+
+const gtasksIcon = readSvg('_google/logo_google-tasks.svg');
+const gcalendarIcon = readSvg('_google/logo_google-calendar.svg');
+
+const demoSteps = [
+  {
+    step: '1',
+    phase: 'WHAT',
+    tool: 'Google Tasks',
+    icon: gtasksIcon,
+    title: 'Capture the Task',
+    desc: 'Write “Prepare and send the monthly report” in your task list. Don’t keep it in your head.',
+    tag: 'Task Inbox',
+    accent: 'bg-blue-50 border-blue-200 text-[#0080C8]',
+  },
+  {
+    step: '2',
+    phase: 'DEADLINE',
+    tool: 'Google Tasks',
+    icon: gtasksIcon,
+    title: 'Assign a Hard Due Date',
+    desc: 'Set Due Date: Thursday at 4:00 PM. A task without a deadline is merely a wish.',
+    tag: 'Clear Due Date',
+    accent: 'bg-amber-50 border-amber-200 text-[#D97706]',
+  },
+  {
+    step: '3',
+    phase: 'WHEN',
+    tool: 'Google Calendar',
+    icon: gcalendarIcon,
+    title: 'Reserve Focus Time Block',
+    desc: 'Book Wednesday 10:00 AM – 11:30 AM on your calendar. Treat this appointment with yourself like a client meeting.',
+    tag: 'Protected Time',
+    accent: 'bg-emerald-50 border-emerald-200 text-[#006233]',
+  },
+  {
+    step: '4',
+    phase: 'ALERT',
+    tool: 'Google Calendar',
+    icon: gcalendarIcon,
+    title: 'Set an Actionable Reminder',
+    desc: 'Alert 30 min before the focus block starts, NOT at the deadline when it’s already too late.',
+    tag: 'Timely Trigger',
+    accent: 'bg-purple-50 border-purple-200 text-purple-700',
+  },
+];
+---
+
+<!-- ================= SLIDE 8 PANE (TASKS TELL YOU WHAT. CALENDAR TELLS YOU WHEN) ================= -->
+<section 
+  id="slide-8-content" 
+  class={`slide-pane slide-pane-8 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+  <!-- Top Tag & Golden Rule -->
+  <div class="flex flex-col items-center space-y-1.5 shrink-0 pt-1">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#006233] animate-ping"></span>
+      <span>Stop Relying on Memory</span>
+    </div>
+
+    <!-- Main Title: Tasks Tell You WHAT. Calendar Tells You WHEN. -->
+    <h2 class="font-black text-2xl sm:text-3xl md:text-5xl lg:text-[3.2rem] text-slate-900 tracking-tight leading-tight">
+      Tasks Tell You <span class="text-[#0080C8]">WHAT</span>. Calendar Tells You <span class="text-[#006233]">WHEN</span>.
+    </h2>
+
+    <p class="text-xs sm:text-sm md:text-base text-slate-500 font-medium">
+      Practical Walkthrough: <span class="font-bold text-slate-800">“Prepare and send the monthly report by Thursday”</span>
+    </p>
+  </div>
+
+  <!-- 4-Step Interactive Sequence Cards -->
+  <div class="w-full max-w-5xl mx-auto my-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 px-2 py-2">
+    {demoSteps.map((s) => (
+      <div class="sequence-card p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white border-2 border-slate-200/90 hover:border-[#006233] transition-all duration-300 flex flex-col justify-between text-left group hover:-translate-y-1">
+        <div>
+          <!-- Header with Tool Logo & Phase Tag -->
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <div class="w-10 h-10 rounded-xl p-1.5 bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+              <img src={s.icon} alt={s.tool} class="w-full h-full object-contain pointer-events-none select-none" />
+            </div>
+
+            <span class={`px-2.5 py-0.5 rounded-full border text-[11px] font-black uppercase tracking-wider ${s.accent}`}>
+              {s.phase}
+            </span>
+          </div>
+
+          <div class="font-mono text-xs font-black text-slate-400 mb-0.5">STEP 0{s.step}</div>
+          <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-snug group-hover:text-[#006233] transition-colors mb-2">
+            {s.title}
+          </h3>
+        </div>
+
+        <div class="border-t border-slate-100 pt-2.5 mt-2">
+          <p class="text-xs text-slate-600 font-medium leading-relaxed">
+            {s.desc}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Bottom Audience Exercise Box (Call to Action) -->
+  <div class="w-full max-w-4xl mx-auto p-4 sm:p-4.5 rounded-2xl sm:rounded-3xl bg-emerald-50/90 border-2 border-emerald-600/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-left shrink-0 mb-1">
+    <div class="flex items-center gap-3">
+      <span class="w-10 h-10 rounded-xl bg-[#1E824C] text-white flex items-center justify-center text-xl shrink-0">
+        ✍️
+      </span>
+      <div>
+        <h4 class="text-sm sm:text-base font-black text-slate-900 tracking-tight">
+          Quick Audience Participation:
+        </h4>
+        <p class="text-xs sm:text-sm text-slate-600 font-medium">
+          Write down <strong class="text-slate-900 font-black">ONE important task</strong> you need to complete tomorrow, and pick an exact 45-minute calendar slot for it!
+        </p>
+      </div>
+    </div>
+
+    <span class="px-4 py-1.5 rounded-full bg-slate-900 text-white font-mono text-xs font-bold shrink-0">
+      Type in chat or note down
+    </span>
+  </div>
+</section>

@@ -1,0 +1,185 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const options = [
+  {
+    num: 1,
+    title: 'Too many messages',
+    desc: 'Endless WhatsApp groups, Slack pings, and email threads competing for attention.',
+    icon: '💬',
+    accent: 'emerald',
+  },
+  {
+    num: 2,
+    title: 'Finding files & information',
+    desc: 'Hunting through Downloads, Desktop folders, chat attachments, and lost links.',
+    icon: '🔍',
+    accent: 'sky',
+  },
+  {
+    num: 3,
+    title: 'Forgetting tasks & deadlines',
+    desc: 'Relying on mental memory or messy sticky notes until an urgent crisis hits.',
+    icon: '⏰',
+    accent: 'amber',
+  },
+  {
+    num: 4,
+    title: 'Repetitive copy-paste work',
+    desc: 'Typing the same email answers, manual spreadsheets, and recurring paperwork.',
+    icon: '🔁',
+    accent: 'rose',
+  },
+  {
+    num: 5,
+    title: 'Too many meetings',
+    desc: 'Lengthy discussions that could have been resolved in a clear 2-minute message.',
+    icon: '📅',
+    accent: 'indigo',
+  },
+];
+---
+
+<!-- ================= SLIDE 3 PANE (AUDIENCE INTERACTION: TIME-WASTERS) ================= -->
+<section 
+  id="slide-3-content" 
+  data-selected-option="none"
+  class={`slide-pane slide-pane-3 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+  <!-- Top Header Block: Headline + Chat Participation CTA -->
+  <div class="flex flex-col items-center space-y-2 shrink-0 pt-1">
+    <!-- Live Engagement Badge -->
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#006233] animate-ping"></span>
+      <span>Live Audience Check-in</span>
+    </div>
+
+    <!-- Main Title -->
+    <h2 class="title-highlight font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-tight">
+      What's Your Biggest Time-Waster?
+    </h2>
+
+    <!-- Instruction Badge for Chat -->
+    <div class="inline-flex items-center gap-2 px-5 py-2 rounded-2xl bg-slate-900 text-white font-mono text-sm sm:text-base font-bold shadow-sm">
+      <span class="text-emerald-400">⌨️</span>
+      <span>Type your number in the chat! (1 – 5)</span>
+    </div>
+  </div>
+
+  <!-- Interactive 5-Option Grid -->
+  <div class="w-full max-w-5xl mx-auto my-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4.5 px-2 py-2">
+    {options.map((opt, idx) => (
+      <button
+        type="button"
+        id={`timeWasterCard-${opt.num}`}
+        data-option-num={opt.num}
+        class={`time-waster-card group text-left p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white border-2 border-slate-200/90 hover:border-emerald-600 transition-all duration-300 hover:-translate-y-1 cursor-pointer relative select-none flex flex-col justify-between ${idx === 4 ? 'sm:col-span-2 lg:col-span-1' : ''}`}
+      >
+        <div class="flex items-start justify-between gap-3 mb-2">
+          <!-- Number Badge -->
+          <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-100 group-hover:bg-[#1E824C] group-hover:text-white border border-slate-200 text-slate-800 font-mono text-lg sm:text-xl font-black flex items-center justify-center shrink-0 transition-colors duration-300">
+            {opt.num}
+          </div>
+
+          <!-- Icon Box -->
+          <span class="text-2xl sm:text-3xl shrink-0 group-hover:scale-115 transition-transform duration-300">
+            {opt.icon}
+          </span>
+        </div>
+
+        <div>
+          <h3 class="text-base sm:text-lg lg:text-xl font-black text-slate-900 group-hover:text-[#006233] transition-colors tracking-tight leading-snug">
+            {opt.title}
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mt-1">
+            {opt.desc}
+          </p>
+        </div>
+
+        <!-- Selected Checkmark Badge (Hidden until active) -->
+        <div class="selected-badge hidden items-center gap-1.5 mt-3 pt-2 border-t border-emerald-500/20 text-xs font-black text-[#006233] uppercase tracking-wide">
+          <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <span>Selected on Screen</span>
+        </div>
+      </button>
+    ))}
+  </div>
+
+  <!-- Bottom Guidance / Presenter Cue -->
+  <div class="w-full max-w-xl mx-auto flex items-center justify-center gap-2 text-xs sm:text-sm text-slate-500 font-medium pb-1 shrink-0">
+    <span>💡 Tip: Click cards or press keys <kbd class="px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-mono font-bold">1</kbd> to <kbd class="px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-mono font-bold">5</kbd> to highlight audience votes live.</span>
+  </div>
+</section>
+
+<!-- Embedded Interactive Controller Script -->
+<script is:inline>
+  (() => {
+    const slide = document.getElementById('slide-3-content');
+    if (!slide) return;
+
+    const cards = slide.querySelectorAll('.time-waster-card');
+
+    function toggleOption(num) {
+      const current = slide.getAttribute('data-selected-option');
+      const targetStr = String(num);
+
+      if (current === targetStr) {
+        // Deselect if already selected
+        slide.setAttribute('data-selected-option', 'none');
+        cards.forEach(c => {
+          c.classList.remove('active-time-waster');
+          const badge = c.querySelector('.selected-badge');
+          if (badge) badge.classList.add('hidden');
+        });
+      } else {
+        slide.setAttribute('data-selected-option', targetStr);
+        cards.forEach(c => {
+          if (c.getAttribute('data-option-num') === targetStr) {
+            c.classList.add('active-time-waster');
+            const badge = c.querySelector('.selected-badge');
+            if (badge) badge.classList.remove('hidden');
+          } else {
+            c.classList.remove('active-time-waster');
+            const badge = c.querySelector('.selected-badge');
+            if (badge) badge.classList.add('hidden');
+          }
+        });
+      }
+    }
+
+    cards.forEach(card => {
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const num = card.getAttribute('data-option-num');
+        if (num) toggleOption(num);
+      });
+    });
+
+    // Keyboard support: 1-5 keys when on Slide 3
+    window.addEventListener('keydown', (e) => {
+      const deck = document.getElementById('presentationDeck');
+      if (deck && deck.getAttribute('data-current-slide') === '3') {
+        const keyNum = parseInt(e.key, 10);
+        if (keyNum >= 1 && keyNum <= 5) {
+          e.preventDefault();
+          toggleOption(keyNum);
+        }
+      }
+    });
+  })();
+</script>
+
+<style>
+  .time-waster-card.active-time-waster {
+    border-color: #006233 !important;
+    background-color: #f0fdf4 !important;
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 0 0 3px rgba(0, 98, 51, 0.18);
+  }
+</style>

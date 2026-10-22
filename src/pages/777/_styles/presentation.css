@@ -533,386 +533,38 @@
 
 /* === 12. Slide Deck Navigation & Smooth Transitions === */
 .slide-pane {
-  transition: opacity 0.6s cubic-bezier(0.2, 0, 0, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  transform: scale(0.97) translateY(24px);
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.5s cubic-bezier(0.2, 0, 0, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
-/* Slide 1 State */
-[data-current-slide="1"] .slide-pane-1 {
+[data-current-slide="1"] .slide-pane-1,
+[data-current-slide="2"] .slide-pane-2,
+[data-current-slide="3"] .slide-pane-3,
+[data-current-slide="4"] .slide-pane-4,
+[data-current-slide="5"] .slide-pane-5,
+[data-current-slide="6"] .slide-pane-6,
+[data-current-slide="7"] .slide-pane-7,
+[data-current-slide="8"] .slide-pane-8,
+[data-current-slide="9"] .slide-pane-9,
+[data-current-slide="10"] .slide-pane-10,
+[data-current-slide="11"] .slide-pane-11,
+[data-current-slide="12"] .slide-pane-12,
+[data-current-slide="13"] .slide-pane-13,
+[data-current-slide="14"] .slide-pane-14,
+[data-current-slide="15"] .slide-pane-15 {
   opacity: 1;
   transform: scale(1) translateY(0);
   pointer-events: auto;
   position: relative;
-}
-
-[data-current-slide="1"] .slide-pane-2,
-[data-current-slide="1"] .slide-pane-3,
-[data-current-slide="1"] .slide-pane-4,
-[data-current-slide="1"] .slide-pane-5,
-[data-current-slide="1"] .slide-pane-6,
-[data-current-slide="1"] .slide-pane-7,
-[data-current-slide="1"] .slide-pane-8,
-[data-current-slide="1"] .slide-pane-9,
-[data-current-slide="1"] .slide-pane-10,
-[data-current-slide="1"] .slide-pane-11 {
-  opacity: 0;
-  transform: scale(0.96) translateY(24px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-/* Slide 2 State */
-[data-current-slide="2"] .slide-pane-1 {
-  opacity: 0;
-  transform: scale(0.97) translateY(-20px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-[data-current-slide="2"] .slide-pane-2 {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  pointer-events: auto;
-  position: relative;
-}
-
-[data-current-slide="2"] .slide-pane-3,
-[data-current-slide="2"] .slide-pane-4,
-[data-current-slide="2"] .slide-pane-5,
-[data-current-slide="2"] .slide-pane-6,
-[data-current-slide="2"] .slide-pane-7,
-[data-current-slide="2"] .slide-pane-8,
-[data-current-slide="2"] .slide-pane-9,
-[data-current-slide="2"] .slide-pane-10,
-[data-current-slide="2"] .slide-pane-11 {
-  opacity: 0;
-  transform: scale(0.96) translateY(24px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-/* Slide 3 State (Welcome Slide) */
-[data-current-slide="3"] .slide-pane-1,
-[data-current-slide="3"] .slide-pane-2 {
-  opacity: 0;
-  transform: scale(0.97) translateY(-20px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-[data-current-slide="3"] .slide-pane-3 {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  pointer-events: auto;
-  position: relative;
-}
-
-[data-current-slide="3"] .slide-pane-4,
-[data-current-slide="3"] .slide-pane-5,
-[data-current-slide="3"] .slide-pane-6,
-[data-current-slide="3"] .slide-pane-7,
-[data-current-slide="3"] .slide-pane-8,
-[data-current-slide="3"] .slide-pane-9,
-[data-current-slide="3"] .slide-pane-10,
-[data-current-slide="3"] .slide-pane-11 {
-  opacity: 0;
-  transform: scale(0.96) translateY(24px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-/* Slide 4 State (7.77 Initiative Overview) */
-[data-current-slide="4"] .slide-pane-1,
-[data-current-slide="4"] .slide-pane-2,
-[data-current-slide="4"] .slide-pane-3 {
-  opacity: 0;
-  transform: scale(0.97) translateY(-20px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-[data-current-slide="4"] .slide-pane-4 {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  pointer-events: auto;
-  position: relative;
-}
-
-[data-current-slide="4"] .slide-pane-5,
-[data-current-slide="4"] .slide-pane-6,
-[data-current-slide="4"] .slide-pane-7,
-[data-current-slide="4"] .slide-pane-8,
-[data-current-slide="4"] .slide-pane-9,
-[data-current-slide="4"] .slide-pane-10,
-[data-current-slide="4"] .slide-pane-11 {
-  opacity: 0;
-  transform: scale(0.96) translateY(24px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-/* Slide 5 State (Are you actually productive?) */
-[data-current-slide="5"] .slide-pane-1,
-[data-current-slide="5"] .slide-pane-2,
-[data-current-slide="5"] .slide-pane-3,
-[data-current-slide="5"] .slide-pane-4 {
-  opacity: 0;
-  transform: scale(0.97) translateY(-20px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-[data-current-slide="5"] .slide-pane-5 {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  pointer-events: auto;
-  position: relative;
-}
-
-[data-current-slide="5"] .slide-pane-6,
-[data-current-slide="5"] .slide-pane-7,
-[data-current-slide="5"] .slide-pane-8,
-[data-current-slide="5"] .slide-pane-9,
-[data-current-slide="5"] .slide-pane-10,
-[data-current-slide="5"] .slide-pane-11 {
-  opacity: 0;
-  transform: scale(0.96) translateY(24px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-/* Slide 6 State (What is Digital Productivity? - n8n Workflow) */
-[data-current-slide="6"] .slide-pane-1,
-[data-current-slide="6"] .slide-pane-2,
-[data-current-slide="6"] .slide-pane-3,
-[data-current-slide="6"] .slide-pane-4,
-[data-current-slide="6"] .slide-pane-5 {
-  opacity: 0;
-  transform: scale(0.97) translateY(-20px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-[data-current-slide="6"] .slide-pane-6 {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  pointer-events: auto;
-  position: relative;
-}
-
-[data-current-slide="6"] .slide-pane-7,
-[data-current-slide="6"] .slide-pane-8,
-[data-current-slide="6"] .slide-pane-9,
-[data-current-slide="6"] .slide-pane-10,
-[data-current-slide="6"] .slide-pane-11 {
-  opacity: 0;
-  transform: scale(0.96) translateY(24px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-/* Slide 7 State (The Scenario: Event Organization) */
-[data-current-slide="7"] .slide-pane-1,
-[data-current-slide="7"] .slide-pane-2,
-[data-current-slide="7"] .slide-pane-3,
-[data-current-slide="7"] .slide-pane-4,
-[data-current-slide="7"] .slide-pane-5,
-[data-current-slide="7"] .slide-pane-6 {
-  opacity: 0;
-  transform: scale(0.97) translateY(-20px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-[data-current-slide="7"] .slide-pane-7 {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  pointer-events: auto;
-  position: relative;
-}
-
-[data-current-slide="7"] .slide-pane-8,
-[data-current-slide="7"] .slide-pane-9,
-[data-current-slide="7"] .slide-pane-10,
-[data-current-slide="7"] .slide-pane-11 {
-  opacity: 0;
-  transform: scale(0.96) translateY(24px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-/* Slide 8 State (The "Better Event" - Before & After) */
-[data-current-slide="8"] .slide-pane-1,
-[data-current-slide="8"] .slide-pane-2,
-[data-current-slide="8"] .slide-pane-3,
-[data-current-slide="8"] .slide-pane-4,
-[data-current-slide="8"] .slide-pane-5,
-[data-current-slide="8"] .slide-pane-6,
-[data-current-slide="8"] .slide-pane-7 {
-  opacity: 0;
-  transform: scale(0.97) translateY(-20px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-[data-current-slide="8"] .slide-pane-8 {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  pointer-events: auto;
-  position: relative;
-}
-
-[data-current-slide="8"] .slide-pane-9,
-[data-current-slide="8"] .slide-pane-10,
-[data-current-slide="8"] .slide-pane-11 {
-  opacity: 0;
-  transform: scale(0.96) translateY(24px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-/* Slide 9 State (The Productivity Toolbox) */
-[data-current-slide="9"] .slide-pane-1,
-[data-current-slide="9"] .slide-pane-2,
-[data-current-slide="9"] .slide-pane-3,
-[data-current-slide="9"] .slide-pane-4,
-[data-current-slide="9"] .slide-pane-5,
-[data-current-slide="9"] .slide-pane-6,
-[data-current-slide="9"] .slide-pane-7,
-[data-current-slide="9"] .slide-pane-8 {
-  opacity: 0;
-  transform: scale(0.97) translateY(-20px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-[data-current-slide="9"] .slide-pane-9 {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  pointer-events: auto;
-  position: relative;
-}
-
-[data-current-slide="9"] .slide-pane-10,
-[data-current-slide="9"] .slide-pane-11 {
-  opacity: 0;
-  transform: scale(0.96) translateY(24px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-/* Slide 10 State (Questions Time / Q&A) */
-[data-current-slide="10"] .slide-pane-1,
-[data-current-slide="10"] .slide-pane-2,
-[data-current-slide="10"] .slide-pane-3,
-[data-current-slide="10"] .slide-pane-4,
-[data-current-slide="10"] .slide-pane-5,
-[data-current-slide="10"] .slide-pane-6,
-[data-current-slide="10"] .slide-pane-7,
-[data-current-slide="10"] .slide-pane-8,
-[data-current-slide="10"] .slide-pane-9 {
-  opacity: 0;
-  transform: scale(0.97) translateY(-20px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-[data-current-slide="10"] .slide-pane-10 {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  pointer-events: auto;
-  position: relative;
-}
-
-[data-current-slide="10"] .slide-pane-11 {
-  opacity: 0;
-  transform: scale(0.96) translateY(24px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-/* Slide 11 State (Thank You / Outro) */
-[data-current-slide="11"] .slide-pane-1,
-[data-current-slide="11"] .slide-pane-2,
-[data-current-slide="11"] .slide-pane-3,
-[data-current-slide="11"] .slide-pane-4,
-[data-current-slide="11"] .slide-pane-5,
-[data-current-slide="11"] .slide-pane-6,
-[data-current-slide="11"] .slide-pane-7,
-[data-current-slide="11"] .slide-pane-8,
-[data-current-slide="11"] .slide-pane-9,
-[data-current-slide="11"] .slide-pane-10 {
-  opacity: 0;
-  transform: scale(0.97) translateY(-20px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-[data-current-slide="11"] .slide-pane-11 {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  pointer-events: auto;
-  position: relative;
+  z-index: 10;
 }
 
 /* Top green pill dynamic content-width morphing */
@@ -933,33 +585,14 @@
   display: none;
 }
 
-[data-current-slide="2"] .pill-text-1,
-[data-current-slide="3"] .pill-text-1,
-[data-current-slide="4"] .pill-text-1,
-[data-current-slide="5"] .pill-text-1,
-[data-current-slide="6"] .pill-text-1,
-[data-current-slide="7"] .pill-text-1,
-[data-current-slide="8"] .pill-text-1,
-[data-current-slide="9"] .pill-text-1,
-[data-current-slide="10"] .pill-text-1,
-[data-current-slide="11"] .pill-text-1 {
-  display: none;
+:not([data-current-slide="1"]) .pill-text-1 {
+  display: none !important;
 }
 
-[data-current-slide="2"] .pill-text-2,
-[data-current-slide="3"] .pill-text-2,
-[data-current-slide="4"] .pill-text-2,
-[data-current-slide="5"] .pill-text-2,
-[data-current-slide="6"] .pill-text-2,
-[data-current-slide="7"] .pill-text-2,
-[data-current-slide="8"] .pill-text-2,
-[data-current-slide="9"] .pill-text-2,
-[data-current-slide="10"] .pill-text-2,
-[data-current-slide="11"] .pill-text-2 {
-  display: inline-block;
+:not([data-current-slide="1"]) .pill-text-2 {
+  display: inline-block !important;
   opacity: 1;
   transform: translateY(0);
-  animation: fadeInPillText 0.35s var(--ease-spring);
 }
 
 @keyframes fadeInPillText {
@@ -1118,42 +751,28 @@
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
+  display: inline-flex;
 }
 
 [data-current-slide="1"] .footer-slide2-title {
   opacity: 0;
   transform: translateY(18px);
   pointer-events: none;
+  display: none;
 }
 
-[data-current-slide="2"] .footer-slide1-tag,
-[data-current-slide="3"] .footer-slide1-tag,
-[data-current-slide="4"] .footer-slide1-tag,
-[data-current-slide="5"] .footer-slide1-tag,
-[data-current-slide="6"] .footer-slide1-tag,
-[data-current-slide="7"] .footer-slide1-tag,
-[data-current-slide="8"] .footer-slide1-tag,
-[data-current-slide="9"] .footer-slide1-tag,
-[data-current-slide="10"] .footer-slide1-tag,
-[data-current-slide="11"] .footer-slide1-tag {
-  opacity: 0;
+:not([data-current-slide="1"]) .footer-slide1-tag {
+  opacity: 0 !important;
   transform: translateY(-18px);
   pointer-events: none;
+  display: none !important;
 }
 
-[data-current-slide="2"] .footer-slide2-title,
-[data-current-slide="3"] .footer-slide2-title,
-[data-current-slide="4"] .footer-slide2-title,
-[data-current-slide="5"] .footer-slide2-title,
-[data-current-slide="6"] .footer-slide2-title,
-[data-current-slide="7"] .footer-slide2-title,
-[data-current-slide="8"] .footer-slide2-title,
-[data-current-slide="9"] .footer-slide2-title,
-[data-current-slide="10"] .footer-slide2-title,
-[data-current-slide="11"] .footer-slide2-title {
-  opacity: 1;
+:not([data-current-slide="1"]) .footer-slide2-title {
+  opacity: 1 !important;
   transform: translateY(0);
   pointer-events: auto;
+  display: block !important;
 }
 
 /* Previous button on the left end of the horizontal line */

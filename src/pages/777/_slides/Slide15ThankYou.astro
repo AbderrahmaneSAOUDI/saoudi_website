@@ -1,0 +1,119 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<!-- ================= SLIDE 15 PANE (THANK YOU / CLOSING) ================= -->
+<section 
+  id="slide-15-content" 
+  class={`slide-pane slide-pane-15 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+  <!-- Top Tag -->
+  <div class="flex flex-col items-center space-y-1.5 shrink-0 pt-1">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#006233] animate-ping"></span>
+      <span>7.77 Program • Djil & Djil</span>
+    </div>
+  </div>
+
+  <!-- Central Celebratory Keynote Card -->
+  <div class="w-full max-w-3xl mx-auto my-auto p-6 sm:p-7 rounded-3xl bg-white border-2 border-emerald-800/20 relative flex flex-col items-center justify-center text-center space-y-3.5 shadow-sm">
+    <!-- Party Popper Icon -->
+    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center text-2xl sm:text-3xl">
+      <span>🎉</span>
+    </div>
+
+    <!-- Main Heading -->
+    <h2 class="title-highlight font-black text-3xl sm:text-5xl md:text-6xl text-slate-900 tracking-tight leading-none">
+      Thank You!
+    </h2>
+
+    <!-- Main Takeaway Banner -->
+    <div class="inline-flex items-center gap-2 px-5 py-2 rounded-2xl bg-emerald-50 border border-emerald-300 text-sm sm:text-lg font-black text-[#006233]">
+      <span>✨ Main Takeaway:</span>
+      <span>One Small Improvement. Starting Tomorrow.</span>
+    </div>
+
+    <!-- Supporting Message -->
+    <p class="text-xs sm:text-base md:text-lg font-medium text-slate-600 max-w-xl leading-relaxed">
+      Make technology work for you, <span class="font-bold text-slate-900">not the other way around</span>.
+    </p>
+
+    <!-- Facilitator Profile Strip -->
+    <div class="flex items-center gap-3 p-2.5 px-5 rounded-2xl bg-slate-50 border border-slate-200 mt-1">
+      <img 
+        src="/profile.webp" 
+        alt="Abderrahmane SAOUDI" 
+        width="44" 
+        height="44" 
+        class="w-10 h-10 rounded-full object-cover border-2 border-[#1E824C]" 
+      />
+      <div class="flex flex-col text-left leading-tight">
+        <span class="font-bold text-sm sm:text-base text-slate-900">Abderrahmane SAOUDI</span>
+        <span class="text-xs text-slate-600">Digital Creator • Developer • Trainer</span>
+      </div>
+    </div>
+
+    <!-- Links & Replay Deck Action Buttons -->
+    <div class="flex flex-wrap items-center justify-center gap-3 pt-1">
+      <a 
+        href="https://saoudi.online/" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1E824C] hover:bg-[#006233] text-white text-xs sm:text-sm font-bold transition-all duration-300 hover:scale-105 select-none"
+      >
+        <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
+        <span>https://saoudi.online/</span>
+      </a>
+
+      <button 
+        type="button" 
+        id="restartDeckBtn"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold border border-slate-300 transition-all duration-300 hover:scale-105 cursor-pointer"
+        title="Go back to Slide 1"
+      >
+        <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span>Replay Presentation</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Final Audience Chat Question (Closing Call) -->
+  <div class="w-full max-w-2xl mx-auto p-3.5 rounded-2xl bg-slate-900 text-white flex items-center justify-between gap-3 text-left shrink-0 mb-1">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <span class="text-xl shrink-0">💬</span>
+      <p class="text-xs sm:text-sm font-bold leading-snug">
+        Final Question: <span class="text-emerald-400 font-black">“What is ONE thing you will do differently tomorrow?”</span>
+      </p>
+    </div>
+    <span class="text-[11px] font-mono text-slate-400 font-bold shrink-0 hidden sm:inline">
+      Type in chat ↵
+    </span>
+  </div>
+</section>
+
+<!-- Replay Button Script -->
+<script is:inline>
+  (() => {
+    const restartBtn = document.getElementById('restartDeckBtn');
+    if (restartBtn) {
+      restartBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (typeof window.setDeckSlide === 'function') {
+          window.setDeckSlide(1);
+        } else {
+          window.location.hash = '#slide-1';
+          window.location.reload();
+        }
+      });
+    }
+  })();
+</script>

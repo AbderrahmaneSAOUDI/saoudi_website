@@ -1,0 +1,224 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const challengeSteps = [
+  {
+    step: '1',
+    label: 'Identify the Task',
+    question: 'What is the annoying task?',
+    detail: 'Pick ONE routine task you repeat every single week that drains your energy.',
+    icon: '🎯',
+  },
+  {
+    step: '2',
+    label: 'Diagnose the Friction',
+    question: 'What makes it slow or frustrating?',
+    detail: 'Is it searching for missing info, formatting, typing the same words, or waiting on others?',
+    icon: '🔍',
+  },
+  {
+    step: '3',
+    label: 'Apply the 4 Filters',
+    question: 'Which filter can you apply?',
+    detail: 'Can you ELIMINATE it, SIMPLIFY the steps, TEMPLATE the document, or AUTOMATE parts?',
+    icon: '⚙️',
+  },
+  {
+    step: '4',
+    label: 'Commit to Action',
+    question: 'What is ONE practical improvement?',
+    detail: 'Decide on one realistic change you will test tomorrow morning.',
+    icon: '🚀',
+  },
+];
+---
+
+<!-- ================= SLIDE 13 PANE (YOUR 2-MINUTE PRODUCTIVITY CHALLENGE) ================= -->
+<section 
+  id="slide-13-content" 
+  class={`slide-pane slide-pane-13 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+  <!-- Top Tag & Header -->
+  <div class="flex flex-col items-center space-y-1.5 shrink-0 pt-1">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#006233] animate-ping"></span>
+      <span>Guided Live Exercise</span>
+    </div>
+
+    <h2 class="title-highlight font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-tight">
+      Your 2-Minute Productivity Challenge
+    </h2>
+
+    <p class="text-xs sm:text-sm md:text-base font-medium text-slate-600">
+      Prompt: <strong class="text-slate-900 font-black">Choose ONE annoying task you repeat every week.</strong>
+    </p>
+  </div>
+
+  <!-- Main Guided 4-Step Flow & Working Countdown Timer -->
+  <div class="w-full max-w-5xl mx-auto my-auto grid grid-cols-1 md:grid-cols-12 gap-4 items-center px-2 py-2">
+    
+    <!-- LEFT (8 Cols): 4 Progressive Guided Steps -->
+    <div class="col-span-12 md:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+      {challengeSteps.map((s) => (
+        <div class="challenge-step-card p-4 rounded-2xl sm:rounded-3xl bg-white border-2 border-slate-200/90 hover:border-emerald-600 transition-all duration-300 flex flex-col justify-between group hover:-translate-y-0.5">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200/80 flex items-center justify-center text-sm font-black font-mono">
+                0{s.step}
+              </span>
+              <span class="text-xl">{s.icon}</span>
+            </div>
+
+            <h3 class="text-sm sm:text-base font-black text-slate-900 tracking-tight leading-snug group-hover:text-[#006233] transition-colors">
+              {s.question}
+            </h3>
+          </div>
+
+          <p class="text-xs text-slate-600 font-medium leading-relaxed mt-2 pt-2 border-t border-slate-100">
+            {s.detail}
+          </p>
+        </div>
+      ))}
+    </div>
+
+    <!-- RIGHT (4 Cols): Reliable Interactive 2:00 Countdown Timer Card -->
+    <div class="col-span-12 md:col-span-4 p-5 sm:p-6 rounded-3xl bg-slate-900 text-white border-2 border-emerald-600/50 flex flex-col items-center justify-center text-center space-y-3 relative overflow-hidden">
+      <!-- Glow ambient background -->
+      <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-emerald-500/20 blur-2xl pointer-events-none"></div>
+
+      <span class="text-[11px] font-mono font-black uppercase tracking-widest text-emerald-400">
+        Live Timer
+      </span>
+
+      <!-- Digital Display -->
+      <div id="challengeTimerDisplay" class="font-mono text-5xl sm:text-6xl font-black tracking-tight text-white select-none">
+        02:00
+      </div>
+
+      <!-- Timer Control Buttons -->
+      <div class="flex items-center gap-2 pt-1 z-10">
+        <button 
+          id="timerStartBtn" 
+          type="button" 
+          class="px-4 py-2 rounded-full bg-[#1E824C] hover:bg-[#006233] text-white font-mono text-xs font-bold transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95"
+        >
+          Start
+        </button>
+
+        <button 
+          id="timerPauseBtn" 
+          type="button" 
+          class="px-4 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-mono text-xs font-bold transition-all duration-200 cursor-pointer"
+        >
+          Pause
+        </button>
+
+        <button 
+          id="timerResetBtn" 
+          type="button" 
+          class="px-3 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 font-mono text-xs transition-all duration-200 cursor-pointer" 
+          title="Reset"
+        >
+          ↺
+        </button>
+      </div>
+
+      <p class="text-[11px] text-slate-400 font-medium pt-1 z-10 leading-snug">
+        Take 2 minutes to reflect, then drop your answer in the chat!
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Bottom Chat Prompt -->
+  <div class="w-full max-w-2xl mx-auto p-3 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center gap-2 text-xs sm:text-sm font-bold text-[#006233] shrink-0 mb-1">
+    <span>💬 Meeting Chat:</span>
+    <span class="text-slate-700 font-normal">Type: <strong class="text-slate-900 font-bold">[Task] + [1 Improvement]</strong> in the chat.</span>
+  </div>
+</section>
+
+<!-- Embedded Reliable Countdown Controller Script -->
+<script is:inline>
+  (() => {
+    const display = document.getElementById('challengeTimerDisplay');
+    const startBtn = document.getElementById('timerStartBtn');
+    const pauseBtn = document.getElementById('timerPauseBtn');
+    const resetBtn = document.getElementById('timerResetBtn');
+
+    if (!display || !startBtn || !pauseBtn || !resetBtn) return;
+
+    let totalSeconds = 120;
+    let timerInterval = null;
+    let isRunning = false;
+
+    function renderTime() {
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      const str = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      display.textContent = str;
+
+      if (totalSeconds <= 10 && totalSeconds > 0) {
+        display.classList.add('text-amber-400');
+      } else if (totalSeconds === 0) {
+        display.classList.remove('text-amber-400');
+        display.classList.add('text-emerald-400');
+      } else {
+        display.classList.remove('text-amber-400', 'text-emerald-400');
+      }
+    }
+
+    function startTimer() {
+      if (isRunning) return;
+      isRunning = true;
+      startBtn.textContent = 'Running';
+      startBtn.classList.add('opacity-75');
+
+      timerInterval = setInterval(() => {
+        if (totalSeconds > 0) {
+          totalSeconds--;
+          renderTime();
+        } else {
+          clearInterval(timerInterval);
+          isRunning = false;
+          startBtn.textContent = 'Done!';
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      if (!isRunning) return;
+      clearInterval(timerInterval);
+      isRunning = false;
+      startBtn.textContent = 'Resume';
+      startBtn.classList.remove('opacity-75');
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isRunning = false;
+      totalSeconds = 120;
+      startBtn.textContent = 'Start';
+      startBtn.classList.remove('opacity-75');
+      renderTime();
+    }
+
+    startBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      startTimer();
+    });
+
+    pauseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      pauseTimer();
+    });
+
+    resetBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      resetTimer();
+    });
+  })();
+</script>

@@ -1,0 +1,167 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const categories = [
+  {
+    id: 'tools',
+    title: 'Tool Selection',
+    icon: '⚡',
+    tag: '#getting-started',
+    summary: 'Which software to pick without tool fatigue',
+    revealedQuestion: '“I currently have 6 different apps on my phone and laptop. Which ONE tool should I master first to stop feeling overwhelmed?”',
+    tip: 'Start with Google Tasks + Calendar for 14 days before exploring anything else.',
+  },
+  {
+    id: 'ai',
+    title: 'AI & Productivity',
+    icon: '✨',
+    tag: '#practical-ai',
+    summary: 'Using AI responsibly for daily output',
+    revealedQuestion: '“How can I safely use tools like ChatGPT or Gemini to draft client emails and summarize reports without leaking sensitive client data?”',
+    tip: 'Anonymize names, remove financial or ID details, and treat AI as a draft creator, not final reviewer.',
+  },
+  {
+    id: 'teams',
+    title: 'Working with Teams',
+    icon: '👥',
+    tag: '#collaboration',
+    summary: 'Getting colleagues & clients on board',
+    revealedQuestion: '“How do I convince colleagues or clients to stop sending scattered voice notes and use a structured shared checklist or folder?”',
+    tip: 'Make it easier for them: send a pre-filled link or form so answering takes them less effort than recording audio.',
+  },
+  {
+    id: 'organization',
+    title: 'Digital Organization',
+    icon: '📁',
+    tag: '#workflow',
+    summary: 'Decluttering files, tabs & emails',
+    revealedQuestion: '“My Desktop and Downloads folders have hundreds of files named ‘final_revised’. What is the simplest naming and filing structure?”',
+    tip: 'Use YYYY-MM_Project_DocumentName format and keep max 3 folder levels deep.',
+  },
+];
+---
+
+<!-- ================= SLIDE 14 PANE (QUESTIONS & DISCUSSION) ================= -->
+<section 
+  id="slide-14-content" 
+  data-active-qa="none"
+  class={`slide-pane slide-pane-14 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+  <!-- Top Tag & Header -->
+  <div class="flex flex-col items-center space-y-1.5 shrink-0 pt-1">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#006233] animate-ping"></span>
+      <span>Open Floor • Q&A Session</span>
+    </div>
+
+    <h2 class="title-highlight font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-tight">
+      Questions & Discussion
+    </h2>
+
+    <p class="text-xs sm:text-sm md:text-base font-medium text-slate-600">
+      What could make your daily work easier? Click a category to reveal a discussion starter.
+    </p>
+  </div>
+
+  <!-- 4 Interactive Category Cards (Selectable) -->
+  <div class="w-full max-w-5xl mx-auto my-auto grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4.5 px-2 py-2">
+    {categories.map((c) => (
+      <button
+        type="button"
+        data-qa-id={c.id}
+        data-revealed-q={c.revealedQuestion}
+        data-revealed-tip={c.tip}
+        data-revealed-title={c.title}
+        class="qa-topic-card group text-left p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white border-2 border-slate-200/90 hover:border-emerald-600 transition-all duration-300 flex flex-col justify-between cursor-pointer select-none hover:-translate-y-1 relative"
+      >
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2.5">
+            <span class="w-10 h-10 rounded-xl bg-slate-50 text-slate-800 border border-slate-200 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+              {c.icon}
+            </span>
+            <span class="font-mono text-xs text-slate-400 font-bold uppercase">{c.tag}</span>
+          </div>
+
+          <span class="topic-reveal-btn text-xs font-bold text-[#006233] bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+            Click to Discuss →
+          </span>
+        </div>
+
+        <div>
+          <h3 class="text-base sm:text-lg font-black text-slate-900 group-hover:text-[#006233] transition-colors tracking-tight">
+            {c.title}
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mt-1">
+            {c.summary}
+          </p>
+        </div>
+      </button>
+    ))}
+  </div>
+
+  <!-- Dynamic Revealed Question Box (Populated on Card Click) -->
+  <div id="revealedQuestionBox" class="w-full max-w-4xl mx-auto p-4 sm:p-4.5 rounded-2xl sm:rounded-3xl bg-emerald-50/90 border-2 border-emerald-600/40 text-left relative overflow-hidden shrink-0 mb-1 transition-all duration-300">
+    <div class="flex items-start gap-3">
+      <span class="text-2xl shrink-0 mt-0.5">💬</span>
+      <div class="flex-1">
+        <div class="flex items-center justify-between">
+          <span id="qaBoxTopic" class="text-xs font-black text-[#006233] uppercase tracking-wider">
+            Discussion Starter
+          </span>
+          <span class="text-[11px] font-mono text-slate-500">Unmute or drop answers in chat</span>
+        </div>
+        <p id="qaBoxQuestion" class="text-xs sm:text-sm md:text-base font-bold text-slate-900 mt-1 leading-snug">
+          “What is ONE annoying digital task in your daily work that you would love to simplify or automate?”
+        </p>
+        <p id="qaBoxTip" class="text-xs text-slate-600 font-medium mt-1">
+          💡 Raise your hand, unmute, or share your thoughts in the chat!
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Embedded Interactive Controller Script -->
+<script is:inline>
+  (() => {
+    const slide = document.getElementById('slide-14-content');
+    if (!slide) return;
+
+    const cards = slide.querySelectorAll('.qa-topic-card');
+    const topicEl = document.getElementById('qaBoxTopic');
+    const questionEl = document.getElementById('qaBoxQuestion');
+    const tipEl = document.getElementById('qaBoxTip');
+
+    cards.forEach(card => {
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = card.getAttribute('data-qa-id');
+        const q = card.getAttribute('data-revealed-q');
+        const tip = card.getAttribute('data-revealed-tip');
+        const title = card.getAttribute('data-revealed-title');
+
+        slide.setAttribute('data-active-qa', id || '');
+
+        cards.forEach(c => c.classList.remove('active-qa-card'));
+        card.classList.add('active-qa-card');
+
+        if (topicEl && title) topicEl.textContent = `Discussion Starter: ${title}`;
+        if (questionEl && q) questionEl.textContent = q;
+        if (tipEl && tip) tipEl.textContent = `💡 Facilitator Tip: ${tip}`;
+      });
+    });
+  })();
+</script>
+
+<style>
+  .qa-topic-card.active-qa-card {
+    border-color: #006233 !important;
+    background-color: #f0fdf4 !important;
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 0 0 3px rgba(0, 98, 51, 0.18);
+  }
+</style>

@@ -1,0 +1,264 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+// Exact meeting notes specified in prompt
+const rawNotes = [
+  'Finish the client proposal.',
+  'Samira prepares the visuals.',
+  'Review the budget.',
+  'Presentation ready by Thursday.',
+  'Contact the client for confirmation.',
+];
+
+// Exact structured expected output table
+const structuredPlan = [
+  { task: 'Finish the client proposal', person: 'Not specified', deadline: 'Not specified', priority: 'High', priorityColor: 'bg-rose-50 text-[#EA4335] border-rose-200' },
+  { task: 'Prepare the visuals', person: 'Samira', deadline: 'Not specified', priority: 'Medium', priorityColor: 'bg-amber-50 text-[#D97706] border-amber-200' },
+  { task: 'Review the budget', person: 'Not specified', deadline: 'Not specified', priority: 'High', priorityColor: 'bg-rose-50 text-[#EA4335] border-rose-200' },
+  { task: 'Finalize presentation deck', person: 'Not specified', deadline: 'Thursday', priority: 'High', priorityColor: 'bg-rose-50 text-[#EA4335] border-rose-200' },
+  { task: 'Contact client for confirmation', person: 'Not specified', deadline: 'Not specified', priority: 'Medium', priorityColor: 'bg-amber-50 text-[#D97706] border-amber-200' },
+];
+
+const structuredPromptText = `Act as an executive project assistant.
+Organize the following raw meeting notes into a clean markdown table with 4 columns:
+Task | Responsible Person | Deadline | Priority
+
+Rules:
+- If a person or deadline is not mentioned, write "Not specified" (do NOT invent names or dates).
+- Assign a realistic priority (High, Medium, Low) based on delivery context.
+- Keep task descriptions concise and action-oriented.
+
+Raw Notes:
+• Finish the client proposal.
+• Samira prepares the visuals.
+• Review the budget.
+• Presentation ready by Thursday.
+• Contact the client for confirmation.`;
+---
+
+<!-- ================= SLIDE 10 PANE (FROM CHAOS TO CLARITY: AI DEMO) ================= -->
+<section 
+  id="slide-10-content" 
+  data-ai-revealed="false"
+  class={`slide-pane slide-pane-10 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+  <!-- Top Header & Live Prompt Compare Bar -->
+  <div class="flex flex-col items-center space-y-1.5 shrink-0 pt-1 w-full max-w-5xl">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#006233] animate-ping"></span>
+      <span>Live AI Transformation Demo</span>
+    </div>
+
+    <div class="flex items-center justify-between w-full px-2">
+      <div class="text-left">
+        <h2 class="font-black text-2xl sm:text-3xl md:text-4xl text-slate-900 tracking-tight leading-tight">
+          From Chaos to Clarity
+        </h2>
+        <p class="text-xs sm:text-sm font-medium text-slate-500">
+          Weak prompt vs. Structured prompt demonstration
+        </p>
+      </div>
+
+      <!-- Action Controls: Reveal Result & Copy Prompt -->
+      <div class="flex items-center gap-2">
+        <button 
+          id="copyPromptBtn"
+          type="button"
+          data-prompt={structuredPromptText}
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-bold text-xs sm:text-sm cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95"
+          title="Copy the structured prompt to clipboard to paste in ChatGPT/Gemini"
+        >
+          <span id="copyIcon">📋</span>
+          <span id="copyLabel">Copy Prompt</span>
+        </button>
+
+        <button 
+          id="revealAiTableBtn"
+          type="button"
+          class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#006233] hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-emerald-400/40"
+        >
+          <span id="revealAiLabel">Reveal AI Result</span>
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prompt Difference Mini-Bar -->
+  <div class="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-3 px-2 py-1 shrink-0">
+    <!-- Weak Prompt -->
+    <div class="p-2.5 px-3.5 rounded-xl bg-rose-50 border border-rose-200 text-left flex items-center justify-between">
+      <div class="text-xs">
+        <span class="font-black text-rose-700 uppercase">❌ Weak Prompt:</span>
+        <span class="text-slate-700 italic ml-1">“Organize these notes.”</span>
+      </div>
+      <span class="text-[10px] text-rose-600 font-bold">Vague & messy output</span>
+    </div>
+
+    <!-- Better Prompt -->
+    <div class="p-2.5 px-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-left flex items-center justify-between">
+      <div class="text-xs">
+        <span class="font-black text-[#006233] uppercase">✅ Better Prompt:</span>
+        <span class="text-slate-700 font-medium ml-1">Specify role + table columns + rule for missing info</span>
+      </div>
+      <span class="text-[10px] text-[#006233] font-bold">Consistent structure</span>
+    </div>
+  </div>
+
+  <!-- Main Comparison Area: Raw Notes (Left) vs Structured Output (Right) -->
+  <div class="flex-1 w-full max-w-5xl grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 my-auto items-stretch px-2 py-1 min-h-0">
+    
+    <!-- LEFT (5 Cols): Raw Unstructured Meeting Notes -->
+    <div class="col-span-12 md:col-span-5 p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-slate-50 border-2 border-slate-200/90 flex flex-col justify-between text-left">
+      <div>
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2 mb-3">
+          <span class="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+            Raw Input Notes
+          </span>
+          <span class="text-[10px] font-mono bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">
+            5 quick bullets
+          </span>
+        </div>
+
+        <ul class="space-y-2 font-mono text-xs sm:text-sm text-slate-800">
+          {rawNotes.map((note) => (
+            <li class="p-2.5 rounded-xl bg-white border border-slate-200/80 flex items-start gap-2 shadow-xs">
+              <span class="text-[#006233] font-black">•</span>
+              <span class="font-medium">{note}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="pt-3 border-t border-slate-200 text-[11px] text-slate-500 font-medium">
+        Unstructured text: deadlines mixed with actions and owners.
+      </div>
+    </div>
+
+    <!-- RIGHT (7 Cols): Clean Structured Action Plan Table -->
+    <div class="col-span-12 md:col-span-7 p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white border-2 border-emerald-600/40 flex flex-col justify-between text-left relative overflow-hidden">
+      <div>
+        <div class="flex items-center justify-between border-b border-emerald-100 pb-2 mb-3">
+          <span class="text-xs font-black text-[#006233] uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#1E824C] animate-pulse"></span>
+            AI Structured Action Plan
+          </span>
+          <span class="text-[10px] font-mono bg-emerald-100 text-[#006233] px-2.5 py-0.5 rounded-full font-bold">
+            Zero invented facts
+          </span>
+        </div>
+
+        <!-- Table Display (Blurred/Hidden initially until revealed) -->
+        <div id="aiResultTable" class="ai-table-container opacity-25 filter blur-xs transition-all duration-500 overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-xs md:text-sm">
+            <thead>
+              <tr class="border-b-2 border-slate-200 text-slate-500 font-mono text-[10px] sm:text-xs uppercase">
+                <th class="pb-2">Task</th>
+                <th class="pb-2">Owner</th>
+                <th class="pb-2">Deadline</th>
+                <th class="pb-2 text-right">Priority</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              {structuredPlan.map((row) => (
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="py-2.5 font-bold text-slate-900 pr-2">{row.task}</td>
+                  <td class="py-2.5 font-medium text-slate-700 pr-2">
+                    {row.person === 'Not specified' ? (
+                      <span class="text-slate-400 italic">Not specified</span>
+                    ) : (
+                      <span class="font-bold text-[#006233]">{row.person}</span>
+                    )}
+                  </td>
+                  <td class="py-2.5 font-medium text-slate-700 pr-2">
+                    {row.deadline === 'Not specified' ? (
+                      <span class="text-slate-400 italic">Not specified</span>
+                    ) : (
+                      <span class="font-bold text-rose-600">{row.deadline}</span>
+                    )}
+                  </td>
+                  <td class="py-2.5 text-right">
+                    <span class={`px-2 py-0.5 rounded-md border text-[10px] font-black uppercase ${row.priorityColor}`}>
+                      {row.priority}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+        <span>Prompt rule applied: <strong class="text-slate-700 font-bold">"Not specified"</strong> protects data integrity.</span>
+        <span class="font-mono text-emerald-700 font-bold">100% actionable</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Embedded Interactive Controller Script -->
+<script is:inline>
+  (() => {
+    const root = document.getElementById('slide-10-content');
+    if (!root) return;
+
+    const copyBtn = document.getElementById('copyPromptBtn');
+    const copyLabel = document.getElementById('copyLabel');
+    const copyIcon = document.getElementById('copyIcon');
+    const revealBtn = document.getElementById('revealAiTableBtn');
+    const revealLabel = document.getElementById('revealAiLabel');
+    const resultTable = document.getElementById('aiResultTable');
+
+    // Clipboard Copy Handler
+    if (copyBtn) {
+      copyBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const text = copyBtn.getAttribute('data-prompt') || '';
+        try {
+          await navigator.clipboard.writeText(text);
+          if (copyLabel) copyLabel.textContent = 'Copied to Clipboard!';
+          if (copyIcon) copyIcon.textContent = '✅';
+          copyBtn.classList.add('bg-emerald-100', 'text-[#006233]');
+          setTimeout(() => {
+            if (copyLabel) copyLabel.textContent = 'Copy Prompt';
+            if (copyIcon) copyIcon.textContent = '📋';
+            copyBtn.classList.remove('bg-emerald-100', 'text-[#006233]');
+          }, 2500);
+        } catch (err) {
+          if (copyLabel) copyLabel.textContent = 'Copy failed';
+          setTimeout(() => {
+            if (copyLabel) copyLabel.textContent = 'Copy Prompt';
+          }, 2000);
+        }
+      });
+    }
+
+    // Step-by-Step Reveal Handler
+    if (revealBtn && resultTable) {
+      revealBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isRevealed = root.getAttribute('data-ai-revealed') === 'true';
+        if (!isRevealed) {
+          root.setAttribute('data-ai-revealed', 'true');
+          resultTable.classList.remove('opacity-25', 'filter', 'blur-xs');
+          resultTable.classList.add('opacity-100', 'filter-none');
+          if (revealLabel) revealLabel.textContent = 'Reset Table';
+        } else {
+          root.setAttribute('data-ai-revealed', 'false');
+          resultTable.classList.add('opacity-25', 'filter', 'blur-xs');
+          resultTable.classList.remove('opacity-100', 'filter-none');
+          if (revealLabel) revealLabel.textContent = 'Reveal AI Result';
+        }
+      });
+    }
+  })();
+</script>

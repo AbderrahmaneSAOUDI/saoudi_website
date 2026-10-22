@@ -1,0 +1,380 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const notes = [
+  {
+    slide: 1,
+    title: 'Digital Productivity',
+    section: 'Welcome & Introduction',
+    time: '2–3 min',
+    points: [
+      'Welcome participants to the 7.77 Djil & Djil national initiative session.',
+      'Acknowledge partners: Ministère MPT, Algérie Télécom, Mobilis.',
+      'Set expectations: Practical, relatable tools for professionals aged 31–45.',
+    ],
+    darija: 'السلام عليكم ومرحبا بيكم كامل فـ 7.77. اليوم راح نهدرو على كيفاش نخدمو بذكاء ماشي بالتعب، وكيفاش الأدوات الرقمية البسيطة اللي كامل نعرفوها تقدر تنحي علينا ضغط كبير.',
+    transition: 'قبل ما نبداو، حبيت نعرّفكم شوية بيا وبوش راني ندير.',
+  },
+  {
+    slide: 2,
+    title: 'About Your Facilitator',
+    section: 'Welcome & Introduction',
+    time: '2 min',
+    points: [
+      'Brief introduction: Graphic designer, mobile/frontend engineer, community lead.',
+      'GDG Ghardaia leadership experience delivering hands-on technical workshops.',
+      'Focus on practical utility rather than resume listing.',
+    ],
+    darija: 'اسمي عبد الرحمان سعودي، مصمم واجهات ومطور تطبيقات ومواقع، وسابقا رئيس نادي GDG بغرداية. خدمتي هي نبسط التكنولوجيا باش تعاون الناس يوصلو لنتائج حقيقية.',
+    transition: 'دك حاب نسقسيكم انتوما سؤال سريع، وبغيت كامل تشاركو معايا فـ le chat.',
+  },
+  {
+    slide: 3,
+    title: "What's Your Biggest Time-Waster?",
+    section: 'Audience Problem Diagnosis',
+    time: '3–4 min',
+    points: [
+      'Invite everyone to type their number (1 to 5) in the meeting chat.',
+      'Click or press keys 1–5 to highlight the most common audience choices live.',
+      'Validate common pains: messages overload, hunting for files, missed reminders.',
+    ],
+    darija: 'اكتبولي فالـ chat الرقم تاع أكبر حاجة تديكم الوقت وتعييكم فالخدمة: رسائل بزاف؟ تحوسو على les fichiers؟ تنسو les tâches؟ كوبي كولي؟ ولا les réunions؟',
+    transition: 'شوفو شحال كامل رانا نشتركو فهاد المشاكل.. هاد الشي يدينا ليوم عادي وشنو هو.',
+  },
+  {
+    slide: 4,
+    title: 'A Typical Busy Day',
+    section: 'Audience Problem Diagnosis',
+    time: '3–4 min',
+    points: [
+      'Paint the relatable picture: 46 WhatsApp pings, 21 unread emails, fragmented meetings.',
+      'Emphasize the central question: "Busy all day. But what did I actually finish?"',
+      'Explain cognitive switching penalty and mental fatigue.',
+    ],
+    darija: 'نهارك كامل وانت تجري بين الواتساب والمايلات والاجتماعات، فالليل ترقد عيان بصح تسقسي روحك: وش درت بالصح اليوم؟ التكنولوجيا إلا مكانش منظمة، تولي مصدر تعب ماشي عون.',
+    transition: 'مالا وش نقصدو حقيقة بالإنتاجية الرقمية؟',
+  },
+  {
+    slide: 5,
+    title: 'What Is Digital Productivity?',
+    section: 'Core Productivity Principles',
+    time: '3 min',
+    points: [
+      'Deliver core definition: Technology intentionally used to reduce effort and get better results.',
+      'Explain the 4 quadrants: Less Friction, Less Repetition, Better Focus, More Useful Output.',
+      'Emphasize that software is a lever, not the driver.',
+    ],
+    darija: 'الإنتاجية ماشي معناها تخدم 14 ساعة، معناها تنحي التكرار وتسهل الحوايج البسيطة باش تركّز على الصح وتخرج بنتيجة مليحة بلا ضغط.',
+    transition: 'بصح قبل ما نروحو نتيليشارجيو أي تطبيق جديد، كاين 4 أسئلة لازم نسقسوهم.',
+  },
+  {
+    slide: 6,
+    title: 'Before Installing Another App...',
+    section: 'Core Productivity Principles',
+    time: '3 min',
+    points: [
+      'Golden Rule: More tools ≠ More productivity.',
+      'Step through: 1. Eliminate → 2. Simplify → 3. Template → 4. Automate.',
+      'Warn: Never automate a chaotic process; simplify first.',
+    ],
+    darija: 'ما تجريش تم تم تشارجي تطبيق جديد. اسأل روحك: هاد الخدمة لازمة أصلا؟ نقدر نبسطها؟ كاش modèle نخدم بيه؟ وعاد فاللخر نخمم فالأتمتة.',
+    transition: 'باش نديرو هاد الشي، يلزمنا système بسيط يمشي كل يوم.',
+  },
+  {
+    slide: 7,
+    title: 'Build a Simple Productivity System',
+    section: 'Core Productivity Principles',
+    time: '2–3 min',
+    points: [
+      'Walk through: Capture → Organize → Prioritize → Execute → Review.',
+      'Click each step on screen to showcase rule and suggested everyday tool.',
+      'Motto: "One reliable system beats five disconnected apps."',
+    ],
+    darija: 'سيستام واحد مضمون خير من 10 تطبيقات مشتتين: سجّل كلش، نظّم دوسياتك، خيّر Top 3 تاعك فالنهار، اخدم بتركيز، وفالعشية دير 5 دقائق مراجعة.',
+    transition: 'دك ندخلو فالتطبيق العملي: كيفاش نتوقفو عن الاعتماد على الذاكرة؟',
+  },
+  {
+    slide: 8,
+    title: 'Stop Relying on Memory',
+    section: 'Tasks & Calendar Live Demo',
+    time: '10 min',
+    points: [
+      'Golden Rule: Tasks Tell You WHAT. Calendar Tells You WHEN.',
+      'Walkthrough: Monthly report by Thursday.',
+      'Demo: Google Tasks captures the WHAT; Google Calendar reserves Wednesday morning for the WHEN.',
+      'Invite audience to write down 1 important task for tomorrow in the chat.',
+    ],
+    darija: 'عمرك ما تخلي المهام فراسك: الـ Tasks يقولولك وش عندك خدمة، والـ Calendar يقولك وقتاش تخدمها. إلا معندهاش وقت فالرزنامة، مهيش راح تندار!',
+    transition: 'ودك، كيفاش نقدروا نستعملو الذكاء الاصطناعي باش متبداش من الصفر؟',
+  },
+  {
+    slide: 9,
+    title: 'AI as Your Everyday Assistant',
+    section: 'Practical AI Skills',
+    time: '4–5 min',
+    points: [
+      'Reframe AI: An everyday drafting assistant, not human replacement.',
+      'Highlight 6 use cases: Drafting emails, summarizing PDFs, organizing messy notes.',
+      'Critical warning: Always verify facts and never paste confidential/personal data.',
+    ],
+    darija: 'الذكاء الاصطناعي كيما ChatGPT وGemini ماشي باش يفكر فبلاصتك، بصح باش ينحيلك تعب الصفحة البيضاء: يلخص، يرتب، ويديرلك مسودات فالمايلات.',
+    transition: 'خلونا نشوفو مثال حي ومباشر: كيفاش نحولو ملاحظات مخلطة لجدول منظم.',
+  },
+  {
+    slide: 10,
+    title: 'From Chaos to Clarity',
+    section: 'Live AI Transformation Demo',
+    time: '5–6 min',
+    points: [
+      'Contrast weak prompt ("Organize notes") with structured prompt.',
+      'Click [Copy Prompt] button live to demonstrate how to copy and paste to ChatGPT/Gemini.',
+      'Click [Reveal AI Result] to step through the structured action plan.',
+      'Point out "Not specified" — never letting AI hallucinate missing deadlines or owners.',
+    ],
+    darija: 'شوفو الفرق بين تقول للـ AI "نظم هادو" وبين تعطيه تعليمات دقيقة: أعطيني جدول بـ 4 خانات، واللي ناقصة كتبلي Not specified. هكذا تضمن الدقة.',
+    transition: 'كي نجمعو كامل هاد الأدوات فاليوميات تاعنا، كيفاش يولي نهار الخدمة؟',
+  },
+  {
+    slide: 11,
+    title: 'The Better Workday',
+    section: 'Before & After Contrast',
+    time: '4 min',
+    points: [
+      'Review the stressful Before (kept in memory, lost downloads, urgent rush).',
+      'Click [Reveal AFTER] or press "A" to reveal the structured day.',
+      'Contrast feeling of control and leaving work on time without guilt.',
+    ],
+    darija: 'قبل: نهار معمر نسيان وضغط وجري مور الوقت. بعد: قائمة مهام وحدة، وقت محجوز فالرزنامة، ونماذج جاهزة. الفرق هو راحة البال والتحكم.',
+    transition: 'بصح واش هي الأدوات اللي لازم نبدوا بيها بالصح؟',
+  },
+  {
+    slide: 12,
+    title: 'Your Minimal Productivity Toolbox',
+    section: 'Toolbox & Ecosystem',
+    time: '3–4 min',
+    points: [
+      'Showcase 5 foundational categories: WhatsApp/Gmail/Outlook, Drive/OneDrive, Tasks/Calendar, Docs/Word, ChatGPT/Gemini.',
+      'Remind: Start with what you already have before buying or installing new subscriptions.',
+    ],
+    darija: 'راكم تشوفو بلي معندناش برامج غالية ولا معقدة: قوقل وميكروسوفت والواتساب كامل كاينين فتيليفوناتكم. المهم كيفاش توظفوهم مع بعض.',
+    transition: 'ودك، جا وقت التحدي تاعكم: تحدي الـ 2 دقائق!',
+  },
+  {
+    slide: 13,
+    title: 'Your 2-Minute Productivity Challenge',
+    section: 'Participant Exercise',
+    time: '9 min',
+    points: [
+      'Announce exercise: Pick ONE annoying task you repeat weekly.',
+      'Hit [Start] on the 2:00 timer.',
+      'Guide participants through the 4 steps while timer counts down.',
+      'Read 2–3 chat responses live and offer immediate practical improvement advice.',
+    ],
+    darija: 'عندكم دقيقتين: خيّرو خدمة تعاودوها كل سمانة وتعييكم. اسألو رواحكم: نقدر نلغيها؟ نبسطها؟ نديرلها modèle؟ اكتبوهالي فالـ chat باش نناقشوها.',
+    transition: 'يعطيكم الصحة على المشاركات القيمة! ودك نفتحو المجال لأسئلتكم.',
+  },
+  {
+    slide: 14,
+    title: 'Questions & Discussion',
+    section: 'Q&A Session',
+    time: '8 min',
+    points: [
+      'Click on any of the 4 topic categories (Tools, AI, Teams, Organization) to spark conversation.',
+      'Answer participant questions with empathy for their workplace constraints.',
+      'Keep answers concise and actionable.',
+    ],
+    darija: 'تفضلو بأي سؤال عندكم، سواء تفتحو المايكروفون ولا تكتبو فالـ chat: على اختيار الأدوات، الذكاء الاصطناعي، ولا كيفاش تقنعو زملائكم فالخدمة.',
+    transition: 'وفالختام، نخرجو بكلمة خفيفة وعهد صغير بيناتنا.',
+  },
+  {
+    slide: 15,
+    title: 'Thank You!',
+    section: 'Closing & Call to Action',
+    time: '3 min',
+    points: [
+      'Reiterate core message: "One Small Improvement. Starting Tomorrow."',
+      'Point to website saoudi.online for further resources and contact.',
+      'Ask final question: "What is ONE thing you will do differently tomorrow?"',
+      'Thank Ministry MPT, Algérie Télécom, Mobilis, and the participants.',
+    ],
+    darija: 'شكرا بزاف على حضوركم واهتمامكم. متخرجوش بلا ما تديرو خطوة وحدة صغيرة غدوة: خيّرو حاجة وحدة تبدلوها، والتكنولوجيا تولي فخدمتكم ماشي العكس!',
+    transition: 'End of presentation.',
+  },
+];
+---
+
+<!-- Presenter Notes Drawer (Toggled via "Notes" button or Pressing 'N' / 'S') -->
+<aside 
+  id="presenterNotesDrawer" 
+  class={`fixed inset-y-0 right-0 w-full sm:w-120 bg-slate-900/98 text-slate-100 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col border-l border-slate-700/80 backdrop-blur-md select-text ${className}`}
+  aria-label="Presenter Notes"
+>
+  <!-- Drawer Header -->
+  <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-950/80">
+    <div class="flex items-center gap-2.5">
+      <span class="w-8 h-8 rounded-lg bg-[#1E824C] text-white flex items-center justify-center text-sm font-bold">
+        📝
+      </span>
+      <div>
+        <h3 class="text-sm sm:text-base font-black text-white tracking-tight flex items-center gap-2">
+          <span>Speaker Guide & Notes</span>
+          <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold">LIVE SYNC</span>
+        </h3>
+        <p class="text-[11px] text-slate-400 font-medium">Presenter view only (Hidden from audience)</p>
+      </div>
+    </div>
+
+    <!-- Close Drawer Button -->
+    <button 
+      id="closeNotesBtn"
+      type="button"
+      class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-sm transition-colors cursor-pointer"
+      title="Close notes (Shortcut: 'N' or 'S')"
+    >
+      ✕
+    </button>
+  </div>
+
+  <!-- Drawer Body: Dynamic Slide Content -->
+  <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+    
+    <!-- Meta Bar: Slide Number, Section, Target Time -->
+    <div class="flex items-center justify-between gap-2 p-3 rounded-2xl bg-slate-800/80 border border-slate-700 text-xs">
+      <div class="flex items-center gap-2">
+        <span class="font-mono font-black text-[#81C784]" id="notesSlideBadge">Slide 1 of 15</span>
+        <span class="text-slate-600">•</span>
+        <span class="font-bold text-slate-300 truncate" id="notesSectionName">Welcome & Introduction</span>
+      </div>
+
+      <span class="px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800 font-mono text-[11px] font-bold shrink-0" id="notesTimeAlloc">
+        ⏱️ 2–3 min
+      </span>
+    </div>
+
+    <!-- Active Slide Title -->
+    <div>
+      <span class="text-[10px] font-mono uppercase text-slate-400 font-bold tracking-wider">Current Slide</span>
+      <h4 class="text-lg sm:text-xl font-black text-white tracking-tight mt-0.5" id="notesSlideTitle">
+        Digital Productivity
+      </h4>
+    </div>
+
+    <!-- Key Points to Cover -->
+    <div class="p-3.5 rounded-2xl bg-slate-800/50 border border-slate-700/60">
+      <h5 class="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 mb-2 flex items-center gap-1.5">
+        <span>✦</span> Key Points to Emphasize
+      </h5>
+      <ul class="space-y-1.5 text-xs sm:text-sm text-slate-300 leading-relaxed" id="notesPointsList">
+        <!-- Injected dynamically -->
+      </ul>
+    </div>
+
+    <!-- Suggested Algerian Darija Phrasing -->
+    <div class="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-800/60 text-emerald-100">
+      <h5 class="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 mb-1.5 flex items-center gap-1.5">
+        <span>🗣️</span> Suggested Algerian Darija Phrasing
+      </h5>
+      <p class="text-xs sm:text-sm leading-relaxed text-emerald-200/90 font-medium font-sans" dir="rtl" id="notesDarijaText">
+        <!-- Injected dynamically -->
+      </p>
+    </div>
+
+    <!-- Suggested Transition -->
+    <div class="p-3 rounded-xl bg-slate-800/40 border border-slate-700 text-xs text-slate-400">
+      <span class="font-bold text-slate-200 block mb-0.5">➡️ Transition to Next Slide:</span>
+      <p class="italic text-slate-300" id="notesTransitionText">
+        <!-- Injected dynamically -->
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Drawer Footer: Quick Tips -->
+  <div class="p-3 sm:p-4 border-t border-slate-800 bg-slate-950 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+    <span>Hotkey: Press <kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700">N</kbd> or <kbd class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700">S</kbd> to toggle</span>
+    <span class="text-emerald-400 font-bold">Total: 60 min</span>
+  </div>
+</aside>
+
+<!-- Embedded Controller Script for Notes -->
+<script is:inline define:vars={{ notesData: notes }}>
+  (() => {
+    const drawer = document.getElementById('presenterNotesDrawer');
+    const closeBtn = document.getElementById('closeNotesBtn');
+    const deck = document.getElementById('presentationDeck');
+
+    const slideBadge = document.getElementById('notesSlideBadge');
+    const sectionName = document.getElementById('notesSectionName');
+    const timeAlloc = document.getElementById('notesTimeAlloc');
+    const slideTitle = document.getElementById('notesSlideTitle');
+    const pointsList = document.getElementById('notesPointsList');
+    const darijaText = document.getElementById('notesDarijaText');
+    const transitionText = document.getElementById('notesTransitionText');
+
+    let isOpen = false;
+
+    function renderSlideNotes(slideNum) {
+      const note = notesData.find(n => n.slide === slideNum) || notesData[0];
+      if (!note) return;
+
+      if (slideBadge) slideBadge.textContent = `Slide ${note.slide} of 15`;
+      if (sectionName) sectionName.textContent = note.section;
+      if (timeAlloc) timeAlloc.textContent = `⏱️ ${note.time}`;
+      if (slideTitle) slideTitle.textContent = note.title;
+
+      if (pointsList) {
+        pointsList.innerHTML = note.points.map(p => `<li class="flex items-start gap-2"><span class="text-emerald-400 font-bold">•</span><span>${p}</span></li>`).join('');
+      }
+
+      if (darijaText) darijaText.textContent = note.darija;
+      if (transitionText) transitionText.textContent = note.transition;
+    }
+
+    function toggleNotes() {
+      isOpen = !isOpen;
+      if (drawer) {
+        if (isOpen) {
+          drawer.classList.remove('translate-x-full');
+          const cur = deck ? parseInt(deck.getAttribute('data-current-slide') || '1', 10) : 1;
+          renderSlideNotes(cur);
+        } else {
+          drawer.classList.add('translate-x-full');
+        }
+      }
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleNotes();
+      });
+    }
+
+    // Toggle on hotkey 'N' or 'S'
+    window.addEventListener('keydown', (e) => {
+      const target = e.target;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+
+      if (e.key === 'n' || e.key === 'N' || e.key === 's' || e.key === 'S') {
+        // Prevent conflict with search or other shortcuts
+        if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+          e.preventDefault();
+          toggleNotes();
+        }
+      }
+    });
+
+    // Expose global updater so slide changes update the notes
+    window.updatePresenterNotes = (slideNum) => {
+      if (isOpen) {
+        renderSlideNotes(slideNum);
+      }
+    };
+  })();
+</script>

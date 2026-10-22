@@ -1,0 +1,106 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const questions = [
+  {
+    step: '1',
+    verb: 'ELIMINATE',
+    question: 'Does this task really need to exist?',
+    example: 'Cancel status meetings that could be a 1-line message. Stop making reports nobody reads.',
+    color: 'rose',
+    badge: 'bg-rose-50 text-rose-700 border-rose-200',
+    icon: '✂️',
+  },
+  {
+    step: '2',
+    verb: 'SIMPLIFY',
+    question: 'Can I make the process easier?',
+    example: 'Turn a 6-step email chain into a single 1-minute shared form or checklist.',
+    color: 'amber',
+    badge: 'bg-amber-50 text-amber-700 border-amber-200',
+    icon: '🧩',
+  },
+  {
+    step: '3',
+    verb: 'TEMPLATE',
+    question: 'Am I repeating the same work?',
+    example: 'Save reusable email drafts, quote templates, and document structures once.',
+    color: 'sky',
+    badge: 'bg-sky-50 text-[#0080C8] border-sky-200',
+    icon: '📑',
+  },
+  {
+    step: '4',
+    verb: 'AUTOMATE',
+    question: 'Can technology handle predictable steps?',
+    example: 'Auto-sync calendar invites, auto-forward receipts, or use AI for initial drafts.',
+    color: 'emerald',
+    badge: 'bg-emerald-50 text-[#006233] border-emerald-200',
+    icon: '⚡',
+  },
+];
+---
+
+<!-- ================= SLIDE 6 PANE (BEFORE INSTALLING ANOTHER APP...) ================= -->
+<section 
+  id="slide-6-content" 
+  class={`slide-pane slide-pane-6 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+  <!-- Top Header & Banner -->
+  <div class="flex flex-col items-center space-y-1.5 shrink-0 pt-1">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#006233] animate-ping"></span>
+      <span>The 4 Golden Filters</span>
+    </div>
+
+    <h2 class="title-highlight font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-tight">
+      Before Installing Another App...
+    </h2>
+
+    <!-- Prominent Mindset Warning Banner -->
+    <div class="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-slate-900 text-white font-black text-xs sm:text-sm tracking-wide">
+      <span class="text-rose-400">⚠️</span>
+      <span>More tools ≠ More productivity</span>
+    </div>
+  </div>
+
+  <!-- 4 Questions Progressive Cards Grid -->
+  <div class="w-full max-w-5xl mx-auto my-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 px-2 py-2">
+    {questions.map((q) => (
+      <div class="question-card p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white border-2 border-slate-200/90 hover:border-[#006233] transition-all duration-300 flex flex-col justify-between text-left group hover:-translate-y-1">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              {q.icon}
+            </span>
+            <span class={`px-2.5 py-0.5 rounded-full border text-xs font-black uppercase tracking-wider ${q.badge}`}>
+              {q.verb}
+            </span>
+          </div>
+
+          <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-snug group-hover:text-[#006233] transition-colors mb-2">
+            {q.question}
+          </h3>
+        </div>
+
+        <div class="border-t border-slate-100 pt-2.5 mt-2">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Practical Example:</span>
+          <p class="text-xs text-slate-600 font-medium leading-relaxed">
+            {q.example}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Bottom Core Insight Card -->
+  <div class="w-full max-w-3xl mx-auto p-3.5 px-6 rounded-2xl bg-amber-50/80 border-2 border-amber-500/30 text-center shrink-0 mb-1">
+    <p class="text-xs sm:text-sm font-bold text-amber-900 leading-snug">
+      💡 <span class="font-extrabold">Rule of Thumb:</span> Never automate or add an app to a process you don't understand yet. Fix the workflow first, then choose the tool.
+    </p>
+  </div>
+</section>

@@ -6,10 +6,10 @@ export interface Props {
 const { class: className = '' } = Astro.props;
 ---
 
-<!-- Top Header positioned more to the bottom, taking only content-width -->
-<header class={`pt-3 sm:pt-5 md:pt-7 lg:pt-8 flex items-center shrink-0 ${className}`}>
+<!-- Top Header positioned with speaker pill on left and subtle notes trigger on right -->
+<header class={`pt-2 sm:pt-4 md:pt-6 flex items-center justify-between shrink-0 ${className}`}>
   <!-- Green Pill: Takes only content width, smoothly morphs text to "7.77 Program" on Slide 2 -->
-  <div class="speaker-pill relative overflow-hidden inline-flex items-center gap-2.5 bg-[#1E824C] hover:bg-[#006233] text-white font-bold text-sm sm:text-base md:text-lg px-5 sm:px-7 py-2 sm:py-2.5 rounded-full tracking-tight transition-all duration-400 cursor-default select-none max-w-max">
+  <div class="speaker-pill relative overflow-hidden inline-flex items-center gap-2.5 bg-[#1E824C] hover:bg-[#006233] text-white font-bold text-sm sm:text-base md:text-lg px-5 sm:px-7 py-2 sm:py-2 rounded-full tracking-tight transition-all duration-400 cursor-default select-none max-w-max">
     <span class="relative flex h-2.5 w-2.5 shrink-0">
       <span class="live-dot-pulse absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
       <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-300"></span>
@@ -19,4 +19,28 @@ const { class: className = '' } = Astro.props;
     <!-- Slide 2 Converted Name (takes its natural content width) -->
     <span class="pill-text-2 whitespace-nowrap">7.77 Program</span>
   </div>
+
+  <!-- Subtle Presenter Notes Toggle (Screen-share friendly, hotkey N or S) -->
+  <button
+    id="toggleNotesBtn"
+    type="button"
+    class="notes-toggle-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/80 hover:bg-emerald-50 text-slate-600 hover:text-[#006233] border border-slate-200/90 hover:border-emerald-400 font-mono text-xs font-bold transition-all duration-200 cursor-pointer select-none"
+    title="Open Presenter Notes (Hotkey: 'N' or 'S')"
+  >
+    <span>📝</span>
+    <span class="hidden sm:inline">Speaker Notes</span>
+    <kbd class="px-1.5 py-0.5 rounded bg-slate-100 text-[10px] text-slate-500 border border-slate-200">N</kbd>
+  </button>
 </header>
+
+<script is:inline>
+  (() => {
+    const btn = document.getElementById('toggleNotesBtn');
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'n' }));
+      });
+    }
+  })();
+</script>

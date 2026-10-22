@@ -1,0 +1,205 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const beforeList = [
+  { text: 'Tasks kept in mental memory', impact: 'Constant anxiety & missed items', icon: '🧠' },
+  { text: 'Scattered files & chaotic downloads', impact: 'Wasted 15 min searching each time', icon: '📁' },
+  { text: 'Forgotten deadlines & rushed deliverables', impact: 'High emergency stress', icon: '⏰' },
+  { text: 'Rewriting repetitive emails from scratch', impact: 'Tiresome duplicate typing', icon: '✉️' },
+  { text: 'Constant non-stop pings & interruptions', impact: 'Zero deep focus blocks', icon: '🔔' },
+  { text: 'Staring at a blank page to start projects', impact: 'Procrastination & friction', icon: '📄' },
+];
+
+const afterList = [
+  { text: 'One centralized task list (Google Tasks)', impact: 'Peace of mind, clear next step', icon: '✅' },
+  { text: 'Organized folders & shared cloud storage', impact: 'Find any file in 5 seconds', icon: '📂' },
+  { text: 'Calendar time-blocks & timely reminders', impact: 'Protected work, no surprises', icon: '📅' },
+  { text: 'Reusable message & document templates', impact: 'Send polished answers in 30 sec', icon: '📋' },
+  { text: 'Dedicated focus sessions with quiet mode', impact: 'Deep momentum & higher quality', icon: '🎯' },
+  { text: 'AI-assisted drafts & structured outlines', impact: 'Instant foundation in seconds', icon: '⚡' },
+];
+---
+
+<!-- ================= SLIDE 11 PANE (THE BETTER WORKDAY - BEFORE & AFTER) ================= -->
+<section 
+  id="slide-11-content" 
+  data-workday-revealed="false"
+  class={`slide-pane slide-pane-11 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+  <!-- Top Tag & Header -->
+  <div class="flex flex-col items-center space-y-1.5 shrink-0 pt-1 w-full max-w-5xl">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#006233] animate-ping"></span>
+      <span>The Outcome</span>
+    </div>
+
+    <div class="flex items-center justify-between w-full px-2">
+      <div class="text-left">
+        <h2 class="font-black text-2xl sm:text-3xl md:text-4xl text-slate-900 tracking-tight leading-tight">
+          The Better Workday
+        </h2>
+        <p class="text-xs sm:text-sm font-medium text-slate-500">
+          From reactive chaos to an intentional, organized routine
+        </p>
+      </div>
+
+      <!-- Action Button to Reveal AFTER -->
+      <button 
+        id="revealWorkdayBtn"
+        type="button"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#006233] hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-emerald-400/40"
+      >
+        <span id="workdayBtnLabel">Reveal AFTER</span>
+        <svg id="workdayBtnIcon" class="w-4 h-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Comparison Columns (BEFORE vs AFTER) -->
+  <div class="flex-1 w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-5 my-auto items-stretch px-2 py-1 min-h-0">
+    
+    <!-- ================= BEFORE CARD ================= -->
+    <div 
+      id="workdayBeforeCard"
+      class="workday-card w-full rounded-3xl bg-rose-50/40 border-2 border-rose-200/80 p-4 sm:p-5 flex flex-col justify-between text-left transition-all duration-500 relative overflow-hidden"
+    >
+      <div>
+        <div class="flex items-center justify-between border-b border-rose-200/80 pb-2.5 mb-2.5">
+          <span class="text-xs sm:text-sm font-black text-[#EA4335] uppercase tracking-widest flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#EA4335]"></span>
+            BEFORE
+          </span>
+          <span class="text-[11px] font-bold text-rose-600 bg-rose-100/80 px-2.5 py-0.5 rounded-full">
+            Reactive & Draining
+          </span>
+        </div>
+
+        <!-- 6 Chaotic Patterns -->
+        <ul class="space-y-2">
+          {beforeList.map((item) => (
+            <li class="p-2 sm:p-2.5 rounded-xl bg-white border border-rose-200/80 flex items-center justify-between gap-2 shadow-xs">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-base sm:text-lg shrink-0">{item.icon}</span>
+                <span class="text-xs sm:text-sm font-bold text-slate-800 truncate">{item.text}</span>
+              </div>
+              <span class="text-[10px] text-rose-500 font-semibold uppercase tracking-tight shrink-0 hidden sm:inline">
+                {item.impact}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="pt-2 border-t border-rose-100 text-[11px] text-rose-700/80 font-medium">
+        Result: Fatigue, overtime, and constant anxiety over missed deadlines.
+      </div>
+    </div>
+
+
+    <!-- ================= AFTER CARD (HIDDEN INITIALLY) ================= -->
+    <div 
+      id="workdayAfterCard"
+      class="workday-card w-full rounded-3xl bg-emerald-50/60 border-2 border-emerald-300/80 p-4 sm:p-5 flex flex-col justify-between text-left transition-all duration-500 opacity-25 filter blur-xs"
+    >
+      <div>
+        <div class="flex items-center justify-between border-b border-emerald-200 pb-2.5 mb-2.5">
+          <span class="text-xs sm:text-sm font-black text-[#006233] uppercase tracking-widest flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#1E824C] animate-pulse"></span>
+            AFTER
+          </span>
+          <span class="text-[11px] font-bold text-[#006233] bg-emerald-100 px-2.5 py-0.5 rounded-full">
+            Structured & In Control
+          </span>
+        </div>
+
+        <!-- 6 Optimized Habits -->
+        <ul class="space-y-2">
+          {afterList.map((item) => (
+            <li class="after-item p-2 sm:p-2.5 rounded-xl bg-white border border-emerald-200 flex items-center justify-between gap-2 shadow-xs transition-transform hover:scale-[1.01]">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-base sm:text-lg shrink-0">{item.icon}</span>
+                <span class="text-xs sm:text-sm font-bold text-slate-800 truncate">{item.text}</span>
+              </div>
+              <span class="text-[10px] text-[#006233] font-bold uppercase tracking-tight shrink-0 hidden sm:inline">
+                {item.impact}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="pt-2 border-t border-emerald-200 text-[11px] text-emerald-800 font-bold">
+        Result: High clarity, predictable progress, and evenings free from work worry.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Tip -->
+  <div class="w-full max-w-xl mx-auto flex items-center justify-center gap-2 text-xs text-slate-500 font-medium pb-1 shrink-0">
+    <span>💡 Press <kbd class="px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-mono font-bold">A</kbd> or click the button to toggle the AFTER workday.</span>
+  </div>
+</section>
+
+<!-- Embedded Interactive Controller Script -->
+<script is:inline>
+  (() => {
+    const root = document.getElementById('slide-11-content');
+    if (!root) return;
+
+    const revealBtn = document.getElementById('revealWorkdayBtn');
+    const beforeCard = document.getElementById('workdayBeforeCard');
+    const afterCard = document.getElementById('workdayAfterCard');
+    const btnLabel = document.getElementById('workdayBtnLabel');
+
+    function toggleWorkday() {
+      const isRevealed = root.getAttribute('data-workday-revealed') === 'true';
+
+      if (!isRevealed) {
+        root.setAttribute('data-workday-revealed', 'true');
+        if (beforeCard) {
+          beforeCard.classList.add('opacity-40', 'scale-[0.98]');
+        }
+        if (afterCard) {
+          afterCard.classList.remove('opacity-25', 'filter', 'blur-xs');
+          afterCard.classList.add('opacity-100', 'filter-none', 'scale-[1.02]');
+        }
+        if (btnLabel) btnLabel.textContent = 'Hide AFTER';
+      } else {
+        root.setAttribute('data-workday-revealed', 'false');
+        if (beforeCard) {
+          beforeCard.classList.remove('opacity-40', 'scale-[0.98]');
+        }
+        if (afterCard) {
+          afterCard.classList.add('opacity-25', 'filter', 'blur-xs');
+          afterCard.classList.remove('opacity-100', 'filter-none', 'scale-[1.02]');
+        }
+        if (btnLabel) btnLabel.textContent = 'Reveal AFTER';
+      }
+    }
+
+    if (revealBtn) {
+      revealBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleWorkday();
+      });
+    }
+
+    // Keyboard hotkey: 'A' when on Slide 11
+    window.addEventListener('keydown', (e) => {
+      const deck = document.getElementById('presentationDeck');
+      if (deck && deck.getAttribute('data-current-slide') === '11') {
+        if (e.key === 'a' || e.key === 'A') {
+          e.preventDefault();
+          toggleWorkday();
+        }
+      }
+    });
+  })();
+</script>

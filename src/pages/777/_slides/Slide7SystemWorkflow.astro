@@ -1,0 +1,193 @@
+---
+export interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const workflowSteps = [
+  {
+    step: 1,
+    title: 'Capture',
+    subtitle: 'Out of your head',
+    icon: '📥',
+    rule: 'Never trust your memory.',
+    action: 'Record every task, message, or idea immediately into ONE trusted inbox (Google Tasks or Quick Notes).',
+    toolHint: 'Google Tasks / Quick Note',
+  },
+  {
+    step: 2,
+    title: 'Organize',
+    subtitle: 'Where does it belong?',
+    icon: '📁',
+    rule: 'A place for everything.',
+    action: 'Group by project, client, or category once a day. Keep cloud folders simple and standardized.',
+    toolHint: 'Google Drive / Folders',
+  },
+  {
+    step: 3,
+    title: 'Prioritize',
+    subtitle: 'What matters today?',
+    icon: '⭐',
+    rule: 'Pick your Top 3.',
+    action: 'Before opening messages, select the 2–3 tasks that will actually make today successful.',
+    toolHint: 'Daily Top-3 List',
+  },
+  {
+    step: 4,
+    title: 'Execute',
+    subtitle: 'Single-task focus',
+    icon: '⚡',
+    rule: 'Block time on calendar.',
+    action: 'Work in dedicated 30–45 minute focus sessions. Close email and notifications during sprint.',
+    toolHint: 'Google Calendar Block',
+  },
+  {
+    step: 5,
+    title: 'Review',
+    subtitle: 'Reset and adjust',
+    icon: '🔄',
+    rule: '5 minutes every afternoon.',
+    action: 'Check what was done, reschedule unfinished items, and clear tomorrow’s calendar roadmap.',
+    toolHint: 'Daily Shutdown Ritual',
+  },
+];
+---
+
+<!-- ================= SLIDE 7 PANE (BUILD A SIMPLE PRODUCTIVITY SYSTEM) ================= -->
+<section 
+  id="slide-7-content" 
+  data-active-step="1"
+  class={`slide-pane slide-pane-7 w-full flex flex-col justify-between items-center text-center my-auto py-2 sm:py-3 h-full relative overflow-hidden ${className}`}
+>
+  <!-- Top Header & Central Motto -->
+  <div class="flex flex-col items-center space-y-1.5 shrink-0 pt-1">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border-2 border-emerald-600/30 text-xs sm:text-sm font-bold text-[#006233] uppercase tracking-wider">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#006233] animate-ping"></span>
+      <span>The 5-Step Operating System</span>
+    </div>
+
+    <h2 class="title-highlight font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-tight">
+      Build a Simple Productivity System
+    </h2>
+
+    <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs sm:text-sm font-black text-[#006233]">
+      <span>✨ Golden Takeaway:</span>
+      <span class="underline decoration-emerald-500 underline-offset-2">One reliable system beats five disconnected apps</span>
+    </div>
+  </div>
+
+  <!-- Interactive 5-Stage Step Flow Diagram -->
+  <div class="w-full max-w-5xl mx-auto my-auto px-2 py-2">
+    <!-- Horizontal Step Track -->
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3 mb-4">
+      {workflowSteps.map((s) => (
+        <button
+          type="button"
+          data-workflow-step={s.step}
+          class={`workflow-step-btn group p-3 sm:p-3.5 rounded-2xl bg-white border-2 border-slate-200/90 hover:border-emerald-600 flex flex-col items-center text-center cursor-pointer transition-all duration-300 select-none ${s.step === 1 ? 'active-step' : ''}`}
+        >
+          <div class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-[#1E824C] group-hover:text-white flex items-center justify-center font-mono font-black text-xs sm:text-sm text-slate-800 transition-colors mb-1">
+            0{s.step}
+          </div>
+          <span class="text-xl my-0.5 group-hover:scale-115 transition-transform">{s.icon}</span>
+          <span class="text-sm font-black text-slate-900 group-hover:text-[#006233] tracking-tight">{s.title}</span>
+          <span class="text-[10px] text-slate-400 font-medium hidden sm:block truncate w-full">{s.subtitle}</span>
+        </button>
+      ))}
+    </div>
+
+    <!-- Active Step Detail Display Card -->
+    <div class="w-full rounded-3xl bg-white border-2 border-emerald-600/40 p-5 sm:p-6 text-left relative overflow-hidden shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-3">
+        <div class="flex items-center gap-3">
+          <span id="activeStepIcon" class="text-3xl">📥</span>
+          <div>
+            <h3 id="activeStepTitle" class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              1. Capture — Out of your head
+            </h3>
+            <p id="activeStepRule" class="text-xs sm:text-sm font-bold text-[#006233]">
+              Golden Rule: Never trust your memory.
+            </p>
+          </div>
+        </div>
+
+        <div class="shrink-0">
+          <span class="text-[10px] uppercase font-bold text-slate-400 block sm:text-right">Suggested Tool:</span>
+          <span id="activeStepTool" class="px-3 py-1 rounded-full bg-slate-100 text-slate-800 font-mono text-xs font-bold inline-block mt-0.5">
+            Google Tasks / Quick Note
+          </span>
+        </div>
+      </div>
+
+      <p id="activeStepAction" class="text-sm sm:text-base text-slate-700 font-medium leading-relaxed">
+        Record every task, message, or idea immediately into ONE trusted inbox (Google Tasks or Quick Notes).
+      </p>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Tip -->
+  <div class="w-full max-w-xl mx-auto flex items-center justify-center gap-2 text-xs text-slate-500 font-medium pb-1 shrink-0">
+    <span>💡 Click any step above to inspect its action rule and recommended tool.</span>
+  </div>
+</section>
+
+<!-- Self-Contained Interactive Controller Script -->
+<script is:inline>
+  (() => {
+    const slide = document.getElementById('slide-7-content');
+    if (!slide) return;
+
+    const data = [
+      { step: 1, title: '1. Capture — Out of your head', icon: '📥', rule: 'Golden Rule: Never trust your memory.', action: 'Record every task, message, or idea immediately into ONE trusted inbox (Google Tasks or Quick Notes).', tool: 'Google Tasks / Quick Note' },
+      { step: 2, title: '2. Organize — Where does it belong?', icon: '📁', rule: 'Golden Rule: A place for everything.', action: 'Group by project, client, or category once a day. Keep cloud folders simple and standardized.', tool: 'Google Drive / Cloud Folders' },
+      { step: 3, title: '3. Prioritize — What matters today?', icon: '⭐', rule: 'Golden Rule: Pick your Top 3 daily must-dos.', action: 'Before opening messages or email, select the 2–3 tasks that will actually make today successful.', tool: 'Daily Top-3 Focus List' },
+      { step: 4, title: '4. Execute — Single-task focus', icon: '⚡', rule: 'Golden Rule: Block time on your calendar.', action: 'Work in dedicated 30–45 minute focus sessions on one task at a time. Close messaging apps during focus sprints.', tool: 'Google Calendar Focus Block' },
+      { step: 5, title: '5. Review — Reset and adjust', icon: '🔄', rule: 'Golden Rule: 5 minutes daily shutdown ritual.', action: 'Check what was completed, reschedule unfinished tasks, and clear tomorrow’s calendar roadmap with zero stress.', tool: 'Daily Shutdown Ritual' },
+    ];
+
+    const stepBtns = slide.querySelectorAll('.workflow-step-btn');
+    const iconEl = document.getElementById('activeStepIcon');
+    const titleEl = document.getElementById('activeStepTitle');
+    const ruleEl = document.getElementById('activeStepRule');
+    const actionEl = document.getElementById('activeStepAction');
+    const toolEl = document.getElementById('activeStepTool');
+
+    function setStep(num) {
+      slide.setAttribute('data-active-step', String(num));
+      const item = data.find(d => d.step === num);
+      if (!item) return;
+
+      stepBtns.forEach(btn => {
+        if (btn.getAttribute('data-workflow-step') === String(num)) {
+          btn.classList.add('active-step');
+        } else {
+          btn.classList.remove('active-step');
+        }
+      });
+
+      if (iconEl) iconEl.textContent = item.icon;
+      if (titleEl) titleEl.textContent = item.title;
+      if (ruleEl) ruleEl.textContent = item.rule;
+      if (actionEl) actionEl.textContent = item.action;
+      if (toolEl) toolEl.textContent = item.tool;
+    }
+
+    stepBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const num = parseInt(btn.getAttribute('data-workflow-step'), 10);
+        if (num) setStep(num);
+      });
+    });
+  })();
+</script>
+
+<style>
+  .workflow-step-btn.active-step {
+    border-color: #006233 !important;
+    background-color: #ecfdf5 !important;
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 0 0 2px rgba(0, 98, 51, 0.15);
+  }
+</style>
