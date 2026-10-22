@@ -15,7 +15,9 @@ try {
 		"trusted_companies_list",
 		async () => {
 			const db = getFirebaseAdminDb();
-			const snapshot = await db.collection("trusted_companies").get();
+			const snapshot = await db.collection("trusted_companies")
+				.select("name", "logoUrl", "websiteUrl", "order", "createdAt", "updatedAt")
+				.get();
 			const list = snapshot.docs.map((doc) => {
 				const data = doc.data();
 				return {

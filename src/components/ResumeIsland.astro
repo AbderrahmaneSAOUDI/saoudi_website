@@ -20,13 +20,20 @@ try {
 	const config = await getOrSetCached(
 		cacheKeyResume,
 		async () => {
-		const db = getFirebaseAdminDb();
-		const configDoc = await db.collection('configuration').doc('static_data').get();
+			const db = getFirebaseAdminDb();
+			const configDoc = await db.collection('configuration').doc('static_data').get();
+			let previewUrl = '/resume.webp';
+			let resumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
+			let excludeAdminDownloads = true;
 			if (configDoc.exists) {
 				const data = configDoc.data();
-				if (data?.previewUrl) resumePreviewUrl = data.previewUrl;
+				if (data?.previewUrl) previewUrl = data.previewUrl;
+				if (data?.resumeUrl) resumeUrl = data.resumeUrl;
+				if (typeof data?.excludeAdminDownloads === 'boolean') {
+					excludeAdminDownloads = data.excludeAdminDownloads;
+				}
 			}
-			return { resumePreviewUrl };
+			return { resumePreviewUrl: previewUrl, resumeUrl, excludeAdminDownloads };
 		},
 		CACHE_TTL_MS.PUBLIC_DATA,
 	);

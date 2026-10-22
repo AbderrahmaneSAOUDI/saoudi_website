@@ -79,6 +79,7 @@ export const POST: APIRoute = async ({ locals, request, cookies }) => {
 			});
 
 			clearCache('admin_dashboard_counts');
+			clearCache('resume_config');
 			return jsonResponse({ success: true, excludeAdminDownloads: newVal });
 		}
 

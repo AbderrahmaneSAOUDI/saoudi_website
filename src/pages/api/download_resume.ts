@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getFirebaseAdminDb } from '../../lib/server/firebase-admin';
-import { clearCache } from '../../lib/server/cache';
+import { CACHE_TTL_MS, getOrSetCached, clearCache } from '../../lib/server/cache';
 import { FieldValue } from 'firebase-admin/firestore';
 import { addSystemLog } from '../../lib/server/system-logs';
 
@@ -22,19 +22,32 @@ export const GET: APIRoute = async ({ locals }) => {
 		const db = getFirebaseAdminDb();
 		const docRef = db.collection('configuration').doc('static_data');
 		
-		// Fetch current resume URL if customized in Firestore
-		const snapshot = await docRef.get();
-		let excludeSetting = true;
-		if (snapshot.exists) {
-			const data = snapshot.data();
-			if (data?.resumeUrl) {
-				const configuredUrl = String(data.resumeUrl);
-				if (configuredUrl.startsWith('data:')) inlineResumeUrl = configuredUrl;
-				else if (isSafeDownloadTarget(configuredUrl)) targetUrl = configuredUrl;
-			}
-			if (typeof data?.excludeAdminDownloads === 'boolean') {
-				excludeSetting = data.excludeAdminDownloads;
-			}
+		// Fetch current resume configuration with caching to prevent redundant Firestore reads
+		const config = await getOrSetCached(
+			'resume_config',
+			async () => {
+				const snapshot = await docRef.get();
+				let resumePreviewUrl = '/resume.webp';
+				let resumeUrl = '/Abderrahmane_SAOUDI_Resume.pdf';
+				let excludeAdminDownloads = true;
+				if (snapshot.exists) {
+					const data = snapshot.data();
+					if (data?.previewUrl) resumePreviewUrl = data.previewUrl;
+					if (data?.resumeUrl) resumeUrl = data.resumeUrl;
+					if (typeof data?.excludeAdminDownloads === 'boolean') {
+						excludeAdminDownloads = data.excludeAdminDownloads;
+					}
+				}
+				return { resumePreviewUrl, resumeUrl, excludeAdminDownloads };
+			},
+			CACHE_TTL_MS.PUBLIC_DATA,
+		);
+
+		let excludeSetting = config.excludeAdminDownloads;
+		if (config.resumeUrl) {
+			const configuredUrl = String(config.resumeUrl);
+			if (configuredUrl.startsWith('data:')) inlineResumeUrl = configuredUrl;
+			else if (isSafeDownloadTarget(configuredUrl)) targetUrl = configuredUrl;
 		}
 
 		// Check if request originates from an authenticated admin
